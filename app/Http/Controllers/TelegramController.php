@@ -13,9 +13,17 @@ class TelegramController extends Controller
 {
     public function setWebhook($token, $replay = [])
     {
-        $telegram = new Api($token);
         $bot = Bot::where('token', $token)->first();
+
+        if(!$bot)
+            $bot = Bot::create(["token"=>$token,"title"=>"bot".time()]);
+
         if (!$bot) return false;
+
+
+        $telegram = new Api($token);
+
+
 // دریافت پیام ارسال شده به بات
         $input = file_get_contents("php://input");
         $update = json_decode($input, true);
