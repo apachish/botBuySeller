@@ -8,6 +8,11 @@ use MongoDB\Laravel\Eloquent\Model as EloquentModel;
 class TextTelegram extends EloquentModel
 {
     use HasFactory;
+
+    protected $connection = "mongodb";
+    protected $collection = 'text_telegram_collection';
+
+
     protected $fillable = [
         "update_id",
         "message_id",

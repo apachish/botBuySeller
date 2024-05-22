@@ -7,7 +7,11 @@ use MongoDB\Laravel\Eloquent\Model;
 
 class Channel extends Model
 {
+
     use HasFactory;
+
+    protected $connection = "mongodb";
+    protected $collection = 'channel_collection';
 
     protected $fillable = [
         "channel_id",
