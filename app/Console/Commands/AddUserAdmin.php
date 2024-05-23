@@ -30,11 +30,6 @@ class AddUserAdmin extends Command
      */
     public function handle()
     {
-        //
-    }
-
-    protected function afterPromptingForMissingArguments(InputInterface $input, OutputInterface $output): void
-    {
         $token = $this->ask('What is  token bot?');
         $bot = Bot::where("token",$token)->first();
         if($bot ==  null){
@@ -53,6 +48,6 @@ class AddUserAdmin extends Command
             "user_id"=>$user_id,
             "type"=>$type
         ]);
-
     }
+
 }
