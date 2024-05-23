@@ -21,14 +21,21 @@ class TelegramAdminController extends Controller
         if (!$bot) return false;
 
 
-        $telegram = new Api($token);
+        $access_token = $bot->token;
 
+// لیست کاربران مجاز
+        $allowed_users = array(
+            70115829, // شناسه کاربر اول
+            987654321, // شناسه کاربر دوم
+            // شناسه‌های بیشتر را اینجا اضافه کنید
+        );
 
-        // دریافت پیام ارسال شده به بات
-        $input = file_get_contents("php://input");
-        $update = json_decode($input, true);
-        $update = $telegram->getWebhookUpdate();
-        logger('ss', [$update]);
+        $content = file_get_contents("php://input");
+        $update = json_decode($content, true);
+
+        if (!$update) {
+            exit;
+        }
 
         $message = isset($update['message']) ? $update['message'] : "";
         $message_id = isset($message['message_id']) ? $message['message_id'] : "";
@@ -36,34 +43,10 @@ class TelegramAdminController extends Controller
         $text = isset($message['text']) ? $message['text'] : "";
         $user_id = isset($message['from']['id']) ? $message['from']['id'] : "";
 
-        // دریافت دستور ارسال شده توسط کار
-        if (isset($update["my_chat_member"]))
-            $type = "my_chat_member";
-        elseif (isset($update['callback_query']))
-            $type = "callback_query";
-        else
-            $type = "message";
-
-        $user_id = data_get($update, $type . '.from.id');
-
-        $access = $bot->accessBot->where("user_id", $user_id)->where("type", "admin");
-
-        // بررسی دسترسی کاربر
-        if ($access == null) {
+// بررسی دسترسی کاربر
+        if (!in_array($user_id, $allowed_users)) {
             $this->sendMessage($chat_id, "شما دسترسی لازم برای استفاده از این ربات را ندارید.", $message_id);
             exit;
-        }
-        $user_telegram = UserTelegram::find($user_id);
-        if ($user_telegram == null) {
-            $user_telegram = UserTelegram::create([
-                "id" => $user_id,
-                "is_bot" => data_get($update, $type . '.from.is_bot'),
-                "first_name" => data_get($update, $type . '.from.first_name'),
-                "last_name" => data_get($update, $type . '.from.last_name'),
-                "mobile" => data_get($update, $type . '.mobile'),
-                "username" => data_get($update, $type . '.from.username'),
-                "language_code" => data_get($update, $type . '.from.language_code'),
-            ]);
         }
         $content = file_get_contents("php://input");
         $update = json_decode($content, true);
