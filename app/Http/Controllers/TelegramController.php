@@ -13,10 +13,9 @@ class TelegramController extends Controller
 {
     public function setWebhook($token, $replay = [])
     {
-        $bot = Bot::where('token', $token)->first();
+        $bot = Bot::where('token', $token)
+            ->first();
 
-        if (!$bot)
-            $bot = Bot::create(["token" => $token, "title" => "bot" . time()]);
 
         if (!$bot) return false;
 

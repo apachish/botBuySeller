@@ -29,4 +29,9 @@ class Bot extends Model
         'created_by',
         'description'
     ];
+
+    public function accessBot()
+    {
+        return $this->hasMany(AccessBot::class,"bot_id");
+    }
 }
