@@ -13,7 +13,7 @@ class TelegramAdminController extends Controller
 {
     private $access_token;
 
-    public function setWebhook($token)
+    public function setWebhooks($token)
     {
         $bot = Bot::where('token', $token)
             ->first();
@@ -87,6 +87,60 @@ class TelegramAdminController extends Controller
 
     }
 
+    public function setWebhook($token)
+    {
+        // دریافت داده‌ها از وب‌هوک تلگرام
+        $content = file_get_contents("php://input");
+        $update = json_decode($content, true);
+
+        if (!$update) {
+            exit;
+        }
+        $this->access_token = $token;
+
+        $message = isset($update['message']) ? $update['message'] : "";
+        $callback_query = isset($update['callback_query']) ? $update['callback_query'] : "";
+        $chat_id = isset($message['chat']['id']) ? $message['chat']['id'] : "";
+        $text = isset($message['text']) ? $message['text'] : "";
+        $message_id = isset($message['message_id']) ? $message['message_id'] : "";
+        $callback_data = isset($callback_query['data']) ? $callback_query['data'] : "";
+        $callback_chat_id = isset($callback_query['message']['chat']['id']) ? $callback_query['message']['chat']['id'] : "";
+        $callback_message_id = isset($callback_query['message']['message_id']) ? $callback_query['message']['message_id'] : "";
+
+// پردازش دستورات کاربر
+        if ($text == "/start") {
+            sendMessage($chat_id, "شخص مورد نظر را انتخاب کنید:", [
+                'inline_keyboard' => [
+                    [
+                        ['text' => "پویا ✅", 'callback_data' => 'confirm_pouya'],
+                        ['text' => "پویا ❌", 'callback_data' => 'reject_pouya']
+                    ],
+                    [
+                        ['text' => "محمد ✅", 'callback_data' => 'confirm_mohammad'],
+                        ['text' => "محمد ❌", 'callback_data' => 'reject_mohammad']
+                    ],
+                    [
+                        ['text' => "صفحه بعد", 'callback_data' => 'next_page']
+                    ]
+                ]
+            ]);
+        } elseif ($callback_data) {
+            if ($callback_data == 'next_page') {
+                sendPage2($callback_chat_id, $callback_message_id);
+            } elseif ($callback_data == 'prev_page') {
+                sendPage1($callback_chat_id, $callback_message_id);
+            } elseif (strpos($callback_data, 'confirm_') === 0) {
+                $name = str_replace('confirm_', '', $callback_data);
+                editMessageReplyMarkup($callback_chat_id, $callback_message_id, null);
+                sendMessage($callback_chat_id, "شما $name را تایید کردید.");
+            } elseif (strpos($callback_data, 'reject_') === 0) {
+                $name = str_replace('reject_', '', $callback_data);
+                editMessageReplyMarkup($callback_chat_id, $callback_message_id, null);
+                sendMessage($callback_chat_id, "شما $name را رد کردید.");
+            }
+        }
+    }
+
     public function menu($telegram, $chatId)
     {
         $keyboard =  [
@@ -130,5 +184,91 @@ class TelegramAdminController extends Controller
 
         return $result;
     }
+
+
+
+// تابع ارسال پیام با کیبورد شیشه‌ای
+    private function sendMessage($chat_id, $message, $keyboard = null) {
+        $url = "https://api.telegram.org/bot$this->access_token/sendMessage";
+        $post_fields = [
+            'chat_id' => $chat_id,
+            'text' => $message,
+            'parse_mode' => 'HTML'
+        ];
+
+        if ($keyboard) {
+            $post_fields['reply_markup'] = json_encode($keyboard);
+        }
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array("Content-Type:multipart/form-data"));
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $post_fields);
+        curl_exec($ch);
+        curl_close($ch);
+    }
+
+// تنظیم کیبورد شیشه‌ای برای صفحه اول
+    private function sendPage1($chat_id, $message_id) {
+        $keyboard = [
+            'inline_keyboard' => [
+                [
+                    ['text' => "پویا ✅", 'callback_data' => 'confirm_pouya'],
+                    ['text' => "پویا ❌", 'callback_data' => 'reject_pouya']
+                ],
+                [
+                    ['text' => "محمد ✅", 'callback_data' => 'confirm_mohammad'],
+                    ['text' => "محمد ❌", 'callback_data' => 'reject_mohammad']
+                ],
+                [
+                    ['text' => "صفحه بعد", 'callback_data' => 'next_page']
+                ]
+            ]
+        ];
+
+        $this->editMessageReplyMarkup($chat_id, $message_id, $keyboard);
+    }
+
+// تنظیم کیبورد شیشه‌ای برای صفحه دوم
+    private function sendPage2($chat_id, $message_id) {
+        $keyboard = [
+            'inline_keyboard' => [
+                [
+                    ['text' => "وحید ✅", 'callback_data' => 'confirm_vahid'],
+                    ['text' => "وحید ❌", 'callback_data' => 'reject_vahid']
+                ],
+                [
+                    ['text' => "خودم ✅", 'callback_data' => 'confirm_self'],
+                    ['text' => "خودم ❌", 'callback_data' => 'reject_self']
+                ],
+                [
+                    ['text' => "صفحه قبل", 'callback_data' => 'prev_page']
+                ]
+            ]
+        ];
+
+        $this->editMessageReplyMarkup($chat_id, $message_id, $keyboard);
+    }
+
+// تابع ویرایش کیبورد شیشه‌ای
+    function editMessageReplyMarkup($chat_id, $message_id, $keyboard) {
+        $url = "https://api.telegram.org/bot$this->access_token/editMessageReplyMarkup";
+        $post_fields = [
+            'chat_id' => $chat_id,
+            'message_id' => $message_id,
+            'reply_markup' => json_encode($keyboard)
+        ];
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array("Content-Type:multipart/form-data"));
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $post_fields);
+        curl_exec($ch);
+        curl_close($ch);
+    }
+
+
 
 }
