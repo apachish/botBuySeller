@@ -41,7 +41,7 @@ class TelegramController extends Controller
         $user_id = data_get($update, $type . '.from.id');
 
         $user_telegram = UserTelegram::find($user_id);
-        if (!$user_telegram) {
+        if ($user_telegram == null) {
             $user_telegram = UserTelegram::create([
                 "id" => $user_id,
                 "is_bot" => data_get($update, $type . '.from.is_bot'),
@@ -92,13 +92,12 @@ class TelegramController extends Controller
                         $text_send = cache()->get("text_" . $chatId);
                         if ($text_send == "شماره موبایل خود را وارد کنید") {
                             $mobile = $this->convertNumber($message);
-                            if ($this->iranMobile($message)) {
+                            if ($this->iranMobile($mobile)) {
                                 $user_telegram->mobile = $mobile;
                                 $user_telegram->update();
                                 if (!$user_telegram->fullName) {
-                                    $text = cache()->remember("text_" . $chatId, now()->addDay(1), function () {
-                                        return "نام و نام خانوادگی خود را وارد کنید";
-                                    });
+                                    $text = "نام و نام خانوادگی خود را وارد کنید";
+                                    cache()->set("text_" . $chatId, $text);
                                     $telegram->sendMessage(['chat_id' => $chatId, 'text' => $text]);
                                 }
                             } else
