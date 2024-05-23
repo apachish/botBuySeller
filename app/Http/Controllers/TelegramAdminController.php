@@ -12,6 +12,7 @@ use Telegram\Bot\Keyboard\Keyboard;
 class TelegramAdminController extends Controller
 {
 
+    private $access_token;
 
     public function setWebhook($token)
     {
@@ -21,7 +22,7 @@ class TelegramAdminController extends Controller
         if (!$bot) return false;
 
 
-        $access_token = $bot->token;
+        $this->access_token = $bot->token;
 
 // لیست کاربران مجاز
         $allowed_users = array(
@@ -85,8 +86,7 @@ class TelegramAdminController extends Controller
 
     // تابع ارسال پیام
     private function sendMessage($chat_id, $message, $reply_to_message_id = null) {
-        global $access_token;
-        $url = "https://api.telegram.org/bot$access_token/sendMessage";
+        $url = "https://api.telegram.org/bot$this->access_token/sendMessage";
         $post_fields = array(
             'chat_id' => $chat_id,
             'text' => $message
@@ -105,8 +105,7 @@ class TelegramAdminController extends Controller
 
 // تابع ارسال منوی شیشه‌ای
     private function sendInlineKeyboard($chat_id, $message, $reply_to_message_id = null) {
-        global $access_token;
-        $url = "https://api.telegram.org/bot$access_token/sendMessage";
+        $url = "https://api.telegram.org/bot$this->access_token/sendMessage";
 
         // تعریف کیبورد شیشه‌ای
         $inline_keyboard = [
