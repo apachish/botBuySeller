@@ -84,7 +84,7 @@ class TelegramAdminController extends Controller
     }
 
     // تابع ارسال پیام
-    function sendMessage($chat_id, $message, $reply_to_message_id = null) {
+    private function sendMessage($chat_id, $message, $reply_to_message_id = null) {
         global $access_token;
         $url = "https://api.telegram.org/bot$access_token/sendMessage";
         $post_fields = array(
@@ -104,7 +104,7 @@ class TelegramAdminController extends Controller
     }
 
 // تابع ارسال منوی شیشه‌ای
-    function sendInlineKeyboard($chat_id, $message, $reply_to_message_id = null) {
+    private function sendInlineKeyboard($chat_id, $message, $reply_to_message_id = null) {
         global $access_token;
         $url = "https://api.telegram.org/bot$access_token/sendMessage";
 
@@ -141,7 +141,7 @@ class TelegramAdminController extends Controller
     }
 
 // تابع پردازش callback queries
-    function handleCallbackQuery($callback_query) {
+    private function handleCallbackQuery($callback_query) {
         $callback_id = $callback_query['id'];
         $chat_id = $callback_query['message']['chat']['id'];
         $data = $callback_query['data'];
@@ -154,86 +154,86 @@ class TelegramAdminController extends Controller
             $this->sendMessage($chat_id, "برای تماس با ما لطفا ایمیل بزنید به: example@example.com");
         }
     }
-    public function setWebhookw($token)
-    {
-        $bot = Bot::where('token', $token)
-            ->first();
-
-        if (!$bot) return false;
-
-
-        $telegram = new Api($token);
-
-
-        // دریافت پیام ارسال شده به بات
-        $input = file_get_contents("php://input");
-        $update = json_decode($input, true);
-        $update = $telegram->getWebhookUpdate();
-        logger('ss', [$update]);
-
-
-        // دریافت دستور ارسال شده توسط کار
-        if (isset($update["my_chat_member"]))
-            $type = "my_chat_member";
-        elseif (isset($update['callback_query']))
-            $type = "callback_query";
-        else
-            $type = "message";
-
-        $user_id = data_get($update, $type . '.from.id');
-
-        $access = $bot->accessBot->where("user_id", $user_id)->where("type", "admin");
-
-        if ($access == null) return false;
-        $user_telegram = UserTelegram::find($user_id);
-        if ($user_telegram == null) {
-            $user_telegram = UserTelegram::create([
-                "id" => $user_id,
-                "is_bot" => data_get($update, $type . '.from.is_bot'),
-                "first_name" => data_get($update, $type . '.from.first_name'),
-                "last_name" => data_get($update, $type . '.from.last_name'),
-                "mobile" => data_get($update, $type . '.mobile'),
-                "username" => data_get($update, $type . '.from.username'),
-                "language_code" => data_get($update, $type . '.from.language_code'),
-            ]);
-        }
-        $chatId = $update[$type]['from']['id']; // چت‌آیدی کاربر
-        logger("chatid" . $chatId);
-        if($type =="callback_query"){
-            $data=  data_get($update,$type.".data");
-            if($data == "list"){
-
-            }
-        }
-        $this->menu($telegram, $chatId);
-
-
-    }
-
-    public function menu($telegram, $chatId)
-    {
-        $keyboard = [
-            [
-                ["text" => '\xE2\x86\xA9	 لیست کاربران', "callback_data" => "list"]
-            ],
-            [
-                ["text" => '\xE2\x9D\x95	 لیست کاربران منتظر تایید', "callback_data" => "pending"]
-            ],
-            [
-                ['text' => "\xE2\x86\xA9	 بازگشت به ", "callback_data" => "return"]
-            ]
-        ];
-        $reply_markup = Keyboard::make([
-            'inline_keyboard' => $keyboard,
-            'resize_keyboard' => true,
-            'one_time_keyboard' => true
-        ]);
-
-        $response = $telegram->sendMessage([
-            'chat_id' => $chatId,
-            'text' => "",
-            'reply_markup' => $reply_markup
-        ]);
-    }
+//    public function setWebhookw($token)
+//    {
+//        $bot = Bot::where('token', $token)
+//            ->first();
+//
+//        if (!$bot) return false;
+//
+//
+//        $telegram = new Api($token);
+//
+//
+//        // دریافت پیام ارسال شده به بات
+//        $input = file_get_contents("php://input");
+//        $update = json_decode($input, true);
+//        $update = $telegram->getWebhookUpdate();
+//        logger('ss', [$update]);
+//
+//
+//        // دریافت دستور ارسال شده توسط کار
+//        if (isset($update["my_chat_member"]))
+//            $type = "my_chat_member";
+//        elseif (isset($update['callback_query']))
+//            $type = "callback_query";
+//        else
+//            $type = "message";
+//
+//        $user_id = data_get($update, $type . '.from.id');
+//
+//        $access = $bot->accessBot->where("user_id", $user_id)->where("type", "admin");
+//
+//        if ($access == null) return false;
+//        $user_telegram = UserTelegram::find($user_id);
+//        if ($user_telegram == null) {
+//            $user_telegram = UserTelegram::create([
+//                "id" => $user_id,
+//                "is_bot" => data_get($update, $type . '.from.is_bot'),
+//                "first_name" => data_get($update, $type . '.from.first_name'),
+//                "last_name" => data_get($update, $type . '.from.last_name'),
+//                "mobile" => data_get($update, $type . '.mobile'),
+//                "username" => data_get($update, $type . '.from.username'),
+//                "language_code" => data_get($update, $type . '.from.language_code'),
+//            ]);
+//        }
+//        $chatId = $update[$type]['from']['id']; // چت‌آیدی کاربر
+//        logger("chatid" . $chatId);
+//        if($type =="callback_query"){
+//            $data=  data_get($update,$type.".data");
+//            if($data == "list"){
+//
+//            }
+//        }
+//        $this->menu($telegram, $chatId);
+//
+//
+//    }
+//
+//    public function menu($telegram, $chatId)
+//    {
+//        $keyboard = [
+//            [
+//                ["text" => '\xE2\x86\xA9	 لیست کاربران', "callback_data" => "list"]
+//            ],
+//            [
+//                ["text" => '\xE2\x9D\x95	 لیست کاربران منتظر تایید', "callback_data" => "pending"]
+//            ],
+//            [
+//                ['text' => "\xE2\x86\xA9	 بازگشت به ", "callback_data" => "return"]
+//            ]
+//        ];
+//        $reply_markup = Keyboard::make([
+//            'inline_keyboard' => $keyboard,
+//            'resize_keyboard' => true,
+//            'one_time_keyboard' => true
+//        ]);
+//
+//        $response = $telegram->sendMessage([
+//            'chat_id' => $chatId,
+//            'text' => "",
+//            'reply_markup' => $reply_markup
+//        ]);
+//    }
 
 }
