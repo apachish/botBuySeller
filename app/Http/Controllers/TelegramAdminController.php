@@ -27,6 +27,7 @@ class TelegramAdminController extends Controller
         $update = json_decode($input, true);
         $update = $telegram->getWebhookUpdate();
         logger('replay', [$replay]);
+        logger('ss', [$update]);
 
 
         // دریافت دستور ارسال شده توسط کار
