@@ -106,7 +106,7 @@ class TelegramAdminController extends Controller
 
         $response = $telegram->sendMessage([
             'chat_id' => $chatId,
-            'text' => "",
+            'text' => "سلام",
             'reply_markup' => $reply_markup
         ]);
 
