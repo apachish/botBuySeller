@@ -64,46 +64,44 @@ class TelegramAdminController extends Controller
             if($data == "list"){
             }
         }
-//        $this->menu($telegram, $chatId);
-        $commands = [
-            [
-                "command" => "start",
-                "description" => "Start the bot"
-            ],
-            [
-                "command" => "help",
-                "description" => "Get help"
-            ],
-            [
-                "command" => "info",
-                "description" => "Get info about the bot"
-            ],
-            [
-                "command" => "contact",
-                "description" => "Contact us"
-            ],
-        ];
-        $this->setCommands($commands);
+        $this->menu($telegram, $chatId);
+//        $commands = [
+//            [
+//                "command" => "start",
+//                "description" => "Start the bot"
+//            ],
+//            [
+//                "command" => "help",
+//                "description" => "Get help"
+//            ],
+//            [
+//                "command" => "info",
+//                "description" => "Get info about the bot"
+//            ],
+//            [
+//                "command" => "contact",
+//                "description" => "Contact us"
+//            ],
+//        ];
+//        $this->setCommands($commands);
 
     }
 
     public function menu($telegram, $chatId)
     {
-        $keyboard = [
-            [
-                ["text" => '\xE2\x86\xA9	 لیست کاربران', "callback_data" => "list"]
-            ],
-            [
-                ["text" => '\xE2\x9D\x95	 لیست کاربران منتظر تایید', "callback_data" => "pending"]
-            ],
-            [
-                ['text' => "\xE2\x86\xA9	 بازگشت به ", "callback_data" => "return"]
-            ]
+        $keyboard =  [
+            [['text' => "پویا"], ['text' => "محمد"]],
+            [['text' => "وحید"], ['text' => "خودم"]],
+            [['text' => "📞 دفترچه تلفن"], ['text' => "📈 معاملات باز"]],
+            [['text' => "ظرفیت"], ['text' => "📋 لیست همکاران"]],
+            [['text' => "📚 قوانین"], ['text' => "مانده کمیسیون"]],
+            [['text' => "🔍 راهنما"], ['text' => "فعال سازی تایید دو مرحله‌ای"]],
+            [['text' => "🛑 غیر فعال فوری"], ['text' => "⚠️ غیر فعال فوری"]]
         ];
         $reply_markup = Keyboard::make([
             'inline_keyboard' => $keyboard,
             'resize_keyboard' => true,
-            'one_time_keyboard' => true
+            'one_time_keyboard' => false
         ]);
 
         $response = $telegram->sendMessage([
