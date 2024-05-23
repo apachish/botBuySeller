@@ -15,6 +15,7 @@ class UserTelegram extends Model
         "id",
         "first_name",
         "last_name",
+        "fullName",
         "mobile",
         "username",
         "language_code",
