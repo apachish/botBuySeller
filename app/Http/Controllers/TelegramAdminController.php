@@ -109,7 +109,7 @@ class TelegramAdminController extends Controller
 
 // پردازش دستورات کاربر
         if ($text == "/start") {
-            sendMessage($chat_id, "شخص مورد نظر را انتخاب کنید:", [
+            $this->sendMessage($chat_id, "شخص مورد نظر را انتخاب کنید:", [
                 'inline_keyboard' => [
                     [
                         ['text' => "پویا ✅", 'callback_data' => 'confirm_pouya'],
@@ -126,17 +126,17 @@ class TelegramAdminController extends Controller
             ]);
         } elseif ($callback_data) {
             if ($callback_data == 'next_page') {
-                sendPage2($callback_chat_id, $callback_message_id);
+                $this->sendPage2($callback_chat_id, $callback_message_id);
             } elseif ($callback_data == 'prev_page') {
-                sendPage1($callback_chat_id, $callback_message_id);
+                $this->sendPage1($callback_chat_id, $callback_message_id);
             } elseif (strpos($callback_data, 'confirm_') === 0) {
                 $name = str_replace('confirm_', '', $callback_data);
-                editMessageReplyMarkup($callback_chat_id, $callback_message_id, null);
-                sendMessage($callback_chat_id, "شما $name را تایید کردید.");
+                $this->editMessageReplyMarkup($callback_chat_id, $callback_message_id, null);
+                $this->sendMessage($callback_chat_id, "شما $name را تایید کردید.");
             } elseif (strpos($callback_data, 'reject_') === 0) {
                 $name = str_replace('reject_', '', $callback_data);
-                editMessageReplyMarkup($callback_chat_id, $callback_message_id, null);
-                sendMessage($callback_chat_id, "شما $name را رد کردید.");
+                $this->editMessageReplyMarkup($callback_chat_id, $callback_message_id, null);
+                $this->sendMessage($callback_chat_id, "شما $name را رد کردید.");
             }
         }
     }
