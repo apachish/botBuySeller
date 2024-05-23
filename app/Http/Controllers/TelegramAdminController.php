@@ -99,7 +99,7 @@ class TelegramAdminController extends Controller
             [['text' => "🛑 غیر فعال فوری"], ['text' => "⚠️ غیر فعال فوری"]]
         ];
         $reply_markup = Keyboard::make([
-            'inline_keyboard' => $keyboard,
+            'keyboard' => $keyboard,
             'resize_keyboard' => true,
             'one_time_keyboard' => false
         ]);
