@@ -54,7 +54,7 @@ class TelegramAdminController extends Controller
                 "language_code" => data_get($update, $type . '.from.language_code'),
             ]);
         }
-        $chatId = $update['my_chat_member']['from']['id']; // چت‌آیدی کاربر
+        $chatId = $update[$type]['from']['id']; // چت‌آیدی کاربر
 
         $this->menu($telegram,$chatId);
 
