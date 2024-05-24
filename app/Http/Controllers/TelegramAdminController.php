@@ -105,12 +105,12 @@ class TelegramAdminController extends Controller
             return true;
         }
         if($data){
-            if(str_contains($data,"tel:"))
+            if(str_contains($data,"tel:")) {
                 $tel = str_replace('tel:', '', $data);
-                    $tel = substr_replace($tel,"+98",0,1);
-                    $response_text = "برای تماس با شماره زیر کلیک کنید:\n\n$tel";
-                    $service_telgram->sendMessage($chatId,$response_text);
-
+                $tel = "[$tel](tel:$tel)";
+                $response_text = "برای تماس با شماره زیر کلیک کنید:\n\n$tel";
+                $service_telgram->sendMessage($chatId, $response_text);
+            }
             return true;
         }
 
