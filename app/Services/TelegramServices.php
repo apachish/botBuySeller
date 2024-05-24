@@ -35,7 +35,6 @@ class TelegramServices
             'chat_id' => $chat_id,
             'text' => $text,
             'reply_markup' => $reply_markup,
-            'parse_mode' => 'HTML'
 
         ]);
 

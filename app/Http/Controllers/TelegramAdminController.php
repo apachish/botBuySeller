@@ -86,7 +86,7 @@ class TelegramAdminController extends Controller
             $contacts->each(function ($contact) use (&$keyboard, &$i) {
                 $keyboard[$i][] = [
                     "text" => $contact->fullName ?: $contact->first_name . " " . $contact->last_name,
-                    'url' => "tel:+98" . $contact->mobile,
+                    'callback_data' =>  "tel:".$contact->mobile,
 
                 ];
             });
