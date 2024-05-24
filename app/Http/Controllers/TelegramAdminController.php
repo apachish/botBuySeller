@@ -107,6 +107,7 @@ class TelegramAdminController extends Controller
         if($data){
             if(str_contains($data,"tel:"))
                 $tel = str_replace('tel:', '', $data);
+                    $tel = substr_replace($tel,"+98",0,1);
                     $response_text = "برای تماس با شماره زیر کلیک کنید:\n\n$tel";
                     $service_telgram->sendMessage($chatId,$response_text);
 
