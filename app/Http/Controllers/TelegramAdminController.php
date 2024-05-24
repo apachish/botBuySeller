@@ -97,25 +97,25 @@ class TelegramAdminController extends Controller
     {
         $keyboard = [
             [
-                ['text' => "📞 دفترچه تلفن", "callback_data" => "contact_us"],
-                ['text' => "📈 معاملات باز", "callback_data" => "trade_open"]
+                ['text' => "📞 دفترچه تلفن", "callback_query" => "contact_us"],
+                ['text' => "📈 معاملات باز", "callback_query" => "trade_open"]
             ],
             [
-                ['text' => "ظرفیت", "callback_data" => "capacity_all"],
-                ['text' => "📋 لیست کاربران", "callback_data" => "list_user"]
+                ['text' => "ظرفیت", "callback_query" => "capacity_all"],
+                ['text' => "📋 لیست کاربران", "callback_query" => "list_user"]
             ],
             [
-                ['text' => "ظرفیت", "callback_data" => "capacity_pending"],
-                ['text' => "📋 لیست کاربران در انتظار", "callback_data" => "list_user_pending"]
+                ['text' => "ظرفیت", "callback_query" => "capacity_pending"],
+                ['text' => "📋 لیست کاربران در انتظار", "callback_query" => "list_user_pending"]
             ],
             [
-                ['text' => "🔍 جستجو کاربر", "callback_data" => "search"]
+                ['text' => "🔍 جستجو کاربر", "callback_query" => "search"]
             ],
             [
-                ['text' => "📚  ویرایش قوانین", "callback_data" => "edit_rul"]
+                ['text' => "📚  ویرایش قوانین", "callback_query" => "edit_rul"]
             ],
             [
-                ['text' => "\xE2\x81\x89	  ویرایش راهنما", "callback_data" => "edit_help"]
+                ['text' => "\xE2\x81\x89	  ویرایش راهنما", "callback_query" => "edit_help"]
             ],
         ];
         $reply_markup = Keyboard::make([
