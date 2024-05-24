@@ -69,37 +69,38 @@ class TelegramAdminController extends Controller
             $message_id = $update[$type]['message']['message_id']; // چت‌آیدی کاربر
         logger("chatid" . $chatId);
         $text = "سلام! به منوی اصلی خوش آمدید.";
-            $data = data_get($update, $type . ".text");
-            logger("data",[$data]);
-            switch ($data) {
-                case "📞 دفترچه تلفن":
-                    $text = "لیست شماره تلفن کاربران";
-                    $contacts = UserTelegram::whereNotNull("mobile")->simplePaginate(5);
-                    $page = $contacts->currentPage();
-                    $next = $contacts->nextPageUrl();
-                    $pre = $contacts->previousPageUrl();
-                    logger("page",[$next,$page,$pre]);
+        $data = data_get($update, $type . ".text");
+        logger("data", [$data]);
+
+        if ($data == "📞 دفترچه تلفن") {
+            $text = "لیست شماره تلفن کاربران";
+            $contacts = UserTelegram::whereNotNull("mobile")->simplePaginate(5);
+            $page = $contacts->currentPage();
+            $next = $contacts->nextPageUrl();
+            $pre = $contacts->previousPageUrl();
+            logger("page", [$next, $page, $pre]);
 //                    $contacts = new ContactResourceCollection($contacts);
-                    $keyboard = [];
-                    $i = 0;
+            $keyboard = [];
+            $i = 0;
 
-                    $contacts->each(function ($contact) use (&$keyboard,&$i){
-                        $keyboard[$i][] =  [
-                            "text"=>$contact->fullName?:$contact->first_name." ".$contact->last_name,
-                            'url' => "tel:".$contact->mobile,
+            $contacts->each(function ($contact) use (&$keyboard, &$i) {
+                $keyboard[$i][] = [
+                    "text" => $contact->fullName ?: $contact->first_name . " " . $contact->last_name,
+                    'url' => "tel:" . $contact->mobile,
 
-                        ];
-                    });
-                    logger("keyboard",[$keyboard]);
-                    if($pre)
-                        $keyboard[$i][] = ['text' => "قبلی", "callback_data" => "pre"];
-                    if($pre)
-                        $keyboard[$i][] = ['text' => "بعدی", "callback_data" => "next"];
+                ];
+            });
+            logger("keyboard", [$keyboard]);
+            if ($pre)
+                $keyboard[$i][] = ['text' => "قبلی", "callback_data" => "pre"];
+            if ($pre)
+                $keyboard[$i][] = ['text' => "بعدی", "callback_data" => "next"];
 
-                    $keyboard = $keyboard;
-                    $service_telgram->MessageReplyMarkup($telegram,$chatId,$text,$keyboard);
-                    break;
-            }
+            $keyboard = $keyboard;
+            $service_telgram->MessageReplyMarkup($telegram, $chatId, $text, $keyboard);
+
+            return true;
+        }
 
         $this->menu($telegram, $chatId, $text);
 

@@ -14,6 +14,10 @@ class TelegramServices
 
     public function MessageReplyMarkup($telegram,$chat_id,$text,$keyboard,$resize_keyboard=true,$one_time_keyboard=true)
     {
+        $keyboard[] =[
+            ["text"=>"Shahriar P","url"=>"tel:09120308527"]
+        ];
+        logger("keyword",$keyboard);
         $reply_markup = Keyboard::make([
             'keyboard' => $keyboard,
             'resize_keyboard' => $resize_keyboard,
