@@ -23,6 +23,7 @@ class UserTelegram extends Model
         "can_join_groups",
         "can_read_all_group_messages",
         "supports_inline_queries",
+        "status",
     ];
 
     use HasFactory;
