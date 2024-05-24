@@ -69,10 +69,13 @@ class TelegramAdminController extends Controller
             $message_id = $update[$type]['message']['message_id']; // چت‌آیدی کاربر
         logger("chatid" . $chatId);
         $text = "سلام! به منوی اصلی خوش آمدید.";
-        $data = data_get($update, $type . ".text");
-        logger("data", [$data]);
+        $data_text = data_get($update, $type . ".text");
+        logger("data_text", [$data_text]);
 
-        if ($data == "📞 دفترچه تلفن") {
+        $data = data_get($update, $type . ".data");
+        logger("data_text", [$data_text]);
+
+        if ($data_text == "📞 دفترچه تلفن") {
             $text = "لیست شماره تلفن کاربران";
             $contacts = UserTelegram::whereNotNull("mobile")->simplePaginate(5);
             $page = $contacts->currentPage();
@@ -98,6 +101,14 @@ class TelegramAdminController extends Controller
 
             $keyboard = $keyboard;
             $service_telgram->MessageReplyMarkup($telegram, $chatId, $text,$keyboard);
+
+            return true;
+        }
+        if($data){
+            if(str_contains($data,"tel:"))
+                $tel = str_replace('tel:', '', $data);
+                    $response_text = "برای تماس با شماره زیر کلیک کنید:\n\n$tel";
+                    $service_telgram->sendMessage($chatId,$response_text);
 
             return true;
         }
