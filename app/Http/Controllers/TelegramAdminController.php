@@ -70,9 +70,9 @@ class TelegramAdminController extends Controller
         logger("chatid" . $chatId);
         $text = "سلام! به منوی اصلی خوش آمدید.";
         if ($type == "callback_query") {
-            $data = data_get($update, $type . ".data");
+            $data = data_get($update, $type . ".text");
             switch ($data) {
-                case "contact_us":
+                case "📞 دفترچه تلفن":
                     $text = "لیست شماره تلفن کاربران";
                     $contacts = UserTelegram::whereNotNull("mobile")->simplePaginate(5);
                     $page = $contacts->currentPage();
@@ -97,25 +97,25 @@ class TelegramAdminController extends Controller
     {
         $keyboard = [
             [
-                ['text' => "📞 دفترچه تلفن", "callback_query" => "contact_us"],
-                ['text' => "📈 معاملات باز", "callback_query" => "trade_open"]
+                ['text' => "📞 دفترچه تلفن"],
+                ['text' => "📈 معاملات باز"]
             ],
             [
-                ['text' => "ظرفیت", "callback_query" => "capacity_all"],
-                ['text' => "📋 لیست کاربران", "callback_query" => "list_user"]
+                ['text' => "ظرفیت"],
+                ['text' => "📋 لیست کاربران"]
             ],
             [
-                ['text' => "ظرفیت", "callback_query" => "capacity_pending"],
-                ['text' => "📋 لیست کاربران در انتظار", "callback_query" => "list_user_pending"]
+                ['text' => "ظرفیت"],
+                ['text' => "📋 لیست کاربران در انتظار"]
             ],
             [
-                ['text' => "🔍 جستجو کاربر", "callback_query" => "search"]
+                ['text' => "🔍 جستجو کاربر"]
             ],
             [
-                ['text' => "📚  ویرایش قوانین", "callback_query" => "edit_rul"]
+                ['text' => "📚  ویرایش قوانین"]
             ],
             [
-                ['text' => "\xE2\x81\x89	  ویرایش راهنما", "callback_query" => "edit_help"]
+                ['text' => "\xE2\x81\x89	  ویرایش راهنما"]
             ],
         ];
         $reply_markup = Keyboard::make([
