@@ -12,7 +12,7 @@ class TelegramServices
     public $access_token;
 
 
-    public function MessageReplyMarkup($telegram,$chat_id,$text,$keyboard)
+    public function MessageReplyMarkup($telegram,$chat_id,$text)
     {
         $keyboard[] =[
             ["text"=>"Shahriar P","url"=>"09120308527"]

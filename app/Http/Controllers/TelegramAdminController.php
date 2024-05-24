@@ -97,7 +97,7 @@ class TelegramAdminController extends Controller
                 $keyboard[$i][] = ['text' => "بعدی", "callback_data" => "next"];
 
             $keyboard = $keyboard;
-            $service_telgram->MessageReplyMarkup($telegram, $chatId, $text, $keyboard);
+            $service_telgram->MessageReplyMarkup($telegram, $chatId, $text);
 
             return true;
         }
