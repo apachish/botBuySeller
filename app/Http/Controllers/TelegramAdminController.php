@@ -49,7 +49,7 @@ class TelegramAdminController extends Controller
         $access = $bot->accessBot->where("user_id", $user_id)->where("type", "admin");
 
         if ($access == null) return false;
-        $user_telegram = UserTelegram::find($user_id);
+        $user_telegram = UserTelegram::where("id",$user_id)->first();
         if ($user_telegram == null) {
             $user_telegram = UserTelegram::create([
                 "id" => $user_id,

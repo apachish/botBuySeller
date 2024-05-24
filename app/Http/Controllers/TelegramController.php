@@ -39,7 +39,7 @@ class TelegramController extends Controller
 
         $user_id = data_get($update, $type . '.from.id');
 
-        $user_telegram = UserTelegram::find($user_id);
+        $user_telegram = UserTelegram::where("id",$user_id)->first();
         if ($user_telegram == null) {
             $user_telegram = UserTelegram::create([
                 "id" => $user_id,
