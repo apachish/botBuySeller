@@ -80,22 +80,22 @@ class TelegramAdminController extends Controller
                     $pre = $contacts->previousPageUrl();
                     logger("page",[$next,$page,$pre]);
 //                    $contacts = new ContactResourceCollection($contacts);
-
-                    $contacts = $contacts->map(function ($contact){
-                        return [
+                    $keyboard = [];
+                     $contacts->each(function ($contact) use (&$keyboard){
+                        $keyboard[] =  [
                             "text"=>$contact->fullName?:$contact->first_name." ".$contact->last_name,
                             'url' => "tel:".$contact->mobile,
 
                         ];
-                    })->toArray();
+                    });
                     logger("contact",[$contacts]);
                     if($pre)
-                        $contacts[6][] = ['text' => "قبلی", "callback_data" => "pre"];
+                        $keyboard[6][] = ['text' => "قبلی", "callback_data" => "pre"];
                     if($pre)
-                        $contacts[6][] = ['text' => "بعدی", "callback_data" => "next"];
+                        $keyboard[6][] = ['text' => "بعدی", "callback_data" => "next"];
 
-                    $contacts[] = $contacts;
-                    $service_telgram->MessageReplyMarkup($telegram,$chatId,$text,$contacts);
+                    $keyboard[] = $keyboard;
+                    $service_telgram->MessageReplyMarkup($telegram,$chatId,$text,$keyboard);
                     break;
             }
 
