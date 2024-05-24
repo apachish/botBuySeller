@@ -80,7 +80,7 @@ class TelegramAdminController extends Controller
 
         $data = data_get($update, $type . ".data");
         logger("data_text", [$data_text]);
-        if (!in_array($data_text, [
+        if (in_array($data_text, [
             "📞 دفترچه تلفن",
             "📋 لیست کاربران",
             "تعداد کاربران",
