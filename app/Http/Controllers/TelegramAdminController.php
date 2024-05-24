@@ -69,8 +69,8 @@ class TelegramAdminController extends Controller
             $message_id = $update[$type]['message']['message_id']; // چت‌آیدی کاربر
         logger("chatid" . $chatId);
         $text = "سلام! به منوی اصلی خوش آمدید.";
-        if ($type == "callback_query") {
             $data = data_get($update, $type . ".text");
+            logger("data",[$data]);
             switch ($data) {
                 case "📞 دفترچه تلفن":
                     $text = "لیست شماره تلفن کاربران";
@@ -87,7 +87,7 @@ class TelegramAdminController extends Controller
                     $service_telgram->MessageReplyMarkup($telegram,$chatId,$text,$contacts);
                     break;
             }
-        }
+
         $this->menu($telegram, $chatId, $text);
 
     }
