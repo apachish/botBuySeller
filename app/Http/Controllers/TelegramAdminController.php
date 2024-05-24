@@ -178,7 +178,7 @@ class TelegramAdminController extends Controller
                 $service_telgram->sendMessage($chatId, $response_text);
                 cache()->forget("text_admin_" . $chatId);
 
-            } elseif ($data_text == "\xE2\x81\x89ویرایش راهنما ") {
+            } elseif ($data_text ==  "⁉️ ویرایش راهنما") {
                 $rule = Setting::where("key", "help")->first();
 
                 if ($rule) {
