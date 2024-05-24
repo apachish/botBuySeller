@@ -14,8 +14,15 @@ class TelegramServices
 
     public function MessageReplyMarkup($telegram,$chat_id,$text)
     {
-        $keyboard[] =[
-            ["text"=>"Shahriar P","url"=>"+989120308527"]
+        $keyboard = [
+            'inline_keyboard' => [
+                [
+                    [
+                        'text' => "تماس بگیرید",
+                        'url' => "tel:+989120308527" // شماره تلفن مورد نظر را با فرمت صحیح وارد کنید
+                    ]
+                ]
+            ]
         ];
         logger("keyword",$keyboard);
         $reply_markup = Keyboard::make([
