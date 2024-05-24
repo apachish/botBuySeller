@@ -121,8 +121,12 @@ class TelegramAdminController extends Controller
                     $text .= "\n" . $user->mobile."\n";
 
                     $keyboard[$i] = [
-                        ['text' => "\xE2\x9C\x85	\n  $text ", 'callback_data' => 'confirm_' . $user->id],
-                        ['text' => "\xE2\x9D\x8C	\n  $text", 'callback_data' => 'reject_' . $user->id]
+                        ['text' => "\xE2\x9C\x85	  $text ", 'callback_data' => 'confirm_' . $user->id],
+                        ['text' => "\xE2\x9D\x8C	 $text", 'callback_data' => 'reject_' . $user->id],
+                        [
+                        'text' => "دکمه 3\nخط دوم",
+                        'callback_data' => "data_3"
+                    ],
                     ];
                 });
                 logger("keyboard", [$keyboard]);
