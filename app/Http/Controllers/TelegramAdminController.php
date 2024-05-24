@@ -85,7 +85,7 @@ class TelegramAdminController extends Controller
             "📋 لیست کاربران",
             "تعداد کاربران",
             "📚  ویرایش قوانین",
-            "\xE2\x81\x89 ویرایش راهنما ",
+            "\xE2\x81\x89 ویرایش راهنما",
             "📈 بازه معاملات",
         ]))
             cache()->forget("text_admin_" . $chatId);
@@ -178,7 +178,7 @@ class TelegramAdminController extends Controller
                 $service_telgram->sendMessage($chatId, $response_text);
                 cache()->forget("text_admin_" . $chatId);
 
-            } elseif ($data_text ==  "⁉️ ویرایش راهنما") {
+            } elseif ($data_text ==  "\xE2\x81\x89 ویرایش راهنما") {
                 $rule = Setting::where("key", "help")->first();
 
                 if ($rule) {
@@ -306,7 +306,7 @@ class TelegramAdminController extends Controller
                 ['text' => "📚  ویرایش قوانین"]
             ],
             [
-                ['text' => "\xE2\x81\x89 ویرایش راهنما "]
+                ['text' => "\xE2\x81\x89 ویرایش راهنما"]
             ],
         ];
         $reply_markup = Keyboard::make([
