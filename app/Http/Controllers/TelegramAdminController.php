@@ -147,7 +147,7 @@ class TelegramAdminController extends Controller
                 $response_text = "برای تماس با شماره زیر کلیک کنید:\n\n$tel";
                 $service_telgram->sendMessage($chatId, $response_text);
             } elseif (str_contains($data, "confirm_")) {
-                $id = str_replace('confirm_', '', $data);
+                $id = (int)str_replace('confirm_', '', $data);
                 $user_con = UserTelegram::where("id", $id)->first();
                 logger("con", [$user_con, $id]);
                 if ($user_con) {
@@ -160,7 +160,7 @@ class TelegramAdminController extends Controller
                     $service_telgram_user->sendMessage($user_con->id, $response_text);
                 }
             } elseif (str_contains($data, "reject_")) {
-                $id = str_replace('reject_', '', $data);
+                $id = (int)str_replace('reject_', '', $data);
                 $user_con = UserTelegram::where("id", $id)->first();
                 logger("rej", [$user_con, $id]);
 
