@@ -82,7 +82,11 @@ class TelegramAdminController extends Controller
 //                    $contacts = new ContactResourceCollection($contacts);
 
                     $contacts = $contacts->map(function ($contact){
-                        return $contact;
+                        return [
+                            "text"=>$contact->fullName?:$contact->first_name." ".$contact->last_name,
+                            'url' => "tel:".$contact->mobile,
+
+                        ];
                     })->toArray();
                     logger("contact",[$contacts]);
                     if($pre)
