@@ -80,7 +80,7 @@ class TelegramAdminController extends Controller
         $data = data_get($update, $type . ".data");
         logger("data_text", [$data_text]);
 
-        if ($data_text && $data_text != "start") {
+        if ($data_text && !str_contains($data_text, "start")) {
             if ($data_text == "📞 دفترچه تلفن") {
                 $text = "لیست شماره تلفن کاربران";
                 $contacts = UserTelegram::whereNotNull("mobile")->simplePaginate(5);
