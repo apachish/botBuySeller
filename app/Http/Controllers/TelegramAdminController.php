@@ -121,8 +121,8 @@ class TelegramAdminController extends Controller
                     $text .= "\n\n" . $user->mobile;
 
                     $keyboard[$i] = [
-                        ['text' => "✅ $text ", 'callback_data' => 'confirm_' . $user->id],
-                        ['text' => "❌ $text", 'callback_data' => 'reject_' . $user->id]
+                        ['text' => "✅ \n\n $text ", 'callback_data' => 'confirm_' . $user->id],
+                        ['text' => "❌ \n\n $text", 'callback_data' => 'reject_' . $user->id]
                     ];
                 });
                 logger("keyboard", [$keyboard]);
