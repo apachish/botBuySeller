@@ -154,9 +154,11 @@ class TelegramAdminController extends Controller
             } elseif ($data_text == "📚  ویرایش قوانین") {
                 $rule = Setting::where("key", "rule")->first();
 
-                if ($rule)
+                if ($rule) {
                     $response_text = $rule->value;
-                else
+                    $response_text .= "\n\n";
+                    $response_text .= "متن بالا متنن قبلی می  باشد ویرایش کنید";
+                }else
                     $response_text = "متن قواتین وارد کنید";
 
                 cache()->set("text_admin_" . $chatId, "rule");
@@ -179,8 +181,12 @@ class TelegramAdminController extends Controller
             } elseif ($data_text == "\xE2\x81\x89 ویرایش راهنما ") {
                 $rule = Setting::where("key", "help")->first();
 
-                if ($rule)
+                if ($rule) {
                     $response_text = $rule->value;
+
+                    $response_text .= "\n\n";
+                    $response_text .= "متن بالا متنن قبلی می  باشد ویرایش کنید";
+                }
                 else
                     $response_text = "متن راهنما وارد کنید";
 
