@@ -118,11 +118,11 @@ class TelegramAdminController extends Controller
 
                 $users->each(function ($user) use (&$keyboard, &$i) {
                     $text = $user->fullName ?: $user->first_name . " " . $user->last_name;
-                    $text .= "\n\r" . $user->mobile;
+                    $text .= "\n\n" . $user->mobile;
 
                     $keyboard[$i] = [
-                        ['text' => "$text ✅", 'callback_data' => 'confirm_' . $user->id],
-                        ['text' => "$text ❌", 'callback_data' => 'reject_' . $user->id]
+                        ['text' => "✅ $text ", 'callback_data' => 'confirm_' . $user->id],
+                        ['text' => "❌ $text", 'callback_data' => 'reject_' . $user->id]
                     ];
                 });
                 logger("keyboard", [$keyboard]);
@@ -154,9 +154,9 @@ class TelegramAdminController extends Controller
                     $fullName = $user_con->fullName ?: $user_con->first_name . " " . $user_con->last_name;
                     $user_con->status = true;
                     $user_con->update();
-                    $response_text = " اکانت کاربریش فعال شد\n\n $fullName";
+                    $response_text = "$fullName اکانت کاربریش فعال شد\n\n ";
                     $service_telgram->sendMessage($chatId, $response_text);
-                    $response_text = " اکانت کاربریتان فعال شد\n\n $fullName";
+                    $response_text = "$fullName اکانت کاربریتان فعال شد\n\n ";
                     $service_telgram_user->sendMessage($user_con->id, $response_text);
                 }
             } elseif (str_contains($data, "reject_")) {
@@ -168,9 +168,9 @@ class TelegramAdminController extends Controller
                     $fullName = $user_con->fullName ?: $user_con->first_name . " " . $user_con->last_name;
                     $user_con->status = false;
                     $user_con->update();
-                    $response_text = " اکانت کاربریش غیر فعال شد\n\n $fullName";
+                    $response_text = "$fullName\n\n اکانت کاربریش غیر فعال شد ";
                     $service_telgram->sendMessage($chatId, $response_text);
-                    $response_text = " اکانت کاربریتان غیر فعال شد\n\n $fullName";
+                    $response_text = "$fullName اکانت کاربریتان غیر فعال شد \n\n ";
                     $service_telgram_user->sendMessage($user_con->id, $response_text);
                 }
             }
