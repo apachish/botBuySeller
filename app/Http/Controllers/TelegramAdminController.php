@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\ContactResourceCollection;
+use App\Services\TelegramServices;
 use Illuminate\Http\Request;
 use Telegram\Bot\Api;
 use App\Models\Bot;
@@ -13,7 +15,7 @@ class TelegramAdminController extends Controller
 {
     private $access_token;
 
-    public function setWebhooks($token)
+    public function setWebhook($token)
     {
         $bot = Bot::where('token', $token)
             ->first();
@@ -23,6 +25,8 @@ class TelegramAdminController extends Controller
         $this->access_token = $bot->token;
 
         $telegram = new Api($token);
+        $service_telgram = new TelegramServices();
+        $service_telgram->access_token = $token;
 
 
         // دریافت پیام ارسال شده به بات
@@ -58,99 +62,61 @@ class TelegramAdminController extends Controller
             ]);
         }
         $chatId = $update[$type]['from']['id']; // چت‌آیدی کاربر
+        $message_id = null;
+        if (isset($update[$type]['message_id']))
+            $message_id = $update['message_id']; // چت‌آیدی کاربر
+        if (isset($update[$type]['message']['message_id']))
+            $message_id = $update[$type]['message']['message_id']; // چت‌آیدی کاربر
         logger("chatid" . $chatId);
-        if($type =="callback_query"){
-            $data=  data_get($update,$type.".data");
-            if($data == "list"){
+        $text = "سلام! به منوی اصلی خوش آمدید.";
+        if ($type == "callback_query") {
+            $data = data_get($update, $type . ".data");
+            switch ($data) {
+                case "contact_us":
+                    $text = "لیست شماره تلفن کاربران";
+                    $contacts = UserTelegram::whereNotNull("mobile")->simplePaginate(5);
+                    $page = $contacts->currentPage();
+                    $next = $contacts->nextPageUrl();
+                    $pre = $contacts->previousPageUrl();
+                    logger("page",[$next,$page,$pre]);
+                    $contacts = (new ContactResourceCollection($contacts))->toArray();
+                    $contacts[] = [
+                        ['text' => "بعدی", "callback_data" => "next"],
+                        ['text' => "قبلی", "callback_data" => "pre"],
+                    ];
+                    $service_telgram->MessageReplyMarkup($telegram,$chatId,$text,$contacts);
+                    break;
             }
         }
-        $this->menu($telegram, $chatId);
-//        $commands = [
-//            [
-//                "command" => "start",
-//                "description" => "Start the bot"
-//            ],
-//            [
-//                "command" => "help",
-//                "description" => "Get help"
-//            ],
-//            [
-//                "command" => "info",
-//                "description" => "Get info about the bot"
-//            ],
-//            [
-//                "command" => "contact",
-//                "description" => "Contact us"
-//            ],
-//        ];
-//        $this->setCommands($commands);
+        $this->menu($telegram, $chatId, $text);
 
     }
 
-    public function setWebhook($token)
+
+    public function menu($telegram, $chatId, $text)
     {
-        // دریافت داده‌ها از وب‌هوک تلگرام
-        $content = file_get_contents("php://input");
-        $update = json_decode($content, true);
-
-        if (!$update) {
-            exit;
-        }
-        $this->access_token = $token;
-
-        $message = isset($update['message']) ? $update['message'] : "";
-        $callback_query = isset($update['callback_query']) ? $update['callback_query'] : "";
-        $chat_id = isset($message['chat']['id']) ? $message['chat']['id'] : "";
-        $text = isset($message['text']) ? $message['text'] : "";
-        $message_id = isset($message['message_id']) ? $message['message_id'] : "";
-        $callback_data = isset($callback_query['data']) ? $callback_query['data'] : "";
-        $callback_chat_id = isset($callback_query['message']['chat']['id']) ? $callback_query['message']['chat']['id'] : "";
-        $callback_message_id = isset($callback_query['message']['message_id']) ? $callback_query['message']['message_id'] : "";
-
-// پردازش دستورات کاربر
-        if ($text == "/start") {
-            $this->sendMessage($chat_id, "شخص مورد نظر را انتخاب کنید:", [
-                'inline_keyboard' => [
-                    [
-                        ['text' => "پویا ✅", 'callback_data' => 'confirm_pouya'],
-                        ['text' => "پویا ❌", 'callback_data' => 'reject_pouya']
-                    ],
-                    [
-                        ['text' => "محمد ✅", 'callback_data' => 'confirm_mohammad'],
-                        ['text' => "محمد ❌", 'callback_data' => 'reject_mohammad']
-                    ],
-                    [
-                        ['text' => "صفحه بعد", 'callback_data' => 'next_page']
-                    ]
-                ]
-            ]);
-        } elseif ($callback_data) {
-            if ($callback_data == 'next_page') {
-                $this->sendPage2($callback_chat_id, $callback_message_id);
-            } elseif ($callback_data == 'prev_page') {
-                $this->sendPage1($callback_chat_id, $callback_message_id);
-            } elseif (strpos($callback_data, 'confirm_') === 0) {
-                $name = str_replace('confirm_', '', $callback_data);
-                $this->editMessageReplyMarkup($callback_chat_id, $callback_message_id, null);
-                $this->sendMessage($callback_chat_id, "شما $name را تایید کردید.");
-            } elseif (strpos($callback_data, 'reject_') === 0) {
-                $name = str_replace('reject_', '', $callback_data);
-                $this->editMessageReplyMarkup($callback_chat_id, $callback_message_id, null);
-                $this->sendMessage($callback_chat_id, "شما $name را رد کردید.");
-            }
-        }
-    }
-
-    public function menu($telegram, $chatId)
-    {
-        $keyboard =  [
-            [['text' => "پویا"], ['text' => "محمد"]],
-            [['text' => "وحید"], ['text' => "خودم"]],
-            [['text' => "📞 دفترچه تلفن"], ['text' => "📈 معاملات باز"]],
-            [['text' => "ظرفیت"], ['text' => "📋 لیست همکاران"]],
-            [['text' => "📚 قوانین"], ['text' => "مانده کمیسیون"]],
-            [['text' => "🔍 راهنما"], ['text' => "فعال سازی تایید دو مرحله‌ای"]],
-            [['text' => "🛑 غیر فعال فوری"], ['text' => "⚠️ غیر فعال فوری"]]
+        $keyboard = [
+            [
+                ['text' => "📞 دفترچه تلفن", "callback_data" => "contact_us"],
+                ['text' => "📈 معاملات باز", "callback_data" => "trade_open"]
+            ],
+            [
+                ['text' => "ظرفیت", "callback_data" => "capacity_all"],
+                ['text' => "📋 لیست کاربران", "callback_data" => "list_user"]
+            ],
+            [
+                ['text' => "ظرفیت", "callback_data" => "capacity_pending"],
+                ['text' => "📋 لیست کاربران در انتظار", "callback_data" => "list_user_pending"]
+            ],
+            [
+                ['text' => "🔍 جستجو کاربر", "callback_data" => "search"]
+            ],
+            [
+                ['text' => "📚  ویرایش قوانین", "callback_data" => "edit_rul"]
+            ],
+            [
+                ['text' => "\xE2\x81\x89	  ویرایش راهنما", "callback_data" => "edit_help"]
+            ],
         ];
         $reply_markup = Keyboard::make([
             'keyboard' => $keyboard,
@@ -160,115 +126,11 @@ class TelegramAdminController extends Controller
 
         $response = $telegram->sendMessage([
             'chat_id' => $chatId,
-            'text' => "سلام",
+            'text' => $text,
             'reply_markup' => $reply_markup
         ]);
 
     }
-
-    private function setCommands($commands) {
-
-        $url = "https://api.telegram.org/bot$this->access_token/setMyCommands";
-
-        $post_fields = [
-            'commands' => json_encode($commands)
-        ];
-
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array("Content-Type:application/json"));
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($post_fields));
-        $result = curl_exec($ch);
-        curl_close($ch);
-
-        return $result;
-    }
-
-
-
-// تابع ارسال پیام با کیبورد شیشه‌ای
-    private function sendMessage($chat_id, $message, $keyboard = null) {
-        $url = "https://api.telegram.org/bot$this->access_token/sendMessage";
-        $post_fields = [
-            'chat_id' => $chat_id,
-            'text' => $message,
-            'parse_mode' => 'HTML'
-        ];
-
-        if ($keyboard) {
-            $post_fields['reply_markup'] = json_encode($keyboard);
-        }
-
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array("Content-Type:multipart/form-data"));
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $post_fields);
-        curl_exec($ch);
-        curl_close($ch);
-    }
-
-// تنظیم کیبورد شیشه‌ای برای صفحه اول
-    private function sendPage1($chat_id, $message_id) {
-        $keyboard = [
-            'inline_keyboard' => [
-                [
-                    ['text' => "پویا ✅", 'callback_data' => 'confirm_pouya'],
-                    ['text' => "پویا ❌", 'callback_data' => 'reject_pouya']
-                ],
-                [
-                    ['text' => "محمد ✅", 'callback_data' => 'confirm_mohammad'],
-                    ['text' => "محمد ❌", 'callback_data' => 'reject_mohammad']
-                ],
-                [
-                    ['text' => "صفحه بعد", 'callback_data' => 'next_page']
-                ]
-            ]
-        ];
-
-        $this->editMessageReplyMarkup($chat_id, $message_id, $keyboard);
-    }
-
-// تنظیم کیبورد شیشه‌ای برای صفحه دوم
-    private function sendPage2($chat_id, $message_id) {
-        $keyboard = [
-            'inline_keyboard' => [
-                [
-                    ['text' => "وحید ✅", 'callback_data' => 'confirm_vahid'],
-                    ['text' => "وحید ❌", 'callback_data' => 'reject_vahid']
-                ],
-                [
-                    ['text' => "خودم ✅", 'callback_data' => 'confirm_self'],
-                    ['text' => "خودم ❌", 'callback_data' => 'reject_self']
-                ],
-                [
-                    ['text' => "صفحه قبل", 'callback_data' => 'prev_page']
-                ]
-            ]
-        ];
-
-        $this->editMessageReplyMarkup($chat_id, $message_id, $keyboard);
-    }
-
-// تابع ویرایش کیبورد شیشه‌ای
-    function editMessageReplyMarkup($chat_id, $message_id, $keyboard) {
-        $url = "https://api.telegram.org/bot$this->access_token/editMessageReplyMarkup";
-        $post_fields = [
-            'chat_id' => $chat_id,
-            'message_id' => $message_id,
-            'reply_markup' => json_encode($keyboard)
-        ];
-
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array("Content-Type:multipart/form-data"));
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $post_fields);
-        curl_exec($ch);
-        curl_close($ch);
-    }
-
 
 
 }
