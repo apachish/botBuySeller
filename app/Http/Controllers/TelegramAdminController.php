@@ -64,7 +64,7 @@ class TelegramAdminController extends Controller
         $chatId = $update[$type]['from']['id']; // چت‌آیدی کاربر
         $message_id = null;
         if (isset($update[$type]['message_id']))
-            $message_id = $update['message_id']; // چت‌آیدی کاربر
+            $message_id = $update[$type]['message_id']; // چت‌آیدی کاربر
         if (isset($update[$type]['message']['message_id']))
             $message_id = $update[$type]['message']['message_id']; // چت‌آیدی کاربر
         logger("chatid" . $chatId);
