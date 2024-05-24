@@ -12,47 +12,32 @@ class TelegramServices
     public $access_token;
 
 
-    public function MessageReplyMarkup($telegram,$chat_id,$text)
+    public function MessageReplyMarkup($telegram,$chat_id,$text,$keyboard)
     {
-        $url = "https://api.telegram.org/bot$this->access_token/sendMessage";
-
-        $keyboard = [
-            'inline_keyboard' => [
-                [
-                    [
-                        'text' => "تماس بگیرید",
-                        'url' => "tel:+989120308527" // شماره تلفن مورد نظر را با فرمت صحیح وارد کنید
-                    ]
-                ]
-            ]
-        ];
+//        $keyboard = [
+//            'inline_keyboard' => [
+//                [
+//                    [
+//                        'text' => "تماس بگیرید",
+//                        'url' => "tel:+989120308527" // شماره تلفن مورد نظر را با فرمت صحیح وارد کنید
+//                    ]
+//                ]
+//            ]
+//        ];
         logger("keyword",$keyboard);
-//        $reply_markup = Keyboard::make([
-//            'inline_keyboard' => $keyboard,
-//            'resize_keyboard' => true,
-//            'one_time_keyboard' => true
-//        ]);
-//
-//        $response = $telegram->sendMessage([
-//            'chat_id' => $chat_id,
-//            'text' => $text,
-//            'reply_markup' => $reply_markup
-//        ]);
-        $post_fields = [
+        $reply_markup = Keyboard::make([
+            'inline_keyboard' => $keyboard,
+            'resize_keyboard' => true,
+            'one_time_keyboard' => true
+        ]);
+
+        $response = $telegram->sendMessage([
             'chat_id' => $chat_id,
-            'text' => "برای تماس کلیک کنید:",
-            'reply_markup' => json_encode($keyboard)
-        ];
+            'text' => $text,
+            'reply_markup' => $reply_markup,
+            'parse_mode' => 'HTML'
 
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array("Content-Type:multipart/form-data"));
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $post_fields);
-        $result = curl_exec($ch);
-        curl_close($ch);
-
-        return $result;
+        ]);
 
     }
     // تابع ویرایش کیبورد شیشه‌ای
