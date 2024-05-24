@@ -93,7 +93,7 @@ class TelegramAdminController extends Controller
                 $i = 0;
 
                 $contacts->each(function ($contact) use (&$keyboard, &$i) {
-                    $keyboard[$i][] = [
+                    $keyboard[$i++][] = [
                         "text" => $contact->fullName ?: $contact->first_name . " " . $contact->last_name,
                         'callback_data' => "tel:" . $contact->mobile,
 
@@ -118,10 +118,10 @@ class TelegramAdminController extends Controller
 
                 $users->each(function ($user) use (&$keyboard, &$i) {
                     $text = $user->fullName ?: $user->first_name . " " . $user->last_name;
-                    $keyboard[$i] = [
+                    $keyboard[$i++] = [
                         ['text' => "  $text "],
                     ];
-                    $keyboard[$i] = [
+                    $keyboard[$i++] = [
                         ['text' => "\xE2\x9C\x85 ", 'callback_data' => 'confirm_' . $user->id],
                         ['text' => "\xE2\x9D\x8C", 'callback_data' => 'reject_' . $user->id],
                     ];
