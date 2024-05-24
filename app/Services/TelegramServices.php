@@ -15,7 +15,7 @@ class TelegramServices
     public function MessageReplyMarkup($telegram,$chat_id,$text,$keyboard)
     {
         $keyboard[] =[
-            ["text"=>"Shahriar P","url"=>"tel:09120308527"]
+            ["text"=>"Shahriar P","callback_data"=>"tel:09120308527"]
         ];
         logger("keyword",$keyboard);
         $reply_markup = Keyboard::make([
