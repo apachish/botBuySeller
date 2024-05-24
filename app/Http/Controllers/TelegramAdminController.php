@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\ContactResourceCollection;
+use App\Models\Setting;
 use App\Services\TelegramServices;
 use Illuminate\Http\Request;
 use Telegram\Bot\Api;
@@ -79,7 +80,9 @@ class TelegramAdminController extends Controller
 
         $data = data_get($update, $type . ".data");
         logger("data_text", [$data_text]);
-
+        $cache_data = cache()->get("text_admin_" . $chatId);
+        if($cache_data)
+            $data_text = $cache_data;
         if ($data_text && !str_contains($data_text, "start")) {
             if ($data_text == "📞 دفترچه تلفن") {
                 $text = "لیست شماره تلفن کاربران";
@@ -136,6 +139,31 @@ class TelegramAdminController extends Controller
             } elseif ($data_text == "تعداد کاربران") {
                 $response_text = UserTelegram::count();
                 $service_telgram->sendMessage($chatId, $response_text);
+
+            }elseif ($data_text == "📚  ویرایش قوانین") {
+                $rule = Setting::where("key","rule")->first();
+
+                if($rule)
+                    $response_text = $rule->value;
+                else
+                    $response_text = "متن قواتین وارد کنید";
+
+                cache()->set("text_admin_" . $chatId, "rule");
+
+                $service_telgram->sendMessage($chatId, $response_text);
+
+            }elseif ($data_text == "rule") {
+                $rule = Setting::updateOrCreate(
+                    ["key"=>"rule"],
+                    ["value"=>data_get($update, $type . ".text")]
+                );
+
+
+                $response_text = "متن قواتین  بروزرسانی شد:";
+                $response_text .= "\n\n";
+                $response_text .= $rule->value;
+                $service_telgram->sendMessage($chatId, $response_text);
+                cache()->forget("text_admin_" . $chatId);
 
             }
             return true;
@@ -194,9 +222,9 @@ class TelegramAdminController extends Controller
                 ['text' => "تعداد کاربران"],
                 ['text' => "📋 لیست کاربران"]
             ],
-            [
-                ['text' => "🔍 جستجو کاربر"]
-            ],
+//            [
+//                ['text' => "🔍 جستجو کاربر"]
+//            ],
             [
                 ['text' => "📚  ویرایش قوانین"]
             ],
