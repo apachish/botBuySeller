@@ -80,9 +80,20 @@ class TelegramAdminController extends Controller
 
         $data = data_get($update, $type . ".data");
         logger("data_text", [$data_text]);
+        if (!in_array($data_text, [
+            "📞 دفترچه تلفن",
+            "📋 لیست کاربران",
+            "تعداد کاربران",
+            "📚  ویرایش قوانین",
+            "\xE2\x81\x89 ویرایش راهنما ",
+            "📈 بازه معاملات",
+        ]))
+            cache()->forget("text_admin_" . $chatId);
+
         $cache_data = cache()->get("text_admin_" . $chatId);
-        if($cache_data)
+        if ($cache_data)
             $data_text = $cache_data;
+
         if ($data_text && !str_contains($data_text, "start")) {
             if ($data_text == "📞 دفترچه تلفن") {
                 $text = "لیست شماره تلفن کاربران";
@@ -122,7 +133,7 @@ class TelegramAdminController extends Controller
                 $users->each(function ($user) use (&$keyboard, &$i) {
                     $text = $user->fullName ?: $user->first_name . " " . $user->last_name;
                     $keyboard[$i++] = [
-                        ['text' => "  $text ",'callback_data' =>  $user->id],
+                        ['text' => "  $text ", 'callback_data' => $user->id],
                     ];
                     $keyboard[$i++] = [
                         ['text' => "\xE2\x9C\x85 ", 'callback_data' => 'confirm_' . $user->id],
@@ -140,10 +151,10 @@ class TelegramAdminController extends Controller
                 $response_text = UserTelegram::count();
                 $service_telgram->sendMessage($chatId, $response_text);
 
-            }elseif ($data_text == "📚  ویرایش قوانین") {
-                $rule = Setting::where("key","rule")->first();
+            } elseif ($data_text == "📚  ویرایش قوانین") {
+                $rule = Setting::where("key", "rule")->first();
 
-                if($rule)
+                if ($rule)
                     $response_text = $rule->value;
                 else
                     $response_text = "متن قواتین وارد کنید";
@@ -152,10 +163,10 @@ class TelegramAdminController extends Controller
 
                 $service_telgram->sendMessage($chatId, $response_text);
 
-            }elseif ($data_text == "rule") {
+            } elseif ($data_text == "rule") {
                 $rule = Setting::updateOrCreate(
-                    ["key"=>"rule"],
-                    ["value"=>data_get($update, $type . ".text")]
+                    ["key" => "rule"],
+                    ["value" => data_get($update, $type . ".text")]
                 );
 
 
@@ -164,6 +175,66 @@ class TelegramAdminController extends Controller
                 $response_text .= $rule->value;
                 $service_telgram->sendMessage($chatId, $response_text);
                 cache()->forget("text_admin_" . $chatId);
+
+            } elseif ($data_text == "\xE2\x81\x89 ویرایش راهنما ") {
+                $rule = Setting::where("key", "help")->first();
+
+                if ($rule)
+                    $response_text = $rule->value;
+                else
+                    $response_text = "متن راهنما وارد کنید";
+
+                cache()->set("text_admin_" . $chatId, "help");
+
+                $service_telgram->sendMessage($chatId, $response_text);
+
+            } elseif ($data_text == "help") {
+                $rule = Setting::updateOrCreate(
+                    ["key" => "help"],
+                    ["value" => data_get($update, $type . ".text")]
+                );
+
+
+                $response_text = "متن راهنما  بروزرسانی شد:";
+                $response_text .= "\n\n";
+                $response_text .= $rule->value;
+                $service_telgram->sendMessage($chatId, $response_text);
+                cache()->forget("text_admin_" . $chatId);
+
+            } elseif ($data_text == "📈 بازه معاملات") {
+                $rule = Setting::where("key", "max_min_trade")->first();
+
+                if ($rule)
+                    $response_text = $rule->value;
+                else
+                    $response_text = "بازه معاملات به صورت min-max وارد کنید \n\n مثل 14320-14550";
+
+                cache()->set("text_admin_" . $chatId, "max_min_trade");
+
+                $service_telgram->sendMessage($chatId, $response_text);
+
+            } elseif ($data_text == "max_min_trade") {
+                $limit_trade = data_get($update, $type . ".text");
+                $array = explode("-", $limit_trade);
+                if (is_array($array) & isset($array[0]) & isset($array[1]) & $array[0] < $array[1]) {
+                    $rule = Setting::updateOrCreate(
+                        ["key" => "max_min_trade"],
+                        ["value" => $array]
+                    );
+                    $response_text = "محدوده   بروزرسانی شد:";
+                    $response_text .= "\n\n";
+                    $response_text .= "حد پایین";
+                    $response_text .= $array[0];
+                    $response_text .= "\n\n";
+
+                    $response_text .= "حد بالا";
+                    $response_text .= $array[1];
+                    $service_telgram->sendMessage($chatId, $response_text);
+                    cache()->forget("text_admin_" . $chatId);
+                } else {
+                    $service_telgram->sendMessage($chatId, "محدودو وارد شده صحیخ نمی باشد");
+
+                }
 
             }
             return true;
@@ -216,7 +287,7 @@ class TelegramAdminController extends Controller
         $keyboard = [
             [
                 ['text' => "📞 دفترچه تلفن"],
-                ['text' => "📈 معاملات باز"]
+                ['text' => "📈 بازه معاملات"]
             ],
             [
                 ['text' => "تعداد کاربران"],
@@ -229,7 +300,7 @@ class TelegramAdminController extends Controller
                 ['text' => "📚  ویرایش قوانین"]
             ],
             [
-                ['text' => "\xE2\x81\x89	  ویرایش راهنما"]
+                ['text' => "\xE2\x81\x89 ویرایش راهنما "]
             ],
         ];
         $reply_markup = Keyboard::make([
