@@ -139,15 +139,17 @@ class TelegramAdminController extends Controller
             }
             return true;
         }
+        logger("data",[$data]);
         if ($data) {
             if (str_contains($data, "tel:")) {
                 $tel = str_replace('tel:', '', $data);
-                $tel = "[$tel](tel:$tel)";
+                $tel = "[$tel]";//(tel:$tel)
                 $response_text = "برای تماس با شماره زیر کلیک کنید:\n\n$tel";
                 $service_telgram->sendMessage($chatId, $response_text);
             }elseif (str_contains($data, "confirm_")) {
                 $id = str_replace('confirm_', '', $data);
                 $user_con = UserTelegram::where("id",$id)->first();
+                logger("con",[$user_con,$id]);
                 if($user_con) {
                     $fullName = $user_con->fullName ?: $user_con->first_name . " " . $user_con->last_name;
                     $user_con->status = true;
@@ -160,6 +162,8 @@ class TelegramAdminController extends Controller
             }elseif (str_contains($data, "reject_")) {
                 $id = str_replace('reject_', '', $data);
                 $user_con = UserTelegram::where("id",$id)->first();
+                logger("rej",[$user_con,$id]);
+
                 if($user_con) {
                     $fullName = $user_con->fullName ?: $user_con->first_name . " " . $user_con->last_name;
                     $user_con->status = false;
