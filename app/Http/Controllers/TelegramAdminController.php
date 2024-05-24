@@ -118,11 +118,11 @@ class TelegramAdminController extends Controller
 
                 $users->each(function ($user) use (&$keyboard, &$i) {
                     $text = $user->fullName ?: $user->first_name . " " . $user->last_name;
-                    $text .= "\n\n" . $user->mobile;
+                    $text .= "\n\n" . $user->mobile."\n\n";
 
                     $keyboard[$i] = [
-                        ['text' => "✅ \n\n $text ", 'callback_data' => 'confirm_' . $user->id],
-                        ['text' => "❌ \n\n $text", 'callback_data' => 'reject_' . $user->id]
+                        ['text' => "✅  $text ", 'callback_data' => 'confirm_' . $user->id],
+                        ['text' => "❌  $text", 'callback_data' => 'reject_' . $user->id]
                     ];
                 });
                 logger("keyboard", [$keyboard]);
