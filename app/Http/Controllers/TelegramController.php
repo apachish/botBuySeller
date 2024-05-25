@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Setting;
+use App\Models\UserTradeAccess;
+use App\Services\TelegramServices;
 use Illuminate\Http\Request;
 use Telegram\Bot\Api;
 use App\Models\Bot;
@@ -21,6 +24,8 @@ class TelegramController extends Controller
 
 
         $telegram = new Api($token);
+        $telegram_services = new TelegramServices();
+        $telegram_services->access_token= $token;
 
 
         // دریافت پیام ارسال شده به بات
@@ -59,6 +64,7 @@ class TelegramController extends Controller
                 'text' => 'خوش آمدید! این یک پیام خودکار به کاربر جدید است.'
             ]);
         }
+        logger("bot user",[$update]);
         if (isset($update['message']['text'])) {
             $message = $update['message']['text'];
 
@@ -72,6 +78,7 @@ class TelegramController extends Controller
                     "data" => json_encode($update)
                 ]);
                 $chatId = $update['message']['chat']['id'];
+                $this->menu($telegram,$user_telegram,"انتخاب کنید");
                 switch ($message) {
                     case '/start':
                         $text = "منتظر تایید مدیر سیستم باشید تا دسترسی به شما ارائه گردد";
@@ -86,6 +93,16 @@ class TelegramController extends Controller
                         break;
                     case '/help':
                         $telegram->sendMessage(['chat_id' => $chatId, 'text' => 'سلام! چطور می‌توانم به شما کمک کنم؟']);
+                        break;
+                    case "\xE2\x98\x8E	 دفترچه تلفن":
+                    case "📈 معاملات باز":
+                    case "📋 لیست همکاران":
+                    case "📚   قوانین":
+                    case "\xE2\x81\x89  راهنما":
+                    case "\xE2\x9A\xA0	\xE2\x9D\x8C	غیرفعال سازی تایید دو مرحله ای ":
+                    case "\xE2\x9C\x8C	 فعال سازی دو مرحله ای":
+                    case  "\xE2\x9D\x8C	   غیر فعال فوری":
+                        $this->getAction($message,$user_telegram,$telegram_services,$telegram);
                         break;
                     default:
                         $text_send = cache()->get("text_" . $chatId);
@@ -117,6 +134,105 @@ class TelegramController extends Controller
         }
     }
 
+    public function getAction($data_text,$user,$telegram_services,$telegram)
+    {
+
+        if ($data_text){
+            switch ($data_text) {
+                case "\xE2\x98\x8E	 دفترچه تلفن":
+                    $keyboard = [
+                        [
+                            [
+                                'text' => "ارسال مخاطب",
+                                'request_contact' => true
+                            ]
+                        ]
+                    ];
+                    $telegram_services->setKeyword($user->id,$keyboard);
+                    break;
+                case "📈 معاملات باز":
+                    $worker = UserTelegram::where("user_id",$user->id)->get();
+                    $keyboard = [];
+                    $i =0;
+                    $worker->each(function ($row) use (&$i,&$keyboard){
+                        $text = $row->fullName ?: $row->first_name . " " . $row->last_name;
+
+                        $keyboard[$i++] = [
+                            ['text' =>  $text, 'callback_data' => "trade_open_".$row->id],
+                        ];
+                    });
+                    $telegram_services->sendMessage($user->id, "شخص مورد نظر را انتخاب کنید",$keyboard);
+                    break;
+
+                case "📋 لیست همکاران":
+                    $text = "لیست  همکاران";
+                    $users = UserTelegram::with("userTradeAccess")->simplePaginate(5);
+                    $page = $users->currentPage();
+                    $next = $users->nextPageUrl();
+                    $pre = $users->previousPageUrl();
+                    logger("page", [$next, $page, $pre]);
+                    $keyboard = [];
+                    $i = 0;
+
+                    $users->each(function ($user) use (&$keyboard, &$i) {
+                        $text = $user->fullName ?: $user->first_name . " " . $user->last_name;
+                        $limit_trade =  $user->userTradeAccess->where("user_trade_id",$user->id);
+                        $keyboard[$i][0] = [
+                            'text' => "  $text ".($limit_trade?"\xE2\x9D\x8C":"\xE2\x9C\x85"),
+                            'callback_data' => "trade_limit_".$user->id
+                        ];
+                        if($user->userTradeAccess)
+                        $keyboard[$i][1] = [
+                            'text' => "مجاز تا".$limit_trade->limit." تا",
+                            'callback_data' => "trade_limit_".$user->id];
+
+
+                        $i++;
+                    });
+                    logger("keyboard", [$keyboard]);
+                    if ($pre)
+                        $keyboard[$i][] = ['text' => "قبلی", "callback_data" => "pre"];
+                    if ($pre)
+                        $keyboard[$i][] = ['text' => "بعدی", "callback_data" => "next"];
+
+                    $telegram_services->MessageReplyMarkup($telegram, $user->id, $text, $keyboard);
+                    break;
+
+                case "📚   قوانین":
+                    $help = Setting::where("key", "rule")->first();
+                    $telegram_services->sendMessage($user->id, $help->value);
+                    break;
+
+                case "\xE2\x81\x89  راهنما":
+                    $help = Setting::where("key", "help")->first();
+                    $telegram_services->sendMessage($user->id, $help->value);
+
+                    break;
+
+                case "\xE2\x9A\xA0	\xE2\x9D\x8C	غیرفعال سازی تایید دو مرحله ای ":
+                    $user->verify_two = false;
+                    $user->update();
+                    $telegram_services->sendMessage($user->id,"تایید دو مرحله ای غیر فعال شد");
+                    break;
+
+                case "\xE2\x9C\x8C	 فعال سازی دو مرحله ای":
+                    $user->verify_two = true;
+                    $user->update();
+                    $telegram_services->sendMessage($user->id,"تایید دو مرحله ای  فعال شد");
+
+                    break;
+
+                case  "\xE2\x9D\x8C	   غیر فعال فوری":
+                    $user->delete();
+                    $this->menu();
+                    break;
+                default:
+                    return false;
+            }
+        }
+
+    }
+
     private function iranMobile($value)
     {
 
@@ -133,45 +249,41 @@ class TelegramController extends Controller
         return str_replace($eastern, $western, $value);
     }
 
-
-    public function checkMember($user, $bot)
+    public function menu($telegram, $user, $text)
     {
-        //        $telegram = new Api(data_get($bot,'token')); // توکن ربات تلگرام خود را جایگزین کنید
-        $token = data_get($bot, 'token'); // توکن ربات تلگرام خود را جایگزین کنید
+        if($user->status)
+        $keyboard = [
+            [
+                ['text' => "\xE2\x98\x8E	 دفترچه تلفن"],
+                ['text' => "📈 معاملات باز"]
+            ],
+            [
+                ['text' => "📋 لیست همکاران"]
+            ],
+            [
+                ['text' => "📚   قوانین"],
+                ['text' => "\xE2\x81\x89  راهنما"]
+            ],
+            [
+                ['text' => $user->verify_two?"\xE2\x9A\xA0	\xE2\x9D\x8C	غیرفعال سازی تایید دو مرحله ای ":"\xE2\x9C\x8C	 فعال سازی دو مرحله ای"],
+                ['text' => "\xE2\x9D\x8C	   غیر فعال فوری"],
 
-        $chatId = '@apdadana'; // نام کاربری یا آیدی کانال مورد نظر
-        $userId = data_get($user, 'id'); // آیدی کاربری مورد نظر
+            ],
+        ];
+        else
+            $keyboard = [];
+        $reply_markup = Keyboard::make([
+            'keyboard' => $keyboard,
+            'resize_keyboard' => true,
+            'one_time_keyboard' => false
+        ]);
 
-        // درخواست اطلاعات کاربر در کانال
-        //        $response = $telegram->getChatMember([
-        //            'chat_id' => $chatId,
-        //            'user_id' => $userId
-        //        ]);
-        //
-        //        logger("response",[$response,$response->isOk() , $response->getChatMember() ]);
-        //// بررسی وضعیت عضویت کاربر در کانال
-        //        if ($response->isOk() && $response->getChatMember()->getStatus() == 'member') {
-        //            logger( "کاربر عضو کانال است.");
-        //            return true;
-        //        } else {
-        //            logger( "کاربر عضو کانال نیست یا خطایی رخ داده است.");
-        //            return false;
-        //
-        //        }
-        // ارسال درخواست به API تلگرام
-        logger("https://api.telegram.org/bot$token/getChatMember?chat_id=$chatId&user_id=$userId");
-        $response = file_get_contents("https://api.telegram.org/bot$token/getChatMember?chat_id=$chatId&user_id=$userId");
+        $response = $telegram->sendMessage([
+            'chat_id' => $user->id,
+            'text' => $text,
+            'reply_markup' => $reply_markup
+        ]);
 
-        // تبدیل پاسخ از JSON به آرایه
-        $result = json_decode($response, true);
-        logger("response", [$response]);
-        // بررسی وضعیت عضویت کاربر در کانال
-        if (data_get($result, 'ok') && in_array(data_get($result, 'result.status'), ['member', 'creator'])) {
-            logger("کاربر عضو کانال است.");
-            return true;
-        } else {
-            logger("کاربر عضو کانال نیست یا خطایی رخ داده است.");
-            return false;
-        }
     }
+
 }
