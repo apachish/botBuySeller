@@ -78,7 +78,8 @@ class TelegramController extends Controller
                     "data" => json_encode($update)
                 ]);
                 $chatId = $update['message']['chat']['id'];
-                $this->menu($telegram,$user_telegram,"انتخاب کنید");
+                if(!cache()->get("keyword_menu".$user_id))
+                $this->menu($telegram,$user_telegram,"خوش آمدید");
                 switch ($message) {
                     case '/start':
                         $text = "منتظر تایید مدیر سیستم باشید تا دسترسی به شما ارائه گردد";
@@ -94,14 +95,14 @@ class TelegramController extends Controller
                     case '/help':
                         $telegram->sendMessage(['chat_id' => $chatId, 'text' => 'سلام! چطور می‌توانم به شما کمک کنم؟']);
                         break;
-                    case "\xE2\x98\x8E	 دفترچه تلفن":
+                    case "\xE2\x98\x8E	دفترچه تلفن":
                     case "📈 معاملات باز":
                     case "📋 لیست همکاران":
                     case "📚   قوانین":
                     case "\xE2\x81\x89  راهنما":
                     case "\xE2\x9A\xA0	\xE2\x9D\x8C	غیرفعال سازی تایید دو مرحله ای ":
-                    case "\xE2\x9C\x8C	 فعال سازی دو مرحله ای":
-                    case  "\xE2\x9D\x8C	   غیر فعال فوری":
+                    case "\xE2\x9C\x8C	فعال سازی دو مرحله ای":
+                    case  "\xE2\x9D\x8C	غیر فعال فوری":
                         $this->getAction($message,$user_telegram,$telegram_services,$telegram);
                         break;
                     default:
@@ -139,7 +140,7 @@ class TelegramController extends Controller
 
         if ($data_text){
             switch ($data_text) {
-                case "\xE2\x98\x8E	 دفترچه تلفن":
+                case "\xE2\x98\x8E	دفترچه تلفن":
                     $keyboard = [
                         [
                             [
@@ -181,7 +182,7 @@ class TelegramController extends Controller
                             'text' => "  $text ".($limit_trade?"\xE2\x9D\x8C":"\xE2\x9C\x85"),
                             'callback_data' => "trade_limit_".$user->id
                         ];
-                        if($user->userTradeAccess)
+                        if($limit_trade)
                         $keyboard[$i][1] = [
                             'text' => "مجاز تا".$limit_trade->limit." تا",
                             'callback_data' => "trade_limit_".$user->id];
@@ -215,14 +216,14 @@ class TelegramController extends Controller
                     $telegram_services->sendMessage($user->id,"تایید دو مرحله ای غیر فعال شد");
                     break;
 
-                case "\xE2\x9C\x8C	 فعال سازی دو مرحله ای":
+                case "\xE2\x9C\x8C	فعال سازی دو مرحله ای":
                     $user->verify_two = true;
                     $user->update();
                     $telegram_services->sendMessage($user->id,"تایید دو مرحله ای  فعال شد");
 
                     break;
 
-                case  "\xE2\x9D\x8C	   غیر فعال فوری":
+                case  "\xE2\x9D\x8C	غیر فعال فوری":
                     $user->delete();
                     $this->menu();
                     break;
@@ -251,38 +252,40 @@ class TelegramController extends Controller
 
     public function menu($telegram, $user, $text)
     {
-        if($user->status)
-        $keyboard = [
-            [
-                ['text' => "\xE2\x98\x8E	 دفترچه تلفن"],
-                ['text' => "📈 معاملات باز"]
-            ],
-            [
-                ['text' => "📋 لیست همکاران"]
-            ],
-            [
-                ['text' => "📚   قوانین"],
-                ['text' => "\xE2\x81\x89  راهنما"]
-            ],
-            [
-                ['text' => $user->verify_two?"\xE2\x9A\xA0	\xE2\x9D\x8C	غیرفعال سازی تایید دو مرحله ای ":"\xE2\x9C\x8C	 فعال سازی دو مرحله ای"],
-                ['text' => "\xE2\x9D\x8C	   غیر فعال فوری"],
+        if($user->status) {
+            $keyboard = [
+                [
+                    ['text' => "\xE2\x98\x8E	 دفترچه تلفن"],
+                    ['text' => "📈 معاملات باز"]
+                ],
+                [
+                    ['text' => "📋 لیست همکاران"]
+                ],
+                [
+                    ['text' => "📚   قوانین"],
+                    ['text' => "\xE2\x81\x89  راهنما"]
+                ],
+                [
+                    ['text' => $user->verify_two ? "\xE2\x9A\xA0	\xE2\x9D\x8C	غیرفعال سازی تایید دو مرحله ای " : "\xE2\x9C\x8C	 فعال سازی دو مرحله ای"],
+                    ['text' => "\xE2\x9D\x8C	   غیر فعال فوری"],
 
-            ],
-        ];
-        else
-            $keyboard = [];
-        $reply_markup = Keyboard::make([
-            'keyboard' => $keyboard,
-            'resize_keyboard' => true,
-            'one_time_keyboard' => false
-        ]);
+                ],
+            ];
+            $reply_markup = Keyboard::make([
+                'keyboard' => $keyboard,
+                'resize_keyboard' => true,
+                'one_time_keyboard' => false
+            ]);
 
-        $response = $telegram->sendMessage([
-            'chat_id' => $user->id,
-            'text' => $text,
-            'reply_markup' => $reply_markup
-        ]);
+            $response = $telegram->sendMessage([
+                'chat_id' => $user->id,
+                'text' => $text,
+                'reply_markup' => $reply_markup
+            ]);
+            cache()->set("keyword_menu".$user->id,true);
+        }else{
+            cache()->forget("keyword_menu".$user->id);
+        }
 
     }
 
