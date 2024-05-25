@@ -167,7 +167,9 @@ class TelegramController extends Controller
 
                 case "📋 لیست همکاران":
                     $text = "لیست  همکاران";
-                    $users = UserTelegram::with("userTradeAccess")->simplePaginate(5);
+                    $users = UserTelegram::where("id","!=",$user->id)
+                        ->with("userTradeAccess")->simplePaginate(5);
+                    logger("users",[$users]);
                     $page = $users->currentPage();
                     $next = $users->nextPageUrl();
                     $pre = $users->previousPageUrl();
