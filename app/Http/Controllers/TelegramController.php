@@ -180,14 +180,16 @@ class TelegramController extends Controller
                     $users->each(function ($user) use (&$keyboard, &$i) {
                         $text = $user->fullName ?: $user->first_name . " " . $user->last_name;
                         $limit_trade =  $user->userTradeAccess->where("user_trade_id",$user->id);
+                        logger('limit_trade',[$limit_trade]);
+
                         $keyboard[$i][0] = [
-                            'text' => "  $text ".($limit_trade?"\xE2\x9D\x8C":"\xE2\x9C\x85"),
+                            'text' => "  $text ".($limit_trade->count()?"\xE2\x9D\x8C":"\xE2\x9C\x85"),
                             'callback_data' => "trade_limit_".$user->id
                         ];
-                        if($limit_trade)
-                        $keyboard[$i][1] = [
-                            'text' => "مجاز تا".$limit_trade->limit." تا",
-                            'callback_data' => "trade_limit_".$user->id];
+                        if($limit_trade->count())
+                            $keyboard[$i][1] = [
+                                'text' => "مجاز تا".$limit_trade->limit_access." تا",
+                                'callback_data' => "trade_limit_".$user->id];
 
 
                         $i++;

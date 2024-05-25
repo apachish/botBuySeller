@@ -15,7 +15,7 @@ class UserTradeAccess extends Model
     protected $fillable = [
         "user_id",
         "user_trade_id",
-        "limit"
+        "limit_access"
     ];
 
     use HasFactory;
