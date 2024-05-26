@@ -165,7 +165,7 @@ class TelegramController extends Controller
                         $value = (int)data_get($max_min_trade, "value");
                     $array = explode("خ", $message);
                     $price = $value + ((int)data_get($array, 0)*1000);
-                    $number = (int)data_get($array, 0);
+                    $number = (int)data_get($array, 1);
                     logger("check_transfare",[$price,$number,$array]);
                     $check_transfare = Transfer::where("price", ">", $price)
                         ->where("status", true)
