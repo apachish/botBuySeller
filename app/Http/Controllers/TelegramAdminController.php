@@ -86,7 +86,7 @@ class TelegramAdminController extends Controller
             "تعداد کاربران",
             "📚  ویرایش قوانین",
             "\xE2\x81\x89 ویرایش راهنما",
-            "📈 بازه معاملات",
+            "📈شروع مبلغ معاملات",
         ]))
             cache()->forget("text_admin_" . $chatId);
 
@@ -207,7 +207,7 @@ class TelegramAdminController extends Controller
                 $service_telgram->sendMessage($chatId, $response_text);
                 cache()->forget("text_admin_" . $chatId);
 
-            } elseif ($data_text == "📈شروع بازه معاملات") {
+            } elseif ($data_text == "📈شروع مبلغ معاملات") {
                 $start_trade = Setting::where("key", "start_trade")->first();
 
                 if ($start_trade)
