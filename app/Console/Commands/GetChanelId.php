@@ -52,7 +52,13 @@ class GetChanelId extends Command
             $result = curl_exec($ch);
             curl_close($ch);
 
-            return json_decode($result, true);
+        $response = json_decode($result, true);
+        if (isset($response['result']['id'])) {
+            $channel_id = $response['result']['id'];
+            echo "شناسه کانال: " . $channel_id;
+        } else {
+            echo "خطا در دریافت شناسه کانال.";
+        }
 
     }
 }
