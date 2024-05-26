@@ -8,6 +8,7 @@ use App\Models\Transfer;
 use App\Models\UserTradeAccess;
 use App\Services\TelegramServices;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Telegram\Bot\Api;
 use App\Models\Bot;
 use App\Models\TextTelegram;
@@ -86,40 +87,49 @@ class TelegramController extends Controller
         $data = data_get($update, $type . ".data");
         logger('data', [$data]);
         if ($data) {
-            if (str_contains($data, "transfer_buy_")) {
+            if (str_contains($data, "request_transfer_")) {
+                $array = str_replace('request_transfer_', '', $data);
+                $info = explode("_", $array);
+                $id = data_get($info, 0);
+                $num = data_get($info, 1);
+                $transfer = Transfer::find($id);
+                if ($transfer) {
+                    DB::beginTransaction();
+                    try {
+                        if ($transfer->number >= $num)
+                            $transfer->number -= $num;
+                        $keyboard = $this->getKeyboardRequest($transfer->number, $transfer);
+
+                        $telegram_services->editMessageReplyMarkup($user_id, $transfer->message_id, $keyboard);
+                        $transfer->update();
+                        DB::commit();
+                    } catch (\Exception $e) {
+                        DB::rollback();
+
+                    }
+                }
+            } elseif (str_contains($data, "transfer_buy_")) {
                 if ($data == "transfer_buy_true") {
                     $array = cache()->get("transfer_cache_buy_" . $user_id);
-                    logger("transfer_cache_buy_",[$array]);
+                    logger("transfer_cache_buy_", [$array]);
                     Transfer::where("user_id", $user_id)->where("type", "خ")->delete();
                     $transfer_new = Transfer::create($array);
-                    logger("a",[$user_id, $message_id, []]);
+                    logger("a", [$user_id, $message_id, []]);
                     $telegram_services->editMessageReplyMarkup($user_id, $message_id, new \stdClass());
                     $telegram_services->sendMessage($user_id, "لفظ شما تایید شد\xE2\x9C\x85	");
                     $price = number_format($transfer_new->price, 0);
                     $number = $transfer_new->number;
                     $message = "$price \xF0\x9F\x94\xB5	خرید \xE2\x8F\xB3	 با حواله $number تا ";
 
-                    $m = 0;
-                    $k = 0;
-                    for ($i=1;$i<=$number;$i++)
-                    {
-                        $keyboard[$k][$m++] = [
-                            'text' => $i,
-                            'callback_data' => "request_transfer_$transfer_new->id",
-                        ];
-                        if($m == 3)
-                        {
-                            $m = 0;
-                            $k++;
-                        }
-                    }
+                    $keyboard = $this->getKeyboardRequest($number, $transfer_new);
 
-                    logger("test",[$bot->chanel_id, $message,$keyboard]);
-                    $message_result = $telegram_services->MessageReplyMarkup($telegram,$bot->chanel_id, $message,$keyboard);
-                    $transfer_new->message_id = data_get($message_result,'message_id');
+                    logger("test", [$bot->chanel_id, $message, $keyboard]);
+                    $message_result = $telegram_services->MessageReplyMarkup($telegram, $bot->chanel_id, $message, $keyboard);
+                    $transfer_new->message_id = data_get($message_result, 'message_id');
                     $transfer_new->message = $message;
                     $transfer_new->update();
                     dispatch(new DeactivateTransfer($transfer_new->id))->delay(now()->addMinute(1));
+                    cache()->forget("transfer_cache_buy_" . $user_id);
                 }
             } elseif (str_contains($data, "trade_limit_")) {
                 $worker_id = (int)str_replace('trade_limit_', '', $data);
@@ -165,16 +175,16 @@ class TelegramController extends Controller
                 $message = $this->convertNumber($message);
                 $array = explode("خ", $message);
 
-                logger('array',[$array,preg_match($pattern_buy, $message)]);
+                logger('array', [$array, preg_match($pattern_buy, $message)]);
                 if (preg_match($pattern_buy, $message)) {
                     $max_min_trade = Setting::where("key", "s_price_trade")->first();
-                    logger("max_min_trade",[$max_min_trade]);
+                    logger("max_min_trade", [$max_min_trade]);
                     if ($max_min_trade)
                         $value = (int)data_get($max_min_trade, "value");
                     $array = explode("خ", $message);
-                    $price = $value + ((int)data_get($array, 0)*1000);
+                    $price = $value + ((int)data_get($array, 0) * 1000);
                     $number = (int)data_get($array, 1);
-                    logger("check_transfare",[$price,$number,$array]);
+                    logger("check_transfare", [$price, $number, $array]);
                     $check_transfare = Transfer::where("price", ">", $price)
                         ->where("status", true)
                         ->first();
@@ -194,15 +204,15 @@ class TelegramController extends Controller
                             "price" => $price,
                             "status" => 0
                         ]);
-                        $p = number_format($price,0);
+                        $p = number_format($price, 0);
                         $message = "$p \xF0\x9F\x94\xB5	خرید \xE2\x8F\xB3	 با حواله $number تا ";
                         $keyboard[0] = [
                             ['text' => "\xE2\x9C\x85	تایید", 'callback_data' => "transfer_buy_true"],
                             ['text' => "\xE2\x9D\x8C	رد", 'callback_data' => "transfer_buy_false"],
                         ];
-                        logger("ke",[$chatId, $message, $keyboard]);
-                        $telegram_services->MessageReplyMarkup($telegram,$chatId, $message, $keyboard);
-                        return  true;
+                        logger("ke", [$chatId, $message, $keyboard]);
+                        $telegram_services->MessageReplyMarkup($telegram, $chatId, $message, $keyboard);
+                        return true;
                     }
                 } elseif (preg_match($pattern_sell, $message)) {
 
@@ -429,6 +439,28 @@ class TelegramController extends Controller
             cache()->forget("keyword_menu" . $user->id);
         }
 
+    }
+
+    /**
+     * @param mixed $number
+     * @param \Illuminate\Database\Eloquent\Model|Transfer $transfer_new
+     * @return mixed
+     */
+    public function getKeyboardRequest(mixed $number, \Illuminate\Database\Eloquent\Model|Transfer $transfer_new): mixed
+    {
+        $m = 0;
+        $k = 0;
+        for ($i = 1; $i <= $number; $i++) {
+            $keyboard[$k][$m++] = [
+                'text' => $i,
+                'callback_data' => "request_transfer_" . $transfer_new->id . "_" . $i,
+            ];
+            if ($m == 3) {
+                $m = 0;
+                $k++;
+            }
+        }
+        return $keyboard;
     }
 
 }
