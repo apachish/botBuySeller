@@ -122,7 +122,7 @@ class TelegramController extends Controller
                         $telegram->sendMessage(['chat_id' => $chatId, 'text' => 'سلام! چطور می‌توانم به شما کمک کنم؟']);
                         break;
                     case "trade_number_limit":
-                        $worker_id =data_get($cache_data,"value");
+                        $worker_id =(int)data_get($cache_data,"value");
                         $limit_assess =$input_data;
                         UserTradeAccess::updateOrCreate([
                             "user_id"=>$user_id,
