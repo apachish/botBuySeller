@@ -153,7 +153,7 @@ class TelegramController extends Controller
                 $pattern_buy = '/^\d{3}خ\d{1,2}$/';
                 $pattern_sell = '/^\d{3}ف\d{1,2}$/';
                 if (preg_match($pattern_buy, $message)) {
-                    $max_min_trade = Setting::where("key", "start_trade")->first();
+                    $max_min_trade = Setting::where("key", "s_price_trade")->first();
                     if ($max_min_trade)
                         $value = data_get($max_min_trade, "value");
                     $array = explode("خ", $message);

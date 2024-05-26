@@ -209,28 +209,28 @@ class TelegramAdminController extends Controller
                 cache()->forget("text_admin_" . $chatId);
 
             } elseif ($data_text == "📈شروع مبلغ معاملات") {
-                $start_trade = Setting::where("key", "start_trade")->first();
+                $s_price_trade = Setting::where("key", "s_price_trade")->first();
 
-                if ($start_trade)
-                    $response_text = $start_trade->value;
+                if ($s_price_trade)
+                    $response_text = $s_price_trade->value;
                 else
                     $response_text = " شروع مبلغ معاملات را وارد کنید \n\n مثل 14000000";
 
-                cache()->set("text_admin_" . $chatId, "start_trade");
+                cache()->set("text_admin_" . $chatId, "s_price_trade");
 
                 $service_telgram->sendMessage($chatId, $response_text);
 
-            } elseif ($data_text == "start_trade") {
-                $start_trade = data_get($update, $type . ".text");
-                if ($start_trade ) {
+            } elseif ($data_text == "s_price_trade") {
+                $s_price_trade = data_get($update, $type . ".text");
+                if ($s_price_trade ) {
                     $rule = Setting::updateOrCreate(
-                        ["key" => "start_trade"],
-                        ["value" => $start_trade]
+                        ["key" => "s_price_trade"],
+                        ["value" => $s_price_trade]
                     );
                     $response_text = "شروع معامله   بروزرسانی شد:";
                     $response_text .= "\n\n";
                     $response_text .= "از مبلغ";
-                    $response_text .= number_format($start_trade,0);
+                    $response_text .= number_format($s_price_trade,0);
                     $response_text .= "\n\n";
                     $service_telgram->sendMessage($chatId, $response_text);
                     cache()->forget("text_admin_" . $chatId);
