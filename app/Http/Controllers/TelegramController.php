@@ -92,7 +92,7 @@ class TelegramController extends Controller
                     Transfer::where("user_id", $user_id)->where("type", "خ")->delete();
                     $transfer_new = Transfer::create($array);
                     logger("a",[$user_id, $message_id, []]);
-                    $telegram_services->editMessageReplyMarkup($user_id, $message_id, []);
+                    $telegram_services->editMessageReplyMarkup($user_id, $message_id, new \stdClass());
                     $telegram_services->sendMessage($user_id, "لفظ شما تایید شد\xE2\x9C\x85	");
                     $price = number_format($transfer_new->price, 0);
                     $number = $transfer_new->number;
