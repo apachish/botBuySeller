@@ -289,7 +289,7 @@ class TelegramAdminController extends Controller
         $keyboard = [
             [
                 ['text' => "📞 دفترچه تلفن"],
-                ['text' => "📈 بازه معاملات"]
+                ['text' => "📈شروع مبلغ معاملات"]
             ],
             [
                 ['text' => "تعداد کاربران"],
