@@ -66,6 +66,7 @@ class TelegramServices
 
         ]);
         logger("reponse",[$response]);
+        return $response;
 
     }
     // تابع ویرایش کیبورد شیشه‌ای

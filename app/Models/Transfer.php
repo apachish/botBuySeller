@@ -17,7 +17,8 @@ class Transfer extends Model
         "type",
         "number",
         "price",
-        "status"
+        "status",
+        "message_id",
     ];
 
     use HasFactory;

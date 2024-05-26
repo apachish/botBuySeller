@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\DeactivateTransfer;
 use App\Models\Setting;
 use App\Models\Transfer;
 use App\Models\UserTradeAccess;
@@ -114,7 +115,10 @@ class TelegramController extends Controller
                     }
 
                     logger("test",[$bot->chanel_id, $message,$keyboard]);
-                    $telegram_services->MessageReplyMarkup($telegram,$bot->chanel_id, $message,$keyboard);
+                    $message_result = $telegram_services->MessageReplyMarkup($telegram,$bot->chanel_id, $message,$keyboard);
+                    $transfer_new->message_id = data_get($message_result,'message_id');
+                    $transfer_new->update();
+                    dispatch(new DeactivateTransfer($transfer_new->id))->delay(now()->addMinute(1));
                 }
             } elseif (str_contains($data, "trade_limit_")) {
                 $worker_id = (int)str_replace('trade_limit_', '', $data);
