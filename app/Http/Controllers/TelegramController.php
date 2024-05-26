@@ -114,7 +114,7 @@ class TelegramController extends Controller
                     }
 
                     logger("test",[$bot->chanel_id, $message,$keyboard]);
-                    $telegram_services->sendMessage($bot->chanel_id, $message,$keyboard);
+                    $telegram_services->MessageReplyMarkup($telegram,$bot->chanel_id, $message,$keyboard);
                 }
             } elseif (str_contains($data, "trade_limit_")) {
                 $worker_id = (int)str_replace('trade_limit_', '', $data);
