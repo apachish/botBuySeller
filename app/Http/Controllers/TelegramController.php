@@ -126,6 +126,8 @@ class TelegramController extends Controller
                             "user_trade_id"=>$worker_id,
                             "limit_access"=>$limit_assess
                         ]);
+                        $telegram->sendMessage(['chat_id' => $chatId, 'text' => 'حد ثابت شد']);
+
                         break;
                     case "\xE2\x98\x8E	دفترچه تلفن":
                     case "📈 معاملات باز":
