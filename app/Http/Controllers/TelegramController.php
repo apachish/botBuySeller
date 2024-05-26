@@ -162,7 +162,7 @@ class TelegramController extends Controller
                     $max_min_trade = Setting::where("key", "s_price_trade")->first();
                     logger("max_min_trade",[$max_min_trade]);
                     if ($max_min_trade)
-                        $value = data_get($max_min_trade, "value");
+                        $value = (int)data_get($max_min_trade, "value");
                     $array = explode("خ", $message);
                     $price = $value + ((int)data_get($array, 0)*1000000);
                     $number = (int)data_get($array, 0);
@@ -187,12 +187,12 @@ class TelegramController extends Controller
                             "status" => 0
                         ]);
                         $message = "$price \xF0\x9F\x94\xB5	خرید \xE2\x8F\xB3	 با حواله $number تا ";
-                        $keyboard[0] = [
-                            ['text' => "\xE2\x9C\x85	تایید", 'callback_data' => "transfer_buy_true"],
-                            ['text' => "\xE2\x9D\x8C	رد", 'callback_data' => "transfer_buy_false"],
-                        ];
+//                        $keyboard[0] = [
+//                            ['text' => "\xE2\x9C\x85	تایید", 'callback_data' => "transfer_buy_true"],
+//                            ['text' => "\xE2\x9D\x8C	رد", 'callback_data' => "transfer_buy_false"],
+//                        ];
                         logger("ke",[$chatId, $message, $keyboard]);
-                        $telegram_services->sendMessage($chatId, $message, $keyboard);
+                        $telegram_services->sendMessage($chatId, $message, []);
                         return  true;
                     }
                 } elseif (preg_match($pattern_sell, $message)) {
