@@ -70,6 +70,7 @@ class TelegramServices
     }
     // تابع ویرایش کیبورد شیشه‌ای
     public function editMessageReplyMarkup($chat_id, $message_id, $keyboard) {
+        logger("aa",[$chat_id, $message_id, $keyboard]);
         $url = "https://api.telegram.org/bot$this->access_token/editMessageReplyMarkup";
         $post_fields = [
             'chat_id' => $chat_id,
@@ -82,8 +83,9 @@ class TelegramServices
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $post_fields);
-        curl_exec($ch);
+        $r = curl_exec($ch);
         curl_close($ch);
+        logger("rrr",[$r]);
     }
 
     // تابع ارسال پیام با کیبورد شیشه‌ای
