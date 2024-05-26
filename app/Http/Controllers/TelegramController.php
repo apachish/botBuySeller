@@ -90,7 +90,7 @@ class TelegramController extends Controller
                     $array = cache()->get("transfer_cache_buy_" . $user_id);
                     Transfer::where("user_id", $user_id)->where("type", "خ")->delete();
                     $transfer_new = Transfer::create($array);
-                    $telegram_services->editMessageReplyMarkup($chatId, $message_id, []);
+                    $telegram_services->editMessageReplyMarkup($user_id, $message_id, []);
                     $telegram_services->sendMessage($chatId, "لفظ شما تایید شد\xE2\x9C\x85	");
                     $price = number_format($transfer_new->price, 0);
                     $number = $transfer_new->number;
@@ -186,7 +186,8 @@ class TelegramController extends Controller
                             "price" => $price,
                             "status" => 0
                         ]);
-                        $message = "$price \xF0\x9F\x94\xB5	خرید \xE2\x8F\xB3	 با حواله $number تا ";
+                        $p = number_format($price,0);
+                        $message = "$p \xF0\x9F\x94\xB5	خرید \xE2\x8F\xB3	 با حواله $number تا ";
                         $keyboard[0] = [
                             ['text' => "\xE2\x9C\x85	تایید", 'callback_data' => "transfer_buy_true"],
                             ['text' => "\xE2\x9D\x8C	رد", 'callback_data' => "transfer_buy_false"],
