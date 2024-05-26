@@ -97,7 +97,8 @@ class TelegramController extends Controller
                     try {
                         if ($transfer->number >= $num)
                             $transfer->number -= $num;
-                        $keyboard = $this->getKeyboardRequest($transfer->number, $transfer);
+                        $keyboard["inline_keyboard"] = $this->getKeyboardRequest($transfer->number, $transfer);
+
 
                         $telegram_services->editMessageReplyMarkup($user_id, $transfer->message_id, $keyboard);
                         $transfer->update();
@@ -448,6 +449,7 @@ class TelegramController extends Controller
     {
         $m = 0;
         $k = 0;
+        $keyboard = [];
         for ($i = 1; $i <= $number; $i++) {
             $keyboard[$k][$m++] = [
                 'text' => $i,
@@ -458,6 +460,8 @@ class TelegramController extends Controller
                 $k++;
             }
         }
+        if(!$keyboard)
+            $keyboard = new \stdClass();
         logger("key",[$keyboard]);
         return $keyboard;
     }
