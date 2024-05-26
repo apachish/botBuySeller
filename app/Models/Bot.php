@@ -27,7 +27,8 @@ class Bot extends Model
         'url',
         'category_id',
         'created_by',
-        'description'
+        'description',
+        'chanel_id'
     ];
 
     public function accessBot()
