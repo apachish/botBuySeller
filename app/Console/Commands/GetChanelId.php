@@ -26,29 +26,22 @@ class GetChanelId extends Command
     public function handle()
     {
         $access_token = $this->ask("access_token");
-//        $query_id = $this->ask("query_id");
+        $query_id = $this->ask("query_id");
 
-
-
-// دریافت داده‌های وب‌هوک تلگرام
-        $content = file_get_contents("php://input");
-        $update = json_decode($content, true);
-
-        if (isset($update['inline_query'])) {
-            $query = $update['inline_query'];
+// تابع برای ارسال درخواست inline
             $url = "https://api.telegram.org/bot$access_token/answerInlineQuery";
 
             $results = json_encode([[
                 'type' => 'article',
                 'id' => 'unique-id',
-                'title' => 'Test Message',
+                'title' => 'Title',
                 'input_message_content' => [
                     'message_text' => "این یک پیام تست برای دریافت شناسه کانال است."
                 ]
             ]]);
 
             $post_fields = [
-                'inline_query_id' => $query['id'],
+                'inline_query_id' => $query_id,
                 'results' => $results,
                 'cache_time' => 0
             ];
@@ -61,16 +54,14 @@ class GetChanelId extends Command
             $result = curl_exec($ch);
             curl_close($ch);
 
-            $response = json_decode($result, true);
+        $response = json_decode($result, true);
 
-            // بررسی پاسخ
-            if ($response['ok']) {
-                echo "درخواست inline با موفقیت ارسال شد.";
-            } else {
-                echo "خطا در ارسال درخواست inline.";
-            }
+// ارسال درخواست inline و دریافت شناسه کانال
+        if (isset($response['result']['id'])) {
+            $channel_id = $response['result']['id'];
+            echo "شناسه کانال: " . $channel_id;
         } else {
-            echo "درخواست inline دریافت نشد.";
+            echo "خطا در دریافت شناسه کانال.";
         }
 
     }
