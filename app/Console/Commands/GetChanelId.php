@@ -52,6 +52,7 @@ class GetChanelId extends Command
 
 // ارسال پیام به کانال و دریافت شناسه کانال
         $response = sendMessageToChannel($channel_username);
+        logger("response",[$response]);
         if (isset($response['result']['chat']['id'])) {
             $channel_id = $response['result']['chat']['id'];
             echo "شناسه کانال: " . $channel_id;
