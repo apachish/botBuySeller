@@ -187,10 +187,10 @@ class TelegramController extends Controller
                             "status" => 0
                         ]);
                         $message = "$price \xF0\x9F\x94\xB5	خرید \xE2\x8F\xB3	 با حواله $number تا ";
-//                        $keyboard[0] = [
-//                            ['text' => "\xE2\x9C\x85	تایید", 'callback_data' => "transfer_buy_true"],
-//                            ['text' => "\xE2\x9D\x8C	رد", 'callback_data' => "transfer_buy_false"],
-//                        ];
+                        $keyboard[0] = [
+                            ['text' => "\xE2\x9C\x85	تایید", 'callback_data' => "transfer_buy_true"],
+                            ['text' => "\xE2\x9D\x8C	رد", 'callback_data' => "transfer_buy_false"],
+                        ];
                         logger("ke",[$chatId, $message, $keyboard]);
                         $telegram_services->sendMessage($chatId, $message, []);
                         return  true;
