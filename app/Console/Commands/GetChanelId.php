@@ -25,44 +25,25 @@ class GetChanelId extends Command
      */
     public function handle()
     {
-        $access_token = $this->ask("access_token");
-        $query_id = $this->ask("query_id");
+        $pattern_buy = '/^\d{3}خ\d{1,2}$/';
 
-// تابع برای ارسال درخواست inline
-            $url = "https://api.telegram.org/bot$access_token/answerInlineQuery";
+        $pattern = '/^[\x{06F0}-\x{06F9}]{3}خ[\x{06F0}-\x{06F9}]{1,2}$/u';
+        $subject = '۳۲۰خ۱'; // رشته‌ای که می‌خواهید بررسی کنید
 
-            $results = json_encode([[
-                'type' => 'article',
-                'id' => 'unique-id',
-                'title' => 'Title',
-                'input_message_content' => [
-                    'message_text' => "این یک پیام تست برای دریافت شناسه کانال است."
-                ]
-            ]]);
-
-            $post_fields = [
-                'inline_query_id' => $query_id,
-                'results' => $results,
-                'cache_time' => 0
-            ];
-
-            $ch = curl_init();
-            curl_setopt($ch, CURLOPT_HTTPHEADER, array("Content-Type:application/json"));
-            curl_setopt($ch, CURLOPT_URL, $url);
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($post_fields));
-            $result = curl_exec($ch);
-            curl_close($ch);
-
-        $response = json_decode($result, true);
-
-// ارسال درخواست inline و دریافت شناسه کانال
-        if (isset($response['result']['id'])) {
-            $channel_id = $response['result']['id'];
-            echo "شناسه کانال: " . $channel_id;
+        $subject = $this->convertNumber($subject);
+        if (preg_match($pattern_buy, $subject)) {
+            echo "مطابقت دارد!";
         } else {
-            echo "خطا در دریافت شناسه کانال.";
+            echo "مطابقت ندارد!";
         }
-
+        dd(explode("خ",$subject));
     }
+
+    private function convertNumber($value)
+    {
+        $western = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'];
+        $eastern = ['۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹', '۰'];
+        return str_replace($eastern, $western, $value);
+    }
+
 }
