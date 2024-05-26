@@ -30,8 +30,6 @@ class GetChanelId extends Command
         $channel_username = $this->ask("YourChannelUsername");
 
 // تابع برای ارسال پیام به کانال
-        function sendMessageToChannel($channel_username) {
-            global $access_token;
             $url = "https://api.telegram.org/bot$access_token/sendMessage";
 
             $post_fields = [
@@ -47,11 +45,10 @@ class GetChanelId extends Command
             $result = curl_exec($ch);
             curl_close($ch);
 
-            return json_decode($result, true);
-        }
+        $response = json_decode($result, true);
+
 
 // ارسال پیام به کانال و دریافت شناسه کانال
-        $response = sendMessageToChannel($channel_username);
         logger("response",[$response]);
         if (isset($response['result']['chat']['id'])) {
             $channel_id = $response['result']['chat']['id'];
