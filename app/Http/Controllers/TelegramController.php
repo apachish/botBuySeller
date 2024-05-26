@@ -154,7 +154,11 @@ class TelegramController extends Controller
                 $pattern_sell = '/^\d{3}ف\d{1,2}$/';
 //                $pattern_buy = '/^[\x{06F0}-\x{06F9}]{3}خ[\x{06F0}-\x{06F9}]{1,2}$/u';
 //                $pattern_sell = '/^[\x{06F0}-\x{06F9}]{3}ف[\x{06F0}-\x{06F9}]{1,2}$/u';
-                if (preg_match($pattern_buy, $this->convertNumber($message))) {
+                $message = $this->convertNumber($message);
+                $array = explode("خ", $message);
+
+                logger('array',[$array]);
+                if (preg_match($pattern_buy, $message)) {
                     $max_min_trade = Setting::where("key", "s_price_trade")->first();
                     if ($max_min_trade)
                         $value = data_get($max_min_trade, "value");
