@@ -39,7 +39,8 @@ class DeactivateTransfer implements ShouldQueue
 
             $transfer = Transfer::find($this->transfer_id);
             if($transfer) {
-                $telegram_services->editMessageReplyMarkup($bot->chanel_id, $transfer->message_id, new \stdClass());
+                $message = $transfer->message."\xF0\x9F\x95\x9B	";
+                $telegram_services->editMessageTextAndInlineKeyboard($bot->chanel_id, $transfer->message_id, $message);
                 $transfer->delete();
             }
 

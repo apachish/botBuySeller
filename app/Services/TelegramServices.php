@@ -89,6 +89,35 @@ class TelegramServices
         logger("rrr",[$r]);
     }
 
+
+    function editMessageTextAndInlineKeyboard($channel_chat_id, $message_id,$message,$keyboard=null) {
+        $url = "https://api.telegram.org/bot$this->access_token/editMessageText";
+
+        // تنظیم کیبورد شیشه‌ای جدید
+        if($keyboard)
+            $keyboard = [
+                'inline_keyboard' => $keyboard
+            ];
+        else
+            $keyboard = new \stdClass();
+
+        $post_fields = [
+            'chat_id' => $channel_chat_id,
+            'message_id' => $message_id,
+            'text' => $message,
+            'reply_markup' => json_encode($keyboard)
+        ];
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array("Content-Type:application/json"));
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($post_fields));
+        $result = curl_exec($ch);
+        curl_close($ch);
+
+        return json_decode($result, true);
+    }
     // تابع ارسال پیام با کیبورد شیشه‌ای
     public function sendMessage($chat_id, $message, $keyboard = null) {
         $url = "https://api.telegram.org/bot$this->access_token/sendMessage";

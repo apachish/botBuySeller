@@ -18,6 +18,7 @@ class Transfer extends Model
         "number",
         "price",
         "status",
+        "message",
         "message_id",
     ];
 
