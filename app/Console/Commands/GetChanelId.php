@@ -33,6 +33,7 @@ class GetChanelId extends Command
             // دریافت شناسه کانال از لینک دعوت
             $channel_chat_id = '@' . parse_url($channel_invite_link, PHP_URL_PATH);
 
+            $this->info($channel_chat_id);
             $url = "https://api.telegram.org/bot$access_token/sendMessage";
 
             $post_fields = [
