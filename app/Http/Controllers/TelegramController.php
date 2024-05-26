@@ -34,6 +34,18 @@ class TelegramController extends Controller
         $update = json_decode($input, true);
         $update = $telegram->getWebhookUpdate();
 
+        $message = isset($update['message']) ? $update['message'] : "";
+        $chat_id = isset($message['chat']['id']) ? $message['chat']['id'] : "";
+        $text = isset($message['text']) ? $message['text'] : "";
+
+        if ($chat_id && $text) {
+            // شناسه کانال را ذخیره کنید
+            file_put_contents(public_path("channel_id.txt"), $chat_id);
+            logger( "شناسه کانال: " . $chat_id);
+        } else {
+            logger( "پیامی دریافت نشد.");
+        }
+
 
         // دریافت دستور ارسال شده توسط کار
         if (isset($update["my_chat_member"]))
