@@ -160,6 +160,7 @@ class TelegramController extends Controller
                 logger('array',[$array,preg_match($pattern_buy, $message)]);
                 if (preg_match($pattern_buy, $message)) {
                     $max_min_trade = Setting::where("key", "s_price_trade")->first();
+                    logger("max_min_trade",[$max_min_trade]);
                     if ($max_min_trade)
                         $value = data_get($max_min_trade, "value");
                     $array = explode("خ", $message);
