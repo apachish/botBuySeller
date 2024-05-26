@@ -66,10 +66,12 @@ class TelegramController extends Controller
         }
         logger("bot user",[$update]);
         $data = data_get($update, $type . ".data");
+        logger('data',[$data]);
         if($data){
             if (str_contains($data, "trade_limit_")) {
                 $worker_id = str_replace('trade_limit_', '', $data);
                 $worker = UserTelegram::where("id",$worker_id)->first();
+                logger("worker",[$worker]);
                 if($worker){
                     $name_worker = $worker->fullName ?: $worker->first_name . " " . $worker->last_name;
 
