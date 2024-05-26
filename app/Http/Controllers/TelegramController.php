@@ -164,7 +164,7 @@ class TelegramController extends Controller
                     if ($max_min_trade)
                         $value = (int)data_get($max_min_trade, "value");
                     $array = explode("خ", $message);
-                    $price = $value + ((int)data_get($array, 0)*1000000);
+                    $price = $value + ((int)data_get($array, 0)*1000);
                     $number = (int)data_get($array, 0);
                     logger("check_transfare",[$price,$number,$array]);
                     $check_transfare = Transfer::where("price", ">", $price)
@@ -192,7 +192,7 @@ class TelegramController extends Controller
                             ['text' => "\xE2\x9D\x8C	رد", 'callback_data' => "transfer_buy_false"],
                         ];
                         logger("ke",[$chatId, $message, $keyboard]);
-                        $telegram_services->sendMessage($chatId, $message, []);
+                        $telegram_services->MessageReplyMarkup($telegram,$chatId, $message, $keyboard);
                         return  true;
                     }
                 } elseif (preg_match($pattern_sell, $message)) {
