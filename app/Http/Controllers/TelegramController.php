@@ -65,8 +65,31 @@ class TelegramController extends Controller
             ]);
         }
         logger("bot user",[$update]);
-        if (isset($update['message']['text'])) {
-            $message = $update['message']['text'];
+        $data = data_get($update, $type . ".data");
+        if($data){
+            if (str_contains($data, "trade_limit_")) {
+                $worker_id = str_replace('trade_limit_', '', $data);
+                $worker = UserTelegram::where("id",$worker_id)->first();
+                if($worker){
+                    $name_worker = $worker->fullName ?: $worker->first_name . " " . $worker->last_name;
+
+                    $telegram->sendMessage([
+                        'chat_id' => $chatId,
+                        'text' => "حد مجازی که می خواهید با $name_worker داشته باشید را وارد کنید "
+                    ]);
+                    cache()->set("text_cache_".$chatId,["title"=>"trade_number_limit","value"=>$worker->id]);
+                }
+
+            }
+        }
+        $message = isset($update['message']['text'])?$update['message']['text']:null;
+        $cache_data = cache()->get("text_cache_".$chatId);
+        if ($cache_data)
+        {
+            $message = data_get($cache_data,"title");
+            $input_data = $message;
+        }
+        if ($message) {
 
 
             if (isset($update['message']['text'])) {
@@ -94,6 +117,15 @@ class TelegramController extends Controller
                         break;
                     case '/help':
                         $telegram->sendMessage(['chat_id' => $chatId, 'text' => 'سلام! چطور می‌توانم به شما کمک کنم؟']);
+                        break;
+                    case "trade_number_limit":
+                        $worker_id =data_get($cache_data,"value");
+                        $limit_assess =$input_data;
+                        UserTradeAccess::updateOrCreate([
+                            "user_id"=>$user_id,
+                            "user_trade_id"=>$worker_id,
+                            "limit_access"=>$limit_assess
+                        ]);
                         break;
                     case "\xE2\x98\x8E	دفترچه تلفن":
                     case "📈 معاملات باز":
