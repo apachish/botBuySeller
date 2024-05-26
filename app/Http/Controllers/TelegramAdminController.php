@@ -94,6 +94,7 @@ class TelegramAdminController extends Controller
         if ($cache_data)
             $data_text = $cache_data;
 
+        logger("data_text",[$data_text,$update]);
         if ($data_text && !str_contains($data_text, "start")) {
             if ($data_text == "📞 دفترچه تلفن") {
                 $text = "لیست شماره تلفن کاربران";
