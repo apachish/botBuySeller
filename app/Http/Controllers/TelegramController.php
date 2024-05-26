@@ -458,6 +458,7 @@ class TelegramController extends Controller
                 $k++;
             }
         }
+        logger("key",[$keyboard]);
         return $keyboard;
     }
 
