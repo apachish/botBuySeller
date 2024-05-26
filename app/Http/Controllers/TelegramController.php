@@ -94,7 +94,6 @@ class TelegramController extends Controller
                 $num = data_get($info, 1);
                 $transfer = Transfer::find($id);
                 if ($transfer) {
-                    DB::beginTransaction();
                     try {
                         if ($transfer->number >= $num)
                             $transfer->number -= $num;
@@ -102,10 +101,9 @@ class TelegramController extends Controller
 
                         $telegram_services->editMessageReplyMarkup($user_id, $transfer->message_id, $keyboard);
                         $transfer->update();
-                        DB::commit();
                     } catch (\Exception $e) {
-                        DB::rollback();
 
+                        logger("exp",[$e->getMessage(),$e->getLine()]);
                     }
                 }
             } elseif (str_contains($data, "transfer_buy_")) {
