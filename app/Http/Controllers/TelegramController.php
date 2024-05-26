@@ -150,11 +150,11 @@ class TelegramController extends Controller
                 $chatId = $update['message']['chat']['id'];
                 if (!cache()->get("keyword_menu" . $user_id))
                     $this->menu($telegram, $user_telegram, "خوش آمدید");
-//                $pattern_buy = '/^\d{3}خ\d{1,2}$/';
-//                $pattern_sell = '/^\d{3}ف\d{1,2}$/';
-                $pattern_buy = '/^[\x{06F0}-\x{06F9}]{3}خ[\x{06F0}-\x{06F9}]{1,2}$/u';
-                $pattern_sell = '/^[\x{06F0}-\x{06F9}]{3}ف[\x{06F0}-\x{06F9}]{1,2}$/u';
-                if (preg_match($pattern_buy, $message)) {
+                $pattern_buy = '/^\d{3}خ\d{1,2}$/';
+                $pattern_sell = '/^\d{3}ف\d{1,2}$/';
+//                $pattern_buy = '/^[\x{06F0}-\x{06F9}]{3}خ[\x{06F0}-\x{06F9}]{1,2}$/u';
+//                $pattern_sell = '/^[\x{06F0}-\x{06F9}]{3}ف[\x{06F0}-\x{06F9}]{1,2}$/u';
+                if (preg_match($pattern_buy, $this->convertNumber($message))) {
                     $max_min_trade = Setting::where("key", "s_price_trade")->first();
                     if ($max_min_trade)
                         $value = data_get($max_min_trade, "value");
