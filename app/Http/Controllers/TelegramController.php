@@ -88,7 +88,7 @@ class TelegramController extends Controller
             if (str_contains($data, "transfer_buy_")) {
                 if ($data == "transfer_buy_true") {
                     $array = cache()->get("transfer_cache_buy_" . $user_id);
-                    logger("transfer_cache_buy_",[$array])
+                    logger("transfer_cache_buy_",[$array]);
                     Transfer::where("user_id", $user_id)->where("type", "خ")->delete();
                     $transfer_new = Transfer::create($array);
                     $telegram_services->editMessageReplyMarkup($user_id, $message_id, []);
