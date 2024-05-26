@@ -26,14 +26,17 @@ class GetChanelId extends Command
     public function handle()
     {
         $access_token = $this->ask("access_token");
-        $query_id = $this->ask("query_id");
-        $channel_username = $this->ask("YourChannelUsername");
+        $channel_invite_link = $this->ask("channel_invite_link");
 
-// تابع برای ارسال پیام به کانال
+
+
+            // دریافت شناسه کانال از لینک دعوت
+            $channel_chat_id = '@' . parse_url($channel_invite_link, PHP_URL_PATH);
+
             $url = "https://api.telegram.org/bot$access_token/sendMessage";
 
             $post_fields = [
-                'chat_id' => $channel_username,
+                'chat_id' => $channel_chat_id,
                 'text' => "این یک پیام تست برای دریافت شناسه کانال است."
             ];
 
@@ -47,9 +50,7 @@ class GetChanelId extends Command
 
         $response = json_decode($result, true);
 
-
-// ارسال پیام به کانال و دریافت شناسه کانال
-        logger("response",[$response]);
+// ارسال پیام به کانال خصوصی و دریافت شناسه کانال
         if (isset($response['result']['chat']['id'])) {
             $channel_id = $response['result']['chat']['id'];
             echo "شناسه کانال: " . $channel_id;
