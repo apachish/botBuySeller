@@ -130,7 +130,7 @@ class TelegramController extends Controller
                             "limit_access"=>$limit_assess
                         ]);
                         $telegram->sendMessage(['chat_id' => $chatId, 'text' => 'حد ثابت شد']);
-
+                        cache()->forget("text_cache_".$user_id);
                         break;
                     case "\xE2\x98\x8E	دفترچه تلفن":
                     case "📈 معاملات باز":
