@@ -27,34 +27,33 @@ class GetChanelId extends Command
     {
         $access_token = $this->ask("access_token");
         $query_id = $this->ask("query_id");
-            $url = "https://api.telegram.org/bot$access_token/answerInlineQuery";
+        $channel_username = $this->ask("YourChannelUsername");
 
-            $results = json_encode([[
-                'type' => 'article',
-                'id' => 'unique-id',
-                'title' => 'Title',
-                'input_message_content' => [
-                    'message_text' => "این یک پیام تست برای دریافت شناسه کانال است."
-                ]
-            ]]);
+// تابع برای ارسال پیام به کانال
+        function sendMessageToChannel($channel_username) {
+            global $access_token;
+            $url = "https://api.telegram.org/bot$access_token/sendMessage";
 
             $post_fields = [
-                'inline_query_id' => $query_id,
-                'results' => $results,
-                'cache_time' => 0
+                'chat_id' => $channel_username,
+                'text' => "این یک پیام تست برای دریافت شناسه کانال است."
             ];
 
             $ch = curl_init();
-            curl_setopt($ch, CURLOPT_HTTPHEADER, array("Content-Type:application/json"));
+            curl_setopt($ch, CURLOPT_HTTPHEADER, array("Content-Type:multipart/form-data"));
             curl_setopt($ch, CURLOPT_URL, $url);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($post_fields));
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $post_fields);
             $result = curl_exec($ch);
             curl_close($ch);
 
-        $response = json_decode($result, true);
-        if (isset($response['result']['id'])) {
-            $channel_id = $response['result']['id'];
+            return json_decode($result, true);
+        }
+
+// ارسال پیام به کانال و دریافت شناسه کانال
+        $response = sendMessageToChannel($channel_username);
+        if (isset($response['result']['chat']['id'])) {
+            $channel_id = $response['result']['chat']['id'];
             echo "شناسه کانال: " . $channel_id;
         } else {
             echo "خطا در دریافت شناسه کانال.";
