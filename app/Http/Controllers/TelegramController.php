@@ -89,8 +89,8 @@ class TelegramController extends Controller
         $cache_data = cache()->get("text_cache_".$user_id);
         if ($cache_data)
         {
-            $message = data_get($cache_data,"title");
             $input_data = $message;
+            $message = data_get($cache_data,"title");
         }
         if ($message) {
 
