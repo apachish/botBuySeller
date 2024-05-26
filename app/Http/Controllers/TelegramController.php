@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Setting;
+use App\Models\Transfer;
 use App\Models\UserTradeAccess;
 use App\Services\TelegramServices;
 use Illuminate\Http\Request;
@@ -25,7 +26,7 @@ class TelegramController extends Controller
 
         $telegram = new Api($token);
         $telegram_services = new TelegramServices();
-        $telegram_services->access_token= $token;
+        $telegram_services->access_token = $token;
 
 
         // دریافت پیام ارسال شده به بات
@@ -43,8 +44,12 @@ class TelegramController extends Controller
             $type = "message";
 
         $user_id = data_get($update, $type . '.from.id');
-
-        $user_telegram = UserTelegram::where("id",$user_id)->first();
+        $message_id = null;
+        if (isset($update[$type]['message_id']))
+            $message_id = $update[$type]['message_id']; // چت‌آیدی کاربر
+        if (isset($update[$type]['message']['message_id']))
+            $message_id = $update[$type]['message']['message_id']; // چت‌آیدی کاربر
+        $user_telegram = UserTelegram::where("id", $user_id)->first();
         if ($user_telegram == null) {
             $user_telegram = UserTelegram::create([
                 "id" => $user_id,
@@ -64,33 +69,60 @@ class TelegramController extends Controller
                 'text' => 'خوش آمدید! این یک پیام خودکار به کاربر جدید است.'
             ]);
         }
-        logger("bot user",[$update]);
+        logger("bot user", [$update]);
         $data = data_get($update, $type . ".data");
-        logger('data',[$data]);
-        if($data){
-            if (str_contains($data, "trade_limit_")) {
+        logger('data', [$data]);
+        if ($data) {
+            if (str_contains($data, "transfer_buy_")) {
+                if ($data == "transfer_buy_true") {
+                    $array = cache()->get("transfer_cache_buy_" . $user_id);
+                    Transfer::where("user_id", $user_id)->where("type", "خ")->delete();
+                    $transfer_new = Transfer::create($array);
+                    $telegram_services->editMessageReplyMarkup($chatId, $message_id, []);
+                    $telegram_services->sendMessage($chatId, "لفظ شما تایید شد\xE2\x9C\x85	");
+                    $price = number_format($transfer_new->price, 0);
+                    $number = $transfer_new->number;
+                    $message = "$price \xF0\x9F\x94\xB5	خرید \xE2\x8F\xB3	 با حواله $number تا ";
+
+                    $m = 0;
+                    $k = 0;
+                    for ($i=1;$i<=$number;$i++)
+                    {
+                        $keyboard[$k][$m++] = [
+                            'text' => $i,
+                            'callback_data' => "request_transfer_$transfer_new->id",
+                        ];
+                        if($m == 3)
+                        {
+                            $m = 0;
+                            $k++;
+                        }
+                    }
+
+                    $telegram_services->sendMessage($chatId, $message,$keyboard);
+                }
+            } elseif (str_contains($data, "trade_limit_")) {
                 $worker_id = (int)str_replace('trade_limit_', '', $data);
 
-                $worker = UserTelegram::where("id",$worker_id)->first();
-                logger("worker",[$worker]);
-                if($worker){
+                $worker = UserTelegram::where("id", $worker_id)->first();
+                logger("worker", [$worker]);
+                if ($worker) {
                     $name_worker = $worker->fullName ?: $worker->first_name . " " . $worker->last_name;
 
                     $telegram->sendMessage([
                         'chat_id' => $user_id,
                         'text' => "حد مجازی که می خواهید با $name_worker داشته باشید را وارد کنید "
                     ]);
-                    cache()->set("text_cache_".$user_id,["title"=>"trade_number_limit","value"=>$worker->id]);
+                    cache()->set("text_cache_" . $user_id, ["title" => "trade_number_limit", "value" => $worker->id]);
                 }
 
             }
         }
-        $message = isset($update['message']['text'])?$update['message']['text']:null;
-        $cache_data = cache()->get("text_cache_".$user_id);
-        if ($cache_data)
-        {
+        $message = isset($update['message']['text']) ? $update['message']['text'] : null;
+        $cache_data = cache()->get("text_cache_" . $user_id);
+        if ($cache_data) {
             $input_data = $message;
-            $message = data_get($cache_data,"title");
+            $message = data_get($cache_data, "title");
         }
         if ($message) {
 
@@ -104,8 +136,47 @@ class TelegramController extends Controller
                     "data" => json_encode($update)
                 ]);
                 $chatId = $update['message']['chat']['id'];
-                if(!cache()->get("keyword_menu".$user_id))
-                $this->menu($telegram,$user_telegram,"خوش آمدید");
+                if (!cache()->get("keyword_menu" . $user_id))
+                    $this->menu($telegram, $user_telegram, "خوش آمدید");
+                $pattern_buy = '/^\d{3}خ\d{1,2}$/';
+                $pattern_sell = '/^\d{3}ف\d{1,2}$/';
+                if (preg_match($pattern_buy, $message)) {
+                    $max_min_trade = Setting::where("key", "start_trade")->first();
+                    if ($max_min_trade)
+                        $value = data_get($max_min_trade, "value");
+                    $array = explode("خ", $message);
+                    $price = $value + data_get($array, 0);
+                    $number = data_get($array, 0);
+                    $check_transfare = Transfer::where("price", ">", $price)
+                        ->where("status", true)
+                        ->first();
+                    if ($check_transfare) {
+                        $message = "قیمت پیشنهادی بهتری از لفظ شمادر کانال میباشد\n\n";
+                        $message .= "لطف اگر پیشنهاد بهتری دارید مجددا لفظ دهید یا \n\n";
+                        $message .= "حداکثر با تلرانس ۲۰۰۰ تومان لفظ دهید \n\n";
+                        $message .= "لفظ پیشنهادی بهتر در کانال : \n\n";
+                        $message .= " \n\n";
+                        $message .= number_format($check_transfare->price, 0);
+                        $telegram_services->sendMessage($chatId, $message);
+                    } else {
+                        cache()->set("transfer_cache_buy_" . $user_id, [
+                            "user_id" => $user_id,
+                            "type" => "خ",
+                            "number" => $number,
+                            "price" => $price,
+                            "status" => 0
+                        ]);
+                        $message = "$price \xF0\x9F\x94\xB5	خرید \xE2\x8F\xB3	 با حواله $number تا ";
+                        $keyboard[0] = [
+                            ['text' => "\xE2\x9C\x85	تایید", 'callback_data' => "transfer_buy_true"],
+                            ['text' => "\xE2\x9D\x8C	رد", 'callback_data' => "transfer_buy_false"],
+                        ];
+                        $telegram_services->sendMessage($chatId, $message, $keyboard);
+
+                    }
+                } elseif (preg_match($pattern_sell, $message)) {
+
+                }
                 switch ($message) {
                     case '/start':
                         $text = "منتظر تایید مدیر سیستم باشید تا دسترسی به شما ارائه گردد";
@@ -122,15 +193,15 @@ class TelegramController extends Controller
                         $telegram->sendMessage(['chat_id' => $chatId, 'text' => 'سلام! چطور می‌توانم به شما کمک کنم؟']);
                         break;
                     case "trade_number_limit":
-                        $worker_id =(int)data_get($cache_data,"value");
-                        $limit_assess =$input_data;
+                        $worker_id = (int)data_get($cache_data, "value");
+                        $limit_assess = $input_data;
                         UserTradeAccess::updateOrCreate([
-                            "user_id"=>$user_id,
-                            "user_trade_id"=>$worker_id,
-                            "limit_access"=>$limit_assess
+                            "user_id" => $user_id,
+                            "user_trade_id" => $worker_id,
+                            "limit_access" => $limit_assess
                         ]);
                         $telegram->sendMessage(['chat_id' => $chatId, 'text' => 'حد ثابت شد']);
-                        cache()->forget("text_cache_".$user_id);
+                        cache()->forget("text_cache_" . $user_id);
                         break;
                     case "\xE2\x98\x8E	دفترچه تلفن":
                     case "📈 معاملات باز":
@@ -140,7 +211,7 @@ class TelegramController extends Controller
                     case "\xE2\x9A\xA0	\xE2\x9D\x8C	غیرفعال سازی تایید دو مرحله ای ":
                     case "\xE2\x9C\x8C	فعال سازی دو مرحله ای":
                     case  "\xE2\x9D\x8C	غیر فعال فوری":
-                        $this->getAction($message,$user_telegram,$telegram_services,$telegram);
+                        $this->getAction($message, $user_telegram, $telegram_services, $telegram);
                         break;
                     default:
                         $text_send = cache()->get("text_" . $chatId);
@@ -172,10 +243,10 @@ class TelegramController extends Controller
         }
     }
 
-    public function getAction($data_text,$user,$telegram_services,$telegram)
+    public function getAction($data_text, $user, $telegram_services, $telegram)
     {
 
-        if ($data_text){
+        if ($data_text) {
             switch ($data_text) {
                 case "\xE2\x98\x8E	دفترچه تلفن":
                     $keyboard = [
@@ -186,27 +257,27 @@ class TelegramController extends Controller
                             ]
                         ]
                     ];
-                    $telegram_services->setKeyword($user->id,$keyboard);
+                    $telegram_services->setKeyword($user->id, $keyboard);
                     break;
                 case "📈 معاملات باز":
-                    $worker = UserTelegram::where("user_id",$user->id)->get();
+                    $worker = UserTelegram::where("user_id", $user->id)->get();
                     $keyboard = [];
-                    $i =0;
-                    $worker->each(function ($row) use (&$i,&$keyboard){
+                    $i = 0;
+                    $worker->each(function ($row) use (&$i, &$keyboard) {
                         $text = $row->fullName ?: $row->first_name . " " . $row->last_name;
 
                         $keyboard[$i++] = [
-                            ['text' =>  $text, 'callback_data' => "trade_open_".$row->id],
+                            ['text' => $text, 'callback_data' => "trade_open_" . $row->id],
                         ];
                     });
-                    $telegram_services->sendMessage($user->id, "شخص مورد نظر را انتخاب کنید",$keyboard);
+                    $telegram_services->sendMessage($user->id, "شخص مورد نظر را انتخاب کنید", $keyboard);
                     break;
 
                 case "📋 لیست همکاران":
                     $text = "لیست  همکاران";
-                    $users = UserTelegram::where("id","!=",$user->id)
+                    $users = UserTelegram::where("id", "!=", $user->id)
                         ->with("userTradeAccess")->simplePaginate(5);
-                    logger("users",[$users]);
+                    logger("users", [$users]);
                     $page = $users->currentPage();
                     $next = $users->nextPageUrl();
                     $pre = $users->previousPageUrl();
@@ -216,17 +287,17 @@ class TelegramController extends Controller
 
                     $users->each(function ($user) use (&$keyboard, &$i) {
                         $text = $user->fullName ?: $user->first_name . " " . $user->last_name;
-                        $limit_trade =  $user->userTradeAccess->where("user_trade_id",$user->id);
-                        logger('limit_trade',[$limit_trade]);
+                        $limit_trade = $user->userTradeAccess->where("user_trade_id", $user->id);
+                        logger('limit_trade', [$limit_trade]);
 
                         $keyboard[$i][0] = [
-                            'text' => "  $text ".($limit_trade->count()?"\xE2\x9D\x8C":"\xE2\x9C\x85"),
-                            'callback_data' => "trade_limit_".$user->id
+                            'text' => "  $text " . ($limit_trade->count() ? "\xE2\x9D\x8C" : "\xE2\x9C\x85"),
+                            'callback_data' => "trade_limit_" . $user->id
                         ];
-                        if($limit_trade->count())
+                        if ($limit_trade->count())
                             $keyboard[$i][1] = [
-                                'text' => "مجاز تا".$limit_trade->limit_access." تا",
-                                'callback_data' => "trade_limit_".$user->id];
+                                'text' => "مجاز تا" . $limit_trade->limit_access . " تا",
+                                'callback_data' => "trade_limit_" . $user->id];
 
 
                         $i++;
@@ -254,13 +325,13 @@ class TelegramController extends Controller
                 case "\xE2\x9A\xA0	\xE2\x9D\x8C	غیرفعال سازی تایید دو مرحله ای ":
                     $user->verify_two = false;
                     $user->update();
-                    $telegram_services->sendMessage($user->id,"تایید دو مرحله ای غیر فعال شد");
+                    $telegram_services->sendMessage($user->id, "تایید دو مرحله ای غیر فعال شد");
                     break;
 
                 case "\xE2\x9C\x8C	فعال سازی دو مرحله ای":
                     $user->verify_two = true;
                     $user->update();
-                    $telegram_services->sendMessage($user->id,"تایید دو مرحله ای  فعال شد");
+                    $telegram_services->sendMessage($user->id, "تایید دو مرحله ای  فعال شد");
 
                     break;
 
@@ -293,7 +364,7 @@ class TelegramController extends Controller
 
     public function menu($telegram, $user, $text)
     {
-        if($user->status) {
+        if ($user->status) {
             $keyboard = [
                 [
                     ['text' => "\xE2\x98\x8E	 دفترچه تلفن"],
@@ -323,9 +394,9 @@ class TelegramController extends Controller
                 'text' => $text,
                 'reply_markup' => $reply_markup
             ]);
-            cache()->set("keyword_menu".$user->id,true);
-        }else{
-            cache()->forget("keyword_menu".$user->id);
+            cache()->set("keyword_menu" . $user->id, true);
+        } else {
+            cache()->forget("keyword_menu" . $user->id);
         }
 
     }

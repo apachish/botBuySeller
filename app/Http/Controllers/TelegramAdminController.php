@@ -207,38 +207,34 @@ class TelegramAdminController extends Controller
                 $service_telgram->sendMessage($chatId, $response_text);
                 cache()->forget("text_admin_" . $chatId);
 
-            } elseif ($data_text == "📈 بازه معاملات") {
-                $rule = Setting::where("key", "max_min_trade")->first();
+            } elseif ($data_text == "📈شروع بازه معاملات") {
+                $start_trade = Setting::where("key", "start_trade")->first();
 
-                if ($rule)
-                    $response_text = $rule->value;
+                if ($start_trade)
+                    $response_text = $start_trade->value;
                 else
-                    $response_text = "بازه معاملات به صورت min-max وارد کنید \n\n مثل 14320-14550";
+                    $response_text = " شروع مبلغ معاملات را وارد کنید \n\n مثل 14000000";
 
-                cache()->set("text_admin_" . $chatId, "max_min_trade");
+                cache()->set("text_admin_" . $chatId, "start_trade");
 
                 $service_telgram->sendMessage($chatId, $response_text);
 
-            } elseif ($data_text == "max_min_trade") {
-                $limit_trade = data_get($update, $type . ".text");
-                $array = explode("-", $limit_trade);
-                if (is_array($array) & isset($array[0]) & isset($array[1]) & $array[0] < $array[1]) {
+            } elseif ($data_text == "start_trade") {
+                $start_trade = data_get($update, $type . ".text");
+                if ($start_trade ) {
                     $rule = Setting::updateOrCreate(
-                        ["key" => "max_min_trade"],
-                        ["value" => $array]
+                        ["key" => "start_trade"],
+                        ["value" => $start_trade]
                     );
-                    $response_text = "محدوده   بروزرسانی شد:";
+                    $response_text = "شروع معامله   بروزرسانی شد:";
                     $response_text .= "\n\n";
-                    $response_text .= "حد پایین";
-                    $response_text .= $array[0];
+                    $response_text .= "از مبلغ";
+                    $response_text .= number_format($start_trade,0);
                     $response_text .= "\n\n";
-
-                    $response_text .= "حد بالا";
-                    $response_text .= $array[1];
                     $service_telgram->sendMessage($chatId, $response_text);
                     cache()->forget("text_admin_" . $chatId);
                 } else {
-                    $service_telgram->sendMessage($chatId, "محدودو وارد شده صحیخ نمی باشد");
+                    $service_telgram->sendMessage($chatId, "شروع معامله وارد شده صحیخ نمی باشد");
 
                 }
 
