@@ -74,16 +74,16 @@ class TelegramController extends Controller
                     $name_worker = $worker->fullName ?: $worker->first_name . " " . $worker->last_name;
 
                     $telegram->sendMessage([
-                        'chat_id' => $chatId,
+                        'chat_id' => $user_id,
                         'text' => "حد مجازی که می خواهید با $name_worker داشته باشید را وارد کنید "
                     ]);
-                    cache()->set("text_cache_".$chatId,["title"=>"trade_number_limit","value"=>$worker->id]);
+                    cache()->set("text_cache_".$user_id,["title"=>"trade_number_limit","value"=>$worker->id]);
                 }
 
             }
         }
         $message = isset($update['message']['text'])?$update['message']['text']:null;
-        $cache_data = cache()->get("text_cache_".$chatId);
+        $cache_data = cache()->get("text_cache_".$user_id);
         if ($cache_data)
         {
             $message = data_get($cache_data,"title");
