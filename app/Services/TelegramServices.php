@@ -9,7 +9,27 @@ use Telegram\Bot\Keyboard\Keyboard;
 class TelegramServices
 {
 
-    public $access_token;
+    private $access_token;
+
+    public function __construct($access_token)
+    {
+        $this->access_token = $access_token;
+    }
+
+    public static function menu($telegram,$keyboard,$user,$text)
+    {
+        $reply_markup = Keyboard::make([
+            'keyboard' => $keyboard,
+            'resize_keyboard' => true,
+            'one_time_keyboard' => false
+        ]);
+
+        $response = $telegram->sendMessage([
+            'chat_id' => $user->id,
+            'text' => $text,
+            'reply_markup' => $reply_markup
+        ]);
+    }
 
     function setKeyword($chat_id,$keyboard) {
         $url = "https://api.telegram.org/bot$this->access_token/sendMessage";

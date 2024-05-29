@@ -7,6 +7,7 @@ use App\Models\Setting;
 use App\Models\Transfer;
 use App\Models\UserTradeAccess;
 use App\Services\TelegramServices;
+use App\Services\TextServices;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Telegram\Bot\Api;
@@ -19,94 +20,28 @@ class TelegramController extends Controller
 {
     public function setWebhook($token, $replay = [])
     {
-        $bot = Bot::where('token', $token)
-            ->first();
+        $text_services = new TextServices($token);
+        $text_services->setTypeMessage();
+        $text_services->setUserId();
+        $text_services->setMessageId();
+        $text_services->setData();
+        $text_services->setMessage();
+        $text_services->setMessageCache();
+        $text_services->setUser();
+
+        if($text_services->getData())
+            $text_services->actionByData();
+
+        if($text_services->getMessage())
+            $text_services->actionByMessage();
 
 
-        if (!$bot) return false;
 
 
-        $telegram = new Api($token);
-        $telegram_services = new TelegramServices();
-        $telegram_services->access_token = $token;
 
+        if ($text_services->data) {
+            if (str_contains($text_services->data, "request_transfer_")) {
 
-        // دریافت پیام ارسال شده به بات
-        $input = file_get_contents("php://input");
-        $update = json_decode($input, true);
-        $update = $telegram->getWebhookUpdate();
-
-//        $message = isset($update['message']) ? $update['message'] : "";
-//        $chat_id = isset($message['chat']['id']) ? $message['chat']['id'] : "";
-//        $text = isset($message['text']) ? $message['text'] : "";
-//
-//        if ($chat_id && $text) {
-//            // شناسه کانال را ذخیره کنید
-//            file_put_contents(public_path("channel_id.txt"), $chat_id);
-//            logger( "شناسه کانال: " . $chat_id);
-//        } else {
-//            logger( "پیامی دریافت نشد.");
-//        }
-
-
-        // دریافت دستور ارسال شده توسط کار
-        if (isset($update["my_chat_member"]))
-            $type = "my_chat_member";
-        elseif (isset($update['callback_query']))
-            $type = "callback_query";
-        else
-            $type = "message";
-
-        $user_id = data_get($update, $type . '.from.id');
-        $message_id = null;
-        if (isset($update[$type]['message_id']))
-            $message_id = $update[$type]['message_id']; // چت‌آیدی کاربر
-        if (isset($update[$type]['message']['message_id']))
-            $message_id = $update[$type]['message']['message_id']; // چت‌آیدی کاربر
-        $user_telegram = UserTelegram::where("id", $user_id)->first();
-        if ($user_telegram == null) {
-            $user_telegram = UserTelegram::create([
-                "id" => $user_id,
-                "is_bot" => data_get($update, $type . '.from.is_bot'),
-                "first_name" => data_get($update, $type . '.from.first_name'),
-                "last_name" => data_get($update, $type . '.from.last_name'),
-                "mobile" => data_get($update, $type . '.mobile'),
-                "username" => data_get($update, $type . '.from.username'),
-                "language_code" => data_get($update, $type . '.from.language_code'),
-            ]);
-        }
-        if (isset($update["my_chat_member"])) {
-            $chatId = $update['my_chat_member']['from']['id']; // چت‌آیدی کاربر
-
-            $telegram->sendMessage([
-                'chat_id' => $chatId,
-                'text' => 'خوش آمدید! این یک پیام خودکار به کاربر جدید است.'
-            ]);
-        }
-        logger("bot user", [$update]);
-        $data = data_get($update, $type . ".data");
-        logger('data', [$data]);
-        if ($data) {
-            if (str_contains($data, "request_transfer_")) {
-                $array = str_replace('request_transfer_', '', $data);
-                $info = explode("_", $array);
-                $id = data_get($info, 0);
-                $num = data_get($info, 1);
-                $transfer = Transfer::find($id);
-                if ($transfer) {
-                    try {
-                        if ($transfer->number >= $num)
-                            $transfer->number -= $num;
-                        $keyboard["inline_keyboard"] = $this->getKeyboardRequest($transfer->number, $transfer);
-
-
-                        $telegram_services->editMessageReplyMarkup($user_id, $transfer->message_id, $keyboard);
-                        $transfer->update();
-                    } catch (\Exception $e) {
-
-                        logger("exp",[$e->getMessage(),$e->getLine()]);
-                    }
-                }
             } elseif (str_contains($data, "transfer_buy_")) {
                 if ($data == "transfer_buy_true") {
                     $array = cache()->get("transfer_cache_buy_" . $user_id);
@@ -147,12 +82,7 @@ class TelegramController extends Controller
 
             }
         }
-        $message = isset($update['message']['text']) ? $update['message']['text'] : null;
-        $cache_data = cache()->get("text_cache_" . $user_id);
-        if ($cache_data) {
-            $input_data = $message;
-            $message = data_get($cache_data, "title");
-        }
+
         if ($message) {
 
 
@@ -218,6 +148,7 @@ class TelegramController extends Controller
                 }
                 switch ($message) {
                     case '/start':
+                    case 'start':
                         $text = "منتظر تایید مدیر سیستم باشید تا دسترسی به شما ارائه گردد";
                         if (!$user_telegram->mobile)
                             $text = "شماره موبایل خود را وارد کنید";
@@ -385,22 +316,6 @@ class TelegramController extends Controller
 
     }
 
-    private function iranMobile($value)
-    {
-
-        if ((bool)preg_match('/^(((98)|(\+98)|(0098)|0)(9){1}[0-9]{9})+$/', $value) || (bool)preg_match('/^(9){1}[0-9]{9}+$/', $value))
-            return true;
-
-        return false;
-    }
-
-    private function convertNumber($value)
-    {
-        $western = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'];
-        $eastern = ['۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹', '۰'];
-        return str_replace($eastern, $western, $value);
-    }
-
     public function menu($telegram, $user, $text)
     {
         if ($user->status) {
@@ -422,17 +337,7 @@ class TelegramController extends Controller
 
                 ],
             ];
-            $reply_markup = Keyboard::make([
-                'keyboard' => $keyboard,
-                'resize_keyboard' => true,
-                'one_time_keyboard' => false
-            ]);
-
-            $response = $telegram->sendMessage([
-                'chat_id' => $user->id,
-                'text' => $text,
-                'reply_markup' => $reply_markup
-            ]);
+            TelegramServices::menu($telegram,$keyboard, $user, $text);
             cache()->set("keyword_menu" . $user->id, true);
         } else {
             cache()->forget("keyword_menu" . $user->id);
@@ -440,30 +345,5 @@ class TelegramController extends Controller
 
     }
 
-    /**
-     * @param mixed $number
-     * @param \Illuminate\Database\Eloquent\Model|Transfer $transfer_new
-     * @return mixed
-     */
-    public function getKeyboardRequest(mixed $number, \Illuminate\Database\Eloquent\Model|Transfer $transfer_new): mixed
-    {
-        $m = 0;
-        $k = 0;
-        $keyboard = [];
-        for ($i = 1; $i <= $number; $i++) {
-            $keyboard[$k][$m++] = [
-                'text' => $i,
-                'callback_data' => "request_transfer_" . $transfer_new->id . "_" . $i,
-            ];
-            if ($m == 3) {
-                $m = 0;
-                $k++;
-            }
-        }
-        if(!$keyboard)
-            $keyboard = new \stdClass();
-        logger("key",[$keyboard]);
-        return $keyboard;
-    }
 
 }
