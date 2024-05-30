@@ -191,7 +191,7 @@ class TextServices
      */
     public function setMessage(): void
     {
-        $this->message = isset($update['message']['text']) ? $update['message']['text'] : null;
+        $this->message = isset($this->update['message']['text']) ? $this->update['message']['text'] : null;
         logger("message",[$this->message]);
     }
 
