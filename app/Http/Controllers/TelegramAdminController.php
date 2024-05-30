@@ -72,7 +72,7 @@ class TelegramAdminController extends Controller
                 ['text' => "\xE2\x81\x89 ویرایش راهنما"]
             ],
         ];
-        $text_services->menu($keyboard_menu);
+        $text_services->menu($keyboard_menu,$access);
 
 
     }

@@ -46,7 +46,7 @@ class TelegramController extends Controller
 
             ],
         ];
-        $text_services->menu($keyboard_menu);
+        $text_services->menu($keyboard_menu,$text_services->getUser()->status);
         if($text_services->getData())
             $text_services->actionByData();
 

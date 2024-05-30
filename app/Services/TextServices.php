@@ -527,10 +527,10 @@ class TextServices
        return $this->bot->accessBot->where("user_id", $this->user_id)->where("type", "admin");
     }
 
-    public function menu($keyboard)
+    public function menu($keyboard,$show)
     {
         logger("menu",[$this->user]);
-        if ($this->user->status) {
+        if ($show) {
             TelegramServices::menu($this->telegram, $keyboard, $this->user, $this->message_menu);
             cache()->set("keyword_menu" . $this->user->id, true);
         } else {
