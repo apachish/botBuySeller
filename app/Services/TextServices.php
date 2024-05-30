@@ -153,6 +153,7 @@ class TextServices
             $this->sendMessageNewUser();
         }
         $this->user = $user_telegram;
+        logger("user",[$this->user]);
     }
 
     private $message_id = null;
@@ -186,7 +187,8 @@ class TextServices
      */
     public function setMessage(): void
     {
-        $this->message = isset($update['message']['text']) ? $update['message']['text'] : null;;
+        $this->message = isset($update['message']['text']) ? $update['message']['text'] : null;
+        logger("message",[$this->message]);
     }
 
     /**
@@ -220,6 +222,8 @@ class TextServices
     public function setMessageCache(): void
     {
         $this->message_cache = cache()->get("text_cache_" . $this->user_id);
+        $this->message_cache =data_get( $this->message_cache,"title");
+        logger("message_cache",[ $this->message_cache]);
         // data_get($cache_data, "title")
     }
 
@@ -496,6 +500,7 @@ class TextServices
 
     public function menu()
     {
+        logger("menu",[$this->user]);
         if ($this->user->status) {
             $keyboard = [
                 [
