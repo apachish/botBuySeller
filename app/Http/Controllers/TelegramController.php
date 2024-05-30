@@ -28,8 +28,25 @@ class TelegramController extends Controller
         $text_services->setMessage();
         $text_services->setMessageCache();
         $text_services->setUser();
+        $keyboard_menu =  [
+            [
+                ['text' => "\xF0\x9F\x91\xA5	معرفی مشتری"],
+                ['text' => "\xF0\x9F\x93\x8B	لیست همکاران"],
+            ],
+            [
+                ['text' => "\xF0\x9F\x93\x88	معاملات باز"]
+            ],
+            [
+                ['text' => "\xF0\x9F\x93\x9A	قوانین"],
+                ['text' => "راهنما \xE2\x81\x89"]
+            ],
+            [
+                ['text' => $this->user->verify_two ? "\xE2\x9A\xA0	\xE2\x9D\x8C	غیرفعال سازی تایید دو مرحله ای " : "\xE2\x9C\x8C	فعال سازی دو مرحله ای"],
+                ['text' => "\xE2\x9D\x8C	غیر فعال فوری"],
 
-        $text_services->menu();
+            ],
+        ];
+        $text_services->menu($keyboard_menu);
         if($text_services->getData())
             $text_services->actionByData();
 

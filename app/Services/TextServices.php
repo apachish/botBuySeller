@@ -498,28 +498,15 @@ class TextServices
         }
     }
 
-    public function menu()
+    public function accessAdmin()
+    {
+       return $this->bot->accessBot->where("user_id", $this->user_id)->where("type", "admin");
+    }
+
+    public function menu($keyboard)
     {
         logger("menu",[$this->user]);
         if ($this->user->status) {
-            $keyboard = [
-                [
-                    ['text' => "\xF0\x9F\x91\xA5	معرفی مشتری"],
-                    ['text' => "\xF0\x9F\x93\x8B	لیست همکاران"],
-                ],
-                [
-                    ['text' => "\xF0\x9F\x93\x88	معاملات باز"]
-                ],
-                [
-                    ['text' => "\xF0\x9F\x93\x9A	قوانین"],
-                    ['text' => "راهنما \xE2\x81\x89"]
-                ],
-                [
-                    ['text' => $this->user->verify_two ? "\xE2\x9A\xA0	\xE2\x9D\x8C	غیرفعال سازی تایید دو مرحله ای " : "\xE2\x9C\x8C	فعال سازی دو مرحله ای"],
-                    ['text' => "\xE2\x9D\x8C	غیر فعال فوری"],
-
-                ],
-            ];
             TelegramServices::menu($this->telegram, $keyboard, $this->user, $this->message_menu);
             cache()->set("keyword_menu" . $this->user->id, true);
         } else {
