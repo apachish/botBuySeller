@@ -531,9 +531,11 @@ class TextServices
     {
         logger("menu",[$this->user,$show]);
         if ($show ) {
-            cache()->rememberForever("keyword_menu".$this->getKeyCache().$this->user->id,function () use ($keyboard){
+            if(cache()->get("keyword_menu".$this->getKeyCache().$this->user->id)) {
+
                 TelegramServices::menu($this->telegram, $keyboard, $this->user, $this->message_menu);
-            });
+                cache()->set("keyword_menu" . $this->getKeyCache() . $this->user->id, true);
+            }
 
         } else {
             cache()->forget("keyword_menu".$this->getKeyCache().$this->user->id);
