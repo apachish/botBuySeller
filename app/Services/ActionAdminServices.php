@@ -160,9 +160,17 @@ class ActionAdminServices extends TextServices
                 $s_price_trade = Setting::where("key", "s_price_trade")->first();
 
                 if ($s_price_trade) {
-                    $response_text = "محدود شروع مبلغ وارد شده قبلا: \n\n  ";
-                    $response_text .= $s_price_trade->value;
-                    $response_text .= " محدوده جدید وارد کنید";
+                    $response_text = "محدود معامله   قبلا شد:";
+                    $response_text .= "\n\n";
+                    $response_text .= "از مبلغ";
+                    $response_text .= number_format(data_get($s_price_trade,"value.start"), 0);
+                    $response_text .= "\n\n";
+
+                    $response_text .= "تا مبلغ";
+                    $response_text .= "\n\n";
+
+                    $response_text .= number_format(data_get(data_get($s_price_trade,"value.end")), 0);
+                    $response_text .= "\n\n";
                 }else {
                     $response_text = "محدود شروع مبلغ وارد شده باید به صورت \n\n";
                     $response_text .= "14000000:15000000 \n\n";
@@ -208,19 +216,35 @@ class ActionAdminServices extends TextServices
             case "s_price_trade":
                 $s_price_trade = $this->getMessage();
                 if ($s_price_trade) {
-                    $rule = Setting::updateOrCreate(
-                        ["key" => "s_price_trade"],
-                        ["value" => $s_price_trade]
-                    );
-                    $response_text = "شروع معامله   بروزرسانی شد:";
-                    $response_text .= "\n\n";
-                    $response_text .= "از مبلغ";
-                    $response_text .= number_format($s_price_trade, 0);
-                    $response_text .= "\n\n";
-                    $this->getTelegramServices()->sendMessage($this->getUserId(), $response_text);
-                    cache()->forget("text_admin_" . $this->getUserId());
+                    $limit_price = explode(":",$s_price_trade);
+                    if(data_get($s_price_trade,0) & data_get($s_price_trade,1)) {
+                        $rule = Setting::updateOrCreate(
+                            ["key" => "s_price_trade"],
+                            ["value" =>
+                                ["start"=>data_get($s_price_trade,0)],
+                                ["end"=>data_get($s_price_trade,1)]
+                            ]
+                        );
+
+                        $response_text = "محدوده معامله   بروزرسانی شد:";
+                        $response_text .= "\n\n";
+                        $response_text .= "از مبلغ";
+                        $response_text .= number_format(data_get($s_price_trade,0), 0);
+                        $response_text .= "\n\n";
+
+                        $response_text .= "تا مبلغ";
+                        $response_text .= "\n\n";
+
+                        $response_text .= number_format(data_get($s_price_trade,1), 0);
+                        $response_text .= "\n\n";
+                        $this->getTelegramServices()->sendMessage($this->getUserId(), $response_text);
+                        cache()->forget("text_admin_" . $this->getUserId());
+                    }else{
+                        $this->getTelegramServices()->sendMessage($this->getUserId(), "محدوده وارد شده معامله  صحیخ نمی باشد");
+
+                    }
                 } else {
-                    $this->getTelegramServices()->sendMessage($this->getUserId(), "شروع معامله وارد شده صحیخ نمی باشد");
+                    $this->getTelegramServices()->sendMessage($this->getUserId(), "محدوده وارد شده معامله  صحیخ نمی باشد");
 
                 }
                 break;
