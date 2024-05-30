@@ -156,17 +156,17 @@ class ActionAdminServices extends TextServices
                 $this->getTelegramServices()->sendMessage($this->getUserId(), $response_text);
 
 
-            case "📈شروع مبلغ معاملات":
+            case "📈محدود شروع مبلغ معاملات":
                 $s_price_trade = Setting::where("key", "s_price_trade")->first();
 
-                logger("📈شروع مبلغ معاملاتee");
                 if ($s_price_trade) {
-                    $response_text = " شروع مبلغ وارد شده قبلا: \n\n  ";
+                    $response_text = "محدود شروع مبلغ وارد شده قبلا: \n\n  ";
                     $response_text .= $s_price_trade->value;
-                    $response_text .= " مبلغ جدید وارد کنید";
-                }else
-                    $response_text = " شروع مبلغ معاملات را وارد کنید \n\n مثل 14000000";
-
+                    $response_text .= " محدوده جدید وارد کنید";
+                }else {
+                    $response_text = "محدود شروع مبلغ وارد شده باید به صورت \n\n";
+                    $response_text .= "14000000:15000000 \n\n";
+                }
                 cache()->set("text_admin_" . $this->getUserId(), "s_price_trade");
 
                 $this->getTelegramServices()->sendMessage($this->getUserId(), $response_text);

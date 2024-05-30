@@ -48,7 +48,7 @@ class TelegramAdminController extends Controller
             "تعداد کاربران",
             "📚  ویرایش قوانین",
             "\xE2\x81\x89 ویرایش راهنما",
-            "📈شروع مبلغ معاملات",
+            "📈محدود شروع مبلغ معاملات",
         ];
 
         $text = "سلام! به منوی اصلی خوش آمدید.";
@@ -56,7 +56,7 @@ class TelegramAdminController extends Controller
         $keyboard_menu = [
             [
                 ['text' => "📞 دفترچه تلفن"],
-                ['text' => "📈شروع مبلغ معاملات"]
+                ['text' => "📈محدود شروع مبلغ معاملات"]
             ],
             [
                 ['text' => "تعداد کاربران"],
