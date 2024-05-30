@@ -37,7 +37,8 @@ class TelegramAdminController extends Controller
             $text_services->actionData();
         if ($text_services->getMessage())
             $text_services->actionText();
-
+        if($text_services->getMessageCache())
+            $text_services->actionTextCache();
         $access_text = [
             "📞 دفترچه تلفن",
             "📋 لیست کاربران",

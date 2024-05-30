@@ -25,6 +25,8 @@ class ActionAdminServices extends TextServices
             $this->service_telgram_user = new TelegramServices($bot->token);
     }
     public function actionData(){
+        logger("actionText",[$this->getData()]);
+
         if (str_contains($this->getData(), "tel:")) {
             $tel = str_replace('tel:', '', $this->getData());
             $tel = "[$tel]";//(tel:$tel)
@@ -61,6 +63,7 @@ class ActionAdminServices extends TextServices
     }
     public function actionText()
     {
+        logger("actionText",[$this->getMessage()]);
         switch ($this->getMessage()) {
             case "📞 دفترچه تلفن":
                 $text = "لیست شماره تلفن کاربران";
@@ -136,19 +139,7 @@ class ActionAdminServices extends TextServices
                 $this->getTelegramServices()->sendMessage($this->getUserId(), $response_text);
 
                 break;
-            case "rule":
-                $rule = Setting::updateOrCreate(
-                    ["key" => "rule"],
-                    ["value" => $this->getMessage()]
-                );
 
-
-                $response_text = "متن قواتین  بروزرسانی شد:";
-                $response_text .= "\n\n";
-                $response_text .= $rule->value;
-                $this->getTelegramServices()->sendMessage($this->getUserId(), $response_text);
-                cache()->forget("text_admin_" . $this->getUserId());
-                break;
             case  "\xE2\x81\x89 ویرایش راهنما":
                 $rule = Setting::where("key", "help")->first();
 
@@ -164,19 +155,7 @@ class ActionAdminServices extends TextServices
 
                 $this->getTelegramServices()->sendMessage($this->getUserId(), $response_text);
 
-            case "help":
-                $rule = Setting::updateOrCreate(
-                    ["key" => "help"],
-                    ["value" => $this->getMessage()]
-                );
 
-
-                $response_text = "متن راهنما  بروزرسانی شد:";
-                $response_text .= "\n\n";
-                $response_text .= $rule->value;
-                $this->getTelegramServices()->sendMessage($this->getUserId(), $response_text);
-                cache()->forget("text_admin_" . $this->getUserId());
-                break;
             case "📈شروع مبلغ معاملات":
                 $s_price_trade = Setting::where("key", "s_price_trade")->first();
 
@@ -189,6 +168,39 @@ class ActionAdminServices extends TextServices
 
                 $this->getTelegramServices()->sendMessage($this->getUserId(), $response_text);
 
+                break;
+
+        }
+    }
+    public function actionTextCache()
+    {
+        logger("cache",[$this->getMessageCache()]);
+        switch ($this->getMessageCache()) {
+            case "rule":
+                $rule = Setting::updateOrCreate(
+                    ["key" => "rule"],
+                    ["value" => $this->getMessage()]
+                );
+
+
+                $response_text = "متن قواتین  بروزرسانی شد:";
+                $response_text .= "\n\n";
+                $response_text .= $rule->value;
+                $this->getTelegramServices()->sendMessage($this->getUserId(), $response_text);
+                cache()->forget("text_admin_" . $this->getUserId());
+                break;
+            case "help":
+                $rule = Setting::updateOrCreate(
+                    ["key" => "help"],
+                    ["value" => $this->getMessage()]
+                );
+
+
+                $response_text = "متن راهنما  بروزرسانی شد:";
+                $response_text .= "\n\n";
+                $response_text .= $rule->value;
+                $this->getTelegramServices()->sendMessage($this->getUserId(), $response_text);
+                cache()->forget("text_admin_" . $this->getUserId());
                 break;
             case "s_price_trade":
                 $s_price_trade = $this->getMessage();
