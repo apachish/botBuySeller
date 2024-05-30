@@ -3,13 +3,16 @@
 namespace App\Services;
 
 
+use App\Models\Setting;
 use App\Models\Transfer;
+use App\Models\UserTelegram;
+use Carbon\Carbon;
 
-class ActionServices
+class ActionServices extends TextServices
 {
-    public static function requestTransfer($data)
+    public  function requestTransfer()
     {
-        $array = str_replace('request_transfer_', '', $data);
+        $array = str_replace('request_transfer_', '', $this->getData());
         $info = explode("_", $array);
         $id = data_get($info, 0);
         $num = data_get($info, 1);
@@ -21,12 +24,142 @@ class ActionServices
                 $keyboard["inline_keyboard"] = self::getKeyboardRequest( $transfer);
 
 
-                $telegram_services->editMessageReplyMarkup($user_id, $transfer->message_id, $keyboard);
+                $this->telegram_services->editMessageReplyMarkup($this->getUserId(), $transfer->message_id, $keyboard);
                 $transfer->update();
             } catch (\Exception $e) {
 
                 logger("exp",[$e->getMessage(),$e->getLine()]);
             }
+        }
+    }
+
+    public  function transferBuy()
+    {
+        $array = str_replace('request_transfer_', '', $this->getData());
+        $info = explode("_", $array);
+        $id = data_get($info, 0);
+        $num = data_get($info, 1);
+        $transfer = Transfer::find($id);
+        if ($transfer) {
+            try {
+                if ($transfer->number >= $num)
+                    $transfer->number -= $num;
+                $keyboard["inline_keyboard"] = self::getKeyboardRequest( $transfer);
+
+
+                $this->telegram_services->editMessageReplyMarkup($this->getUserId(), $transfer->message_id, $keyboard);
+                $transfer->update();
+            } catch (\Exception $e) {
+
+                logger("exp",[$e->getMessage(),$e->getLine()]);
+            }
+        }
+    }
+
+    public function tradeLimit()
+    {
+        $worker_id = (int)str_replace('trade_limit_', '', $this->getData());
+
+        $worker = UserTelegram::where("id", $worker_id)->first();
+        logger("worker", [$worker]);
+        if ($worker) {
+            $name_worker = $worker->fullName ?: $worker->first_name . " " . $worker->last_name;
+
+            $this->telegram->sendMessage([
+                'chat_id' => $this->getUserId(),
+                'text' => "حد مجازی که می خواهید با $name_worker داشته باشید را وارد کنید "
+            ]);
+            cache()->set("text_cache_" . $this->getUserId(), ["title" => "trade_number_limit", "value" => $worker->id]);
+        }
+    }
+
+    public function checkWord()
+    {
+        $start_trade = cache()->remember("s_price_trade",now()->addDay(1),function (){
+            $value = 14000000;
+           $setting = Setting::where("key", "s_price_trade")->first();
+            if ($setting)
+                $value = (int)data_get($setting, "value");
+            return $value;
+        });
+        logger("start_trade", [$start_trade]);
+
+
+        $array = explode($this->getType(), $this->message);
+        $array_desc = explode(":", $this->message);
+
+        if(isset($array_desc[1]))
+            $description = $array_desc[1];
+        $price = $start_trade + ((int)data_get($array, 0) * 1000);
+
+        $number = (int)data_get($array, 1,1);
+        logger("check_transfer", [$price, $number, $array]);
+
+        $type_transaction = in_array($this->getType(),$this->list_type_buy)?"buy":"sell";
+        $check_transfer = Transfer::where("price", $type_transaction=="buy"?">":"<", $price)
+            ->where("status",Transfer::STATUS_ACTIVE)
+            ->orWhere(function ($query){
+                $query->whereIn("status",[
+                    Transfer::STATUS_ACTIVE_DO,
+                    Transfer::STATUS_ACTIVE_DONE
+                ])->where("updated",">",now()->subMinute(1));
+            })
+
+            ->first();
+        if ($check_transfer) {
+//            $message = "قیمت پیشنهادی بهتری از لفظ شمادر کانال میباشد\n\n";
+//            $message .= "لطف اگر پیشنهاد بهتری دارید مجددا لفظ دهید یا \n\n";
+//            $message .= "حداکثر با تلرانس ۲۰۰۰ تومان لفظ دهید \n\n";
+            $message = "لفظ پیشنهادی بهتر در کانال : \n\n";
+            $message .= " \n\n";
+            $message .= number_format($check_transfer->price, 0);
+            $this->telegram_services->sendMessage($this->getUserId(), $message);
+        } else {
+            cache()->set("transfer_cache_buy_" . $this->getUserId(), [
+                "user_id" => $this->getUserId(),
+                "type" =>$this->getType(),
+                "number" => $number,
+                "price" => $price,
+                "status" => 0
+            ]);
+            $price_format = number_format($price, 0);
+            $message = $price_format;
+            if(in_array($this->getType(),$this->list_type_buy))
+                $message .= " \xF0\x9F\x94\xB5	خرید";
+            elseif(in_array($this->getType(),$this->list_type_buy))
+                $message .= " \xF0\x9F\x94\xB4	فروش";
+            $time = Carbon::now();
+            $morning = Carbon::create($time->year, $time->month, $time->day, 10, 0, 0); //set time to 08:00
+            $none = Carbon::create($time->year, $time->month, $time->day, 13, 15, 0); //set time to 18:00
+            if($time->between($morning, $none, true) & (
+                !in_array($this->getType(),$this->list_type_buy_tommarow) ||
+                !in_array($this->getType(),$this->list_type_sell_tommarow)
+                )) {
+                $message .= " \xE2\x98\x80	";
+            } else {
+                $message .= " \xE2\x8F\xB3	";
+            }
+
+            if(str_contains("ن",$this->getType())) {
+                $message .= "بی حواله";
+                if(!$time->between($morning, $none, true) ||
+                    in_array($this->getType(),$this->list_type_sell_n_buy_tom))
+                    $message .= "فردا";
+                $message .= "\xF0\x9F\x92\xB0	\xF0\x9F\x92\xB5	";
+
+                $message .= "بی حواله";
+            }
+            else
+                $message .="با حواله";
+            $message .= $number;
+            $message .= "تا";
+            $keyboard[0] = [
+                ['text' => "\xE2\x9C\x85	تایید", 'callback_data' => "transfer_buy_true"],
+                ['text' => "\xE2\x9D\x8C	رد", 'callback_data' => "transfer_buy_false"],
+            ];
+            logger("ke", [$this->getUserId(), $message, $keyboard]);
+            $this->telegram_services->MessageReplyMarkup($this->telegram, $this->getUserId(), $message, $keyboard);
+            return true;
         }
     }
 

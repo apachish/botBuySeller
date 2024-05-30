@@ -5,6 +5,7 @@ namespace App\Jobs;
 use App\Models\Bot;
 use App\Models\Transfer;
 use App\Services\TelegramServices;
+use App\Services\TextServices;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -33,14 +34,12 @@ class DeactivateTransfer implements ShouldQueue
         $bot = Bot::where("title","botUser")->first();
         if($bot){
             $token = $bot->token;
-            $telegram = new Api($token);
-            $telegram_services = new TelegramServices();
-            $telegram_services->access_token = $token;
+            $text_services = new TextServices($token);
 
             $transfer = Transfer::find($this->transfer_id);
             if($transfer) {
                 $message = $transfer->message."\xF0\x9F\x95\x9B	";
-                $telegram_services->editMessageTextAndInlineKeyboard($bot->chanel_id, $transfer->message_id, $message);
+                $text_services->getTelegramServices()->editMessageTextAndInlineKeyboard($bot->chanel_id, $transfer->message_id, $message);
                 $transfer->delete();
             }
 

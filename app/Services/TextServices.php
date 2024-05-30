@@ -3,34 +3,54 @@
 namespace App\Services;
 
 use App\Models\Bot;
+use App\Models\Setting;
+use App\Models\TextTelegram;
 use App\Models\Transfer;
 use App\Models\UserTelegram;
+use App\Models\UserTradeAccess;
 use Telegram\Bot\Api;
 
 class TextServices
 {
-    private static $list_type =  ["فف","خخ","خ","ف","خفش","خش","ففش","فش"];
-    private static $type;
-    private  $type_message;
-    public $message;
+    private static $list_type = ["فف", "خخ", "خ", "ف", "خفش", "خش", "ففش", "فش","خن","خفن","فن","ففن"];
+    protected $list_type_buy = [ "خخ", "خ", "خفش", "خش","خن","خفن"];
+    protected $list_type_sell = ["فف", "ف", "ففش", "فش","فن","ففن"];
+    protected $list_type_sell_n_buy_tom = ["خفن","ففن"];
+    protected $list_type_sell_tommarow = ["فف",  "ففش","ففن"];
+    protected $list_type_buy_tommarow = [ "خخ", "خفش","خفن"];
+
+    private  $type;
+
+    private $type_message;
+
+    protected $message;
+
     private $message_cache;
 
     public $data;
 
     private $bot;
-    private $telegram;
-    private $telegram_services;
+
+    protected $telegram;
+
+    protected $message_menu = "خوش آمدید";
+
+    private $pattern;
+
+    protected $telegram_services;
+
     private $token;
+
     private $update;
 
-    private  $user;
+    private $user;
 
-    private  $user_id;
+    private $user_id;
 
     public function __construct($token)
     {
         $this->token = $token;
-        $this->bot = cache()->remember("token_".$token,now()->addDay(),function() {
+        $this->bot = cache()->remember("token_" . $token, now()->addDay(), function () {
             return Bot::where('token', $this->token)
                 ->first();
         });
@@ -46,7 +66,20 @@ class TextServices
         logger("bot user", [$this->update]);
     }
 
-
+    /**
+     * @return Api
+     */
+    public function getTelegram(): Api
+    {
+        return $this->telegram;
+    }
+    /**
+     * @return TelegramServices
+     */
+    public function getTelegramServices(): TelegramServices
+    {
+        return $this->telegram_services;
+    }
     /**
      * @return mixed
      *
@@ -122,9 +155,9 @@ class TextServices
         $this->user = $user_telegram;
     }
 
-    private  $message_id = null;
+    private $message_id = null;
 
-    public function getMessageId(): null
+    public function getMessageId()
     {
         return $this->message_id;
     }
@@ -193,37 +226,36 @@ class TextServices
     /**
      * @return mixed
      */
-    public static function getType()
+    public  function getType()
     {
-        return self::$type;
+        return $this->type;
     }
 
     /**
      * @param mixed $type
      */
-    public static function setType($type): void
+    public  function setType($type): void
     {
-        self::$type = $type;
+        $this->type = $type;
     }
-    private static $pattern;
 
     /**
      * @return mixed
      */
-    public static function getPattern()
+    public function getPattern()
     {
-        return self::$pattern;
+        return $this->pattern;
     }
 
     /**
      * @param mixed $pattern
      */
-    public static function setPattern($pattern): void
+    public function setPattern(): void
     {
-        self::$pattern = "/^\d{3,5}".self::$type."\d{1}$/";
+        $this->pattern = "/^\d{3,5}" . self::$type . "\d{1}$/";
     }
 
-    public  function checkText()
+    public function checkText()
     {
 
         $accept = [
@@ -241,20 +273,21 @@ class TextServices
             "\xE2\x9C\x8C	فعال سازی دو مرحله ای",
             "\xE2\x9D\x8C	غیر فعال فوری",
         ];
-        if(in_array($this->text,$accept))
+        if (in_array($this->text, $accept))
             return true;
-        collect(self::$list_type)->contains(function (int $value, int $key){
-            if(str_contains($this->text,$value))
-               self::setType($value);
+        collect(self::$list_type)->contains(function (int $value, int $key) {
+            if (str_contains($this->text, $value))
+                $this->setType($value);
         });
-        if (preg_match(self::$pattern, $this->text))
+        if (preg_match($this->pattern, $this->text))
             return true;
 
         return false;
     }
-    public  function checkData()
+
+    public function checkData()
     {
-        if(str_contains($this->data, "request_transfer_") ||
+        if (str_contains($this->data, "request_transfer_") ||
             str_contains($this->data, "trade_limit_"))
             return true;
         return false;
@@ -265,8 +298,80 @@ class TextServices
         /*
        * check message
        */
-        $this->checkText();
-        $this->telegram->sendMessage(['chat_id' => $this->user_id, 'text' => 'متن نا معتبر می باشد']);
+        if (!$this->checkText())
+            $this->telegram->sendMessage(['chat_id' => $this->user_id, 'text' => 'متن نا معتبر می باشد']);
+        TextTelegram::create([
+            "update_id" => data_get($this->update, 'update_id'),
+            "message_id" => data_get($this->update, 'message.message_id'),
+            "user_telegram_id" => $this->user->id,
+            "text" => data_get($this->update, 'message.text'),
+            "data" => json_encode($this->update)
+        ]);
+        if (preg_match($this->pattern, $this->message))
+            $this->checkWord();
+        switch ($this->message) {
+            case '/start':
+            case 'start':
+                $text = "منتظر تایید مدیر سیستم باشید تا دسترسی به شما ارائه گردد";
+                if (!$this->user->mobile)
+                    $text = "شماره موبایل خود را وارد کنید";
+                elseif (!$this->user->fullName)
+                    $text = "نام و نام خانوادگی خود را وارد کنید";
+                cache()->remember("text_" . $this->user_id, now()->addDay(1), function () use ($text) {
+                    return $text;
+                });
+                $this->telegram->sendMessage(['chat_id' => $this->user_id, 'text' => $text]);
+                break;
+            case '/help':
+                $this->telegram->sendMessage(['chat_id' => $this->user_id, 'text' => 'سلام! چطور می‌توانم به شما کمک کنم؟']);
+                break;
+            case "trade_number_limit":
+                $worker_id = (int)data_get($this->message_cache, "value");
+                UserTradeAccess::updateOrCreate([
+                    "user_id" => $this->user_id,
+                    "user_trade_id" => $worker_id,
+                    "limit_access" => $this->message
+                ]);
+                $this->telegram->sendMessage(['chat_id' => $this->user_id, 'text' => 'حد ثابت شد']);
+                cache()->forget("text_cache_" . $this->user_id);
+                break;
+            case "\xF0\x9F\x91\xA5	معرفی مشتری":
+            case "\xF0\x9F\x93\x88	معاملات باز":
+            case "\xF0\x9F\x93\x8B	لیست همکاران":
+            case "\xF0\x9F\x93\x9A	قوانین":
+            case "راهنما \xE2\x81\x89":
+            case "\xE2\x9A\xA0	\xE2\x9D\x8C	غیرفعال سازی تایید دو مرحله ای ":
+            case "\xE2\x9C\x8C	فعال سازی دو مرحله ای":
+            case  "\xE2\x9D\x8C	غیر فعال فوری":
+                $this->getAction();
+                break;
+            default:
+                $text_send = cache()->get("text_" . $this->user_id);
+                if ($text_send == "شماره موبایل خود را وارد کنید") {
+                    $mobile = $this->convertNumber($this->message);
+                    if ($this->iranMobile($mobile)) {
+                        $this->user->mobile = $mobile;
+                        $this->user->update();
+                        if (!$this->user->fullName) {
+                            $text = "نام و نام خانوادگی خود را وارد کنید";
+                            cache()->set("text_" . $this->user_id, $text);
+                            $this->telegram->sendMessage(['chat_id' => $this->user_id, 'text' => $text]);
+                        }
+                    } else
+                        $this->telegram->sendMessage(['chat_id' => $this->user_id, 'text' => "شماره همراه وارد شده نامعتبر می باشد دوباره وارد کنید"]);
+
+                } elseif ($text_send == "نام و نام خانوادگی خود را وارد کنید") {
+                    $this->user->fullName = $this->message;
+                    $this->user->update();
+                    $text = "منتظر تایید مدیر سیستم باشید تا دسترسی به شما ارائه گردد";
+                    cache()->set("text_" .  $this->user_id, $text);
+                    $this->telegram->sendMessage(['chat_id' =>  $this->user_id, 'text' => $text]);
+
+                } else
+                    $this->telegram->sendMessage(['chat_id' =>  $this->user_id, 'text' => 'متن نا معتبر می باشد']);
+                break;
+        }
+
 
     }
 
@@ -275,14 +380,109 @@ class TextServices
         /*
         * check data
         */
-        if(!$this->checkData())
+        if (!$this->checkData())
             $this->telegram->sendMessage(['chat_id' => $this->user_id, 'text' => 'متن نا معتبر می باشد']);
+        elseif (str_contains($this->data, "request_transfer_"))
+            $this->requestTransfer();
+        elseif (str_contains($this->data, "transfer_buy_"))
+            $this->transferBuy();
+        elseif (str_contains($this->data, "trade_limit_"))
+            $this->tradeLimit();
+    }
 
-        if (str_contains($this->data, "request_transfer_"))
-            ActionServices::requestTransfer();
+    private function getAction()
+    {
+            switch ($this->message) {
+                case "\xF0\x9F\x91\xA5	معرفی مشتری":
+                    break;
+                case "\xF0\x9F\x93\x88	معاملات باز":
+                    $worker = UserTelegram::where("user_id", $this->user_id)->get();
+                    $keyboard = [];
+                    $i = 0;
+                    $worker->each(function ($row) use (&$i, &$keyboard) {
+                        $text = $row->fullName ?: $row->first_name . " " . $row->last_name;
+
+                        $keyboard[$i++] = [
+                            ['text' => $text, 'callback_data' => "trade_open_" . $row->id],
+                        ];
+                    });
+                    $this->telegram_services->sendMessage($this->user_id, "شخص مورد نظر را انتخاب کنید", $keyboard);
+                    break;
+
+                case "📋 لیست همکاران":
+                    $text = "لیست  همکاران";
+                    $users = UserTelegram::where("id", "!=", $this->user_id)
+                        ->with("userTradeAccess")->simplePaginate(5);
+                    logger("users", [$users]);
+                    $page = $users->currentPage();
+                    $next = $users->nextPageUrl();
+                    $pre = $users->previousPageUrl();
+                    logger("page", [$next, $page, $pre]);
+                    $keyboard = [];
+                    $i = 0;
+
+                    $users->each(function ($user) use (&$keyboard, &$i) {
+                        $text = $user->fullName ?: $user->first_name . " " . $user->last_name;
+                        $limit_trade = $user->userTradeAccess->where("user_trade_id", $this->user_id);
+                        logger('limit_trade', [$limit_trade]);
+
+                        $keyboard[$i][0] = [
+                            'text' => "  $text " . ($limit_trade->count() ? "\xE2\x9D\x8C" : "\xE2\x9C\x85"),
+                            'callback_data' => "trade_limit_" . $this->user_id
+                        ];
+                        if ($limit_trade->count())
+                            $keyboard[$i][1] = [
+                                'text' => "مجاز تا" . $limit_trade->limit_access . " تا",
+                                'callback_data' => "trade_limit_" . $this->user_id];
+
+
+                        $i++;
+                    });
+                    logger("keyboard", [$keyboard]);
+                    if ($pre)
+                        $keyboard[$i][] = ['text' => "قبلی", "callback_data" => "pre"];
+                    if ($pre)
+                        $keyboard[$i][] = ['text' => "بعدی", "callback_data" => "next"];
+
+                    $this->telegram_services->MessageReplyMarkup($this->telegram, $this->user_id, $text, $keyboard);
+                    break;
+
+                case "📚   قوانین":
+                    $help = Setting::where("key", "rule")->first();
+                    $this->telegram_services->sendMessage($this->user_id, $help->value);
+                    break;
+
+                case "\xE2\x81\x89  راهنما":
+                    $help = Setting::where("key", "help")->first();
+                    $this->telegram_services->sendMessage($this->user_id, $help->value);
+
+                    break;
+
+                case "\xE2\x9A\xA0	\xE2\x9D\x8C	غیرفعال سازی تایید دو مرحله ای ":
+                    $this->user->verify_two = false;
+                    $this->user->update();
+                    $this->telegram_services->sendMessage($this->user_id, "تایید دو مرحله ای غیر فعال شد");
+                    break;
+
+                case "\xE2\x9C\x8C	فعال سازی دو مرحله ای":
+                    $this->user->verify_two = true;
+                    $this->user->update();
+                    $this->telegram_services->sendMessage($this->user_id, "تایید دو مرحله ای  فعال شد");
+
+                    break;
+
+                case  "\xE2\x9D\x8C	غیر فعال فوری":
+                    $this->user->delete();
+                    $this->user->menu();
+                    break;
+                default:
+                    return false;
+            }
 
     }
-    private function sendMessageNewUser():void
+
+
+    private function sendMessageNewUser(): void
     {
         if (isset($this->update["my_chat_member"])) {
             $chatId = $this->update['my_chat_member']['from']['id']; // چت‌آیدی کاربر
@@ -293,6 +493,36 @@ class TextServices
             ]);
         }
     }
+
+    public function menu()
+    {
+        if ($this->user->status) {
+            $keyboard = [
+                [
+                    ['text' => "\xF0\x9F\x91\xA5	معرفی مشتری"],
+                    ['text' => "\xF0\x9F\x93\x8B	لیست همکاران"],
+                ],
+                [
+                    ['text' => "\xF0\x9F\x93\x88	معاملات باز"]
+                ],
+                [
+                    ['text' => "\xF0\x9F\x93\x9A	قوانین"],
+                    ['text' => "راهنما \xE2\x81\x89"]
+                ],
+                [
+                    ['text' => $this->user->verify_two ? "\xE2\x9A\xA0	\xE2\x9D\x8C	غیرفعال سازی تایید دو مرحله ای " : "\xE2\x9C\x8C	فعال سازی دو مرحله ای"],
+                    ['text' => "\xE2\x9D\x8C	غیر فعال فوری"],
+
+                ],
+            ];
+            TelegramServices::menu($this->telegram, $keyboard, $this->user, $this->message_menu);
+            cache()->set("keyword_menu" . $this->user->id, true);
+        } else {
+            cache()->forget("keyword_menu" . $this->user->id);
+        }
+
+    }
+
 
 
     private function iranMobile($value)

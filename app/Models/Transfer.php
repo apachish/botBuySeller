@@ -12,6 +12,12 @@ class Transfer extends Model
     protected $connection = "mongodb";
     protected $collection = 'transfer_collection';
 
+    const STATUS_PENDING = "pending";
+    const STATUS_ACTIVE = "active";
+    const STATUS_ACTIVE_DO = "active_do";
+    const STATUS_ACTIVE_DONE = "active_done";
+    const STATUS_DEACTIVATE = "deactivate";
+
     protected $fillable = [
         "user_id",
         "type",
