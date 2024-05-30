@@ -105,6 +105,7 @@ class TextServices
             $type = "message";
 
         $this->type_message = $type;
+        logger("type_messager",[$this->type_message]);
     }
 
 
@@ -122,6 +123,7 @@ class TextServices
     public function setUserId(): void
     {
         $this->user_id = data_get($this->update, $this->type_message . '.from.id');;
+        logger("user_id",[$this->user_id]);
     }
 
     /**
@@ -172,6 +174,8 @@ class TextServices
             $this->message_id = $this->update[$this->type_message]['message_id']; // چت‌آیدی کاربر
         if (isset($this->update[$this->type_message]['message']['message_id']))
             $this->message_id = $this->update[$this->type_message]['message']['message_id']; // چت‌آیدی کاربر
+
+        logger("messgae_id",[$this->message_id]);
     }
 
     /**
@@ -222,6 +226,8 @@ class TextServices
     public function setMessageCache(): void
     {
         $this->message_cache = cache()->get("text_cache_" . $this->user_id);
+        logger("message_cache",[ $this->message_cache,"text_cache_" . $this->user_id]);
+
         $this->message_cache =data_get( $this->message_cache,"title");
         logger("message_cache",[ $this->message_cache]);
         // data_get($cache_data, "title")
