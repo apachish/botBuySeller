@@ -221,8 +221,8 @@ class ActionAdminServices extends TextServices
                         $rule = Setting::updateOrCreate(
                             ["key" => "s_price_trade"],
                             ["value" =>
-                                ["start"=>data_get($limit_price,0)],
-                                ["end"=>data_get($limit_price,1)]
+                                ["start"=>data_get($limit_price,0),
+                                "end"=>data_get($limit_price,1)]
                             ]
                         );
 
