@@ -13,8 +13,10 @@ class ActionAdminServices extends TextServices
 {
     public $service_telgram_user;
 
-    public function __construct()
+    public function __construct($token)
     {
+        parent::__construct($token);
+
         $bot = cache()->remember("telegram_user", now()->addDay(), function () {
             return Bot::where('title', "botUser")
                 ->first();

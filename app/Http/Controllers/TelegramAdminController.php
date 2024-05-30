@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\ContactResourceCollection;
 use App\Models\Setting;
+use App\Services\ActionAdminServices;
 use App\Services\TelegramServices;
 use App\Services\TextServices;
 use Illuminate\Http\Request;
@@ -20,7 +21,7 @@ class TelegramAdminController extends Controller
     public function setWebhook($token)
     {
 
-        $text_services = new TextServices($token);
+        $text_services = new ActionAdminServices($token);
 
         $access = $text_services->accessAdmin();
         if ($access == null) return false;
