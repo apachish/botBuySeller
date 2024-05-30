@@ -217,7 +217,7 @@ class ActionAdminServices extends TextServices
                 $s_price_trade = $this->getMessage();
                 if ($s_price_trade) {
                     $limit_price = explode(":",$s_price_trade);
-                    if(data_get($s_price_trade,0) & data_get($s_price_trade,1)) {
+                    if(data_get($limit_price,0) & data_get($limit_price,1)) {
                         $rule = Setting::updateOrCreate(
                             ["key" => "s_price_trade"],
                             ["value" =>
