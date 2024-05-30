@@ -160,9 +160,11 @@ class ActionAdminServices extends TextServices
                 $s_price_trade = Setting::where("key", "s_price_trade")->first();
 
                 logger("📈شروع مبلغ معاملاتee");
-                if ($s_price_trade)
-                    $response_text = " شروع مبلغ معاملات را   قبلا وارد شده: \n\n  $s_price_trade->value";
-                else
+                if ($s_price_trade) {
+                    $response_text = " شروع مبلغ وارد شده قبلا: \n\n  ";
+                    $response_text .= $s_price_trade->value;
+                    $response_text .= " مبلغ جدید وارد کنید";
+                }else
                     $response_text = " شروع مبلغ معاملات را وارد کنید \n\n مثل 14000000";
 
                 cache()->set("text_admin_" . $this->getUserId(), "s_price_trade");
