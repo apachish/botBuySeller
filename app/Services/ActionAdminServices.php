@@ -159,6 +159,7 @@ class ActionAdminServices extends TextServices
             case "📈شروع مبلغ معاملات":
                 $s_price_trade = Setting::where("key", "s_price_trade")->first();
 
+                logger("📈شروع مبلغ معاملاتee");
                 if ($s_price_trade)
                     $response_text = $s_price_trade->value;
                 else
