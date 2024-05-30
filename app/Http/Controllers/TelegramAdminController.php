@@ -32,8 +32,12 @@ class TelegramAdminController extends Controller
         $text_services->setMessage();
         $text_services->setMessageCache();
         $text_services->setUser();
+        if ($text_services->getData())
+            $text_services->actionData();
+        if ($text_services->getMessage())
+            $text_services->actionText();
 
-        $access_text =  [
+        $access_text = [
             "📞 دفترچه تلفن",
             "📋 لیست کاربران",
             "تعداد کاربران",
@@ -44,7 +48,7 @@ class TelegramAdminController extends Controller
         $key_cache = "text_admin_";
         $text = "سلام! به منوی اصلی خوش آمدید.";
 
-        $keyboard_menu =  [
+        $keyboard_menu = [
             [
                 ['text' => "📞 دفترچه تلفن"],
                 ['text' => "📈شروع مبلغ معاملات"]
@@ -66,12 +70,7 @@ class TelegramAdminController extends Controller
         $text_services->menu($keyboard_menu);
 
 
-
-
-
-
     }
-
 
 
 }
