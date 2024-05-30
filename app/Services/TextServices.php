@@ -184,7 +184,7 @@ class TextServices
     /**
      * @param mixed $message
      */
-    public function setMessage($message): void
+    public function setMessage(): void
     {
         $this->message = isset($update['message']['text']) ? $update['message']['text'] : null;;
     }
