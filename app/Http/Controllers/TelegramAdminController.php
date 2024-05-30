@@ -30,6 +30,8 @@ class TelegramAdminController extends Controller
         $text_services->setUserId();
         $text_services->setMessageId();
         $text_services->setData();
+        $key_cache = "text_admin_";
+        $text_services->setKeyCache($key_cache);
         $text_services->setMessage();
         $text_services->setMessageCache();
         $text_services->setUser();
@@ -47,7 +49,7 @@ class TelegramAdminController extends Controller
             "\xE2\x81\x89 ویرایش راهنما",
             "📈شروع مبلغ معاملات",
         ];
-        $key_cache = "text_admin_";
+
         $text = "سلام! به منوی اصلی خوش آمدید.";
 
         $keyboard_menu = [

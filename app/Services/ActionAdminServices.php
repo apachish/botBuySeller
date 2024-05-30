@@ -161,7 +161,7 @@ class ActionAdminServices extends TextServices
 
                 logger("📈شروع مبلغ معاملاتee");
                 if ($s_price_trade)
-                    $response_text = $s_price_trade->value;
+                    $response_text = " شروع مبلغ معاملات را   قبلا وارد شده: \n\n  $s_price_trade->value";
                 else
                     $response_text = " شروع مبلغ معاملات را وارد کنید \n\n مثل 14000000";
 

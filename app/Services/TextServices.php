@@ -47,6 +47,9 @@ class TextServices
 
     private $user_id;
 
+    private $key_cache;
+
+
     public function __construct($token)
     {
         $this->token = $token;
@@ -80,6 +83,23 @@ class TextServices
     {
         return $this->telegram_services;
     }
+
+    /**
+     * @return mixed
+     */
+    public function getKeyCache()
+    {
+        return $this->key_cache;
+    }
+
+    /**
+     * @param mixed $key_cache
+     */
+    public function setKeyCache($key_cache): void
+    {
+        $this->key_cache = $key_cache;
+    }
+
     /**
      * @return mixed
      *
@@ -225,8 +245,8 @@ class TextServices
      */
     public function setMessageCache(): void
     {
-        $this->message_cache = cache()->get("text_cache_" . $this->user_id);
-        logger("message_cache",[ $this->message_cache,"text_cache_" . $this->user_id]);
+        $this->message_cache = cache()->get($this->key_cache . $this->user_id);
+        logger("message_cache",[ $this->message_cache,$this->key_cache . $this->user_id]);
 
         $this->message_cache =data_get( $this->message_cache,"title");
         logger("message_cache",[ $this->message_cache]);
@@ -343,7 +363,7 @@ class TextServices
                     "limit_access" => $this->message
                 ]);
                 $this->telegram->sendMessage(['chat_id' => $this->user_id, 'text' => 'حد ثابت شد']);
-                cache()->forget("text_cache_" . $this->user_id);
+                cache()->forget($this->key_cache . $this->user_id);
                 break;
             case "\xF0\x9F\x91\xA5	معرفی مشتری":
             case "\xF0\x9F\x93\x88	معاملات باز":
