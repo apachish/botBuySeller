@@ -169,7 +169,7 @@ class ActionAdminServices extends TextServices
                     $response_text .= "تا مبلغ";
                     $response_text .= "\n\n";
 
-                    $response_text .= number_format(data_get(data_get($s_price_trade,"value.end")), 0);
+                    $response_text .= number_format(data_get($s_price_trade,"value.end"),0);
                     $response_text .= "\n\n";
                 }else {
                     $response_text = "محدود شروع مبلغ وارد شده باید به صورت \n\n";
