@@ -248,8 +248,6 @@ class TextServices
         $this->message_cache = cache()->get($this->key_cache . $this->user_id);
         logger("message_cache",[ $this->message_cache,$this->key_cache . $this->user_id]);
 
-        $this->message_cache =data_get( $this->message_cache,"title");
-        logger("message_cache",[ $this->message_cache]);
         // data_get($cache_data, "title")
     }
 
