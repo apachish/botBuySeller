@@ -554,7 +554,7 @@ class TextServices
         return false;
     }
 
-    private function convertNumber($value)
+    protected function convertNumber($value)
     {
         $western = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'];
         $eastern = ['۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹', '۰'];

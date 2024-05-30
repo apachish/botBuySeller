@@ -216,26 +216,26 @@ class ActionAdminServices extends TextServices
             case "s_price_trade":
                 $s_price_trade = $this->getMessage();
                 if ($s_price_trade) {
-                    $limit_price = explode(":",$s_price_trade);
+                    $limit_price = explode(":",$this->convertNumber($s_price_trade));
                     if(data_get($limit_price,0) & data_get($limit_price,1)) {
                         $rule = Setting::updateOrCreate(
                             ["key" => "s_price_trade"],
                             ["value" =>
-                                ["start"=>data_get($s_price_trade,0)],
-                                ["end"=>data_get($s_price_trade,1)]
+                                ["start"=>data_get($limit_price,0)],
+                                ["end"=>data_get($limit_price,1)]
                             ]
                         );
 
                         $response_text = "محدوده معامله   بروزرسانی شد:";
                         $response_text .= "\n\n";
                         $response_text .= "از مبلغ";
-                        $response_text .= number_format(data_get($s_price_trade,0), 0);
+                        $response_text .= number_format(data_get($limit_price,0), 0);
                         $response_text .= "\n\n";
 
                         $response_text .= "تا مبلغ";
                         $response_text .= "\n\n";
 
-                        $response_text .= number_format(data_get($s_price_trade,1), 0);
+                        $response_text .= number_format(data_get($limit_price,1), 0);
                         $response_text .= "\n\n";
                         $this->getTelegramServices()->sendMessage($this->getUserId(), $response_text);
                         cache()->forget("text_admin_" . $this->getUserId());
