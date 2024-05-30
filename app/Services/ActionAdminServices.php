@@ -163,6 +163,8 @@ class ActionAdminServices extends TextServices
                     $response_text = "محدود معامله   قبلا شد:";
                     $response_text .= "\n\n";
                     $response_text .= "از مبلغ";
+                    $response_text .= "\n\n";
+
                     $response_text .= number_format(data_get($s_price_trade,"value.start"), 0);
                     $response_text .= "\n\n";
 
@@ -229,9 +231,9 @@ class ActionAdminServices extends TextServices
                         $response_text = "محدوده معامله   بروزرسانی شد:";
                         $response_text .= "\n\n";
                         $response_text .= "از مبلغ";
+                        $response_text .= "\n\n";
                         $response_text .= number_format(data_get($limit_price,0), 0);
                         $response_text .= "\n\n";
-
                         $response_text .= "تا مبلغ";
                         $response_text .= "\n\n";
 
