@@ -330,6 +330,12 @@ class TextServices
     {
         if (str_contains($this->message_cache, "add_customer"))
             return true;
+        elseif (str_contains($this->message_cache, "add_fullName"))
+            return true;
+        elseif (str_contains($this->message_cache, "add_mobile"))
+            return true;
+        elseif (str_contains($this->message_cache, "pending_accept"))
+            return true;
         return false;
     }
 
@@ -338,7 +344,7 @@ class TextServices
         /*
        * check message
        */
-        logger("check messahge",[$this->checkText()]);
+        logger("check message",[$this->checkText()]);
 
         if (!$this->checkText())
             $this->telegram->sendMessage(['chat_id' => $this->user_id, 'text' => 'متن نا معتبر می باشد']);
@@ -356,12 +362,16 @@ class TextServices
             case 'start':
                 $text = $this->user->status?"خوش آمدید":"منتظر تایید مدیر سیستم باشید تا دسترسی به شما ارائه گردد";
                 if (!$this->user->mobile)
+                {
                     $text = "شماره موبایل خود را وارد کنید";
-                elseif (!$this->user->fullName)
+                    $type_add = "add_mobile";
+                }
+                elseif (!$this->user->fullName) {
                     $text = "نام و نام خانوادگی خود را وارد کنید";
-                cache()->remember("text_" . $this->user_id, now()->addDay(1), function () use ($text) {
-                    return $text;
-                });
+                    $type_add = "add_fullName";
+
+                }
+                cache()->set($this->key_cache.$this->user_id,$type_add);
                 $this->telegram->sendMessage(['chat_id' => $this->user_id, 'text' => $text]);
                 break;
             case '/help':
@@ -388,28 +398,6 @@ class TextServices
                 $this->getAction();
                 break;
             default:
-                $text_send = cache()->get("text_" . $this->user_id);
-                if ($text_send == "شماره موبایل خود را وارد کنید") {
-                    $mobile = $this->convertNumber($this->message);
-                    if ($this->iranMobile($mobile)) {
-                        $this->user->mobile = $mobile;
-                        $this->user->update();
-                        if (!$this->user->fullName) {
-                            $text = "نام و نام خانوادگی خود را وارد کنید";
-                            cache()->set("text_" . $this->user_id, $text);
-                            $this->telegram->sendMessage(['chat_id' => $this->user_id, 'text' => $text]);
-                        }
-                    } else
-                        $this->telegram->sendMessage(['chat_id' => $this->user_id, 'text' => "شماره همراه وارد شده نامعتبر می باشد دوباره وارد کنید"]);
-
-                } elseif ($text_send == "نام و نام خانوادگی خود را وارد کنید") {
-                    $this->user->fullName = $this->message;
-                    $this->user->update();
-                    $text = "منتظر تایید مدیر سیستم باشید تا دسترسی به شما ارائه گردد";
-                    cache()->set("text_" .  $this->user_id, $text);
-                    $this->telegram->sendMessage(['chat_id' =>  $this->user_id, 'text' => $text]);
-
-                } else
                     $this->telegram->sendMessage(['chat_id' =>  $this->user_id, 'text' => 'متن نا معتبر می باشد']);
                 break;
         }
@@ -441,6 +429,12 @@ class TextServices
             $this->telegram->sendMessage(['chat_id' => $this->user_id, 'text' => 'متن نا معتبر می باشد']);
         elseif (str_contains($this->message_cache, "add_customer"))
             $this->addCustomer();
+        elseif (str_contains($this->message_cache, "add_mobile"))
+            $this->addMobile();
+        elseif (str_contains($this->message_cache, "add_customer"))
+            $this->addFullName();
+        elseif (str_contains($this->message_cache, "pending_accept"))
+            $this->pendingAccept();
     }
 
     private function getAction()
@@ -584,7 +578,7 @@ class TextServices
 
 
 
-    private function iranMobile($value)
+    protected function iranMobile($value)
     {
 
         if ((bool)preg_match('/^(((98)|(\+98)|(0098)|0)(9){1}[0-9]{9})+$/', $value) || (bool)preg_match('/^(9){1}[0-9]{9}+$/', $value))

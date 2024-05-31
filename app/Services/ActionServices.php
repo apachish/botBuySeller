@@ -14,20 +14,18 @@ class ActionServices extends TextServices
     public function addCustomer()
     {
         $limit = null;
-        $array = explode(",",$this->getMessage());
+        $array = explode(",", $this->getMessage());
         foreach ($array as $item) {
             str_replace(":", "", $item);
             if (str_contains($item, "موبایل")) {
                 $mobile = $this->convertNumber(str_replace("موبایل", "", $item));
-            }
-            elseif (str_contains($item, "نام ونام خانوادگی")) {
+            } elseif (str_contains($item, "نام ونام خانوادگی")) {
                 $fullName = $this->convertNumber(str_replace("نام ونام خانوادگی", "", $item));
-            }
-            elseif (str_contains($item, "حد")) {
+            } elseif (str_contains($item, "حد")) {
                 $limit = $this->convertNumber(str_replace("حد", "", $item));
             }
         }
-        if($mobile && $fullName ) {
+        if ($mobile && $fullName) {
             CustomerUser::updateOrCreate(["user_id" => $this->getUserId(), "mobile" => $mobile],
                 [
                     "fullName" => $fullName,
@@ -42,17 +40,60 @@ class ActionServices extends TextServices
             $message .= $mobile;
             $message .= "\n\n";
             $message .= "حد مجاز:";
-            $message .= $limit === null?"آزاد": $limit;
+            $message .= $limit === null ? "آزاد" : $limit;
             $message .= "\n\n";
             $this->telegram_services->sendMessage($this->getUserId(), $message);
 
-        }else{
+        } else {
             $this->telegram_services->sendMessage($this->getUserId(), "اطلاعات وارد شده مشابه مثال باید باشه");
 
         }
     }
 
-    public  function requestTransfer()
+    public function addMobile()
+    {
+        $mobile = $this->convertNumber($this->message);
+        if ($this->iranMobile($mobile)) {
+            $this->getUser()->mobile = $mobile;
+            $this->getUser()->update();
+            if (!$this->getUser()->fullName) {
+                $text = "نام و نام خانوادگی خود را وارد کنید";
+                cache()->set($this->getKeyCache() . $this->getUserId(), "add_fullName");
+                $this->telegram->sendMessage(['chat_id' => $this->getUserId(), 'text' => $text]);
+            } elseif (!$this->getUser()->status) {
+                cache()->set($this->getKeyCache() . $this->getUserId(), "pending_accept");
+                $text = "منتظر تایید مدیر سیستم باشید تا دسترسی به شما ارائه گردد";
+                $this->telegram->sendMessage(['chat_id' => $this->getUserId(), 'text' => $text]);
+            } else {
+                cache()->forget($this->getKeyCache() . $this->getUserId());
+            }
+        } else
+            $this->telegram->sendMessage(['chat_id' => $this->getUserId(), 'text' => "شماره همراه وارد شده نامعتبر می باشد دوباره وارد کنید"]);
+    }
+
+    public function addFullName()
+    {
+        $this->getUser()->fullName = $this->message;
+        $this->getUser()->update();
+        $text = "منتظر تایید مدیر سیستم باشید تا دسترسی به شما ارائه گردد";
+        if (!$this->getUser()->status) {
+            cache()->set($this->getKeyCache() . $this->getUserId(), "pending_accept");
+            $text = "منتظر تایید مدیر سیستم باشید تا دسترسی به شما ارائه گردد";
+            $this->telegram->sendMessage(['chat_id' => $this->getUserId(), 'text' => $text]);
+        } else {
+            cache()->forget($this->getKeyCache() . $this->getUserId());
+        }
+        $this->telegram->sendMessage(['chat_id' => $this->getUserId(), 'text' => $text]);
+    }
+
+    public function pendingAccept()
+    {
+        $text = "منتظر تایید مدیر سیستم باشید تا دسترسی به شما ارائه گردد";
+        cache()->set($this->getKeyCache() . $this->getUserId(), "pending_accept");
+        $this->telegram->sendMessage(['chat_id' => $this->getUserId(), 'text' => $text]);
+    }
+
+    public function requestTransfer()
     {
         $array = str_replace('request_transfer_', '', $this->getData());
         $info = explode("_", $array);
@@ -63,19 +104,19 @@ class ActionServices extends TextServices
             try {
                 if ($transfer->number >= $num)
                     $transfer->number -= $num;
-                $keyboard["inline_keyboard"] = self::getKeyboardRequest( $transfer);
+                $keyboard["inline_keyboard"] = self::getKeyboardRequest($transfer);
 
 
                 $this->telegram_services->editMessageReplyMarkup($this->getUserId(), $transfer->message_id, $keyboard);
                 $transfer->update();
             } catch (\Exception $e) {
 
-                logger("exp",[$e->getMessage(),$e->getLine()]);
+                logger("exp", [$e->getMessage(), $e->getLine()]);
             }
         }
     }
 
-    public  function transferBuy()
+    public function transferBuy()
     {
         $array = str_replace('request_transfer_', '', $this->getData());
         $info = explode("_", $array);
@@ -86,14 +127,14 @@ class ActionServices extends TextServices
             try {
                 if ($transfer->number >= $num)
                     $transfer->number -= $num;
-                $keyboard["inline_keyboard"] = self::getKeyboardRequest( $transfer);
+                $keyboard["inline_keyboard"] = self::getKeyboardRequest($transfer);
 
 
                 $this->telegram_services->editMessageReplyMarkup($this->getUserId(), $transfer->message_id, $keyboard);
                 $transfer->update();
             } catch (\Exception $e) {
 
-                logger("exp",[$e->getMessage(),$e->getLine()]);
+                logger("exp", [$e->getMessage(), $e->getLine()]);
             }
         }
     }
@@ -117,9 +158,9 @@ class ActionServices extends TextServices
 
     public function checkWord()
     {
-        $start_trade = cache()->remember("s_price_trade",now()->addDay(1),function (){
+        $start_trade = cache()->remember("s_price_trade", now()->addDay(1), function () {
             $value = 14000000;
-           $setting = Setting::where("key", "s_price_trade")->first();
+            $setting = Setting::where("key", "s_price_trade")->first();
             if ($setting)
                 $value = (int)data_get($setting, "value");
             return $value;
@@ -130,23 +171,22 @@ class ActionServices extends TextServices
         $array = explode($this->getType(), $this->message);
         $array_desc = explode(":", $this->message);
 
-        if(isset($array_desc[1]))
+        if (isset($array_desc[1]))
             $description = $array_desc[1];
         $price = $start_trade + ((int)data_get($array, 0) * 1000);
 
-        $number = (int)data_get($array, 1,1);
+        $number = (int)data_get($array, 1, 1);
         logger("check_transfer", [$price, $number, $array]);
 
-        $type_transaction = in_array($this->getType(),$this->list_type_buy)?"buy":"sell";
-        $check_transfer = Transfer::where("price", $type_transaction=="buy"?">":"<", $price)
-            ->where("status",Transfer::STATUS_ACTIVE)
-            ->orWhere(function ($query){
-                $query->whereIn("status",[
+        $type_transaction = in_array($this->getType(), $this->list_type_buy) ? "buy" : "sell";
+        $check_transfer = Transfer::where("price", $type_transaction == "buy" ? ">" : "<", $price)
+            ->where("status", Transfer::STATUS_ACTIVE)
+            ->orWhere(function ($query) {
+                $query->whereIn("status", [
                     Transfer::STATUS_ACTIVE_DO,
                     Transfer::STATUS_ACTIVE_DONE
-                ])->where("updated",">",now()->subMinute(1));
+                ])->where("updated", ">", now()->subMinute(1));
             })
-
             ->first();
         if ($check_transfer) {
 //            $message = "قیمت پیشنهادی بهتری از لفظ شمادر کانال میباشد\n\n";
@@ -159,40 +199,39 @@ class ActionServices extends TextServices
         } else {
             cache()->set("transfer_cache_buy_" . $this->getUserId(), [
                 "user_id" => $this->getUserId(),
-                "type" =>$this->getType(),
+                "type" => $this->getType(),
                 "number" => $number,
                 "price" => $price,
                 "status" => 0
             ]);
             $price_format = number_format($price, 0);
             $message = $price_format;
-            if(in_array($this->getType(),$this->list_type_buy))
+            if (in_array($this->getType(), $this->list_type_buy))
                 $message .= " \xF0\x9F\x94\xB5	خرید";
-            elseif(in_array($this->getType(),$this->list_type_buy))
+            elseif (in_array($this->getType(), $this->list_type_buy))
                 $message .= " \xF0\x9F\x94\xB4	فروش";
             $time = Carbon::now();
             $morning = Carbon::create($time->year, $time->month, $time->day, 10, 0, 0); //set time to 08:00
             $none = Carbon::create($time->year, $time->month, $time->day, 13, 15, 0); //set time to 18:00
-            if($time->between($morning, $none, true) & (
-                !in_array($this->getType(),$this->list_type_buy_tommarow) ||
-                !in_array($this->getType(),$this->list_type_sell_tommarow)
+            if ($time->between($morning, $none, true) & (
+                    !in_array($this->getType(), $this->list_type_buy_tommarow) ||
+                    !in_array($this->getType(), $this->list_type_sell_tommarow)
                 )) {
                 $message .= " \xE2\x98\x80	";
             } else {
                 $message .= " \xE2\x8F\xB3	";
             }
 
-            if(str_contains("ن",$this->getType())) {
+            if (str_contains("ن", $this->getType())) {
                 $message .= "بی حواله";
-                if(!$time->between($morning, $none, true) ||
-                    in_array($this->getType(),$this->list_type_sell_n_buy_tom))
+                if (!$time->between($morning, $none, true) ||
+                    in_array($this->getType(), $this->list_type_sell_n_buy_tom))
                     $message .= "فردا";
                 $message .= "\xF0\x9F\x92\xB0	\xF0\x9F\x92\xB5	";
 
                 $message .= "بی حواله";
-            }
-            else
-                $message .="با حواله";
+            } else
+                $message .= "با حواله";
             $message .= $number;
             $message .= "تا";
             $keyboard[0] = [
@@ -210,7 +249,7 @@ class ActionServices extends TextServices
      * @param \Illuminate\Database\Eloquent\Model|Transfer $transfer_new
      * @return mixed
      */
-    public static function getKeyboardRequest( Transfer $transfer_new): mixed
+    public static function getKeyboardRequest(Transfer $transfer_new): mixed
     {
         $m = 0;
         $k = 0;
@@ -226,9 +265,9 @@ class ActionServices extends TextServices
                 $k++;
             }
         }
-        if(!$keyboard)
+        if (!$keyboard)
             $keyboard = new \stdClass();
-        logger("key",[$keyboard]);
+        logger("key", [$keyboard]);
         return $keyboard;
     }
 }
