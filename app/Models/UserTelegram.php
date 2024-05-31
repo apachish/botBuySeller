@@ -27,7 +27,8 @@ class UserTelegram extends Model
         "supports_inline_queries",
         "status",
         "verify_two",
-        "agent_id"
+        "agent_id",
+        "role"
     ];
 
     use HasFactory;

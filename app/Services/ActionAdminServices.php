@@ -32,7 +32,33 @@ class ActionAdminServices extends TextServices
             $tel = "[$tel]";//(tel:$tel)
             $response_text = "برای تماس با شماره زیر کلیک کنید:\n\n$tel";
             $this->getTelegramServices()->sendMessage($this->getUserId(), $response_text);
-        } elseif (str_contains($this->getData(), "confirm_")) {
+        } elseif (str_contains($this->getData(), "customer_")) {
+            $id = (int)str_replace('customer_', '', $this->getData());
+            $user_con = UserTelegram::where("id", $id)->first();
+            logger("con", [$user_con, $id]);
+            if ($user_con) {
+                $fullName = $user_con->fullName ?: $user_con->first_name . " " . $user_con->last_name;
+                $user_con->role = "customer";
+                $user_con->update();
+                $response_text = "$fullName نقش همکار فعال شد \n\n ";
+                $this->getTelegramServices()->sendMessage($this->getUserId(), $response_text);
+                $response_text = "$fullName همکار گرامی به سیستم ما خوش آمدید\n\n ";
+                $this->service_telgram_user->sendMessage($user_con->id, $response_text);
+            }
+        }elseif (str_contains($this->getData(), "colleague_")) {
+            $id = (int)str_replace('colleague_', '', $this->getData());
+            $user_con = UserTelegram::where("id", $id)->first();
+            logger("con", [$user_con, $id]);
+            if ($user_con) {
+                $fullName = $user_con->fullName ?: $user_con->first_name . " " . $user_con->last_name;
+                $user_con->role = "customer";
+                $user_con->update();
+                $response_text = "$fullName نقش همکاری این شخص به مشتری تغییر یافت \n\n ";
+                $this->getTelegramServices()->sendMessage($this->getUserId(), $response_text);
+                $response_text = "$fullName همکاری شما در سیستم به سطح مشتری انتقال یافت\n\n ";
+                $this->service_telgram_user->sendMessage($user_con->id, $response_text);
+            }
+        }elseif (str_contains($this->getData(), "confirm_")) {
             $id = (int)str_replace('confirm_', '', $this->getData());
             $user_con = UserTelegram::where("id", $id)->first();
             logger("con", [$user_con, $id]);
@@ -91,9 +117,9 @@ class ActionAdminServices extends TextServices
 
                 $this->getTelegramServices()->MessageReplyMarkup($this->getTelegram(), $this->getUserId(), $text, $keyboard);
                 break;
-            case "📋 لیست کاربران":
-                $text = "لیست  کاربران";
-                $users = UserTelegram::simplePaginate(5);
+            case "📋 لیست همکاران":
+                $text = "لیست  همکاران";
+                $users = UserTelegram::where("role","colleague")->simplePaginate(5);
                 $page = $users->currentPage();
                 $next = $users->nextPageUrl();
                 $pre = $users->previousPageUrl();
@@ -105,6 +131,36 @@ class ActionAdminServices extends TextServices
                     $text = $user->fullName ?: $user->first_name . " " . $user->last_name;
                     $keyboard[$i++] = [
                         ['text' => "  $text ", 'callback_data' => $user->id],
+                    ];
+//                    $keyboard[$i++] = [
+//                        ['text' => "\xE2\x9C\x85 ", 'callback_data' => 'confirm_' . $user->id],
+//                        ['text' => "\xE2\x9D\x8C", 'callback_data' => 'reject_' . $user->id],
+//                    ];
+                });
+                logger("keyboard", [$keyboard]);
+                if ($pre)
+                    $keyboard[$i][] = ['text' => "قبلی", "callback_data" => "pre"];
+                if ($pre)
+                    $keyboard[$i][] = ['text' => "بعدی", "callback_data" => "next"];
+
+                $this->getTelegramServices()->MessageReplyMarkup($this->getTelegram(), $this->getUserId(), $text, $keyboard);
+                break;
+            case "📋 لیست کاربران":
+                $text = "\n\nلیست  کاربران";
+                $text .= "با کلیک بر\xE2\x9D\x8C کاربر غیر فعال شده و با کلیک بر \xE2\x9C\x85 کاربرقعال گردید در صورت کلیک بر روی اسم شخص نوع کاربر از مشتری به همکار و همکار به مشتری تغییر می کنند ";
+                $users = UserTelegram::simplePaginate(5);
+                $page = $users->currentPage();
+                $next = $users->nextPageUrl();
+                $pre = $users->previousPageUrl();
+                logger("page", [$next, $page, $pre]);
+                $keyboard = [];
+                $i = 0;
+
+                $users->each(function ($user) use (&$keyboard, &$i) {
+                    $text = $user->fullName ?: $user->first_name . " " . $user->last_name;
+                    $text .= $this->getUser()->role=="colleague"?"(همکار)":"(مشتری)";
+                    $keyboard[$i++] = [
+                        ['text' => "  $text  ", 'callback_data' => $this->getUser()->role=="colleague"?"colleague_":"customer_".$user->id],
                     ];
                     $keyboard[$i++] = [
                         ['text' => "\xE2\x9C\x85 ", 'callback_data' => 'confirm_' . $user->id],

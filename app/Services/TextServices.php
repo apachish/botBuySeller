@@ -427,6 +427,11 @@ class TextServices
     {
             switch ($this->message) {
                 case "\xF0\x9F\x91\xA5	معرفی مشتری":
+                    $text =  "مشتری خود را به صورت زیر وارد کنید\n\n";
+                    $text .= "موبایل:شماره موبایل,نام و نام خانوادگی :نام";
+                    $this->telegram_services->sendMessage($this->user_id, $text);
+                    cache()->set($this->key_cache . $this->getUserId(), "add_customer");
+
                     break;
                 case "\xF0\x9F\x93\x88	معاملات باز":
                     $worker = UserTelegram::where("user_id", $this->user_id)->get();

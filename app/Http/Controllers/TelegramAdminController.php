@@ -45,7 +45,7 @@ class TelegramAdminController extends Controller
         $access_text = [
             "📞 دفترچه تلفن",
             "📋 لیست کاربران",
-            "تعداد کاربران",
+            "📋 لیست همکاران",
             "📚  ویرایش قوانین",
             "\xE2\x81\x89 ویرایش راهنما",
             "📈محدود شروع مبلغ معاملات",
@@ -59,7 +59,7 @@ class TelegramAdminController extends Controller
                 ['text' => "📈محدود شروع مبلغ معاملات"]
             ],
             [
-                ['text' => "تعداد کاربران"],
+                ['text' =>"📋 لیست همکاران"],
                 ['text' => "📋 لیست کاربران"]
             ],
 //            [
