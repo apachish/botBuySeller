@@ -301,13 +301,13 @@ class TextServices
             "\xE2\x9C\x8C	فعال سازی دو مرحله ای",
             "\xE2\x9D\x8C	غیر فعال فوری",
         ];
-        if (in_array($this->text, $accept))
+        if (in_array($this->message, $accept))
             return true;
         collect(self::$list_type)->contains(function (int $value, int $key) {
-            if (str_contains($this->text, $value))
+            if (str_contains($this->message, $value))
                 $this->setType($value);
         });
-        if (preg_match($this->pattern, $this->text))
+        if (preg_match($this->pattern, $this->message))
             return true;
 
         return false;
