@@ -92,7 +92,7 @@ class ActionAdminServices extends TextServices
                 $this->getTelegramServices()->MessageReplyMarkup($this->getTelegram(), $this->getUserId(), $text, $keyboard);
                 break;
             case "📋 لیست کاربران":
-                $text = "لیست  کاربران";
+                $text = "                              لیست  کاربران                                    " ;
                 $users = UserTelegram::simplePaginate(5);
                 $page = $users->currentPage();
                 $next = $users->nextPageUrl();
