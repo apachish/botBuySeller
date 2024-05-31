@@ -11,6 +11,15 @@ class TelegramServices
 
     private $access_token;
 
+    /**
+     * @return mixed
+     */
+    public function getAccessToken()
+    {
+        return $this->access_token;
+    }
+
+
     public function __construct($access_token)
     {
         $this->access_token = $access_token;
@@ -29,6 +38,7 @@ class TelegramServices
             'text' => $text,
             'reply_markup' => $reply_markup
         ]);
+        return $response;
     }
 
     function setKeyword($chat_id,$keyboard) {
@@ -109,6 +119,35 @@ class TelegramServices
         logger("rrr",[$r]);
     }
 
+    function editCustomKeyboard($chat_id, $message_id, $text,$keyboard_menu) {
+        $url = "https://api.telegram.org/bot$this->access_token/editMessageReplyMarkup";
+
+        // تنظیم کیبورد سفارشی جدید
+        $keyboard = [
+            'keyboard' => $keyboard_menu,
+            'resize_keyboard' => true,
+            'one_time_keyboard' => false,
+            'input_field_placeholder' => $text
+        ];
+
+
+
+        $post_fields = [
+            'chat_id' => $chat_id,
+            'message_id' => $message_id,
+            'reply_markup' => json_encode($keyboard)
+        ];
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array("Content-Type:application/json"));
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($post_fields));
+        $result = curl_exec($ch);
+        curl_close($ch);
+
+        return json_decode($result, true);
+    }
 
     function editMessageTextAndInlineKeyboard($channel_chat_id, $message_id,$message,$keyboard=null) {
         $url = "https://api.telegram.org/bot$this->access_token/editMessageText";

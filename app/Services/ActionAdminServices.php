@@ -12,6 +12,33 @@ use Carbon\Carbon;
 class ActionAdminServices extends TextServices
 {
     public $service_telgram_user;
+    public $bot_title;
+
+    protected $keyword_colleague = [
+        [
+            ['text' => "\xF0\x9F\x91\xA5	معرفی مشتری"],
+            ['text' => "\xF0\x9F\x93\x8B	لیست همکاران"],
+        ],
+        [
+            ['text' => "\xF0\x9F\x93\x88	معاملات باز"]
+        ],
+        [
+            ['text' => "\xF0\x9F\x93\x9A	قوانین"],
+            ['text' => "راهنما \xE2\x81\x89"]
+        ], [
+            ['text' => "\xE2\x9C\x8C	فعال سازی دو مرحله ای"],
+            ['text' => "\xE2\x9D\x8C	غیر فعال فوری"],
+
+        ]];
+    protected $keyword_customer = [
+        [
+            ['text' => "\xF0\x9F\x93\x9A	قوانین"],
+            ['text' => "راهنما \xE2\x81\x89"]
+        ], [
+            ['text' => "\xE2\x9C\x8C	فعال سازی دو مرحله ای"],
+            ['text' => "\xE2\x9D\x8C	غیر فعال فوری"],
+
+        ]];
 
     public function __construct($token)
     {
@@ -21,11 +48,15 @@ class ActionAdminServices extends TextServices
             return Bot::where('title', "botUser")
                 ->first();
         });
-        if($bot)
+        if ($bot) {
             $this->service_telgram_user = new TelegramServices($bot->token);
+            $this->bot_title = $bot->title;
+        }
     }
-    public function actionData(){
-        logger("actionText",[$this->getData()]);
+
+    public function actionData()
+    {
+        logger("actionText", [$this->getData()]);
 
         if (str_contains($this->getData(), "tel:")) {
             $tel = str_replace('tel:', '', $this->getData());
@@ -44,8 +75,13 @@ class ActionAdminServices extends TextServices
                 $this->getTelegramServices()->sendMessage($this->getUserId(), $response_text);
                 $response_text = "$fullName همکار گرامی به سیستم ما خوش آمدید\n\n ";
                 $this->service_telgram_user->sendMessage($user_con->id, $response_text);
+                if (isset($user_con["menu"][$this->bot_title]))
+                {
+                    $key = $user_con->role = "colleague"?$this->keyword_colleague:$this->keyword_customer;
+                    $this->service_telgram_user->editCustomKeyboard($user_con->id, $user_con["menu"][$this->bot_title],"انتخاب کنید",$key);
+                }
             }
-        }elseif (str_contains($this->getData(), "colleague_")) {
+        } elseif (str_contains($this->getData(), "colleague_")) {
             $id = (int)str_replace('colleague_', '', $this->getData());
             $user_con = UserTelegram::where("id", $id)->first();
             logger("con", [$user_con, $id]);
@@ -57,8 +93,13 @@ class ActionAdminServices extends TextServices
                 $this->getTelegramServices()->sendMessage($this->getUserId(), $response_text);
                 $response_text = "$fullName همکاری شما در سیستم به سطح مشتری انتقال یافت\n\n ";
                 $this->service_telgram_user->sendMessage($user_con->id, $response_text);
+                if (isset($user_con["menu"][$this->bot_title]))
+                {
+                    $key = $user_con->role = "colleague"?$this->keyword_colleague:$this->keyword_customer;
+                    $this->service_telgram_user->editCustomKeyboard($user_con->id, $user_con["menu"][$this->bot_title],"انتخاب کنید",$key);
+                }
             }
-        }elseif (str_contains($this->getData(), "confirm_")) {
+        } elseif (str_contains($this->getData(), "confirm_")) {
             $id = (int)str_replace('confirm_', '', $this->getData());
             $user_con = UserTelegram::where("id", $id)->first();
             logger("con", [$user_con, $id]);
@@ -66,10 +107,17 @@ class ActionAdminServices extends TextServices
                 $fullName = $user_con->fullName ?: $user_con->first_name . " " . $user_con->last_name;
                 $user_con->status = true;
                 $user_con->update();
+                cache()->forget("keyword_menu" . $this->getKeyCache() . $user_con->id);
                 $response_text = "$fullName اکانت کاربریش فعال شد\n\n ";
                 $this->getTelegramServices()->sendMessage($this->getUserId(), $response_text);
                 $response_text = "$fullName اکانت کاربریتان فعال شد\n\n ";
                 $this->service_telgram_user->sendMessage($user_con->id, $response_text);
+                if (isset($user_con["menu"][$this->bot_title]))
+                {
+                    $key = $user_con->role = "colleague"?$this->keyword_colleague:$this->keyword_customer;
+                    $this->service_telgram_user->editCustomKeyboard($user_con->id, $user_con["menu"][$this->bot_title],"انتخاب کنید",$key);
+                }
+
             }
         } elseif (str_contains($this->getData(), "reject_")) {
             $id = (int)str_replace('reject_', '', $this->getData());
@@ -87,9 +135,10 @@ class ActionAdminServices extends TextServices
             }
         }
     }
+
     public function actionText()
     {
-        logger("actionText",[$this->getMessage()]);
+        logger("actionText", [$this->getMessage()]);
         switch ($this->getMessage()) {
             case "📞 دفترچه تلفن":
                 $text = "لیست شماره تلفن کاربران";
@@ -119,7 +168,7 @@ class ActionAdminServices extends TextServices
                 break;
             case "📋 لیست همکاران":
                 $text = "لیست  همکاران";
-                $users = UserTelegram::where("role","colleague")->simplePaginate(5);
+                $users = UserTelegram::where("role", "colleague")->simplePaginate(5);
                 $page = $users->currentPage();
                 $next = $users->nextPageUrl();
                 $pre = $users->previousPageUrl();
@@ -159,9 +208,9 @@ class ActionAdminServices extends TextServices
 
                 $users->each(function ($user) use (&$keyboard, &$i) {
                     $text = $user->fullName ?: $user->first_name . " " . $user->last_name;
-                    $text .= $user->role=="colleague"?"(همکار)":"(مشتری)";
+                    $text .= $user->role == "colleague" ? "(همکار)" : "(مشتری)";
                     $keyboard[$i++] = [
-                        ['text' => "  $text  ", 'callback_data' => ($user->role=="colleague"?"colleague_":"customer_").$user->id],
+                        ['text' => "  $text  ", 'callback_data' => ($user->role == "colleague" ? "colleague_" : "customer_") . $user->id],
                     ];
                     $keyboard[$i++] = [
                         ['text' => "\xE2\x9C\x85 ", 'callback_data' => 'confirm_' . $user->id],
@@ -222,15 +271,15 @@ class ActionAdminServices extends TextServices
                     $response_text .= "از مبلغ";
                     $response_text .= "\n\n";
 
-                    $response_text .= number_format(data_get($s_price_trade,"value.start"), 0);
+                    $response_text .= number_format(data_get($s_price_trade, "value.start"), 0);
                     $response_text .= "\n\n";
 
                     $response_text .= "تا مبلغ";
                     $response_text .= "\n\n";
 
-                    $response_text .= number_format(data_get($s_price_trade,"value.end"),0);
+                    $response_text .= number_format(data_get($s_price_trade, "value.end"), 0);
                     $response_text .= "\n\n";
-                }else {
+                } else {
                     $response_text = "محدود شروع مبلغ وارد شده باید به صورت \n\n";
                     $response_text .= "14000000:15000000 \n\n";
                 }
@@ -242,9 +291,10 @@ class ActionAdminServices extends TextServices
 
         }
     }
+
     public function actionTextCache()
     {
-        logger("cache",[$this->getMessageCache()]);
+        logger("cache", [$this->getMessageCache()]);
         switch ($this->getMessageCache()) {
             case "rule":
                 $rule = Setting::updateOrCreate(
@@ -275,13 +325,13 @@ class ActionAdminServices extends TextServices
             case "s_price_trade":
                 $s_price_trade = $this->getMessage();
                 if ($s_price_trade) {
-                    $limit_price = explode(":",$this->convertNumber($s_price_trade));
-                    if(data_get($limit_price,0) && data_get($limit_price,1)) {
+                    $limit_price = explode(":", $this->convertNumber($s_price_trade));
+                    if (data_get($limit_price, 0) && data_get($limit_price, 1)) {
                         $rule = Setting::updateOrCreate(
                             ["key" => "s_price_trade"],
                             ["value" =>
-                                ["start"=>data_get($limit_price,0),
-                                "end"=>data_get($limit_price,1)]
+                                ["start" => data_get($limit_price, 0),
+                                    "end" => data_get($limit_price, 1)]
                             ]
                         );
 
@@ -289,16 +339,16 @@ class ActionAdminServices extends TextServices
                         $response_text .= "\n\n";
                         $response_text .= "از مبلغ";
                         $response_text .= "\n\n";
-                        $response_text .= number_format(data_get($limit_price,0), 0);
+                        $response_text .= number_format(data_get($limit_price, 0), 0);
                         $response_text .= "\n\n";
                         $response_text .= "تا مبلغ";
                         $response_text .= "\n\n";
 
-                        $response_text .= number_format(data_get($limit_price,1), 0);
+                        $response_text .= number_format(data_get($limit_price, 1), 0);
                         $response_text .= "\n\n";
                         $this->getTelegramServices()->sendMessage($this->getUserId(), $response_text);
                         cache()->forget("text_admin_" . $this->getUserId());
-                    }else{
+                    } else {
                         $this->getTelegramServices()->sendMessage($this->getUserId(), "محدوده وارد شده معامله  صحیخ نمی باشد");
 
                     }

@@ -543,8 +543,12 @@ class TextServices
         if ($show ) {
             if(!cache()->get("keyword_menu".$this->getKeyCache().$this->user->id)) {
 
-                TelegramServices::menu($this->telegram, [], $this->user, $this->message_menu);
-                TelegramServices::menu($this->telegram, $keyboard, $this->user, $this->message_menu);
+                $response = TelegramServices::menu($this->telegram, $keyboard, $this->user, $this->message_menu);
+                if(isset($response['result']['message_id']))
+                {
+                    $this->user->menu[$this->bot->title] = $response['result']['message_id'];
+                    $this->user->update();
+                }
                 cache()->set("keyword_menu" . $this->getKeyCache() . $this->user->id, true);
             }
 
