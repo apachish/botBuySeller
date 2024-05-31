@@ -562,9 +562,9 @@ class TextServices
 
                 $response = TelegramServices::menu($this->telegram, $keyboard, $this->user, $this->message_menu);
                 logger("response",[$response]);
-                if(isset($response['result']['message_id']))
+                if(isset($response['message_id']))
                 {
-                    $this->user->menu[$this->bot->title] = $response['result']['message_id'];
+                    $this->user->menu[$this->bot->title] = $response['message_id'];
                     $this->user->update();
                 }
                 cache()->set("keyword_menu" . $this->getKeyCache() . $this->user->id, true);
