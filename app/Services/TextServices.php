@@ -564,7 +564,7 @@ class TextServices
                 logger("response",[$response]);
                 if(isset($response['message_id']))
                 {
-                    $this->user->menu[$this->bot->title] = $response['message_id'];
+                    $this->user->menu = $response['message_id'];
                     $this->user->update();
                 }
                 cache()->set("keyword_menu" . $this->getKeyCache() . $this->user->id, true);
