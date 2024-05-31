@@ -75,8 +75,8 @@ class TelegramServices
         logger("keyword",$keyboard);
         $reply_markup = Keyboard::make([
             'inline_keyboard' => $keyboard,
-//            'resize_keyboard' => true,
-            'one_time_keyboard' => true
+            'resize_keyboard' => false,
+            'one_time_keyboard' => false
         ]);
 
         $response = $telegram->sendMessage([
