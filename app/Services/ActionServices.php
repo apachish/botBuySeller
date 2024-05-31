@@ -11,6 +11,11 @@ use Carbon\Carbon;
 
 class ActionServices extends TextServices
 {
+
+    public function __construct($token)
+    {
+        parent::__construct($token);
+    }
     public function addCustomer()
     {
         $limit = null;

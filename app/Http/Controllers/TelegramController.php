@@ -6,6 +6,7 @@ use App\Jobs\DeactivateTransfer;
 use App\Models\Setting;
 use App\Models\Transfer;
 use App\Models\UserTradeAccess;
+use App\Services\ActionServices;
 use App\Services\TelegramServices;
 use App\Services\TextServices;
 use Illuminate\Http\Request;
@@ -20,7 +21,7 @@ class TelegramController extends Controller
 {
     public function setWebhook($token, $replay = [])
     {
-        $text_services = new TextServices($token);
+        $text_services = new ActionServices($token);
         $text_services->setTypeMessage();
         $text_services->setUserId();
         $text_services->setMessageId();
