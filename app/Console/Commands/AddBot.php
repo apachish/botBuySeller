@@ -16,7 +16,7 @@ class AddUserAdmin extends Command
      *
      * @var string
      */
-    protected $signature = 'app:add-user-admin';
+    protected $signature = 'app:add-bot';
 
     /**
      * The console command description.
