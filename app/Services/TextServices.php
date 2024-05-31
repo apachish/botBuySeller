@@ -305,9 +305,12 @@ class TextServices
             return true;
         collect(self::$list_type)->contains(function (int $value, int $key) {
             if (str_contains($this->message, $value))
+            {
                 $this->setType($value);
+                $this->setPattern();
+            }
         });
-        if ($this->type &&  preg_match($this->pattern, $this->message))
+        if ($this->pattern &&   preg_match($this->pattern, $this->message))
             return true;
 
         return false;
