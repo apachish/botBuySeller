@@ -305,7 +305,7 @@ class TextServices
         if (in_array($this->message, $accept))
             return true;
         logger("lits_type",[$this->list_type]);
-        collect($this->list_type)->contains(function (int $value, int $key) {
+        collect($this->list_type)->contains(function (string $value, int $key) {
             logger("iii",[$value,$key]);
             if (str_contains($this->message, $value))
             {
