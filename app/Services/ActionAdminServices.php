@@ -161,7 +161,7 @@ class ActionAdminServices extends TextServices
                     $text = $user->fullName ?: $user->first_name . " " . $user->last_name;
                     $text .= $user->role=="colleague"?"(همکار)":"(مشتری)";
                     $keyboard[$i++] = [
-                        ['text' => "  $text  ", 'callback_data' => $user->role=="colleague"?"colleague_":"customer_".$user->id],
+                        ['text' => "  $text  ", 'callback_data' => ($user->role=="colleague"?"colleague_":"customer_").$user->id],
                     ];
                     $keyboard[$i++] = [
                         ['text' => "\xE2\x9C\x85 ", 'callback_data' => 'confirm_' . $user->id],
