@@ -543,7 +543,7 @@ class TextServices
         if ($show ) {
             if(!cache()->get("keyword_menu".$this->getKeyCache().$this->user->id)) {
 
-                TelegramServices::menu($this->telegram, \stdClass::class, $this->user, $this->message_menu);
+                TelegramServices::menu($this->telegram, [], $this->user, $this->message_menu);
                 TelegramServices::menu($this->telegram, $keyboard, $this->user, $this->message_menu);
                 cache()->set("keyword_menu" . $this->getKeyCache() . $this->user->id, true);
             }
