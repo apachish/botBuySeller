@@ -12,7 +12,7 @@ use Telegram\Bot\Api;
 
 class TextServices
 {
-    private static $list_type = ["فف", "خخ", "خ", "ف", "خفش", "خش", "ففش", "فش","خن","خفن","فن","ففن"];
+    private  $list_type = ["فف", "خخ", "خ", "ف", "خفش", "خش", "ففش", "فش","خن","خفن","فن","ففن"];
     protected $list_type_buy = [ "خخ", "خ", "خفش", "خش","خن","خفن"];
     protected $list_type_sell = ["فف", "ف", "ففش", "فش","فن","ففن"];
     protected $list_type_sell_n_buy_tom = ["خفن","ففن"];
@@ -304,7 +304,8 @@ class TextServices
         ];
         if (in_array($this->message, $accept))
             return true;
-        collect(self::$list_type)->contains(function (int $value, int $key) {
+        collect($this->list_type)->contains(function (int $value, int $key) {
+            logger("iii",[$value,$key]);
             if (str_contains($this->message, $value))
             {
                 $this->setType($value);
