@@ -562,7 +562,7 @@ class TextServices
 
     public function menu($keyboard,$show)
     {
-        logger("menu",[$this->user,$show]);
+        logger("menu",[$this->user,$show,$keyboard]);
         if ($show ) {
             if(!cache()->get("keyword_menu".$this->getKeyCache().$this->user->id)) {
 
