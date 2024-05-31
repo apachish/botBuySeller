@@ -307,7 +307,7 @@ class TextServices
             if (str_contains($this->message, $value))
                 $this->setType($value);
         });
-        if (preg_match($this->pattern, $this->message))
+        if ($this->type &&  preg_match($this->pattern, $this->message))
             return true;
 
         return false;
