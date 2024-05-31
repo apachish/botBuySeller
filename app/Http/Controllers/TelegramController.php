@@ -28,6 +28,13 @@ class TelegramController extends Controller
         $text_services->setMessage();
         $text_services->setMessageCache();
         $text_services->setUser();
+
+        if($text_services->getData())
+            $text_services->actionByData();
+
+        if($text_services->getMessage())
+            $text_services->actionByMessage();
+
         $keyboard_menu =  [
             [
                 ['text' => "\xF0\x9F\x91\xA5	معرفی مشتری"],
@@ -47,11 +54,6 @@ class TelegramController extends Controller
             ],
         ];
         $text_services->menu($keyboard_menu,$text_services->getUser()->status);
-        if($text_services->getData())
-            $text_services->actionByData();
-
-        if($text_services->getMessage())
-            $text_services->actionByMessage();
 
 
 

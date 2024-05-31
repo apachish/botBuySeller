@@ -345,7 +345,7 @@ class TextServices
         switch ($this->message) {
             case '/start':
             case 'start':
-                $text = "منتظر تایید مدیر سیستم باشید تا دسترسی به شما ارائه گردد";
+                $text = $this->user->status?"خوش آمدید":"منتظر تایید مدیر سیستم باشید تا دسترسی به شما ارائه گردد";
                 if (!$this->user->mobile)
                     $text = "شماره موبایل خود را وارد کنید";
                 elseif (!$this->user->fullName)
