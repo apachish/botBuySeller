@@ -304,9 +304,7 @@ class TextServices
         ];
         if (in_array($this->message, $accept))
             return true;
-        logger("lits_type",[$this->list_type]);
         collect($this->list_type)->contains(function (string $value, int $key) {
-            logger("iii",[$value,$key]);
             if (str_contains($this->message, $value))
             {
                 $this->setType($value);
@@ -340,6 +338,8 @@ class TextServices
         /*
        * check message
        */
+        logger("check messahge",[$this->checkText()]);
+
         if (!$this->checkText())
             $this->telegram->sendMessage(['chat_id' => $this->user_id, 'text' => 'متن نا معتبر می باشد']);
         TextTelegram::create([
@@ -567,6 +567,7 @@ class TextServices
             if(!cache()->get("keyword_menu".$this->getKeyCache().$this->user->id)) {
 
                 $response = TelegramServices::menu($this->telegram, $keyboard, $this->user, $this->message_menu);
+                logger("response",[$response]);
                 if(isset($response['result']['message_id']))
                 {
                     $this->user->menu[$this->bot->title] = $response['result']['message_id'];
