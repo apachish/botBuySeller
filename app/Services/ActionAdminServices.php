@@ -4,6 +4,7 @@ namespace App\Services;
 
 
 use App\Models\Bot;
+use App\Models\BotMenuUser;
 use App\Models\Setting;
 use App\Models\Transfer;
 use App\Models\UserTelegram;
@@ -13,6 +14,7 @@ class ActionAdminServices extends TextServices
 {
     public $service_telgram_user;
     public $bot_title;
+    public $bot_user;
 
     protected $keyword_colleague = [
         [
@@ -44,13 +46,13 @@ class ActionAdminServices extends TextServices
     {
         parent::__construct($token);
 
-        $bot = cache()->remember("telegram_user", now()->addDay(), function () {
+        $this->bot_user = cache()->remember("telegram_user", now()->addDay(), function () {
             return Bot::where('title', "botUser")
                 ->first();
         });
-        if ($bot) {
-            $this->service_telgram_user = new TelegramServices($bot->token);
-            $this->bot_title = $bot->title;
+        if ($this->bot_user) {
+            $this->service_telgram_user = new TelegramServices($this->bot_user->token);
+            $this->bot_title = $this->bot_user->title;
         }
     }
 
@@ -75,11 +77,9 @@ class ActionAdminServices extends TextServices
                 $this->getTelegramServices()->sendMessage($this->getUserId(), $response_text);
                 $response_text = "$fullName همکار گرامی به سیستم ما خوش آمدید\n\n ";
                 $this->service_telgram_user->sendMessage($user_con->id, $response_text);
-                if (isset($user_con["menu"][$this->bot_title]))
-                {
-                    $key = $user_con->role = "colleague"?$this->keyword_colleague:$this->keyword_customer;
-                    $this->service_telgram_user->editCustomKeyboard($user_con->id, $user_con["menu"][$this->bot_title],"انتخاب کنید",$key);
-                }
+
+                $this->changeMenu($user_con);
+
             }
         } elseif (str_contains($this->getData(), "colleague_")) {
             $id = (int)str_replace('colleague_', '', $this->getData());
@@ -93,11 +93,8 @@ class ActionAdminServices extends TextServices
                 $this->getTelegramServices()->sendMessage($this->getUserId(), $response_text);
                 $response_text = "$fullName همکاری شما در سیستم به سطح مشتری انتقال یافت\n\n ";
                 $this->service_telgram_user->sendMessage($user_con->id, $response_text);
-                if (isset($user_con["menu"][$this->bot_title]))
-                {
-                    $key = $user_con->role = "colleague"?$this->keyword_colleague:$this->keyword_customer;
-                    $this->service_telgram_user->editCustomKeyboard($user_con->id, $user_con["menu"][$this->bot_title],"انتخاب کنید",$key);
-                }
+                $this->changeMenu($user_con);
+
             }
         } elseif (str_contains($this->getData(), "confirm_")) {
             $id = (int)str_replace('confirm_', '', $this->getData());
@@ -112,12 +109,7 @@ class ActionAdminServices extends TextServices
                 $this->getTelegramServices()->sendMessage($this->getUserId(), $response_text);
                 $response_text = "$fullName اکانت کاربریتان فعال شد\n\n ";
                 $this->service_telgram_user->sendMessage($user_con->id, $response_text);
-                if (isset($user_con["menu"][$this->bot_title]))
-                {
-                    $key = $user_con->role = "colleague"?$this->keyword_colleague:$this->keyword_customer;
-                    $this->service_telgram_user->editCustomKeyboard($user_con->id, $user_con["menu"][$this->bot_title],"انتخاب کنید",$key);
-                }
-
+                $this->changeMenu($user_con);
             }
         } elseif (str_contains($this->getData(), "reject_")) {
             $id = (int)str_replace('reject_', '', $this->getData());
@@ -132,6 +124,8 @@ class ActionAdminServices extends TextServices
                 $this->getTelegramServices()->sendMessage($this->getUserId(), $response_text);
                 $response_text = "$fullName اکانت کاربریتان غیر فعال شد \n\n ";
                 $this->service_telgram_user->sendMessage($user_con->id, $response_text);
+                $this->changeMenu($user_con);
+
             }
         }
     }
@@ -357,6 +351,21 @@ class ActionAdminServices extends TextServices
 
                 }
                 break;
+        }
+    }
+
+    /**
+     * @param \Illuminate\Database\Eloquent\Model|object|UserTelegram $user_con
+     * @return void
+     */
+    public function changeMenu($user_con): void
+    {
+        $menu_bot = BotMenuUser::where("user_id", $user_con->id)->where("bot_id", $this->bot_user->id)->first();
+        if ($menu_bot) {
+            $key = $user_con->role == "colleague" ? $this->keyword_colleague : $this->keyword_customer;
+            if(!$user_con->status)
+                $key = new \stdClass();
+            $this->service_telgram_user->editCustomKeyboard($user_con->id, $menu_bot->menu_id, "تغییر منو", $key);
         }
     }
 }
