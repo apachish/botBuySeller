@@ -560,13 +560,18 @@ class TextServices
         logger("menu",[$this->user,$show,$keyboard]);
         if ($show ) {
             if(!cache()->get("keyword_menu".$this->getKeyCache().$this->user->id)) {
+                $menu_bot = BotMenuUser::where("user_id", $this->user_id)->where("bot_id", $this->bot->id)->first();
+                if($menu_bot) {
+                    logger("menu change",[$this->user_id, $menu_bot->menu_id, "تغییر منو", $keyboard]);
+                    $this->telegram_services->editCustomKeyboard($this->user_id, $menu_bot->menu_id, "تغییر منو", $keyboard);
 
-                $response = TelegramServices::menu($this->telegram, $keyboard, $this->user, $this->message_menu);
-                logger("response",[$response]);
-                if(isset($response['message_id']))
-                {
-                    BotMenuUser::updateOrCreate(["user_id"=>$this->user_id,"bot_id"=>$this->bot->id], ["menu_id"=>$response['message_id']]);
-                    $this->user->update();
+                }else{
+                    $response = TelegramServices::menu($this->telegram, $keyboard, $this->user, $this->message_menu);
+                    logger("response", [$response]);
+                    if (isset($response['message_id'])) {
+                        BotMenuUser::updateOrCreate(["user_id" => $this->user_id, "bot_id" => $this->bot->id], ["menu_id" => $response['message_id']]);
+                        $this->user->update();
+                    }
                 }
                 cache()->set("keyword_menu" . $this->getKeyCache() . $this->user->id, true);
             }

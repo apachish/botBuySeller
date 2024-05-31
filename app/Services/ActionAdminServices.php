@@ -78,7 +78,7 @@ class ActionAdminServices extends TextServices
                 $response_text = "$fullName همکار گرامی به سیستم ما خوش آمدید\n\n ";
                 $this->service_telgram_user->sendMessage($user_con->id, $response_text);
 
-                $this->changeMenu($user_con);
+                cache()->forget("keyword_menu".$this->getKeyCache().$user_con->id);
 
             }
         } elseif (str_contains($this->getData(), "colleague_")) {
@@ -93,7 +93,7 @@ class ActionAdminServices extends TextServices
                 $this->getTelegramServices()->sendMessage($this->getUserId(), $response_text);
                 $response_text = "$fullName همکاری شما در سیستم به سطح مشتری انتقال یافت\n\n ";
                 $this->service_telgram_user->sendMessage($user_con->id, $response_text);
-                $this->changeMenu($user_con);
+                cache()->forget("keyword_menu".$this->getKeyCache().$user_con->id);
 
             }
         } elseif (str_contains($this->getData(), "confirm_")) {
@@ -109,7 +109,7 @@ class ActionAdminServices extends TextServices
                 $this->getTelegramServices()->sendMessage($this->getUserId(), $response_text);
                 $response_text = "$fullName اکانت کاربریتان فعال شد\n\n ";
                 $this->service_telgram_user->sendMessage($user_con->id, $response_text);
-                $this->changeMenu($user_con);
+                cache()->forget("keyword_menu".$this->getKeyCache().$user_con->id);
             }
         } elseif (str_contains($this->getData(), "reject_")) {
             $id = (int)str_replace('reject_', '', $this->getData());
@@ -124,7 +124,7 @@ class ActionAdminServices extends TextServices
                 $this->getTelegramServices()->sendMessage($this->getUserId(), $response_text);
                 $response_text = "$fullName اکانت کاربریتان غیر فعال شد \n\n ";
                 $this->service_telgram_user->sendMessage($user_con->id, $response_text);
-                $this->changeMenu($user_con);
+                cache()->forget("keyword_menu".$this->getKeyCache().$user_con->id);
 
             }
         }
