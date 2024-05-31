@@ -41,7 +41,7 @@ class TelegramController extends Controller
                 ['text' => "راهنما \xE2\x81\x89"]
             ],
             [
-                ['text' => $this->user->verify_two ? "\xE2\x9A\xA0	\xE2\x9D\x8C	غیرفعال سازی تایید دو مرحله ای " : "\xE2\x9C\x8C	فعال سازی دو مرحله ای"],
+                ['text' => $text_services->getUser()->verify_two ? "\xE2\x9A\xA0	\xE2\x9D\x8C	غیرفعال سازی تایید دو مرحله ای " : "\xE2\x9C\x8C	فعال سازی دو مرحله ای"],
                 ['text' => "\xE2\x9D\x8C	غیر فعال فوری"],
 
             ],
