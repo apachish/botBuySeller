@@ -80,7 +80,6 @@ class ActionServices extends TextServices
     {
         $this->getUser()->fullName = $this->message;
         $this->getUser()->update();
-        $text = "منتظر تایید مدیر سیستم باشید تا دسترسی به شما ارائه گردد";
         if (!$this->getUser()->status) {
             cache()->set($this->getKeyCache() . $this->getUserId(), "pending_accept");
             $text = "منتظر تایید مدیر سیستم باشید تا دسترسی به شما ارائه گردد";
@@ -88,7 +87,6 @@ class ActionServices extends TextServices
         } else {
             cache()->forget($this->getKeyCache() . $this->getUserId());
         }
-        $this->telegram->sendMessage(['chat_id' => $this->getUserId(), 'text' => $text]);
     }
 
     public function pendingAccept()
