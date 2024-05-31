@@ -147,7 +147,8 @@ class ActionAdminServices extends TextServices
                 break;
             case "📋 لیست کاربران":
                 $text = "\n\nلیست  کاربران";
-                $text .= "با کلیک بر\xE2\x9D\x8C کاربر غیر فعال شده و با کلیک بر \xE2\x9C\x85 کاربرقعال گردید در صورت کلیک بر روی اسم شخص نوع کاربر از مشتری به همکار و همکار به مشتری تغییر می کنند ";
+                $text .= "\n\n";
+                $text .= "با کلیک بر\xE2\x9D\x8C کاربر غیر فعال شده و با کلیک بر \xE2\x9C\x85 کاربرفعال گردید در صورت کلیک بر روی اسم شخص نوع کاربر از مشتری به همکار و همکار به مشتری تغییر می کنند ";
                 $users = UserTelegram::simplePaginate(5);
                 $page = $users->currentPage();
                 $next = $users->nextPageUrl();
