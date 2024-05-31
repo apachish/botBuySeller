@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Bot;
+use App\Models\BotMenuUser;
 use App\Models\Setting;
 use App\Models\TextTelegram;
 use App\Models\Transfer;
@@ -564,7 +565,7 @@ class TextServices
                 logger("response",[$response]);
                 if(isset($response['message_id']))
                 {
-                    $this->user->menu = $response['message_id'];
+                    BotMenuUser::updateOrCreate(["user_id"=>$this->user_id,"bot_id"=>$this->bot->id], ["menu_id"=>$response['message_id']]);
                     $this->user->update();
                 }
                 cache()->set("keyword_menu" . $this->getKeyCache() . $this->user->id, true);
