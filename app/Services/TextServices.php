@@ -328,7 +328,7 @@ class TextServices
 
     public function checkCache()
     {
-        if (str_contains($this->data, "add_customer"))
+        if (str_contains($this->message_cache, "add_customer"))
             return true;
         return false;
     }
@@ -437,7 +437,7 @@ class TextServices
         */
         if (!$this->checkCache())
             $this->telegram->sendMessage(['chat_id' => $this->user_id, 'text' => 'متن نا معتبر می باشد']);
-        elseif (str_contains($this->data, "add_customer"))
+        elseif (str_contains($this->message_cache, "add_customer"))
             $this->addCustomer();
     }
 
