@@ -431,7 +431,7 @@ class TextServices
             $this->addCustomer();
         elseif (str_contains($this->message_cache, "add_mobile"))
             $this->addMobile();
-        elseif (str_contains($this->message_cache, "add_customer"))
+        elseif (str_contains($this->message_cache, "add_fullName"))
             $this->addFullName();
         elseif (str_contains($this->message_cache, "pending_accept"))
             $this->pendingAccept();
