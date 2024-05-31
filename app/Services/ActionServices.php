@@ -65,7 +65,7 @@ class ActionServices extends TextServices
                 $text = "نام و نام خانوادگی خود را وارد کنید";
                 cache()->set($this->getKeyCache() . $this->getUserId(), "add_fullName");
                 $this->telegram->sendMessage(['chat_id' => $this->getUserId(), 'text' => $text]);
-            } elseif (!$this->getUser()->status) {
+            } elseif (!data_get($this->getUser(),"status",false)) {
                 cache()->set($this->getKeyCache() . $this->getUserId(), "pending_accept");
                 $text = "منتظر تایید مدیر سیستم باشید تا دسترسی به شما ارائه گردد";
                 $this->telegram->sendMessage(['chat_id' => $this->getUserId(), 'text' => $text]);
@@ -80,7 +80,7 @@ class ActionServices extends TextServices
     {
         $this->getUser()->fullName = $this->message;
         $this->getUser()->update();
-        if (!$this->getUser()->status) {
+        if (!data_get($this->getUser(),"status",false)) {
             cache()->set($this->getKeyCache() . $this->getUserId(), "pending_accept");
             $text = "منتظر تایید مدیر سیستم باشید تا دسترسی به شما ارائه گردد";
             $this->telegram->sendMessage(['chat_id' => $this->getUserId(), 'text' => $text]);
