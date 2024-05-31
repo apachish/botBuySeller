@@ -39,20 +39,21 @@ class TelegramController extends Controller
         elseif ($text_services->getMessage())
             $text_services->actionByMessage();
 
+        $i = 0;
         if($text_services->getUser()->role == "colleague") {
-            $keyboard_menu[0] = [
+            $keyboard_menu[$i++] = [
                 ['text' => "\xF0\x9F\x91\xA5	معرفی مشتری"],
                 ['text' => "\xF0\x9F\x93\x8B	لیست همکاران"],
             ];
-            $keyboard_menu[1] = [
+            $keyboard_menu[$i++] = [
                 ['text' => "\xF0\x9F\x93\x88	معاملات باز"]
             ];
         }
-        $keyboard_menu[2] = [
+        $keyboard_menu[$i++] = [
                 ['text' => "\xF0\x9F\x93\x9A	قوانین"],
                 ['text' => "راهنما \xE2\x81\x89"]
             ];
-        $keyboard_menu[3] = [
+        $keyboard_menu[$i++] = [
                 ['text' => $text_services->getUser()->verify_two ? "\xE2\x9A\xA0	\xE2\x9D\x8C	غیرفعال سازی تایید دو مرحله ای " : "\xE2\x9C\x8C	فعال سازی دو مرحله ای"],
                 ['text' => "\xE2\x9D\x8C	غیر فعال فوری"],
 
