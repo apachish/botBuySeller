@@ -340,7 +340,7 @@ class TextServices
             "text" => data_get($this->update, 'message.text'),
             "data" => json_encode($this->update)
         ]);
-        if (preg_match($this->pattern, $this->message))
+        if ($this->pattern && preg_match($this->pattern, $this->message))
             $this->checkWord();
         switch ($this->message) {
             case '/start':
