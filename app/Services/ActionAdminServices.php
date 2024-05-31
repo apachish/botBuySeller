@@ -38,7 +38,7 @@ class ActionAdminServices extends TextServices
             logger("con", [$user_con, $id]);
             if ($user_con) {
                 $fullName = $user_con->fullName ?: $user_con->first_name . " " . $user_con->last_name;
-                $user_con->role = "customer";
+                $user_con->role = "colleague";
                 $user_con->update();
                 $response_text = "$fullName نقش همکار فعال شد \n\n ";
                 $this->getTelegramServices()->sendMessage($this->getUserId(), $response_text);
