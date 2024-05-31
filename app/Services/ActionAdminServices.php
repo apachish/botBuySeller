@@ -158,7 +158,7 @@ class ActionAdminServices extends TextServices
 
                 $users->each(function ($user) use (&$keyboard, &$i) {
                     $text = $user->fullName ?: $user->first_name . " " . $user->last_name;
-                    $text .= $this->getUser()->role=="colleague"?"(همکار)":"(مشتری)";
+                    $text .= $user->role=="colleague"?"(همکار)":"(مشتری)";
                     $keyboard[$i++] = [
                         ['text' => "  $text  ", 'callback_data' => $this->getUser()->role=="colleague"?"colleague_":"customer_".$user->id],
                     ];
