@@ -361,6 +361,7 @@ class ActionAdminServices extends TextServices
     public function changeMenu($user_con): void
     {
         $menu_bot = BotMenuUser::where("user_id", $user_con->id)->where("bot_id", $this->bot_user->id)->first();
+        logger("menu bot",[$menu_bot]);
         if ($menu_bot) {
             $key = $user_con->role == "colleague" ? $this->keyword_colleague : $this->keyword_customer;
             if(!$user_con->status)
