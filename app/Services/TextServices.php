@@ -326,6 +326,13 @@ class TextServices
         return false;
     }
 
+    public function checkCache()
+    {
+        if (str_contains($this->data, "add_customer"))
+            return true;
+        return false;
+    }
+
     public function actionByMessage()
     {
         /*
@@ -423,12 +430,25 @@ class TextServices
             $this->tradeLimit();
     }
 
+    public function actionByCache()
+    {
+        /*
+        * check data
+        */
+        if (!$this->checkCache())
+            $this->telegram->sendMessage(['chat_id' => $this->user_id, 'text' => 'متن نا معتبر می باشد']);
+        elseif (str_contains($this->data, "add_customer"))
+            $this->addCustomer();
+    }
+
     private function getAction()
     {
             switch ($this->message) {
                 case "\xF0\x9F\x91\xA5	معرفی مشتری":
                     $text =  "مشتری خود را به صورت زیر وارد کنید\n\n";
-                    $text .= "موبایل:شماره موبایل,نام و نام خانوادگی :نام";
+                    $text .= "موبایل:شماره موبایل,نام و نام خانوادگی :نام,حد:۳";
+                    $text .= "\n\n";
+                    $text .= "در صورت وارد نکردن حد مقدار حد آن آزاد می باشد";
                     $this->telegram_services->sendMessage($this->user_id, $text);
                     cache()->set($this->key_cache . $this->getUserId(), "add_customer");
 
@@ -450,6 +470,7 @@ class TextServices
                 case "📋 لیست همکاران":
                     $text = "لیست  همکاران";
                     $users = UserTelegram::where("id", "!=", $this->user_id)
+                        ->where("role","colleague")
                         ->with("userTradeAccess")->simplePaginate(5);
                     logger("users", [$users]);
                     $page = $users->currentPage();

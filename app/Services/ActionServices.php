@@ -3,6 +3,7 @@
 namespace App\Services;
 
 
+use App\Models\CustomerUser;
 use App\Models\Setting;
 use App\Models\Transfer;
 use App\Models\UserTelegram;
@@ -10,6 +11,47 @@ use Carbon\Carbon;
 
 class ActionServices extends TextServices
 {
+    public function addCustomer()
+    {
+        $limit = null;
+        $array = explode(",",$this->getMessage());
+        foreach ($array as $item) {
+            str_replace(":", "", $item);
+            if (str_contains($item, "موبایل")) {
+                $mobile = $this->convertNumber(str_replace("موبایل", "", $item));
+            }
+            elseif (str_contains($item, "نام ونام خانوادگی")) {
+                $fullName = $this->convertNumber(str_replace("نام ونام خانوادگی", "", $item));
+            }
+            elseif (str_contains($item, "حد")) {
+                $limit = $this->convertNumber(str_replace("حد", "", $item));
+            }
+        }
+        if($mobile && $fullName ) {
+            CustomerUser::updateOrCreate(["user_id" => $this->getUserId(), "mobile" => $mobile],
+                [
+                    "fullName" => $fullName,
+                    "limit" => $limit
+                ]);
+            $message = "اطلاعات مشتری وارد شد";
+            $message .= "\n\n";
+            $message .= "نام و نام خانوادگی:";
+            $message .= $fullName;
+            $message .= "\n\n";
+            $message = "شماره همراه:";
+            $message .= $mobile;
+            $message .= "\n\n";
+            $message .= "حد مجاز:";
+            $message .= $limit === null?"آزاد": $limit;
+            $message .= "\n\n";
+            $this->telegram_services->sendMessage($this->getUserId(), $message);
+
+        }else{
+            $this->telegram_services->sendMessage($this->getUserId(), "اطلاعات وارد شده مشابه مثال باید باشه");
+
+        }
+    }
+
     public  function requestTransfer()
     {
         $array = str_replace('request_transfer_', '', $this->getData());
