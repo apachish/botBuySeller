@@ -146,6 +146,7 @@ class TelegramServices
         $result = curl_exec($ch);
         curl_close($ch);
 
+        logger("edit menu",[json_decode($result, true)]);
         return json_decode($result, true);
     }
 

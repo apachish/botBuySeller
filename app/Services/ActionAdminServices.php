@@ -366,6 +366,7 @@ class ActionAdminServices extends TextServices
             if(!$user_con->status)
                 $key = new \stdClass();
             $this->service_telgram_user->editCustomKeyboard($user_con->id, $menu_bot->menu_id, "تغییر منو", $key);
+            cache()->forget("keyword_menu".$this->getKeyCache().$user_con->id);
         }
     }
 }
