@@ -280,7 +280,8 @@ class TextServices
      */
     public function setPattern(): void
     {
-        $this->pattern = "/^\d{3,5}" . self::$type . "\d{1}$/";
+        $this->pattern = "/^\d{3,5}" . $this->type . "\d{1}$/";
+        logger("pattern",[$this->pattern,$this->type]);
     }
 
     public function checkText()
