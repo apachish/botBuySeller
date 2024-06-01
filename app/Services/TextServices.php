@@ -479,7 +479,7 @@ class TextServices
                 logger("page", [$next, $page, $pre]);
                 $keyboard = [];
                 $i = 0;
-                $userTradeAccess = $this->user->userTradeAccess;
+                $userTradeAccess = collect($this->user->userTradeAccess);
                 logger("userTradeAccess",[$userTradeAccess]);
                 $users->each(function ($user) use (&$keyboard, &$i,$userTradeAccess) {
                     $text = $user->fullName ?: $user->first_name . " " . $user->last_name;
@@ -492,7 +492,7 @@ class TextServices
                     ];
                     if ($limit_trade->count())
                         $keyboard[$i][1] = [
-                            'text' => "مجاز تا" . $limit_trade->limit_access . " تا",
+                            'text' => "مجاز تا" . data_get($limit_trade,"limit_access") . " تا",
                             'callback_data' => "trade_limit_" . $user->id];
 
 
