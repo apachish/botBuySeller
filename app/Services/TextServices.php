@@ -424,6 +424,8 @@ class TextServices
         */
         if (!$this->checkCache())
             $this->telegram->sendMessage(['chat_id' => $this->user_id, 'text' => 'متن نا معتبر می باشد']);
+        elseif (is_array($this->message_cache) && str_contains(data_get($this->message_cache, "title"), "trade_number_limit"))
+            $this->tradeNumberLimit();
         elseif (str_contains($this->message_cache, "add_customer"))
             $this->addCustomer();
         elseif (str_contains($this->message_cache, "add_mobile"))
@@ -436,8 +438,7 @@ class TextServices
             else
                 $this->pendingAccept();
 
-        } elseif (is_array($this->message_cache) && str_contains(data_get($this->message_cache, "title"), "trade_number_limit"))
-            $this->tradeNumberLimit();
+        }
     }
 
     private function getAction()
