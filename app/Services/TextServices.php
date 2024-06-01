@@ -483,13 +483,14 @@ class TextServices
                 logger("userTradeAccess",[$userTradeAccess]);
                 $users->each(function ($user) use (&$keyboard, &$i,$userTradeAccess) {
                     $text = $user->fullName ?: $user->first_name . " " . $user->last_name;
-                    $limit_trade = $userTradeAccess->where("user_trade_id", $user->id);
-                    logger('limit_trade', [$limit_trade]);
+                    $limit_trade = $userTradeAccess->where("user_trade_id", $user->id)->first();
 
                     $keyboard[$i][0] = [
                         'text' => "  $text " . ($limit_trade->count() ? "\xE2\x9D\x8C" : "\xE2\x9C\x85"),
                         'callback_data' => "trade_limit_" . $user->id
                     ];
+                    logger('limit_trade', [$limit_trade,$limit_trade->count(),data_get($limit_trade,"limit_access")]);
+
                     if ($limit_trade->count())
                         $keyboard[$i][1] = [
                             'text' => "مجاز تا" . data_get($limit_trade,"limit_access") . " تا",
