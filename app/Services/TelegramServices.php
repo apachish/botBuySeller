@@ -119,6 +119,33 @@ class TelegramServices
         logger("rrr",[$r]);
     }
 
+
+    public function deleteKeyboard($chatId)
+    {
+        $keyboard = [
+            'remove_keyboard' => true
+        ];
+
+        $data = [
+            'chat_id' => $chatId,
+            'text' => 'کیبورد حذف شد',
+            'reply_markup' => json_encode($keyboard)
+        ];
+
+        $url = "https://api.telegram.org/bot$this->access_token/sendMessage";
+
+        $options = [
+            'http' => [
+                'method' => 'POST',
+                'header' => "Content-Type:application/x-www-form-urlencoded\r\n",
+                'content' => http_build_query($data),
+            ],
+        ];
+
+        $context = stream_context_create($options);
+        $result = file_get_contents($url, false, $context);
+    }
+
     function editCustomKeyboard($chat_id, $message_id, $text,$keyboard_menu) {
 
         $url = "https://api.telegram.org/bot$this->access_token/editMessageReplyMarkup";
