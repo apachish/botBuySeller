@@ -497,12 +497,12 @@ class TextServices
 
                         $keyboard[$i][0] = [
                             'text' => "  $text " . ($limit_trade->count() ? "\xE2\x9D\x8C" : "\xE2\x9C\x85"),
-                            'callback_data' => "trade_limit_" . $this->user_id
+                            'callback_data' => "trade_limit_" . $user->id
                         ];
                         if ($limit_trade->count())
                             $keyboard[$i][1] = [
                                 'text' => "مجاز تا" . $limit_trade->limit_access . " تا",
-                                'callback_data' => "trade_limit_" . $this->user_id];
+                                'callback_data' => "trade_limit_" . $user->id];
 
 
                         $i++;
