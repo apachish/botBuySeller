@@ -24,6 +24,7 @@ class ActionServices extends TextServices
         $mobile = null;
         $fullName = null;
         foreach ($array as $item) {
+            logger("item",[$item]);
             $item = str_replace(":", "", $item);
             if (str_contains($item, "موبایل")) {
                 $mobile = str_replace("موبایل", "", $item);
@@ -33,6 +34,8 @@ class ActionServices extends TextServices
                 $limit = str_replace("حد", "", $item);
             }
         }
+        logger("item",[$mobile,$fullName,$limit]);
+
         if ($mobile && $fullName) {
             CustomerUser::updateOrCreate(["user_id" => $this->getUserId(), "mobile" => $mobile],
                 [
