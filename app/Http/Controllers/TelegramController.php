@@ -44,19 +44,19 @@ class TelegramController extends Controller
         if($text_services->getUser()->role == "colleague") {
             $keyboard_menu[$i++] = [
                 ['text' => "\xF0\x9F\x91\xA5معرفی مشتری"],
-                ['text' => "\xF0\x9F\x93\x8B	لیست همکاران"],
+                ['text' => "\xF0\x9F\x93\x8Bلیست همکاران"],
             ];
             $keyboard_menu[$i++] = [
-                ['text' => "\xF0\x9F\x93\x88	معاملات باز"]
+                ['text' => "\xF0\x9F\x93\x88معاملات باز"]
             ];
         }
         $keyboard_menu[$i++] = [
-                ['text' => "\xF0\x9F\x93\x9A	قوانین"],
-                ['text' => "راهنما \xE2\x81\x89"]
+                ['text' => "\xF0\x9F\x93\x9Aقوانین"],
+                ['text' => "راهنما\xE2\x81\x89"]
             ];
         $keyboard_menu[$i++] = [
-                ['text' => $text_services->getUser()->verify_two ? "\xE2\x9A\xA0	\xE2\x9D\x8C	غیرفعال سازی تایید دو مرحله ای " : "\xE2\x9C\x8C	فعال سازی دو مرحله ای"],
-                ['text' => "\xE2\x9D\x8C	غیر فعال فوری"],
+                ['text' => $text_services->getUser()->verify_two ? "\xE2\x9A\xA0\xE2\x9D\x8Cغیرفعال سازی تایید دو مرحله ای" : "\xE2\x9C\x8Cفعال سازی دو مرحله ای"],
+                ['text' => "\xE2\x9D\x8Cغیر فعال فوری"],
 
             ];
 

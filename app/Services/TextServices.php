@@ -297,13 +297,13 @@ class TextServices
             "transfer_buy_true",
             "trade_number_limit",
             "\xF0\x9F\x91\xA5معرفی مشتری",
-            "\xF0\x9F\x93\x88	معاملات باز",
-            "\xF0\x9F\x93\x8B	لیست همکاران",
-            "\xF0\x9F\x93\x9A	قوانین",
-            "راهنما \xE2\x81\x89",
-            "\xE2\x9A\xA0	\xE2\x9D\x8C	غیرفعال سازی تایید دو مرحله ای ",
-            "\xE2\x9C\x8C	فعال سازی دو مرحله ای",
-            "\xE2\x9D\x8C	غیر فعال فوری",
+            "\xF0\x9F\x93\x88معاملات باز",
+            "\xF0\x9F\x93\x8Bلیست همکاران",
+            "\xF0\x9F\x93\x9Aقوانین",
+            "راهنما\xE2\x81\x89",
+            "\xE2\x9A\xA0\xE2\x9D\x8Cغیرفعال سازی تایید دو مرحله ای",
+            "\xE2\x9C\x8Cفعال سازی دو مرحله ای",
+            "\xE2\x9D\x8Cغیر فعال فوری",
         ];
         logger("check message",[in_array($this->message, $accept),$accept]);
         if (in_array($this->message, $accept))
@@ -392,13 +392,13 @@ class TextServices
                 cache()->forget($this->key_cache . $this->user_id);
                 break;
             case "\xF0\x9F\x91\xA5معرفی مشتری":
-            case "\xF0\x9F\x93\x88	معاملات باز":
-            case "\xF0\x9F\x93\x8B	لیست همکاران":
-            case "\xF0\x9F\x93\x9A	قوانین":
-            case "راهنما \xE2\x81\x89":
-            case "\xE2\x9A\xA0	\xE2\x9D\x8C	غیرفعال سازی تایید دو مرحله ای ":
-            case "\xE2\x9C\x8C	فعال سازی دو مرحله ای":
-            case  "\xE2\x9D\x8C	غیر فعال فوری":
+            case "\xF0\x9F\x93\x88معاملات باز":
+            case "\xF0\x9F\x93\x8Bلیست همکاران":
+            case "\xF0\x9F\x93\x9Aقوانین":
+            case "راهنما\xE2\x81\x89":
+            case "\xE2\x9A\xA0\xE2\x9D\x8Cغیرفعال سازی تایید دو مرحله ای":
+            case "\xE2\x9C\x8Cفعال سازی دو مرحله ای":
+            case  "\xE2\x9D\x8Cغیر فعال فوری":
                 $this->getAction();
                 break;
             default:
@@ -459,7 +459,7 @@ class TextServices
                     cache()->set($this->key_cache . $this->getUserId(), "add_customer");
 
                     break;
-                case "\xF0\x9F\x93\x88	معاملات باز":
+                case "\xF0\x9F\x93\x88معاملات باز":
                     $worker = UserTelegram::where("user_id", $this->user_id)->get();
                     $keyboard = [];
                     $i = 0;
@@ -473,7 +473,7 @@ class TextServices
                     $this->telegram_services->sendMessage($this->user_id, "شخص مورد نظر را انتخاب کنید", $keyboard);
                     break;
 
-                case "📋 لیست همکاران":
+                case "\xF0\x9F\x93\x8Bلیست همکاران":
                     $text = "لیست  همکاران";
                     $users = UserTelegram::where("id", "!=", $this->user_id)
                         ->where("role","colleague")
@@ -512,24 +512,24 @@ class TextServices
                     $this->telegram_services->MessageReplyMarkup($this->telegram, $this->user_id, $text, $keyboard);
                     break;
 
-                case "📚   قوانین":
+                case "\xF0\x9F\x93\x9Aقوانین":
                     $help = Setting::where("key", "rule")->first();
                     $this->telegram_services->sendMessage($this->user_id, $help->value);
                     break;
 
-                case "\xE2\x81\x89  راهنما":
+                case "\xE2\x81\x89راهنما":
                     $help = Setting::where("key", "help")->first();
                     $this->telegram_services->sendMessage($this->user_id, $help->value);
 
                     break;
 
-                case "\xE2\x9A\xA0	\xE2\x9D\x8C	غیرفعال سازی تایید دو مرحله ای ":
+                case "\xE2\x9A\xA0\xE2\x9D\x8Cغیرفعال سازی تایید دو مرحله ای":
                     $this->user->verify_two = false;
                     $this->user->update();
                     $this->telegram_services->sendMessage($this->user_id, "تایید دو مرحله ای غیر فعال شد");
                     break;
 
-                case "\xE2\x9C\x8C	فعال سازی دو مرحله ای":
+                case "\xE2\x9D\x8Cغیر فعال فوری":
                     $this->user->verify_two = true;
                     $this->user->update();
                     $this->telegram_services->sendMessage($this->user_id, "تایید دو مرحله ای  فعال شد");
