@@ -45,13 +45,14 @@ class TestApiTelegram extends Command
 
                 ]];
             $user = UserTelegram::where("id", $user_id)->first();
+            $bot = Bot::where("token", $token)->first();
             $this->info("user".$user->fullName);
             $response = TelegramServices::menu($telegram, $keyword_customer, $user, "تست");
             logger("response", [$response]);
             if (isset($response['message_id'])) {
                 $this->info($response['message_id']);
-                BotMenuUser::updateOrCreate(["user_id" => $this->user_id, "bot_id" => $this->bot->id], ["menu_id" => $response['message_id']]);
-                $this->user->update();
+                BotMenuUser::updateOrCreate(["user_id" => $user->id, "bot_id" => $bot->id], ["menu_id" => $response['message_id']]);
+                $user->update();
             }
         }else {
             $keyword_colleague = [
