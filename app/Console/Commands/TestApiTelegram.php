@@ -88,13 +88,67 @@ class TestApiTelegram extends Command
 //            $d = $telegram->editMessageReplyMarkup($params);
 ////            $d = $telegram_services->editCustomKeyboard($user_id, $menu_id, "تغییر منو", $keyword_colleague);
 //            dd($d);
-            $response = TelegramServices::menu($telegram, $keyword_colleague, $user, "تست");
-            logger("response", [$response]);
-            if (isset($response['message_id'])) {
-                $this->info($response['message_id']);
-                BotMenuUser::updateOrCreate(["user_id" => $user->id, "bot_id" => $bot->id], ["menu_id" => $response['message_id']]);
-                $user->update();
-            }
+//            $response = TelegramServices::menu($telegram, $keyword_colleague, $user, "تست");
+//            logger("response", [$response]);
+//            if (isset($response['message_id'])) {
+//                $this->info($response['message_id']);
+//                BotMenuUser::updateOrCreate(["user_id" => $user->id, "bot_id" => $bot->id], ["menu_id" => $response['message_id']]);
+//                $user->update();
+//            }
+
+            $apiToken = $token;
+            $chatId = $user_id;
+
+
+            $keyboard = [
+                'remove_keyboard' => true
+            ];
+
+            $data = [
+                'chat_id' => $chatId,
+                'text' => 'کیبورد حذف شد',
+                'reply_markup' => json_encode($keyboard)
+            ];
+
+            $url = "https://api.telegram.org/bot$apiToken/sendMessage";
+
+            $options = [
+                'http' => [
+                    'method' => 'POST',
+                    'header' => "Content-Type:application/x-www-form-urlencoded\r\n",
+                    'content' => http_build_query($data),
+                ],
+            ];
+
+            $context = stream_context_create($options);
+            $result = file_get_contents($url, false, $context);
+            $keyboard = [
+                'keyboard' => [
+                    [['text' => 'دکمه 1'], ['text' => 'دکمه 2']],
+                    [['text' => 'دکمه 3'], ['text' => 'دکمه 4']]
+                ],
+                'resize_keyboard' => true,
+                'one_time_keyboard' => true
+            ];
+
+            $data = [
+                'chat_id' => $chatId,
+                'text' => 'لطفاً یک گزینه را انتخاب کنید:',
+                'reply_markup' => json_encode($keyboard)
+            ];
+
+            $url = "https://api.telegram.org/bot$apiToken/sendMessage";
+
+            $options = [
+                'http' => [
+                    'method' => 'POST',
+                    'header' => "Content-Type:application/x-www-form-urlencoded\r\n",
+                    'content' => http_build_query($data),
+                ],
+            ];
+
+            $context = stream_context_create($options);
+            $result = file_get_contents($url, false, $context);
         }
     }
 }
