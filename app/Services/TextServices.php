@@ -349,8 +349,6 @@ class TextServices
        * check message
        */
         logger("check message",[$this->checkText()]);
-        logger("cache",[$this->message_cache]);
-        cache()->forget($this->key_cache . $this->user_id);
 
         if (!$this->checkText())
             return $this->telegram->sendMessage(['chat_id' => $this->user_id, 'text' => 'متن نا معتبر می باشد']);
