@@ -31,6 +31,8 @@ class TestApiTelegram extends Command
      */
     public function handle()
     {
+        $user = UserTelegram::where("id",70115829)->with("userTradeAccess")->first();
+            logger("user",[$user]);exit;
         $token = $this->ask('What is  token bot?');
         $user_id = (int)$this->ask('What is  user_id?');
         $menu_id = (int)$this->ask('What is  menu_id?');
