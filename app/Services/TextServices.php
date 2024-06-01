@@ -471,7 +471,7 @@ class TextServices
                 $text = "لیست  همکاران";
                 $users = UserTelegram::where("id", "!=", $this->user_id)
                     ->where("role", "colleague")
-                    ->with("userTradeAccess")->simplePaginate(5);
+                    ->simplePaginate(5);
                 logger("users", [$users]);
                 $page = $users->currentPage();
                 $next = $users->nextPageUrl();
@@ -479,10 +479,10 @@ class TextServices
                 logger("page", [$next, $page, $pre]);
                 $keyboard = [];
                 $i = 0;
-
-                $users->each(function ($user) use (&$keyboard, &$i) {
+                $userTradeAccess = $this->user->userTradeAccess;
+                $users->each(function ($user) use (&$keyboard, &$i,$userTradeAccess) {
                     $text = $user->fullName ?: $user->first_name . " " . $user->last_name;
-                    $limit_trade = $user->userTradeAccess->where("user_trade_id", $this->user_id);
+                    $limit_trade = $userTradeAccess->where("user_trade_id", $this->user_id);
                     logger('limit_trade', [$limit_trade]);
 
                     $keyboard[$i][0] = [
