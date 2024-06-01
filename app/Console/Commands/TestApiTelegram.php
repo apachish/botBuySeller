@@ -88,7 +88,7 @@ class TestApiTelegram extends Command
 //            $d = $telegram->editMessageReplyMarkup($params);
 ////            $d = $telegram_services->editCustomKeyboard($user_id, $menu_id, "تغییر منو", $keyword_colleague);
 //            dd($d);
-            $response = TelegramServices::menu($telegram, $keyword_customer, $user, "تست");
+            $response = TelegramServices::menu($telegram, $keyword_colleague, $user, "تست");
             logger("response", [$response]);
             if (isset($response['message_id'])) {
                 $this->info($response['message_id']);
