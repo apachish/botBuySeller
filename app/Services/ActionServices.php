@@ -157,6 +157,24 @@ class ActionServices extends TextServices
         }
     }
 
+    public function tradeLimitClose()
+    {
+        $worker_id = (int)str_replace('trade_limit_close_', '', $this->getData());
+
+        $worker = UserTelegram::where("id", $worker_id)->first();
+        logger("worker", [$worker]);
+        if ($worker) {
+            $limit_access = UserTradeAccess::where("user_id",$this->getUserId())->where("user_trade_id",$worker->id)->first();
+            $name_worker = $worker->fullName ?: $worker->first_name . " " . $worker->last_name;
+
+            $limit_access->delete();
+            $this->telegram->sendMessage([
+                'chat_id' => $this->getUserId(),
+                'text' => "حد مجاز برای $name_worker نا محدود شد "
+            ]);
+        }
+    }
+
     public function tradeLimit()
     {
         $worker_id = (int)str_replace('trade_limit_', '', $this->getData());

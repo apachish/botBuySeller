@@ -324,7 +324,8 @@ class TextServices
     public function checkData()
     {
         if (str_contains($this->data, "request_transfer_") ||
-            str_contains($this->data, "trade_limit_"))
+            str_contains($this->data, "trade_limit_") ||
+            str_contains($this->data, "trade_limit_close_"))
             return true;
         return false;
     }
@@ -415,6 +416,8 @@ class TextServices
             $this->transferBuy();
         elseif (str_contains($this->data, "trade_limit_"))
             $this->tradeLimit();
+        elseif (str_contains($this->data, "trade_limit_close_"))
+            $this->tradeLimitClose();
     }
 
     public function actionByCache()
@@ -480,23 +483,30 @@ class TextServices
                 $keyboard = [];
                 $i = 0;
                 $userTradeAccess = $this->user->userTradeAccess;
-                logger("userTradeAccess",[$userTradeAccess]);
-                $users->each(function ($user) use (&$keyboard, &$i,$userTradeAccess) {
+                logger("userTradeAccess", [$userTradeAccess]);
+                $users->each(function ($user) use (&$keyboard, &$i, $userTradeAccess) {
                     $text = $user->fullName ?: $user->first_name . " " . $user->last_name;
                     $limit_trade = $userTradeAccess->where("user_trade_id", $user->id)->first();
 
-                    $keyboard[$i][0] = [
-                        'text' => "  $text " . ($limit_trade->count() ? "\xE2\x9D\x8C" : "\xE2\x9C\x85"),
-                        'callback_data' => "trade_limit_" . $user->id
-                    ];
-                    logger('limit_trade', [$limit_trade,$limit_trade->count(),data_get($limit_trade,"limit_access")]);
+
+                    logger('limit_trade', [$limit_trade, $limit_trade->count(), data_get($limit_trade, "limit_access")]);
 
                     if ($limit_trade->count())
-                        $keyboard[$i][1] = [
-                            'text' => "مجاز تا" . data_get($limit_trade,"limit_access") . " تا",
-                            'callback_data' => "trade_limit_" . $user->id];
-
-
+                        $keyboard[$i] = [
+                            [
+                                'text' => "  مجاز تا " . data_get($limit_trade, "limit_access") . "  تا ",
+                                'callback_data' => "trade_limit_" . $user->id
+                            ],
+                            [
+                                'text' => "  $text " . "\xE2\x9D\x8C",
+                                'callback_data' => "trade_limit_close_" . $user->id
+                            ]
+                        ];
+                    else
+                        $keyboard[$i][] = [
+                            'text' => "  $text " . "\xE2\x9C\x85",
+                            'callback_data' => "trade_limit_" . $user->id
+                        ];
                     $i++;
                 });
                 logger("keyboard", [$keyboard]);
