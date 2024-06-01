@@ -363,8 +363,8 @@ class ActionAdminServices extends TextServices
 
         $users = UserTelegram::simplePaginate(4, ['*'], 'page', $page);
         $page = $users->currentPage();
-        $next = $users->nextPageUrl() ? strstr($users->nextPageUrl(), "?page=") : null;
-        $pre = $users->previousPageUrl() ? strstr($users->previousPageUrl(), "?page=") : null;
+        $next = $users->nextPageUrl() ? (int)str_replace("?page=","",strstr($users->nextPageUrl(), "?page=")) : null;
+        $pre = $users->previousPageUrl() ? (int)str_replace("?page=","",strstr($users->previousPageUrl(), "?page=")) : null;
         $keyboard = [];
         $i = 0;
 
