@@ -8,6 +8,7 @@ use App\Models\UserTelegram;
 use App\Services\TelegramServices;
 use Illuminate\Console\Command;
 use Telegram\Bot\Api;
+use Telegram\Bot\Keyboard\Keyboard;
 
 class TestApiTelegram extends Command
 {
@@ -33,8 +34,9 @@ class TestApiTelegram extends Command
         $token = $this->ask('What is  token bot?');
         $user_id = (int)$this->ask('What is  user_id?');
         $menu_id = (int)$this->ask('What is  menu_id?');
+        $telegram = new Api($token);
+
         if(!$menu_id) {
-            $telegram = new Api($token);
             $keyword_customer = [
                 [
                     ['text' => "\xF0\x9F\x93\x9A	قوانین"],
@@ -71,8 +73,20 @@ class TestApiTelegram extends Command
                     ['text' => "\xE2\x9D\x8C	غیر فعال فوری"],
 
                 ]];
+            $reply_markup = Keyboard::make([
+                'keyboard' => $keyword_colleague,
+                'resize_keyboard' => true,
+                'one_time_keyboard' => false
+            ]);
             $telegram_services = new TelegramServices($token);
-            $d = $telegram_services->editCustomKeyboard($user_id, $menu_id, "تغییر منو", $keyword_colleague);
+             $params = [
+            'chat_id'            => $user_id,  // int|string - (Optional). Required if inline_message_id is not specified. Unique identifier for the target chat or username of the target channel (in the format "@channelusername")
+           'message_id'         => $menu_id,  // int        - (Optional). Required if inline_message_id is not specified. Identifier of the sent message
+            'inline_message_id'  => '',  // string     - (Optional). Required if chat_id and message_id are not specified. Identifier of the inline message
+            'reply_markup'       => $reply_markup,  // string     - (Optional). A JSON-serialized object for an inline keyboard.
+      ];
+            $d = $telegram->editMessageReplyMarkup($params);
+//            $d = $telegram_services->editCustomKeyboard($user_id, $menu_id, "تغییر منو", $keyword_colleague);
             dd($d);
         }
     }
