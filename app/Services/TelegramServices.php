@@ -128,7 +128,7 @@ class TelegramServices
 
         $data = [
             'chat_id' => $chatId,
-            'text' => 'کیبورد حذف شد',
+            'text' => 'منو کاربری شما تغییر  یافت',
             'reply_markup' => json_encode($keyboard)
         ];
 

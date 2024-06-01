@@ -305,6 +305,7 @@ class TextServices
             "\xE2\x9C\x8C	فعال سازی دو مرحله ای",
             "\xE2\x9D\x8C	غیر فعال فوری",
         ];
+        logger("check message",[in_array($this->message, $accept),$accept]);
         if (in_array($this->message, $accept))
             return true;
         collect($this->list_type)->contains(function (string $value, int $key) {
