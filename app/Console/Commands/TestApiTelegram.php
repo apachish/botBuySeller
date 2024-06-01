@@ -35,7 +35,9 @@ class TestApiTelegram extends Command
         $user_id = (int)$this->ask('What is  user_id?');
         $menu_id = (int)$this->ask('What is  menu_id?');
         $telegram = new Api($token);
-
+        $user = UserTelegram::where("id", $user_id)->first();
+        $bot = Bot::where("token", $token)->first();
+        $this->info("user".$user->fullName);
         if(!$menu_id) {
             $keyword_customer = [
                 [
@@ -46,9 +48,7 @@ class TestApiTelegram extends Command
                     ['text' => "\xE2\x9D\x8C	غیر فعال فوری"],
 
                 ]];
-            $user = UserTelegram::where("id", $user_id)->first();
-            $bot = Bot::where("token", $token)->first();
-            $this->info("user".$user->fullName);
+
             $response = TelegramServices::menu($telegram, $keyword_customer, $user, "تست");
             logger("response", [$response]);
             if (isset($response['message_id'])) {
@@ -73,21 +73,28 @@ class TestApiTelegram extends Command
                     ['text' => "\xE2\x9D\x8C	غیر فعال فوری"],
 
                 ]];
-            $reply_markup = Keyboard::make([
-                'keyboard' => $keyword_colleague,
-                'resize_keyboard' => true,
-                'one_time_keyboard' => false
-            ]);
-            $telegram_services = new TelegramServices($token);
-             $params = [
-            'chat_id'            => $user_id,  // int|string - (Optional). Required if inline_message_id is not specified. Unique identifier for the target chat or username of the target channel (in the format "@channelusername")
-           'message_id'         => $menu_id,  // int        - (Optional). Required if inline_message_id is not specified. Identifier of the sent message
-            'inline_message_id'  => '',  // string     - (Optional). Required if chat_id and message_id are not specified. Identifier of the inline message
-            'reply_markup'       => $reply_markup,  // string     - (Optional). A JSON-serialized object for an inline keyboard.
-      ];
-            $d = $telegram->editMessageReplyMarkup($params);
-//            $d = $telegram_services->editCustomKeyboard($user_id, $menu_id, "تغییر منو", $keyword_colleague);
-            dd($d);
+//            $reply_markup = Keyboard::make([
+//                'keyboard' => $keyword_colleague,
+//                'resize_keyboard' => true,
+//                'one_time_keyboard' => false
+//            ]);
+//            $telegram_services = new TelegramServices($token);
+//             $params = [
+//            'chat_id'            => $user_id,  // int|string - (Optional). Required if inline_message_id is not specified. Unique identifier for the target chat or username of the target channel (in the format "@channelusername")
+//           'message_id'         => $menu_id,  // int        - (Optional). Required if inline_message_id is not specified. Identifier of the sent message
+//            'inline_message_id'  => '',  // string     - (Optional). Required if chat_id and message_id are not specified. Identifier of the inline message
+//            'reply_markup'       => $reply_markup,  // string     - (Optional). A JSON-serialized object for an inline keyboard.
+//      ];
+//            $d = $telegram->editMessageReplyMarkup($params);
+////            $d = $telegram_services->editCustomKeyboard($user_id, $menu_id, "تغییر منو", $keyword_colleague);
+//            dd($d);
+            $response = TelegramServices::menu($telegram, $keyword_customer, $user, "تست");
+            logger("response", [$response]);
+            if (isset($response['message_id'])) {
+                $this->info($response['message_id']);
+                BotMenuUser::updateOrCreate(["user_id" => $user->id, "bot_id" => $bot->id], ["menu_id" => $response['message_id']]);
+                $user->update();
+            }
         }
     }
 }
