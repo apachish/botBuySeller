@@ -11,6 +11,7 @@ class TelegramServices
 {
 
     private $access_token;
+    public $menu_key = "menu_";
 
     /**
      * @return mixed
@@ -101,9 +102,9 @@ class TelegramServices
 
         if (data_get($response, "message_id"))
         {
-            if(cache()->get("menu_".$chat_id))
-                $this->deleteMessage($chat_id,cache()->get("menu_".$chat_id));
-            cache()->set("menu_".$chat_id,["id"=>data_get($response, "message_id"),"keyboard"=>$keyboard]);
+            if(cache()->get($this->menu_key.$chat_id))
+                $this->deleteMessage($chat_id,cache()->get($this->menu_key.$chat_id));
+            cache()->set($this->menu_key.$chat_id,["id"=>data_get($response, "message_id"),"keyboard"=>$keyboard]);
         }
         else
             logger("exption", [$response]);

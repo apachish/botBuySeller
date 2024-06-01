@@ -66,6 +66,14 @@ class ActionAdminServices extends TextServices
             $tel = "[$tel]";//(tel:$tel)
             $response_text = "برای تماس با شماره زیر کلیک کنید:\n\n$tel";
             $this->getTelegramServices()->sendMessage($this->getUserId(), $response_text);
+        }elseif (str_contains($this->getData(), "pre_")) {
+            $page = str_replace('pre_', '', $this->getData());
+            $message_id = cache()->get("menu_List_user_".$this->getUserId());
+            $this->listUser($page,$message_id);
+        }elseif (str_contains($this->getData(), "next_")) {
+            $page = str_replace('next_', '', $this->getData());
+            $message_id = cache()->get("menu_List_user_".$this->getUserId());
+            $this->listUser($page,$message_id);
         } elseif (str_contains($this->getData(), "customer_")) {
             $id = (int)str_replace('customer_', '', $this->getData());
             $user_con = UserTelegram::where("id", $id)->first();
@@ -190,35 +198,7 @@ class ActionAdminServices extends TextServices
                 $this->getTelegramServices()->MessageReplyMarkup($this->getTelegram(), $this->getUserId(), $text, $keyboard);
                 break;
             case "📋 لیست کاربران":
-                $text = "\n\nلیست  کاربران";
-                $text .= "\n\n";
-                $text .= "با کلیک بر\xE2\x9D\x8C کاربر غیر فعال شده و با کلیک بر \xE2\x9C\x85 کاربرفعال گردید در صورت کلیک بر روی اسم شخص نوع کاربر از مشتری به همکار و همکار به مشتری تغییر می کنند ";
-                $users = UserTelegram::simplePaginate(4);
-                $page = $users->currentPage();
-                $next = $users->nextPageUrl();
-                $pre = $users->previousPageUrl();
-                logger("page", [$next, $page, $pre,$users]);
-                $keyboard = [];
-                $i = 0;
-
-                $users->each(function ($user) use (&$keyboard, &$i) {
-                    $text = $user->fullName ?: $user->first_name . " " . $user->last_name;
-                    $text .= $user->role == "colleague" ? "(همکار)" : "(مشتری)";
-                    $keyboard[$i++] = [
-                        ['text' => "  $text  ", 'callback_data' => ($user->role == "colleague" ? "colleague_" : "customer_") . $user->id],
-                    ];
-                    $keyboard[$i++] = [
-                        ['text' => "\xE2\x9C\x85 ", 'callback_data' => 'confirm_' . $user->id],
-                        ['text' => "\xE2\x9D\x8C", 'callback_data' => 'reject_' . $user->id],
-                    ];
-                });
-                logger("keyboard", [$keyboard]);
-                if ($pre)
-                    $keyboard[$i][] = ['text' => "قبلی", "callback_data" => "pre"];
-                if ($pre)
-                    $keyboard[$i][] = ['text' => "بعدی", "callback_data" => "next"];
-
-                $this->getTelegramServices()->MessageReplyMarkup($this->getTelegram(), $this->getUserId(), $text, $keyboard);
+                $this->listUser();
                 break;
             case "تعداد کاربران":
                 $response_text = UserTelegram::count();
@@ -369,6 +349,47 @@ class ActionAdminServices extends TextServices
                 $key = new \stdClass();
             $this->service_telgram_user->editCustomKeyboard($user_con->id, $menu_bot->menu_id, "تغییر منو", $key);
             cache()->forget("keyword_menu".$this->getKeyCache().$user_con->id);
+        }
+    }
+
+    /**
+     * @return void
+     */
+    public function listUser($page=1,$message_id=null)
+    {
+        $text = "\n\nلیست  کاربران";
+        $text .= "\n\n";
+        $text .= "با کلیک بر\xE2\x9D\x8C کاربر غیر فعال شده و با کلیک بر \xE2\x9C\x85 کاربرفعال گردید در صورت کلیک بر روی اسم شخص نوع کاربر از مشتری به همکار و همکار به مشتری تغییر می کنند ";
+
+        $users = UserTelegram::simplePaginate(4, ['*'], 'page', $page);
+        $page = $users->currentPage();
+        $next = $users->nextPageUrl() ? strstr($users->nextPageUrl(), "?page=") : null;
+        $pre = $users->previousPageUrl() ? strstr($users->previousPageUrl(), "?page=") : null;
+        $keyboard = [];
+        $i = 0;
+
+        $users->each(function ($user) use (&$keyboard, &$i) {
+            $text = $user->fullName ?: $user->first_name . " " . $user->last_name;
+            $text .= $user->role == "colleague" ? "(همکار)" : "(مشتری)";
+            $keyboard[$i++] = [
+                ['text' => "  $text  ", 'callback_data' => ($user->role == "colleague" ? "colleague_" : "customer_") . $user->id],
+            ];
+            $keyboard[$i++] = [
+                ['text' => "\xE2\x9C\x85 ", 'callback_data' => 'confirm_' . $user->id],
+                ['text' => "\xE2\x9D\x8C", 'callback_data' => 'reject_' . $user->id],
+            ];
+        });
+        if ($pre)
+            $keyboard[$i][] = ['text' => "قبلی", "callback_data" => "pre_".$pre];
+        if ($next)
+            $keyboard[$i][] = ['text' => "بعدی", "callback_data" => "next_" . $next];
+
+        if($message_id)
+            $this->getTelegramServices()->editMessageTextAndInlineKeyboard( $this->getUserId(),$message_id, $text, $keyboard);
+        else
+        {
+            $this->getTelegramServices()->menu_key = "menu_List_user_";
+            $menu = $this->getTelegramServices()->MessageReplyMarkup($this->getTelegram(), $this->getUserId(), $text, $keyboard);
         }
     }
 }
