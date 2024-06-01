@@ -9,7 +9,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use function Laravel\Prompts\confirm;
 
-class AddUserAdmin extends Command
+class AddBot extends Command
 {
     /**
      * The name and signature of the console command.
@@ -32,8 +32,10 @@ class AddUserAdmin extends Command
     {
         $token = $this->ask('What is  token bot?');
         $title = $this->ask('What is  title bot?');
-        $bot = Bot::create(["title"=>$title,"token"=>$token]);
+        $chanel_id = $this->ask('What is  chanel_id bot?');
+        $bot = Bot::updateOrCreate(["token"=>$token],["title"=>$title,"chanel_id"=>$chanel_id]);
 
+        $this->info("done");
 
     }
 
