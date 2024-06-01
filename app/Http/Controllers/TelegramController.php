@@ -43,7 +43,7 @@ class TelegramController extends Controller
         $i = 0;
         if($text_services->getUser()->role == "colleague") {
             $keyboard_menu[$i++] = [
-                ['text' => "👥\tمعرفی مشتری"],
+                ['text' => "\xF0\x9F\x91\xA5معرفی مشتری"],
                 ['text' => "\xF0\x9F\x93\x8B	لیست همکاران"],
             ];
             $keyboard_menu[$i++] = [
