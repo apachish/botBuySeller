@@ -500,7 +500,7 @@ class TextServices
                             ],
                             [
                                 'text' => "  $text " . "\xE2\x9D\x8C",
-                                'callback_data' => "trade_limit_close_" . $user->id
+                                'callback_data' => "trade_limit_close_" . $user->id."_".$i
                             ]
                         ];
                     else

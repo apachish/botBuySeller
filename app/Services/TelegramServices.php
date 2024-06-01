@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\MessageTelegram;
 use danog\MadelineProto\API;
 use danog\MadelineProto\RPCErrorException;
 use Telegram\Bot\Keyboard\Keyboard;
@@ -25,7 +26,7 @@ class TelegramServices
         $this->access_token = $access_token;
     }
 
-    public static function menu($telegram,$keyboard,$user,$text)
+    public static function menu($telegram, $keyboard, $user, $text)
     {
         $reply_markup = Keyboard::make([
             'keyboard' => $keyboard,
@@ -41,7 +42,8 @@ class TelegramServices
         return $response;
     }
 
-    function setKeyword($chat_id,$keyboard) {
+    function setKeyword($chat_id, $keyboard)
+    {
         $url = "https://api.telegram.org/bot$this->access_token/sendMessage";
 
         // تنظیم کیبورد با درخواست به اشتراک‌گذاری مخاطب
@@ -70,7 +72,7 @@ class TelegramServices
         return $result;
     }
 
-    public function MessageReplyMarkup($telegram,$chat_id,$text,$keyboard)
+    public function MessageReplyMarkup($telegram, $chat_id, $text, $keyboard)
     {
 //        $keyboard = [
 //            'inline_keyboard' => [
@@ -82,7 +84,7 @@ class TelegramServices
 //                ]
 //            ]
 //        ];
-        logger("keyword",$keyboard);
+        logger("keyword", $keyboard);
         $reply_markup = Keyboard::make([
             'inline_keyboard' => $keyboard,
             'resize_keyboard' => false,
@@ -95,13 +97,43 @@ class TelegramServices
             'reply_markup' => $reply_markup,
 
         ]);
-        logger("reponse",[$response]);
+        logger("reponse", [$response]);
+
+        if (data_get($response, "message_id"))
+        {
+            if(cache()->get("menu_".$chat_id))
+                $this->deleteMessage($chat_id,cache()->get("menu_".$chat_id));
+            cache()->set("menu_".$chat_id,["id"=>data_get($response, "message_id"),"keyboard"=>$keyboard]);
+        }
+        else
+            logger("exption", [$response]);
         return $response;
 
     }
+
+// تابع برای حذف پیام
+    function deleteMessage($chat_id, $message_id) {
+        $url = "https://api.telegram.org/bot$this->access_token/deleteMessage";
+
+        $post_fields = [
+            'chat_id' => $chat_id,
+            'message_id' => $message_id
+        ];
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array("Content-Type:application/json"));
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($post_fields));
+        $result = curl_exec($ch);
+        curl_close($ch);
+
+        return json_decode($result, true);
+    }
     // تابع ویرایش کیبورد شیشه‌ای
-    public function editMessageReplyMarkup($chat_id, $message_id, $keyboard) {
-        logger("aa",[$chat_id, $message_id, $keyboard]);
+    public function editMessageReplyMarkup($chat_id, $message_id, $keyboard)
+    {
+        logger("aa", [$chat_id, $message_id, $keyboard]);
         $url = "https://api.telegram.org/bot$this->access_token/editMessageReplyMarkup";
         $post_fields = [
             'chat_id' => $chat_id,
@@ -116,7 +148,7 @@ class TelegramServices
         curl_setopt($ch, CURLOPT_POSTFIELDS, $post_fields);
         $r = curl_exec($ch);
         curl_close($ch);
-        logger("rrr",[$r]);
+        logger("rrr", [$r]);
     }
 
 
@@ -146,7 +178,8 @@ class TelegramServices
         $result = file_get_contents($url, false, $context);
     }
 
-    function editCustomKeyboard($chat_id, $message_id, $text,$keyboard_menu) {
+    function editCustomKeyboard($chat_id, $message_id, $text, $keyboard_menu)
+    {
 
         $url = "https://api.telegram.org/bot$this->access_token/editMessageReplyMarkup";
 
@@ -157,7 +190,6 @@ class TelegramServices
             'one_time_keyboard' => false,
             'input_field_placeholder' => $text
         ];
-
 
 
         $post_fields = [
@@ -174,15 +206,16 @@ class TelegramServices
         $result = curl_exec($ch);
         curl_close($ch);
 
-        logger("edit menu",[json_decode($result, true)]);
+        logger("edit menu", [json_decode($result, true)]);
         return json_decode($result, true);
     }
 
-    function editMessageTextAndInlineKeyboard($channel_chat_id, $message_id,$message,$keyboard=null) {
+    function editMessageTextAndInlineKeyboard($channel_chat_id, $message_id, $message, $keyboard = null)
+    {
         $url = "https://api.telegram.org/bot$this->access_token/editMessageText";
 
         // تنظیم کیبورد شیشه‌ای جدید
-        if($keyboard)
+        if ($keyboard)
             $keyboard = [
                 'inline_keyboard' => $keyboard
             ];
@@ -206,8 +239,10 @@ class TelegramServices
 
         return json_decode($result, true);
     }
+
     // تابع ارسال پیام با کیبورد شیشه‌ای
-    public function sendMessage($chat_id, $message, $keyboard = null) {
+    public function sendMessage($chat_id, $message, $keyboard = null)
+    {
         $url = "https://api.telegram.org/bot$this->access_token/sendMessage";
         $post_fields = [
             'chat_id' => $chat_id,
@@ -249,7 +284,8 @@ class TelegramServices
             ],
         ];
      */
-    public function setCommands($commands) {
+    public function setCommands($commands)
+    {
 
         $url = "https://api.telegram.org/bot$this->access_token/setMyCommands";
 
@@ -269,7 +305,8 @@ class TelegramServices
     }
 
 
-    public function kickUserFromChannel($chat_id, $user_id) {
+    public function kickUserFromChannel($chat_id, $user_id)
+    {
         global $access_token, $channel_username;
         $url = "https://api.telegram.org/bot$access_token/kickChatMember";
         $post_fields = [
@@ -288,13 +325,13 @@ class TelegramServices
         return $result;
     }
 
-    public function checkMember($user,$bot)
+    public function checkMember($user, $bot)
     {
 //        $telegram = new Api(data_get($bot,'token')); // توکن ربات تلگرام خود را جایگزین کنید
-        $token = data_get($bot,'token'); // توکن ربات تلگرام خود را جایگزین کنید
+        $token = data_get($bot, 'token'); // توکن ربات تلگرام خود را جایگزین کنید
 
         $chatId = '@apdadana'; // نام کاربری یا آیدی کانال مورد نظر
-        $userId = data_get($user,'id'); // آیدی کاربری مورد نظر
+        $userId = data_get($user, 'id'); // آیدی کاربری مورد نظر
 
 // درخواست اطلاعات کاربر در کانال
 //        $response = $telegram->getChatMember([
@@ -318,13 +355,13 @@ class TelegramServices
 
 // تبدیل پاسخ از JSON به آرایه
         $result = json_decode($response, true);
-        logger("response",[$response ]);
+        logger("response", [$response]);
 // بررسی وضعیت عضویت کاربر در کانال
-        if (data_get($result,'ok') && in_array(data_get($result,'result.status'),['member','creator'])) {
-            logger( "کاربر عضو کانال است.");
+        if (data_get($result, 'ok') && in_array(data_get($result, 'result.status'), ['member', 'creator'])) {
+            logger("کاربر عضو کانال است.");
             return true;
         } else {
-            logger( "کاربر عضو کانال نیست یا خطایی رخ داده است.");
+            logger("کاربر عضو کانال نیست یا خطایی رخ داده است.");
             return false;
         }
     }
@@ -334,8 +371,8 @@ class TelegramServices
     {
         $settings = [
             'app_info' => [
-                'api_id' => env('YOUR_API_ID',37090), // API ID خود را وارد کنید
-                'api_hash' => env('YOUR_API_HASH','0fca2444e39d6d2eb7ad48c7cb302ae3') // API Hash خود را وارد کنید
+                'api_id' => env('YOUR_API_ID', 37090), // API ID خود را وارد کنید
+                'api_hash' => env('YOUR_API_HASH', '0fca2444e39d6d2eb7ad48c7cb302ae3') // API Hash خود را وارد کنید
             ],
         ];
 
@@ -345,7 +382,8 @@ class TelegramServices
         $MadelineProto->start();
 
 // تابع برای اضافه کردن کاربر به کانال
-        function addUserToChannel($MadelineProto, $channel, $user) {
+        function addUserToChannel($MadelineProto, $channel, $user)
+        {
             try {
                 $MadelineProto->channels->inviteToChannel([
                     'channel' => $channel,

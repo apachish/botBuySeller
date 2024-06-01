@@ -4,6 +4,7 @@ namespace App\Services;
 
 
 use App\Models\CustomerUser;
+use App\Models\MessageTelegram;
 use App\Models\Setting;
 use App\Models\Transfer;
 use App\Models\UserTelegram;
@@ -159,7 +160,9 @@ class ActionServices extends TextServices
 
     public function tradeLimitClose()
     {
-        $worker_id = (int)str_replace('trade_limit_close_', '', $this->getData());
+        $array = explode("_",str_replace('trade_limit_close_', '', $this->getData()));
+        $worker_id = (int)data_get($array,0);
+        $worker_i = (int)data_get($array,1);
 
         $worker = UserTelegram::where("id", $worker_id)->first();
         logger("worker", [$worker,$worker_id]);
@@ -169,6 +172,16 @@ class ActionServices extends TextServices
             if($limit_access) {
                 $name_worker = $worker->fullName ?: $worker->first_name . " " . $worker->last_name;
 
+                $message_menu = cache()->get("menu_".$this->getUserId()) ;
+                if($message_menu){
+                    $keyboard = data_get($message_menu,"keyboard");
+                    $text = $worker->fullName ?: $worker->first_name . " " . $worker->last_name;
+                    $keyboard[$worker_i]=  [
+                        'text' => "  $text " . "\xE2\x9C\x85",
+                        'callback_data' => "trade_limit_" . $worker->id
+                    ];
+                    $this->telegram_services->editMessageReplyMarkup($this->getUserId(),data_get($message_menu,"id"),$keyboard);
+                }
                 $limit_access->delete();
                 $this->telegram->sendMessage([
                     'chat_id' => $this->getUserId(),
