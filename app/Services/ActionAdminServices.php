@@ -15,6 +15,7 @@ class ActionAdminServices extends TextServices
     public $service_telgram_user;
     public $bot_title;
     public $bot_user;
+    public $key_cache_user = "text_user_";
 
     protected $keyword_colleague = [
         [
@@ -78,7 +79,7 @@ class ActionAdminServices extends TextServices
                 $response_text = "$fullName همکار گرامی به سیستم ما خوش آمدید\n\n ";
                 $this->service_telgram_user->sendMessage($user_con->id, $response_text);
 
-                cache()->forget("keyword_menu".$this->getKeyCache().$user_con->id);
+                cache()->forget("keyword_menu".$this->key_cache_user.$user_con->id);
 
             }
         } elseif (str_contains($this->getData(), "colleague_")) {
@@ -93,7 +94,7 @@ class ActionAdminServices extends TextServices
                 $this->getTelegramServices()->sendMessage($this->getUserId(), $response_text);
                 $response_text = "$fullName همکاری شما در سیستم به سطح مشتری انتقال یافت\n\n ";
                 $this->service_telgram_user->sendMessage($user_con->id, $response_text);
-                cache()->forget("keyword_menu".$this->getKeyCache().$user_con->id);
+                cache()->forget("keyword_menu".$this->key_cache_user.$user_con->id);
 
             }
         } elseif (str_contains($this->getData(), "confirm_")) {
@@ -104,12 +105,12 @@ class ActionAdminServices extends TextServices
                 $fullName = $user_con->fullName ?: $user_con->first_name . " " . $user_con->last_name;
                 $user_con->status = true;
                 $user_con->update();
-                cache()->forget("keyword_menu" . $this->getKeyCache() . $user_con->id);
+                cache()->forget("keyword_menu" . $this->key_cache_user . $user_con->id);
                 $response_text = "$fullName اکانت کاربریش فعال شد\n\n ";
                 $this->getTelegramServices()->sendMessage($this->getUserId(), $response_text);
                 $response_text = "$fullName اکانت کاربریتان فعال شد\n\n ";
                 $this->service_telgram_user->sendMessage($user_con->id, $response_text);
-                cache()->forget("keyword_menu".$this->getKeyCache().$user_con->id);
+                cache()->forget("keyword_menu".$this->key_cache_user.$user_con->id);
             }
         } elseif (str_contains($this->getData(), "reject_")) {
             $id = (int)str_replace('reject_', '', $this->getData());

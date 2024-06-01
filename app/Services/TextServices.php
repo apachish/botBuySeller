@@ -437,7 +437,13 @@ class TextServices
         elseif (str_contains($this->message_cache, "add_fullName"))
             $this->addFullName();
         elseif (str_contains($this->message_cache, "pending_accept"))
-            $this->pendingAccept();
+        {
+            if($this->user->status)
+                cache()->forget($this->getKeyCache().$this->user->id);
+            else
+                $this->pendingAccept();
+
+        }
     }
 
     private function getAction()
