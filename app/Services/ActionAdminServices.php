@@ -68,12 +68,16 @@ class ActionAdminServices extends TextServices
             $this->getTelegramServices()->sendMessage($this->getUserId(), $response_text);
         }elseif (str_contains($this->getData(), "pre_")) {
             $page = str_replace('pre_', '', $this->getData());
-            $message_id = cache()->get("menu_List_user_".$this->getUserId());
-            $this->listUser($page,$message_id);
+            $data_old = cache()->get("menu_List_user_".$this->getUserId());
+            $message_id = data_get($data_old,"id",null);
+            if($message_id)
+                $this->listUser($page,$message_id);
         }elseif (str_contains($this->getData(), "next_")) {
             $page = str_replace('next_', '', $this->getData());
-            $message_id = cache()->get("menu_List_user_".$this->getUserId());
-            $this->listUser($page,$message_id);
+            $data_old = cache()->get("menu_List_user_".$this->getUserId());
+            $message_id = data_get($data_old,"id",null);
+            if($message_id)
+                $this->listUser($page,$message_id);
         } elseif (str_contains($this->getData(), "customer_")) {
             $id = (int)str_replace('customer_', '', $this->getData());
             $user_con = UserTelegram::where("id", $id)->first();
