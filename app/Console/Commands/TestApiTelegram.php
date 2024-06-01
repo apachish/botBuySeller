@@ -31,8 +31,8 @@ class TestApiTelegram extends Command
     public function handle()
     {
         $token = $this->ask('What is  token bot?');
-        $user_id = $this->ask('What is  user_id?');
-        $menu_id = $this->ask('What is  menu_id?');
+        $user_id = (int)$this->ask('What is  user_id?');
+        $menu_id = (int)$this->ask('What is  menu_id?');
         if(!$menu_id) {
             $telegram = new Api($token);
             $keyword_customer = [
@@ -44,7 +44,7 @@ class TestApiTelegram extends Command
                     ['text' => "\xE2\x9D\x8C	غیر فعال فوری"],
 
                 ]];
-            $user = UserTelegram::where("id",(int) $user_id)->first();
+            $user = UserTelegram::where("id", $user_id)->first();
             $this->info("user".$user->fullName);
             $response = TelegramServices::menu($telegram, $keyword_customer, $user, "تست");
             logger("response", [$response]);
