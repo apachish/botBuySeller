@@ -28,8 +28,8 @@ class ActionServices extends TextServices
             $item = str_replace(":", "", $item);
             if (str_contains($item, "موبایل")) {
                 $mobile = str_replace("موبایل", "", $item);
-            } elseif (str_contains($item, "نام ونام خانوادگی")) {
-                $fullName = str_replace("نام ونام خانوادگی", "", $item);
+            } elseif (str_contains($item, "نام و نام خانوادگی")) {
+                $fullName = str_replace("نام و نام خانوادگی", "", $item);
             } elseif (str_contains($item, "حد")) {
                 $limit = str_replace("حد", "", $item);
             }
