@@ -136,9 +136,8 @@ class TelegramServices
         $url = "https://api.telegram.org/bot$this->access_token/editMessageReplyMarkup";
         $keyboard = [
             'keyboard' => $keyboard,
-            'resize_keyboard' => true, // اندازه کیبورد را تغییر می‌دهد تا به صفحه کاربر بخورد
-            'one_time_keyboard' => false, // کیبورد پس از استفاده مخفی نمی‌شود
-            'input_field_placeholder' => 'یک گزینه را انتخاب کنید...' // متن جایگزین در فیلد ورودی
+            'resize_keyboard' => true,
+            'one_time_keyboard' => false
         ];
         $post_fields = [
             'chat_id' => $chat_id,
