@@ -19,7 +19,8 @@ class ActionServices extends TextServices
     public function addCustomer()
     {
         $limit = null;
-        $array = explode(",", $this->getMessage());
+        $message = $this->convertNumber( $this->getMessage());
+        $array = explode(",",$message);
         $mobile = null;
         $fullName = null;
         foreach ($array as $item) {
