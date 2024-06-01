@@ -351,7 +351,8 @@ class TextServices
         logger("check message",[$this->checkText()]);
 
         if (!$this->checkText())
-            $this->telegram->sendMessage(['chat_id' => $this->user_id, 'text' => 'متن نا معتبر می باشد']);
+            return $this->telegram->sendMessage(['chat_id' => $this->user_id, 'text' => 'متن نا معتبر می باشد']);
+
         TextTelegram::create([
             "update_id" => data_get($this->update, 'update_id'),
             "message_id" => data_get($this->update, 'message.message_id'),
