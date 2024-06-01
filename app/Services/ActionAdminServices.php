@@ -197,7 +197,7 @@ class ActionAdminServices extends TextServices
                 $page = $users->currentPage();
                 $next = $users->nextPageUrl();
                 $pre = $users->previousPageUrl();
-                logger("page", [$next, $page, $pre]);
+                logger("page", [$next, $page, $pre,$users]);
                 $keyboard = [];
                 $i = 0;
 
