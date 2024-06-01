@@ -296,7 +296,7 @@ class TextServices
             "/help",
             "transfer_buy_true",
             "trade_number_limit",
-            "\xF0\x9F\x91\xA5	معرفی مشتری",
+            "👥\tمعرفی مشتری",
             "\xF0\x9F\x93\x88	معاملات باز",
             "\xF0\x9F\x93\x8B	لیست همکاران",
             "\xF0\x9F\x93\x9A	قوانین",
@@ -391,7 +391,7 @@ class TextServices
                 $this->telegram->sendMessage(['chat_id' => $this->user_id, 'text' => 'حد ثابت شد']);
                 cache()->forget($this->key_cache . $this->user_id);
                 break;
-            case "\xF0\x9F\x91\xA5	معرفی مشتری":
+            case "👥\tمعرفی مشتری":
             case "\xF0\x9F\x93\x88	معاملات باز":
             case "\xF0\x9F\x93\x8B	لیست همکاران":
             case "\xF0\x9F\x93\x9A	قوانین":
@@ -450,7 +450,7 @@ class TextServices
     private function getAction()
     {
             switch ($this->message) {
-                case "\xF0\x9F\x91\xA5	معرفی مشتری":
+                case "👥\tمعرفی مشتری":
                     $text =  "مشتری خود را به صورت زیر وارد کنید\n\n";
                     $text .= "موبایل:شماره موبایل,نام و نام خانوادگی :نام,حد:۳";
                     $text .= "\n\n";
