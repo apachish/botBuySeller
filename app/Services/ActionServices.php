@@ -47,13 +47,21 @@ class ActionServices extends TextServices
             $message .= "نام و نام خانوادگی:";
             $message .= $fullName;
             $message .= "\n\n";
-            $message = "شماره همراه:";
+            $message .= "شماره همراه:";
             $message .= $mobile;
             $message .= "\n\n";
             $message .= "حد مجاز:";
             $message .= $limit === null ? "آزاد" : $limit;
             $message .= "\n\n";
             $this->telegram_services->sendMessage($this->getUserId(), $message);
+            $message_share = "لینک را برای مشتری خود فورواد کرد تا پس از تایید  مدیر دسترسی به معامله خواهد داشت";
+            $message_share .= "\n\n";
+
+            $message_share .= "https://t.me/sell_buy_goldbot";
+            $this->telegram_services->sendMessage($this->getUserId(), $message_share);
+            cache()->forget($this->getKeyCache() . $this->getUserId());
+
+
 
         } else {
             $this->telegram_services->sendMessage($this->getUserId(), "اطلاعات وارد شده مشابه مثال باید باشه");
