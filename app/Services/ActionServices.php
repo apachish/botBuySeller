@@ -20,6 +20,8 @@ class ActionServices extends TextServices
     {
         $limit = null;
         $array = explode(",", $this->getMessage());
+        $mobile = null;
+        $fullName = null;
         foreach ($array as $item) {
             str_replace(":", "", $item);
             if (str_contains($item, "موبایل")) {
