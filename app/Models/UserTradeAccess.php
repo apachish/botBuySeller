@@ -8,7 +8,6 @@ use MongoDB\Laravel\Eloquent\SoftDeletes;
 
 class UserTradeAccess extends Model
 {
-    use SoftDeletes;
     protected $connection = "mongodb";
     protected $collection = 'user_trade_access_collection';
 
