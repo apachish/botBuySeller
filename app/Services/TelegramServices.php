@@ -96,7 +96,7 @@ class TelegramServices
             'reply_markup' => $reply_markup,
 
         ]);
-        logger("reponse", [$response]);
+        logger("reponse", [$response,$reply_markup]);
 
         if (data_get($response, "message_id"))
         {
