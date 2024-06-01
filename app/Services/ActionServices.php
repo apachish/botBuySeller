@@ -24,13 +24,13 @@ class ActionServices extends TextServices
         $mobile = null;
         $fullName = null;
         foreach ($array as $item) {
-            str_replace(":", "", $item);
+            $item = str_replace(":", "", $item);
             if (str_contains($item, "موبایل")) {
-                $mobile = $this->convertNumber(str_replace("موبایل", "", $item));
+                $mobile = str_replace("موبایل", "", $item);
             } elseif (str_contains($item, "نام ونام خانوادگی")) {
-                $fullName = $this->convertNumber(str_replace("نام ونام خانوادگی", "", $item));
+                $fullName = str_replace("نام ونام خانوادگی", "", $item);
             } elseif (str_contains($item, "حد")) {
-                $limit = $this->convertNumber(str_replace("حد", "", $item));
+                $limit = str_replace("حد", "", $item);
             }
         }
         if ($mobile && $fullName) {
