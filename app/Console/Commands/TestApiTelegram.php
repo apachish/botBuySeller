@@ -122,6 +122,7 @@ class TestApiTelegram extends Command
 
             $context = stream_context_create($options);
             $result = file_get_contents($url, false, $context);
+            logger("re",[$result]);
             $keyboard = [
                 'keyboard' => [
                     [['text' => 'دکمه 1'], ['text' => 'دکمه 2']],
@@ -149,6 +150,8 @@ class TestApiTelegram extends Command
 
             $context = stream_context_create($options);
             $result = file_get_contents($url, false, $context);
+            logger("re",[$result]);
+
         }
     }
 }
