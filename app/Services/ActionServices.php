@@ -7,6 +7,7 @@ use App\Models\CustomerUser;
 use App\Models\Setting;
 use App\Models\Transfer;
 use App\Models\UserTelegram;
+use App\Models\UserTradeAccess;
 use Carbon\Carbon;
 
 class ActionServices extends TextServices
@@ -16,15 +17,16 @@ class ActionServices extends TextServices
     {
         parent::__construct($token);
     }
+
     public function addCustomer()
     {
         $limit = null;
-        $message = $this->convertNumber( $this->getMessage());
-        $array = explode(",",$message);
+        $message = $this->convertNumber($this->getMessage());
+        $array = explode(",", $message);
         $mobile = null;
         $fullName = null;
         foreach ($array as $item) {
-            logger("item",[$item]);
+            logger("item", [$item]);
             $item = str_replace(":", "", $item);
             if (str_contains($item, "موبایل")) {
                 $mobile = str_replace("موبایل", "", $item);
@@ -34,7 +36,7 @@ class ActionServices extends TextServices
                 $limit = str_replace("حد", "", $item);
             }
         }
-        logger("item",[$mobile,$fullName,$limit]);
+        logger("item", [$mobile, $fullName, $limit]);
 
         if ($mobile && $fullName) {
             CustomerUser::updateOrCreate(["user_id" => $this->getUserId(), "mobile" => $mobile],
@@ -60,7 +62,6 @@ class ActionServices extends TextServices
             $message_share .= "https://t.me/sell_buy_goldbot";
             $this->telegram_services->sendMessage($this->getUserId(), $message_share);
             cache()->forget($this->getKeyCache() . $this->getUserId());
-
 
 
         } else {
@@ -169,7 +170,26 @@ class ActionServices extends TextServices
                 'chat_id' => $this->getUserId(),
                 'text' => "حد مجازی که می خواهید با $name_worker داشته باشید را وارد کنید "
             ]);
-            cache()->set("text_cache_" . $this->getUserId(), ["title" => "trade_number_limit", "value" => $worker->id]);
+            cache()->set($this->getKeyCache() . $this->getUserId(), ["title" => "trade_number_limit", "value" => $worker->id]);
+        }
+    }
+
+    public function tradeNumberLimit()
+    {
+        $data_cache = $this->getMessageCache();
+
+        $number = (int)$this->getMessage();
+        if (is_numeric($number)) {
+            $worker_id = (int)data_get($data_cache, "value");
+            UserTradeAccess::updateOrCreate([
+                "user_id" => $this->getUserId(),
+                "user_trade_id" => $worker_id,
+                "limit_access" => $number
+            ]);
+            $this->telegram->sendMessage(['chat_id' => $this->getUserId(), 'text' => 'حد ثابت شد']);
+            cache()->forget($this->getKeyCache() . $this->getUserId());
+        }else{
+            $this->telegram->sendMessage(['chat_id' => $this->getUserId(), 'text' => 'عدد وارد کنید']);
         }
     }
 

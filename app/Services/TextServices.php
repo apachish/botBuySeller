@@ -295,7 +295,6 @@ class TextServices
             "start",
             "/help",
             "transfer_buy_true",
-            "trade_number_limit",
             "\xF0\x9F\x91\xA5معرفی مشتری",
             "\xF0\x9F\x93\x88معاملات باز",
             "\xF0\x9F\x93\x8Bلیست همکاران",
@@ -385,16 +384,6 @@ class TextServices
             case '/help':
                 $this->telegram->sendMessage(['chat_id' => $this->user_id, 'text' => 'سلام! چطور می‌توانم به شما کمک کنم؟']);
                 break;
-            case "trade_number_limit":
-                $worker_id = (int)data_get($this->message_cache, "value");
-                UserTradeAccess::updateOrCreate([
-                    "user_id" => $this->user_id,
-                    "user_trade_id" => $worker_id,
-                    "limit_access" => $this->message
-                ]);
-                $this->telegram->sendMessage(['chat_id' => $this->user_id, 'text' => 'حد ثابت شد']);
-                cache()->forget($this->key_cache . $this->user_id);
-                break;
             case "\xF0\x9F\x91\xA5معرفی مشتری":
             case "\xF0\x9F\x93\x88معاملات باز":
             case "\xF0\x9F\x93\x8Bلیست همکاران":
@@ -449,6 +438,8 @@ class TextServices
                 $this->pendingAccept();
 
         }
+        elseif (is_array($this->message_cache) && str_contains(data_get($this->message_cache,"title"), "trade_number_limit"))
+            $this->tradeNumberLimit();
     }
 
     private function getAction()
