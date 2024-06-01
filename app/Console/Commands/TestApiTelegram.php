@@ -31,6 +31,8 @@ class TestApiTelegram extends Command
      */
     public function handle()
     {
+//        $t = new TelegramServices();
+//        $t->deleteMessage(70115829,845);
         $user = UserTelegram::where("id",70115829)->with("userTradeAccess")->first();
             logger("user",[$user]);exit;
         $token = $this->ask('What is  token bot?');

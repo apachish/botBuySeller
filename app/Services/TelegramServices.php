@@ -2,7 +2,6 @@
 
 namespace App\Services;
 
-use App\Models\MessageTelegram;
 use danog\MadelineProto\API;
 use danog\MadelineProto\RPCErrorException;
 use Telegram\Bot\Keyboard\Keyboard;
@@ -135,6 +134,12 @@ class TelegramServices
     {
         logger("aa", [$chat_id, $message_id, $keyboard]);
         $url = "https://api.telegram.org/bot$this->access_token/editMessageReplyMarkup";
+        $keyboard = [
+            'keyboard' => $keyboard,
+            'resize_keyboard' => true, // اندازه کیبورد را تغییر می‌دهد تا به صفحه کاربر بخورد
+            'one_time_keyboard' => false, // کیبورد پس از استفاده مخفی نمی‌شود
+            'input_field_placeholder' => 'یک گزینه را انتخاب کنید...' // متن جایگزین در فیلد ورودی
+        ];
         $post_fields = [
             'chat_id' => $chat_id,
             'message_id' => $message_id,
