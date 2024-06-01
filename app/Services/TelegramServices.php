@@ -129,31 +129,6 @@ class TelegramServices
 
         return json_decode($result, true);
     }
-    // تابع ویرایش کیبورد شیشه‌ای
-    public function editMessageReplyMarkup($chat_id, $message_id, $keyboard)
-    {
-        logger("aa", [$chat_id, $message_id, $keyboard]);
-        $url = "https://api.telegram.org/bot$this->access_token/editMessageReplyMarkup";
-        $keyboard = [
-            'keyboard' => $keyboard,
-            'resize_keyboard' => true,
-            'one_time_keyboard' => false
-        ];
-        $post_fields = [
-            'chat_id' => $chat_id,
-            'message_id' => $message_id,
-            'reply_markup' => json_encode($keyboard)
-        ];
-
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array("Content-Type:multipart/form-data"));
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $post_fields);
-        $r = curl_exec($ch);
-        curl_close($ch);
-        logger("rrr", [$r]);
-    }
 
 
     public function deleteKeyboard($chatId)
