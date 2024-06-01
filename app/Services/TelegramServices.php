@@ -192,7 +192,7 @@ class TelegramServices
     function editMessageTextAndInlineKeyboard($channel_chat_id, $message_id, $message, $keyboard = null)
     {
         logger("editMessageTextAndInlineKeyboard",[
-            $channel_chat_id, $message_id, $message, $keyboard = null
+            $channel_chat_id, $message_id, $message, $keyboard
         ]);
         $url = "https://api.telegram.org/bot$this->access_token/editMessageText";
 

@@ -180,6 +180,7 @@ class ActionServices extends TextServices
                         'text' => "  $text " . "\xE2\x9C\x85",
                         'callback_data' => "trade_limit_" . $worker->id
                     ];
+                    logger("close",[$this->getUserId(),data_get($message_menu,"id"),"لیست همکاران",$keyboard]);
                     $this->telegram_services->editMessageTextAndInlineKeyboard($this->getUserId(),data_get($message_menu,"id"),"لیست همکاران",$keyboard);
                 }
                 $limit_access->delete();
