@@ -183,8 +183,9 @@ class ActionServices extends TextServices
             $worker_id = (int)data_get($data_cache, "value");
             UserTradeAccess::updateOrCreate([
                 "user_id" => $this->getUserId(),
-                "user_trade_id" => $worker_id,
-                "limit_access" => $number
+                "user_trade_id" => $worker_id,],
+                [
+                    "limit_access" => $number
             ]);
             $this->telegram->sendMessage(['chat_id' => $this->getUserId(), 'text' => 'حد ثابت شد']);
             cache()->forget($this->getKeyCache() . $this->getUserId());
