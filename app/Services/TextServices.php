@@ -479,7 +479,7 @@ class TextServices
                 logger("page", [$next, $page, $pre]);
                 $keyboard = [];
                 $i = 0;
-                $userTradeAccess = collect($this->user->userTradeAccess);
+                $userTradeAccess = $this->user->userTradeAccess;
                 logger("userTradeAccess",[$userTradeAccess]);
                 $users->each(function ($user) use (&$keyboard, &$i,$userTradeAccess) {
                     $text = $user->fullName ?: $user->first_name . " " . $user->last_name;
