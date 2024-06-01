@@ -472,7 +472,9 @@ class TextServices
                 break;
 
             case "\xF0\x9F\x93\x8Bلیست همکاران":
-                $text = "لیست  همکاران";
+                $text = "      لیست  همکاران    ";
+                $text .= "\n\n";
+                $text .= "میزان حد معامله خود با همکاران خود مشخص کنید";
                 $users = UserTelegram::where("id", "!=", $this->user_id)
                     ->where("role", "colleague")
                     ->simplePaginate(5);

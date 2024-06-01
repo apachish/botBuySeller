@@ -213,7 +213,7 @@ class ActionServices extends TextServices
     {
         $data_cache = $this->getMessageCache();
 
-        $number = (int)$this->getMessage();
+        $number = (int)$this->convertNumber($this->getMessage());
         if (is_numeric($number)) {
             $worker_id = (int)data_get($data_cache, "value");
             UserTradeAccess::updateOrCreate([

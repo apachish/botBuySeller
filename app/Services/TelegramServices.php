@@ -5,6 +5,7 @@ namespace App\Services;
 use danog\MadelineProto\API;
 use danog\MadelineProto\RPCErrorException;
 use Telegram\Bot\Keyboard\Keyboard;
+use function Symfony\Component\Translation\t;
 
 class TelegramServices
 {
@@ -86,8 +87,8 @@ class TelegramServices
         logger("keyword", $keyboard);
         $reply_markup = Keyboard::make([
             'inline_keyboard' => $keyboard,
-            'resize_keyboard' => false,
-            'one_time_keyboard' => false
+            'resize_keyboard' => true,
+            'one_time_keyboard' => true
         ]);
 
         $response = $telegram->sendMessage([
