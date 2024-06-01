@@ -176,10 +176,10 @@ class ActionServices extends TextServices
                 if($message_menu){
                     $keyboard = data_get($message_menu,"keyboard");
                     $text = $worker->fullName ?: $worker->first_name . " " . $worker->last_name;
-                    $keyboard[$worker_i]=  [
+                    $keyboard[$worker_i]=  [[
                         'text' => "  $text " . "\xE2\x9C\x85",
                         'callback_data' => "trade_limit_" . $worker->id
-                    ];
+                    ]];
                     logger("close",[$this->getUserId(),data_get($message_menu,"id"),"لیست همکاران",$keyboard]);
                     $this->telegram_services->editMessageTextAndInlineKeyboard($this->getUserId(),data_get($message_menu,"id"),"لیست همکاران",$keyboard);
                 }
