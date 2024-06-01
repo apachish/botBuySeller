@@ -414,10 +414,11 @@ class TextServices
             $this->requestTransfer();
         elseif (str_contains($this->data, "transfer_buy_"))
             $this->transferBuy();
-        elseif (str_contains($this->data, "trade_limit_"))
-            $this->tradeLimit();
         elseif (str_contains($this->data, "trade_limit_close_"))
             $this->tradeLimitClose();
+        elseif (str_contains($this->data, "trade_limit_"))
+            $this->tradeLimit();
+
     }
 
     public function actionByCache()
