@@ -490,9 +490,9 @@ class TextServices
                     $limit_trade = $userTradeAccess->where("user_trade_id", $user->id)->first();
 
 
-                    logger('limit_trade', [$limit_trade, $limit_trade->count(), data_get($limit_trade, "limit_access")]);
+                    logger('limit_trade', [$limit_trade, data_get($limit_trade, "limit_access")]);
 
-                    if ($limit_trade->count())
+                    if ($limit_trade)
                         $keyboard[$i] = [
                             [
                                 'text' => "  مجاز تا " . data_get($limit_trade, "limit_access") . "  تا ",
