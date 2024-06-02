@@ -161,7 +161,7 @@ class ActionServices extends TextServices
             cache()->forget("transfer_cache_buy_" . $this->getUserId());
         }elseif($check == "false"){
             $this->telegram_services->editMessageReplyMarkup($this->getUserId(), $this->getMessageId(), new \stdClass());
-            $this->telegram_services->sendMessage($this->getUserId(), "لفظ شما رد شد\xE2\x9C\x85	");
+            $this->telegram_services->sendMessage($this->getUserId(), "لفظ شما رد شد\xE2\x9D\x8C	");
 
         }
     }
