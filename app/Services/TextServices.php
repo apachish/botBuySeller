@@ -325,6 +325,8 @@ class TextServices
         });
         if ($this->pattern && preg_match($this->pattern, $this->message))
             return true;
+        if($this->getTypeMessage() == "contact")
+            return true;
 
         return false;
     }
