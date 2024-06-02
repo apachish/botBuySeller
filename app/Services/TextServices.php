@@ -124,6 +124,8 @@ class TextServices
             $type = "my_chat_member";
         elseif (isset($this->update['callback_query']))
             $type = "callback_query";
+        elseif (isset($this->update['contact']))
+            $type = "contact";
         else
             $type = "message";
 
