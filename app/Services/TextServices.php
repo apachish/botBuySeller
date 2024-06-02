@@ -30,7 +30,7 @@ class TextServices
 
     public $data;
 
-    private $bot;
+    protected $bot;
 
     protected $telegram;
 
@@ -295,7 +295,6 @@ class TextServices
             "/start",
             "start",
             "/help",
-            "transfer_buy_true",
             "\xF0\x9F\x91\xA5معرفی مشتری",
             "\xF0\x9F\x93\x88معاملات باز",
             "\xF0\x9F\x93\x8Bلیست همکاران",

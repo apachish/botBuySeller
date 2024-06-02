@@ -3,6 +3,7 @@
 namespace App\Services;
 
 
+use App\Jobs\DeactivateTransfer;
 use App\Models\CustomerUser;
 use App\Models\MessageTelegram;
 use App\Models\Setting;
@@ -137,25 +138,26 @@ class ActionServices extends TextServices
 
     public function transferBuy()
     {
-        $array = str_replace('request_transfer_', '', $this->getData());
-        $info = explode("_", $array);
-        $id = data_get($info, 0);
-        $num = data_get($info, 1);
-        $transfer = Transfer::find($id);
-        if ($transfer) {
-            try {
-                if ($transfer->number >= $num)
-                    $transfer->number -= $num;
-                $keyboard["inline_keyboard"] = self::getKeyboardRequest($transfer);
+        $array = cache()->get("transfer_cache_buy_" . $this->getUserId());
+        logger("transfer_cache_buy_", [$array]);
+        Transfer::where("user_id", $this->getUserId())->where("type", "خ")->delete();
+        $transfer_new = Transfer::create($array);
+        logger("a", [$this->getUserId(), $this->getMessageId(), []]);
+        $this->telegram_services->editMessageReplyMarkup($this->getUserId(), $this->getMessageId(), new \stdClass());
+        $this->telegram_services->sendMessage($this->getUserId(), "لفظ شما تایید شد\xE2\x9C\x85	");
+        $price = number_format($transfer_new->price, 0);
+        $number = $transfer_new->number;
+        $message = "$price \xF0\x9F\x94\xB5	خرید \xE2\x8F\xB3	 با حواله $number تا ";
 
+        $keyboard = $this->getKeyboardRequest($number, $transfer_new);
 
-                $this->telegram_services->editMessageReplyMarkup($this->getUserId(), $transfer->message_id, $keyboard);
-                $transfer->update();
-            } catch (\Exception $e) {
-
-                logger("exp", [$e->getMessage(), $e->getLine()]);
-            }
-        }
+        logger("test", [$this->bot->chanel_id, $message, $keyboard]);
+        $message_result = $this->telegram_services->MessageReplyMarkup($this->telegram, $this->bo->chanel_id, $message, $keyboard);
+        $transfer_new->message_id = data_get($message_result, 'message_id');
+        $transfer_new->message = $message;
+        $transfer_new->update();
+        dispatch(new DeactivateTransfer($transfer_new->id))->delay(now()->addMinute(1));
+        cache()->forget("transfer_cache_buy_" . $this->getUserId());
     }
 
     public function tradeLimitClose()
