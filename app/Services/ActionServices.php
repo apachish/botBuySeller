@@ -127,7 +127,7 @@ class ActionServices extends TextServices
                 $keyboard = self::getKeyboardRequest($transfer);
 
 
-                $this->telegram_services->editMessageTextAndInlineKeyboard($this->getUserId(), $transfer->message_id,$transfer->message, $keyboard);
+                $this->telegram_services->editMessageTextAndInlineKeyboard($this->bot->chanel_id, $transfer->message_id,$transfer->message, $keyboard);
                 $transfer->update();
             } catch (\Exception $e) {
 
