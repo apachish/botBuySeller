@@ -314,7 +314,13 @@ class TextServices
                 $this->setPattern();
             }
         });
-        logger("aa", [$this->pattern, $this->message,preg_match($this->pattern, $this->message)]);
+        logger("aa", [
+            $this->pattern,
+            $this->message,
+            preg_match($this->pattern, $this->message),
+            $this->getType(),
+            $this->pattern && preg_match($this->pattern, $this->message)
+        ]);
         if ($this->pattern && preg_match($this->pattern, $this->message))
             return true;
 

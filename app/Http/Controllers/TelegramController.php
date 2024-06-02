@@ -35,6 +35,7 @@ class TelegramController extends Controller
         if($text_services->getData())
             $text_services->actionByData();
 
+        logger("dd",[$text_services->checkText()]);
         if($text_services->getMessage() && $text_services->checkText())
             $text_services->actionByMessage();
         elseif($text_services->getMessageCache())
