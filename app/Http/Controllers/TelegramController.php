@@ -35,10 +35,11 @@ class TelegramController extends Controller
         if($text_services->getData())
             $text_services->actionByData();
 
-        if($text_services->getMessage() && $text_services->checkText())
-            $text_services->actionByMessage();
         elseif($text_services->getMessageCache())
             $text_services->actionByCache();
+        if($text_services->getMessage() && $text_services->checkText())
+            $text_services->actionByMessage();
+
 
 
         $i = 0;
