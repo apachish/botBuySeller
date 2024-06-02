@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Bot;
 use App\Models\BotMenuUser;
+use App\Models\CustomerUser;
 use App\Models\Setting;
 use App\Models\TextTelegram;
 use App\Models\Transfer;
@@ -176,6 +177,11 @@ class TextServices
                     "language_code" => data_get($update, $type . '.from.language_code'),
                 ]);
                 $this->sendMessageNewUser();
+                CustomerUser::updateOrCreate(["user_id" => $this->getUserId(), "mobile" => data_get($update, $type . '.mobile')],
+                    [
+                        "fullName" => "خودم",
+                        "limit" => null
+                    ]);
             }
         }
         $this->user = $user_telegram;
