@@ -215,7 +215,7 @@ class TextServices
      */
     public function setMessage(): void
     {
-        $this->message = isset($this->update['message']['text']) ? $this->update['message']['text'] : null;
+        $this->message = isset($this->update['message']['text']) ? $this->convertNumber($this->update['message']['text']) : null;
         logger("message", [$this->message]);
     }
 
