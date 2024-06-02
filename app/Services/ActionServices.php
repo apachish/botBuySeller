@@ -124,7 +124,7 @@ class ActionServices extends TextServices
             try {
                 if ($transfer->number >= $num)
                     $transfer->number -= $num;
-                $keyboard["inline_keyboard"] = self::getKeyboardRequest($transfer);
+                $keyboard = self::getKeyboardRequest($transfer);
 
 
                 $this->telegram_services->editMessageTextAndInlineKeyboard($this->getUserId(), $transfer->message_id,$transfer->message, $keyboard);
