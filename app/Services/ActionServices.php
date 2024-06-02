@@ -296,7 +296,7 @@ class ActionServices extends TextServices
             $message = $price_format;
             if (in_array($this->getType(), $this->list_type_buy))
                 $message .= " \xF0\x9F\x94\xB5	خرید";
-            elseif (in_array($this->getType(), $this->list_type_buy))
+            elseif (in_array($this->getType(), $this->list_type_sell))
                 $message .= " \xF0\x9F\x94\xB4	فروش";
             $time = Carbon::now();
             $morning = Carbon::create($time->year, $time->month, $time->day, 10, 0, 0); //set time to 08:00
