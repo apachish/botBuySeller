@@ -224,6 +224,8 @@ class TextServices
     public function setMessage(): void
     {
         $this->message = isset($this->update['message']['text']) ? $this->convertNumber($this->update['message']['text']) : null;
+        if (!$this->message && isset($this->update['message']['contact']["phone_number"]))
+            $this->message = $this->convertNumber($this->update['message']['contact']["phone_number"]);
         logger("message", [$this->message]);
     }
 
@@ -372,7 +374,7 @@ class TextServices
             "text" => data_get($this->update, 'message.text'),
             "data" => json_encode($this->update)
         ]);
-        if($this->getTypeMessage()=="contact"){
+        if ($this->getTypeMessage() == "contact") {
             logger("add mobile");
             $this->addMobile();
             return true;
@@ -392,7 +394,7 @@ class TextServices
 
                 } elseif (!$this->user->mobile) {
                     $text = "ممنون شماره خود را به اشتراک بگذارید";
-                    $this->telegram_services->sendRequestContactButton($this->getUserId(),$text);
+                    $this->telegram_services->sendRequestContactButton($this->getUserId(), $text);
                 }
 
                 break;
