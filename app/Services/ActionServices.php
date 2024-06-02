@@ -74,8 +74,9 @@ class ActionServices extends TextServices
 
     public function addMobile()
     {
-        $mobile = $this->convertNumber($this->message);
-        if ($this->iranMobile($mobile)) {
+        $mobile = data_get($this->update,"message.contact.phone_number");
+        $mobile = $this->convertNumber($mobile);
+        if ($mobile) {
             $this->getUser()->mobile = $mobile;
             $this->getUser()->update();
             if (!$this->getUser()->fullName) {
