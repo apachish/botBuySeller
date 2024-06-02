@@ -231,14 +231,14 @@ class ActionServices extends TextServices
 
     public function checkWord()
     {
-        $start_trade = cache()->remember("s_price_trade", now()->addDay(1), function () {
-            $value = 14000000;
+        $limit_trade = cache()->remember("s_price_trade", now()->addDay(1), function () {
+            $value = ["start"=>14000000,"end"=>15000000];
             $setting = Setting::where("key", "s_price_trade")->first();
             if ($setting)
-                $value = (int)data_get($setting, "value");
+                $value = data_get($setting, "value");
             return $value;
         });
-        logger("start_trade", [$start_trade]);
+        logger("limit_trade", [$limit_trade]);
 
 
         $array = explode($this->getType(), $this->message);
@@ -246,7 +246,20 @@ class ActionServices extends TextServices
 
         if (isset($array_desc[1]))
             $description = $array_desc[1];
-        $price = $start_trade + ((int)data_get($array, 0) * 1000);
+
+        $suggest_price = data_get($array, 0);
+
+        // طول رشته عدد را محاسبه کنید
+        $length = strlen($suggest_price);
+
+        // بررسی کنید که آیا طول عدد 3 یا 5 است
+        if ($length === 3 )
+            $start_trade = ((int)data_get($limit_trade,"start")/1000000)*1000000;
+        elseif($length === 5 )
+            $start_trade = ((int)($suggest_price*1000)/1000000)*1000000;
+
+
+        $price = $start_trade + ( $suggest_price* 1000);
 
         $number = (int)data_get($array, 1, 1);
         logger("check_transfer", [$price, $number, $array]);
