@@ -373,6 +373,7 @@ class TextServices
             "data" => json_encode($this->update)
         ]);
         if($this->getTypeMessage()=="contact"){
+            logger("add mobile");
             $this->addMobile();
             return true;
         }

@@ -76,6 +76,7 @@ class ActionServices extends TextServices
     {
         $mobile = data_get($this->update,"message.contact.phone_number");
         $mobile = $this->convertNumber($mobile);
+        logger("mobile", [$mobile]);
         if ($mobile) {
             $this->getUser()->mobile = $mobile;
             $this->getUser()->update();
