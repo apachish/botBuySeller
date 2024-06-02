@@ -50,7 +50,7 @@ class TextServices
     private $user_id;
 
     private $key_cache;
-
+    private $contact;
 
     public function __construct($token)
     {
@@ -222,8 +222,6 @@ class TextServices
     public function setMessage(): void
     {
         $this->message = isset($this->update['message']['text']) ? $this->convertNumber($this->update['message']['text']) : null;
-        if (!$this->message && isset($this->update['message']['contact']["phone_number"]))
-            $this->message = $this->convertNumber($this->update['message']['contact']["phone_number"]);
         logger("message", [$this->message]);
     }
 
@@ -296,6 +294,23 @@ class TextServices
         logger("pattern", [$this->pattern, $this->type]);
     }
 
+    /**
+     * @return mixed
+     */
+    public function getContact()
+    {
+        return $this->contact;
+    }
+
+    /**
+     * @param mixed $contact
+     */
+    public function setContact(): void
+    {
+        if (isset($this->update['message']['contact']["phone_number"]))
+            $this->contact = $this->convertNumber($this->update['message']['contact']["phone_number"]);
+    }
+
     public function checkText()
     {
 
@@ -323,7 +338,7 @@ class TextServices
         });
         if ($this->pattern && preg_match($this->pattern, $this->message))
             return true;
-        if($this->getTypeMessage() == "contact")
+        if($this->contact)
             return true;
 
         return false;
@@ -374,7 +389,7 @@ class TextServices
             "text" => data_get($this->update, 'message.text'),
             "data" => json_encode($this->update)
         ]);
-        if ($this->getTypeMessage() == "contact") {
+        if ($this->contact) {
             logger("add mobile");
             $this->addMobile();
             return true;
