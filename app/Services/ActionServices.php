@@ -337,7 +337,7 @@ class ActionServices extends TextServices
      * @param \Illuminate\Database\Eloquent\Model|Transfer $transfer_new
      * @return mixed
      */
-    public static function getKeyboardRequest(Transfer $transfer_new): mixed
+    public static function getKeyboardRequest($transfer_new): mixed
     {
         $m = 0;
         $k = 0;
