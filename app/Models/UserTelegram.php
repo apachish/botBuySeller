@@ -40,6 +40,10 @@ class UserTelegram extends Model
         return $this->hasMany(UserTradeAccess::class,"user_id","id");
     }
 
+    public function customerUser()
+    {
+        return $this->hasMany(CustomerUser::class,"user_id","id");
+    }
 
 
 }

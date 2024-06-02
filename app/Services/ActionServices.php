@@ -140,24 +140,30 @@ class ActionServices extends TextServices
     {
         $array = cache()->get("transfer_cache_buy_" . $this->getUserId());
         logger("transfer_cache_buy_", [$array]);
-        Transfer::where("user_id", $this->getUserId())->where("type", "خ")->delete();
-        $transfer_new = Transfer::create($array);
-        logger("a", [$this->getUserId(), $this->getMessageId(), []]);
-        $this->telegram_services->editMessageReplyMarkup($this->getUserId(), $this->getMessageId(), new \stdClass());
-        $this->telegram_services->sendMessage($this->getUserId(), "لفظ شما تایید شد\xE2\x9C\x85	");
-        $price = number_format($transfer_new->price, 0);
-        $number = $transfer_new->number;
-        $message = "$price \xF0\x9F\x94\xB5	خرید \xE2\x8F\xB3	 با حواله $number تا ";
+        $check = str_replace('transfer_buy_', '', $this->getData());
 
-        $keyboard = $this->getKeyboardRequest( $transfer_new);
+        if($check == "true") {
+            Transfer::where("user_id", $this->getUserId())
+                ->where("type", data_get($array,"type"))
+                ->delete();
+            $transfer_new = Transfer::create($array);
+            logger("a", [$this->getUserId(), $this->getMessageId(), []]);
+            $this->telegram_services->editMessageReplyMarkup($this->getUserId(), $this->getMessageId(), new \stdClass());
+            $this->telegram_services->sendMessage($this->getUserId(), "لفظ شما تایید شد\xE2\x9C\x85	");
+            $message = $transfer_new->message;
+            $keyboard = $this->getKeyboardRequest($transfer_new);
 
-        logger("test", [$this->bot->chanel_id, $message, $keyboard]);
-        $message_result = $this->telegram_services->MessageReplyMarkup($this->telegram, $this->bot->chanel_id, $message, $keyboard);
-        $transfer_new->message_id = data_get($message_result, 'message_id');
-        $transfer_new->message = $message;
-        $transfer_new->update();
-        dispatch(new DeactivateTransfer($transfer_new->id))->delay(now()->addMinute(1));
-        cache()->forget("transfer_cache_buy_" . $this->getUserId());
+            logger("test", [$this->bot->chanel_id, $message, $keyboard]);
+            $message_result = $this->telegram_services->MessageReplyMarkup($this->telegram, $this->bot->chanel_id, $message, $keyboard);
+            $transfer_new->message_id = data_get($message_result, 'message_id');
+            $transfer_new->update();
+            dispatch(new DeactivateTransfer($transfer_new->id))->delay(now()->addMinute(1));
+            cache()->forget("transfer_cache_buy_" . $this->getUserId());
+        }elseif($check == "false"){
+            $this->telegram_services->editMessageReplyMarkup($this->getUserId(), $this->getMessageId(), new \stdClass());
+            $this->telegram_services->sendMessage($this->getUserId(), "لفظ شما رد شد\xE2\x9D\x8C	");
+
+        }
     }
 
     public function tradeLimitClose()
@@ -285,18 +291,12 @@ class ActionServices extends TextServices
             $message .= number_format($check_transfer->price, 0);
             $this->telegram_services->sendMessage($this->getUserId(), $message);
         } else {
-            cache()->set("transfer_cache_buy_" . $this->getUserId(), [
-                "user_id" => $this->getUserId(),
-                "type" => $this->getType(),
-                "number" => $number,
-                "price" => $price,
-                "status" => 0
-            ]);
+
             $price_format = number_format($price, 0);
             $message = $price_format;
             if (in_array($this->getType(), $this->list_type_buy))
                 $message .= " \xF0\x9F\x94\xB5	خرید";
-            elseif (in_array($this->getType(), $this->list_type_buy))
+            elseif (in_array($this->getType(), $this->list_type_sell))
                 $message .= " \xF0\x9F\x94\xB4	فروش";
             $time = Carbon::now();
             $morning = Carbon::create($time->year, $time->month, $time->day, 10, 0, 0); //set time to 08:00
@@ -322,6 +322,14 @@ class ActionServices extends TextServices
                 $message .= "با حواله";
             $message .= $number;
             $message .= "تا";
+            cache()->set("transfer_cache_buy_" . $this->getUserId(), [
+                "user_id" => $this->getUserId(),
+                "type" => $this->getType(),
+                "number" => $number,
+                "price" => $price,
+                "status" => 0,
+                "message"=>$message
+            ]);
             $keyboard[0] = [
                 ['text' => "\xE2\x9C\x85	تایید", 'callback_data' => "transfer_buy_true"],
                 ['text' => "\xE2\x9D\x8C	رد", 'callback_data' => "transfer_buy_false"],

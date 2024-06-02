@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Bot;
 use App\Models\BotMenuUser;
+use App\Models\CustomerUser;
 use App\Models\Setting;
 use App\Models\TextTelegram;
 use App\Models\Transfer;
@@ -176,6 +177,11 @@ class TextServices
                     "language_code" => data_get($update, $type . '.from.language_code'),
                 ]);
                 $this->sendMessageNewUser();
+                CustomerUser::updateOrCreate(["user_id" => $this->getUserId(), "mobile" => data_get($update, $type . '.mobile')],
+                    [
+                        "fullName" => "خودم",
+                        "limit" => null
+                    ]);
             }
         }
         $this->user = $user_telegram;
@@ -465,7 +471,7 @@ class TextServices
 
                 break;
             case "\xF0\x9F\x93\x88معاملات باز":
-                $worker = UserTelegram::where("user_id", $this->user_id)->get();
+                $worker = UserTelegram::where("user_id", $this->user_id)->whereHas("customerUser")->get();
                 $keyboard = [];
                 $i = 0;
                 $worker->each(function ($row) use (&$i, &$keyboard) {
