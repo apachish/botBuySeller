@@ -389,11 +389,6 @@ class TextServices
             "text" => data_get($this->update, 'message.text'),
             "data" => json_encode($this->update)
         ]);
-        if ($this->contact) {
-            logger("add mobile");
-            $this->addMobile();
-            return true;
-        }
         if ($this->pattern && preg_match($this->pattern, $this->message))
             return $this->checkWord();
 
