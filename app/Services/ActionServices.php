@@ -152,7 +152,7 @@ class ActionServices extends TextServices
         $keyboard = $this->getKeyboardRequest( $transfer_new);
 
         logger("test", [$this->bot->chanel_id, $message, $keyboard]);
-        $message_result = $this->telegram_services->MessageReplyMarkup($this->telegram, $this->bo->chanel_id, $message, $keyboard);
+        $message_result = $this->telegram_services->MessageReplyMarkup($this->telegram, $this->bot->chanel_id, $message, $keyboard);
         $transfer_new->message_id = data_get($message_result, 'message_id');
         $transfer_new->message = $message;
         $transfer_new->update();
