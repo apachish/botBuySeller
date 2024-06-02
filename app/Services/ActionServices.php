@@ -354,7 +354,7 @@ class ActionServices extends TextServices
             }
         }
         if (!$keyboard)
-            $keyboard = new \stdClass();
+            $keyboard = null;
         logger("key", [$keyboard]);
         return $keyboard;
     }
