@@ -97,7 +97,11 @@ class ActionServices extends TextServices
     {
         $this->getUser()->fullName = $this->message;
         $this->getUser()->update();
-        if (!$this->getUser()->status) {
+        if($this->getUser()->mobile) {
+            $text = "ممنون شماره خود را به اشتراک بگذارید";
+            $this->telegram_services->sendRequestContactButton($this->getUserId(), $text);
+        }
+        elseif (!$this->getUser()->status) {
             cache()->set($this->getKeyCache() . $this->getUserId(), "pending_accept");
             $text = "منتظر تایید مدیر سیستم باشید تا دسترسی به شما ارائه گردد";
             $this->telegram->sendMessage(['chat_id' => $this->getUserId(), 'text' => $text]);
