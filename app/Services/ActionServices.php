@@ -149,7 +149,7 @@ class ActionServices extends TextServices
         $number = $transfer_new->number;
         $message = "$price \xF0\x9F\x94\xB5	خرید \xE2\x8F\xB3	 با حواله $number تا ";
 
-        $keyboard = $this->getKeyboardRequest($number, $transfer_new);
+        $keyboard = $this->getKeyboardRequest( $transfer_new);
 
         logger("test", [$this->bot->chanel_id, $message, $keyboard]);
         $message_result = $this->telegram_services->MessageReplyMarkup($this->telegram, $this->bo->chanel_id, $message, $keyboard);
@@ -337,7 +337,7 @@ class ActionServices extends TextServices
      * @param \Illuminate\Database\Eloquent\Model|Transfer $transfer_new
      * @return mixed
      */
-    public static function getKeyboardRequest($transfer_new): mixed
+    public static function getKeyboardRequest(Transfer $transfer_new): mixed
     {
         $m = 0;
         $k = 0;
