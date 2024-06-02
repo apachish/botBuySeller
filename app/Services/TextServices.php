@@ -329,6 +329,7 @@ class TextServices
     public function checkData()
     {
         if (str_contains($this->data, "request_transfer_") ||
+            str_contains($this->data, "transfer_buy_") ||
             str_contains($this->data, "trade_limit_") ||
             str_contains($this->data, "trade_limit_close_"))
             return true;
