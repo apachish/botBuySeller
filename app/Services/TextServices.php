@@ -384,6 +384,7 @@ class TextServices
             case '/start':
             case 'start':
                 $text = $this->user->status ? "خوش آمدید" : "منتظر تایید مدیر سیستم باشید تا دسترسی به شما ارائه گردد";
+            $type_add =  null;
                 if (!$this->user->mobile) {
                     $text = "شماره موبایل خود را وارد کنید";
                     $type_add = "add_mobile";
@@ -392,8 +393,10 @@ class TextServices
                     $type_add = "add_fullName";
 
                 }
-                cache()->set($this->key_cache . $this->user_id, $type_add);
-                $this->telegram->sendMessage(['chat_id' => $this->user_id, 'text' => $text]);
+                if($type_add) {
+                    cache()->set($this->key_cache . $this->user_id, $type_add);
+                    $this->telegram->sendMessage(['chat_id' => $this->user_id, 'text' => $text]);
+                }
                 break;
             case '/help':
                 $this->telegram->sendMessage(['chat_id' => $this->user_id, 'text' => 'سلام! چطور می‌توانم به شما کمک کنم؟']);
