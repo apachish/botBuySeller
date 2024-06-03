@@ -237,6 +237,16 @@ class ActionServices extends TextServices
         }
     }
 
+    public function rejectAll()
+    {
+        $transfers = Transfer::where("user_id", $this->getUserId())
+            ->whereIn("status", [Transfer::STATUS_ACTIVE,Transfer::STATUS_ACTIVE_DO])
+            ->get();
+        foreach ($transfers as $transfer){
+            $message = $transfer->message."\xF0\x9F\x9A\xAB";
+            $this->getTelegramServices()->editMessageTextAndInlineKeyboard($this->bot->chanel_id, $transfer->message_id, $message);
+        }
+    }
     public function checkWord()
     {
         $limit_trade = cache()->remember("s_price_trade", now()->addDay(1), function () {
