@@ -318,6 +318,8 @@ class TextServices
             "/start",
             "start",
             "/help",
+            "نشد",
+            "ن",
             "\xF0\x9F\x91\xA5معرفی مشتری",
             "\xF0\x9F\x93\x88معاملات باز",
             "\xF0\x9F\x93\x8Bلیست همکاران",
