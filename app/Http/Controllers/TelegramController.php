@@ -29,15 +29,18 @@ class TelegramController extends Controller
         $text_services->setKeyCache($key_cache);
         $text_services->setData();
         $text_services->setMessage();
+        $text_services->setContact();
         $text_services->setMessageCache();
         $text_services->setUser();
 
         if($text_services->getData())
             $text_services->actionByData();
 
+        elseif($text_services->getContact())
+            $text_services->addMobile();
         elseif($text_services->getMessageCache())
             $text_services->actionByCache();
-        if($text_services->getMessage() && $text_services->checkText())
+        elseif($text_services->getMessage() && $text_services->checkText())
             $text_services->actionByMessage();
 
 

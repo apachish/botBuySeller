@@ -410,4 +410,37 @@ class TelegramServices
 
     }
 
+    function sendRequestContactButton($chat_id,$text) {
+        $url = "https://api.telegram.org/bot$this->access_token/sendMessage";
+
+        $keyboard = [
+            'keyboard' => [
+                [
+                    [
+                        'text' => 'ارسال شماره تلفن',
+                        'request_contact' => true
+                    ]
+                ]
+            ],
+            'resize_keyboard' => true,
+            'one_time_keyboard' => true
+        ];
+
+        $post_fields = [
+            'chat_id' => $chat_id,
+            'text' => $text,
+            'reply_markup' => json_encode($keyboard)
+        ];
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array("Content-Type:application/json"));
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($post_fields));
+        $result = curl_exec($ch);
+        curl_close($ch);
+
+        return json_decode($result, true);
+    }
+
 }

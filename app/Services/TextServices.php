@@ -43,14 +43,14 @@ class TextServices
 
     private $token;
 
-    private $update;
+    protected $update;
 
     private $user;
 
     private $user_id;
 
     private $key_cache;
-
+    private $contact;
 
     public function __construct($token)
     {
@@ -294,6 +294,23 @@ class TextServices
         logger("pattern", [$this->pattern, $this->type]);
     }
 
+    /**
+     * @return mixed
+     */
+    public function getContact()
+    {
+        return $this->contact;
+    }
+
+    /**
+     * @param mixed $contact
+     */
+    public function setContact(): void
+    {
+        if (isset($this->update['message']['contact']["phone_number"]))
+            $this->contact = $this->convertNumber($this->update['message']['contact']["phone_number"]);
+    }
+
     public function checkText()
     {
 
@@ -320,6 +337,8 @@ class TextServices
             }
         });
         if ($this->pattern && preg_match($this->pattern, $this->message))
+            return true;
+        if($this->contact)
             return true;
 
         return false;
@@ -377,19 +396,17 @@ class TextServices
             case '/start':
             case 'start':
                 $text = $this->user->status ? "خوش آمدید" : "منتظر تایید مدیر سیستم باشید تا دسترسی به شما ارائه گردد";
-            $type_add =  null;
-                if (!$this->user->mobile) {
-                    $text = "شماره موبایل خود را وارد کنید";
-                    $type_add = "add_mobile";
-                } elseif (!$this->user->fullName) {
-                    $text = "نام و نام خانوادگی خود را وارد کنید";
-                    $type_add = "add_fullName";
-
-                }
-                if($type_add) {
-                    cache()->set($this->key_cache . $this->user_id, $type_add);
+                $type_add = null;
+                if (!$this->user->fullName) {
+                    $text = "سلام به طبیعت گردی خوش آمدین لطفاٌ نام و نام خانوادگی وارد کنید";
+                    cache()->set($this->key_cache . $this->user_id, "add_fullName");
                     $this->telegram->sendMessage(['chat_id' => $this->user_id, 'text' => $text]);
+
+                } elseif (!$this->user->mobile) {
+                    $text = "ممنون شماره خود را به اشتراک بگذارید";
+                    $this->telegram_services->sendRequestContactButton($this->getUserId(), $text);
                 }
+
                 break;
             case '/help':
                 $this->telegram->sendMessage(['chat_id' => $this->user_id, 'text' => 'سلام! چطور می‌توانم به شما کمک کنم؟']);
@@ -516,7 +533,7 @@ class TextServices
                             ],
                             [
                                 'text' => "  $text " . "\xE2\x9D\x8C",
-                                'callback_data' => "trade_limit_close_" . $user->id."_".$i
+                                'callback_data' => "trade_limit_close_" . $user->id . "_" . $i
                             ]
                         ];
                     else
