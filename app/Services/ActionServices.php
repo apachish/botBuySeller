@@ -152,6 +152,7 @@ class ActionServices extends TextServices
             Transfer::where("user_id", $this->getUserId())
                 ->where("type", data_get($array,"type"))
                 ->delete();
+            $array["status"]= Transfer::STATUS_ACTIVE;
             $transfer_new = Transfer::create($array);
             logger("a", [$this->getUserId(), $this->getMessageId(), []]);
             $this->telegram_services->editMessageReplyMarkup($this->getUserId(), $this->getMessageId(), new \stdClass());
@@ -245,13 +246,23 @@ class ActionServices extends TextServices
 
     public function rejectAll()
     {
+        $result =  false;
         $transfers = Transfer::where("user_id", $this->getUserId())
             ->whereIn("status", [Transfer::STATUS_ACTIVE,Transfer::STATUS_ACTIVE_DO])
             ->get();
+        $i = 1;
         foreach ($transfers as $transfer){
             $message = $transfer->message."\xF0\x9F\x9A\xAB";
+
             $this->getTelegramServices()->editMessageTextAndInlineKeyboard($this->bot->chanel_id, $transfer->message_id, $message);
+            $transfer->status = Transfer::STATUS_DEACTIVATE;
+            $transfer->update();
+            $transfer->delete();
+            $i++;
         }
+        if($transfers->count() && $i == $transfers->count())
+            return true;
+        return $result;
     }
     public function checkWord()
     {
@@ -343,7 +354,7 @@ class ActionServices extends TextServices
                 "type" => $this->getType(),
                 "number" => $number,
                 "price" => $price,
-                "status" => 0,
+                "status" => Transfer::STATUS_PENDING,
                 "message"=>$message
             ]);
             $keyboard[0] = [

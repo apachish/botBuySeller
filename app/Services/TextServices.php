@@ -415,8 +415,8 @@ class TextServices
                 break;
             case 'ن':
             case 'نشد':
-                $this->rejectAll();
-                $this->telegram->sendMessage(['chat_id' => $this->user_id, 'text' => 'لفظ های شما کنسل شد']);
+                if($this->rejectAll())
+                    $this->telegram->sendMessage(['chat_id' => $this->user_id, 'text' => 'لفظ های شما کنسل شد']);
             break;
             case "\xF0\x9F\x91\xA5معرفی مشتری":
             case "\xF0\x9F\x93\x88معاملات باز":
