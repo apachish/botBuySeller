@@ -28,31 +28,34 @@ class DeleteMessageChanel extends Command
     {
         $bot = Bot::where("title","botUser")->first();
 
-        logger("delete Message");
-        $updates = $this->getUpdates($bot->token);
+        if($bot) {
+            logger("delete Message");
+            $updates = $this->getUpdates($bot->token);
 
 // تعیین تاریخ مورد نظر
-        $targetDate = now()->subDay(1); // تاریخ مورد نظر برای حذف پیام‌ها (فرمت YYYY-MM-DD)
+            $targetDate = now()->subDay(1); // تاریخ مورد نظر برای حذف پیام‌ها (فرمت YYYY-MM-DD)
 
-        foreach ($updates['result'] as $update) {
-            if (isset($update['channel_post'])) {
-                $message = $update['channel_post'];
-                $messageId = $message['message_id'];
-                $messageDate = date('Y-m-d', $message['date']);
+            foreach ($updates['result'] as $update) {
+                if (isset($update['channel_post'])) {
+                    $message = $update['channel_post'];
+                    $messageId = $message['message_id'];
+                    $messageDate = date('Y-m-d', $message['date']);
 
-                // چک کردن تاریخ پیام
-                if ($messageDate <= $targetDate) {
-                    // حذف پیام
-                    $result = $this->deleteMessage($bot->token, $bot->chanel_id, $messageId);
-                    if ($result['ok']) {
-                        echo "پیام با شناسه $messageId حذف شد.\n";
-                    } else {
-                        echo "خطا در حذف پیام با شناسه $messageId: " . $result['description'] . "\n";
+                    // چک کردن تاریخ پیام
+                    if ($messageDate <= $targetDate) {
+                        // حذف پیام
+                        logger("aaaaa",[$bot,$messageDate,$bot->token, $bot->chanel_id, $messageId,$message]);
+                        $result = $this->deleteMessage($bot->token, $bot->chanel_id, $messageId);
+                        if ($result['ok']) {
+                            echo "پیام با شناسه $messageId حذف شد.\n";
+                        } else {
+                            echo "خطا در حذف پیام با شناسه $messageId: " . $result['description'] . "\n";
+                        }
                     }
                 }
             }
+            logger("end delete Message");
         }
-        logger("end delete Message");
 
     }
 
