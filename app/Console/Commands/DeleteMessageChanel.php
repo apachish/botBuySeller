@@ -60,9 +60,12 @@ class DeleteMessageChanel extends Command
     }
 
     function getUpdates($apiToken) {
-        $url = "https://api.telegram.org/bot$apiToken/getUpdates";
-        $response = file_get_contents($url);
-        return json_decode($response, true);
+//        $url = "https://api.telegram.org/bot$apiToken/getUpdates";
+//        $response = file_get_contents($url);
+        $content = file_get_contents("php://input");
+        $update = json_decode($content, true);
+        logger("ghazal",[$update]);
+        return $update;
     }
 
 // تابع برای حذف پیام
