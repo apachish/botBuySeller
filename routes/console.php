@@ -2,7 +2,8 @@
 
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
-
+use Illuminate\Support\Facades;
+use Illuminate\Console\Scheduling\Schedule;
 /*
 |--------------------------------------------------------------------------
 | Console Routes
@@ -17,3 +18,6 @@ use Illuminate\Support\Facades\Artisan;
 Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote');
+
+
+Schedule::command('app:delete-message-chanel')->everyFiveMinutes();
