@@ -29,7 +29,7 @@ class DeleteMessageChanel extends Command
         $bot = Bot::where("title","botUser")->first();
 
         logger("delete Message");
-        $updates = getUpdates($bot->token);
+        $updates = $this->getUpdates($bot->token);
 
 // تعیین تاریخ مورد نظر
         $targetDate = now()->subDay(1); // تاریخ مورد نظر برای حذف پیام‌ها (فرمت YYYY-MM-DD)
@@ -43,7 +43,7 @@ class DeleteMessageChanel extends Command
                 // چک کردن تاریخ پیام
                 if ($messageDate <= $targetDate) {
                     // حذف پیام
-                    $result = deleteMessage($bot->token, $bot->chanel_id, $messageId);
+                    $result = $this->deleteMessage($bot->token, $bot->chanel_id, $messageId);
                     if ($result['ok']) {
                         echo "پیام با شناسه $messageId حذف شد.\n";
                     } else {
