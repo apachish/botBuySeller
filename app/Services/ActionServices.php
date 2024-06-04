@@ -254,7 +254,8 @@ class ActionServices extends TextServices
         foreach ($transfers as $transfer){
             $message = $transfer->message."\xF0\x9F\x9A\xAB";
 
-            $this->getTelegramServices()->editMessageTextAndInlineKeyboard($this->bot->chanel_id, $transfer->message_id, $message);
+            logger("tran".$message);
+            $this->telegram_services->editMessageTextAndInlineKeyboard($this->bot->chanel_id, $transfer->message_id,$message);
             $transfer->status = Transfer::STATUS_DEACTIVATE;
             $transfer->update();
             $transfer->delete();
