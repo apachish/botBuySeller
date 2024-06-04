@@ -33,7 +33,7 @@ class DeleteMessageChanel extends Command
             logger("delete Message");
             // تعیین تاریخ مورد نظر
             $targetDate = now()->subDay(1); // تاریخ مورد نظر برای حذف پیام‌ها (فرمت YYYY-MM-DD)
-            $updates = Transfer::where("created_at",$targetDate)->get();
+            $updates = Transfer::where("created_at","<=",$targetDate)->get();
 
 
 
