@@ -261,6 +261,7 @@ class ActionServices extends TextServices
             $transfer->delete();
             $i++;
         }
+        logger("w",[$transfers->count() , $i == $transfers->count()]);
         if($transfers->count() && $i == $transfers->count())
             return true;
         return $result;
