@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\Bot;
+use App\Models\Transfer;
 use Illuminate\Console\Command;
 
 class DeleteMessageChanel extends Command
@@ -30,42 +31,27 @@ class DeleteMessageChanel extends Command
 
         if($bot) {
             logger("delete Message");
-            $updates = $this->getUpdates($bot->token);
-
-// تعیین تاریخ مورد نظر
+            // تعیین تاریخ مورد نظر
             $targetDate = now()->subDay(1); // تاریخ مورد نظر برای حذف پیام‌ها (فرمت YYYY-MM-DD)
+            $updates = Transfer::where("created_at",$targetDate)->get();
 
-            foreach ($updates['result'] as $update) {
-                if (isset($update['channel_post'])) {
-                    $message = $update['channel_post'];
-                    $messageId = $message['message_id'];
-                    $messageDate = date('Y-m-d', $message['date']);
 
-                    // چک کردن تاریخ پیام
-                    if ($messageDate <= $targetDate) {
+
+            foreach ($updates as $update) {
+
                         // حذف پیام
-                        logger("aaaaa",[$bot,$messageDate,$bot->token, $bot->chanel_id, $messageId,$message]);
-                        $result = $this->deleteMessage($bot->token, $bot->chanel_id, $messageId);
+                        logger("aaaaa",[$bot,$update,$bot->token, ]);
+                        $result = $this->deleteMessage($bot->token, $bot->chanel_id, $update->message_id);
                         if ($result['ok']) {
-                            echo "پیام با شناسه $messageId حذف شد.\n";
+                            echo "پیام با شناسه $update->message_id حذف شد.\n";
                         } else {
-                            echo "خطا در حذف پیام با شناسه $messageId: " . $result['description'] . "\n";
+                            echo "خطا در حذف پیام با شناسه $update->message_id: " . $result['description'] . "\n";
                         }
-                    }
-                }
+
             }
             logger("end delete Message");
         }
 
-    }
-
-    function getUpdates($apiToken) {
-//        $url = "https://api.telegram.org/bot$apiToken/getUpdates";
-//        $response = file_get_contents($url);
-        $content = file_get_contents("php://input");
-        $update = json_decode($content, true);
-        logger("ghazal",[$update]);
-        return $update;
     }
 
 // تابع برای حذف پیام
