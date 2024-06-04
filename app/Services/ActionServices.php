@@ -250,7 +250,7 @@ class ActionServices extends TextServices
         $transfers = Transfer::where("user_id", $this->getUserId())
             ->whereIn("status", [Transfer::STATUS_ACTIVE,Transfer::STATUS_ACTIVE_DO])
             ->get();
-        $i = 1;
+        $i = 0;
         foreach ($transfers as $transfer){
             $message = $transfer->message."\xF0\x9F\x9A\xAB";
 
