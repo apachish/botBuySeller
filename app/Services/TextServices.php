@@ -394,6 +394,7 @@ class TextServices
 
         logger($pattern,[preg_match($pattern, $this->message, $matches),$this->message]);
         if (preg_match($pattern, $this->message, $matches)) {
+            logger("matches",[$matches]);
             $this->setPrice($matches[1]);
             $this->setType($matches[2]);
             $optionalNumber = isset($matches[3]) ?$matches[3]: '1'; // اگر گروه سوم خالی بود، مقدار ۱ قرار داده شود
