@@ -397,7 +397,7 @@ class TextServices
             logger("matches",[$matches]);
             $this->setPrice($matches[1]);
             $this->setType($matches[2]);
-            $optionalNumber = isset($matches[3]) ?$matches[3]: '1'; // اگر گروه سوم خالی بود، مقدار ۱ قرار داده شود
+            $optionalNumber = isset($matches[3]) && $matches[3]?$matches[3]: '1'; // اگر گروه سوم خالی بود، مقدار ۱ قرار داده شود
             $this->setNumberOrder($optionalNumber);
             $description = isset($matches[4]) ? substr($matches[4], 1) : ''; // حذف ":" از ابتدای توضیحات
             $this->setDescription($description);
