@@ -46,6 +46,7 @@ class DeleteMessageChanel extends Command
                         // حذف پیام
                         logger("aaaaa",[$bot,$update,$bot->token, ]);
                         $result = $this->deleteMessage($bot->token, $bot->chanel_id, $update->message_id);
+                        logger("result",[$result]);
                         if ($result['ok']) {
                             echo "پیام با شناسه $update->message_id حذف شد.\n";
                         } else {
@@ -61,21 +62,20 @@ class DeleteMessageChanel extends Command
 // تابع برای حذف پیام
     function deleteMessage($apiToken, $chatId, $messageId) {
         $url = "https://api.telegram.org/bot$apiToken/deleteMessage";
-        $data = [
+
+        $post_fields = [
             'chat_id' => $chatId,
             'message_id' => $messageId
         ];
 
-        $options = [
-            'http' => [
-                'method' => 'POST',
-                'header' => "Content-Type:application/x-www-form-urlencoded\r\n",
-                'content' => http_build_query($data),
-            ],
-        ];
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array("Content-Type:application/json"));
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($post_fields));
+        $result = curl_exec($ch);
+        curl_close($ch);
 
-        $context = stream_context_create($options);
-        $result = file_get_contents($url, false, $context);
         return json_decode($result, true);
     }
 
