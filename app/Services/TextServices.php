@@ -166,16 +166,17 @@ class TextServices
         if ($user_telegram == null) {
             $update = $this->update;
             $type = $this->type_message;
-            if ($update) {
-                $user_telegram = UserTelegram::create([
-                    "id" => $this->user_id,
-                    "is_bot" => data_get($update, $type . '.from.is_bot'),
-                    "first_name" => data_get($update, $type . '.from.first_name'),
-                    "last_name" => data_get($update, $type . '.from.last_name'),
-                    "mobile" => data_get($update, $type . '.mobile'),
-                    "username" => data_get($update, $type . '.from.username'),
-                    "language_code" => data_get($update, $type . '.from.language_code'),
-                ]);
+            $data =  array_filter([
+                "id" => $this->user_id,
+                "is_bot" => data_get($update, $type . '.from.is_bot'),
+                "first_name" => data_get($update, $type . '.from.first_name'),
+                "last_name" => data_get($update, $type . '.from.last_name'),
+                "mobile" => data_get($update, $type . '.mobile'),
+                "username" => data_get($update, $type . '.from.username'),
+                "language_code" => data_get($update, $type . '.from.language_code'),
+            ]);
+            if ($update && $data) {
+                $user_telegram = UserTelegram::create($data);
                 $this->sendMessageNewUser();
                 CustomerUser::updateOrCreate(["user_id" => $this->getUserId(), "mobile" => data_get($update, $type . '.mobile')],
                     [
