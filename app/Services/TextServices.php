@@ -329,16 +329,17 @@ class TextServices
             "\xE2\x9C\x8Cفعال سازی دو مرحله ای",
             "\xE2\x9D\x8Cغیر فعال فوری",
         ];
-        logger("check message", [in_array($this->message, $accept), $accept]);
         if (in_array($this->message, $accept))
             return true;
         $im = implode("|",$this->list_type);
         $p = "/^([1-9]{3}|[1-9]{5})($im)([1-3]?)$/";
+        logger($p);
         if (preg_match($p, $this->message, $matches)) {
             collect($this->list_type)->contains(function (string $value, int $key) {
                 if (str_contains($this->message, $value)) {
                     $this->setType($value);
                     $this->setPattern();
+                    logger("set type", [$this->type,$this->pattern]);
                 }
             });
             if ($this->pattern && preg_match($this->pattern, $this->message))
