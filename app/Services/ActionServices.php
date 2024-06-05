@@ -297,6 +297,7 @@ class ActionServices extends TextServices
         $type_transaction = in_array($this->getType(), $this->list_type_buy) ? "buy" : "sell";
         $check_transfer = Transfer::where("price", $type_transaction == "buy" ? ">" : "<", $price)
             ->where("status", Transfer::STATUS_ACTIVE)
+            ->where("type", $this->getType())
             ->orWhere(function ($query) {
                 $query->whereIn("status", [
                     Transfer::STATUS_ACTIVE_DO,
@@ -311,11 +312,6 @@ class ActionServices extends TextServices
             $message = "لفظ پیشنهادی بهتر در کانال : \n\n";
             $message .= " \n\n";
             $message .= number_format($check_transfer->price, 0);
-            if ($this->getDescription()) {
-                $message .= "توضیحات ";
-                $message .= "\xE2\x9D\x97 : ";
-                $message .= $this->getDescription();
-            }
             $this->telegram_services->sendMessage($this->getUserId(), $message);
         } else {
 
@@ -349,6 +345,16 @@ class ActionServices extends TextServices
                 $message .= "با حواله";
             $message .= $number;
             $message .= "تا";
+            if (str_contains("ش", $this->getType()))
+                $message .= " شنا ";
+
+
+            if ($this->getDescription()) {
+                $message .= "\n\n ";
+                $message .= "توضیحات ";
+                $message .= "\xE2\x9D\x97 : ";
+                $message .= $this->getDescription();
+            }
             cache()->set("transfer_cache_buy_" . $this->getUserId(), [
                 "user_id" => $this->getUserId(),
                 "type" => $this->getType(),
