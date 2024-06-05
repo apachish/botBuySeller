@@ -14,7 +14,7 @@ use Telegram\Bot\Api;
 
 class TextServices
 {
-    private $list_type = ["فف", "خخ", "خ", "ف", "خفش", "خش", "ففش", "فش", "خن", "خفن", "فن", "ففن"];
+    private $list_type = [  "خفن","خفش","ففش","ففن", "فف","خخ","خش","فش", "خش","خن","فن","خ","ف"];
     protected $list_type_buy = ["خخ", "خ", "خفش", "خش", "خن", "خفن"];
     protected $list_type_sell = ["فف", "ف", "ففش", "فش", "فن", "ففن"];
     protected $list_type_sell_n_buy_tom = ["خفن", "ففن"];
