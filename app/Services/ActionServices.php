@@ -334,13 +334,12 @@ class ActionServices extends TextServices
             }
 
             if (str_contains($this->getType(),"ن")) {
-                $message .= "بی حواله";
+                $message .= " بی حواله ";
                 if (!$time->between($morning, $none, true) ||
                     in_array($this->getType(), $this->list_type_sell_n_buy_tom))
-                    $message .= "فردا";
+                    $message .= " فردا ";
                 $message .= "\xF0\x9F\x92\xB0	\xF0\x9F\x92\xB5	";
 
-                $message .= "بی حواله";
             } else
                 $message .= "با حواله";
             $message .= $number;
