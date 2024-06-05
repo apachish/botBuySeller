@@ -343,7 +343,7 @@ class ActionServices extends TextServices
             } else
                 $message .= "با حواله";
             $message .= $number;
-            $message .= "تا";
+            $message .= " تا ";
             if (str_contains($this->getType(),"ش"))
                 $message .= " شنا ";
 
