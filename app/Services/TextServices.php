@@ -185,7 +185,6 @@ class TextServices
             }
         }
         $this->user = $user_telegram;
-        logger("user", [$this->user]);
     }
 
     private $message_id = null;
@@ -396,6 +395,7 @@ class TextServices
             "text" => data_get($this->update, 'message.text'),
             "data" => json_encode($this->update)
         ]);
+        logger("check word",[$this->pattern, $this->message,preg_match($this->pattern, $this->message)]);
         if ($this->pattern && preg_match($this->pattern, $this->message))
             return $this->checkWord();
 
@@ -613,7 +613,6 @@ class TextServices
 
     public function menu($keyboard, $show)
     {
-        logger("menu", [$this->user, $show, $keyboard]);
         if ($show) {
             if (!cache()->get("keyword_menu" . $this->getKeyCache() . $this->user->id)) {
 
