@@ -332,7 +332,7 @@ class TextServices
         if (in_array($this->message, $accept))
             return true;
         $im = implode("|",$this->list_type);
-        $p = "/^([1-9]{3}|[1-9]{5})($im)([1-3]?)$/";
+        $p = "/^([0-9]{3}|[0-9]{5})($im)([1-3]?)$/";
         logger($p,[preg_match($p, $this->message, $matches),$this->message]);
         if (preg_match($p, $this->message, $matches)) {
             collect($this->list_type)->contains(function (string $value, int $key) {
