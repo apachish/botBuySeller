@@ -99,11 +99,10 @@ class ActionServices extends TextServices
     {
         $this->getUser()->fullName = $this->message;
         $this->getUser()->update();
-        if(!$this->getUser()->mobile) {
+        if (!$this->getUser()->mobile) {
             $text = "ممنون شماره خود را به اشتراک بگذارید";
             $this->telegram_services->sendRequestContactButton($this->getUserId(), $text);
-        }
-        elseif (!$this->getUser()->status) {
+        } elseif (!$this->getUser()->status) {
             cache()->set($this->getKeyCache() . $this->getUserId(), "pending_accept");
             $text = "منتظر تایید مدیر سیستم باشید تا دسترسی به شما ارائه گردد";
             $this->telegram->sendMessage(['chat_id' => $this->getUserId(), 'text' => $text]);
@@ -133,7 +132,7 @@ class ActionServices extends TextServices
                 $keyboard = self::getKeyboardRequest($transfer);
 
 
-                $this->telegram_services->editMessageTextAndInlineKeyboard($this->bot->chanel_id, $transfer->message_id,$transfer->message, $keyboard);
+                $this->telegram_services->editMessageTextAndInlineKeyboard($this->bot->chanel_id, $transfer->message_id, $transfer->message, $keyboard);
                 $transfer->update();
             } catch (\Exception $e) {
 
@@ -148,11 +147,11 @@ class ActionServices extends TextServices
         logger("transfer_cache_buy_", [$array]);
         $check = str_replace('transfer_buy_', '', $this->getData());
 
-        if($check == "true") {
+        if ($check == "true") {
             Transfer::where("user_id", $this->getUserId())
-                ->where("type", data_get($array,"type"))
+                ->where("type", data_get($array, "type"))
                 ->delete();
-            $array["status"]= Transfer::STATUS_ACTIVE;
+            $array["status"] = Transfer::STATUS_ACTIVE;
             $transfer_new = Transfer::create($array);
             logger("a", [$this->getUserId(), $this->getMessageId(), []]);
             $this->telegram_services->editMessageReplyMarkup($this->getUserId(), $this->getMessageId(), new \stdClass());
@@ -166,7 +165,7 @@ class ActionServices extends TextServices
             $transfer_new->update();
             dispatch(new DeactivateTransfer($transfer_new->id))->delay(now()->addMinute(1));
             cache()->forget("transfer_cache_buy_" . $this->getUserId());
-        }elseif($check == "false"){
+        } elseif ($check == "false") {
             $this->telegram_services->editMessageReplyMarkup($this->getUserId(), $this->getMessageId(), new \stdClass());
             $this->telegram_services->sendMessage($this->getUserId(), "لفظ شما رد شد\xE2\x9D\x8C	");
 
@@ -175,28 +174,28 @@ class ActionServices extends TextServices
 
     public function tradeLimitClose()
     {
-        $array = explode("_",str_replace('trade_limit_close_', '', $this->getData()));
-        $worker_id = (int)data_get($array,0);
-        $worker_i = (int)data_get($array,1);
+        $array = explode("_", str_replace('trade_limit_close_', '', $this->getData()));
+        $worker_id = (int)data_get($array, 0);
+        $worker_i = (int)data_get($array, 1);
 
         $worker = UserTelegram::where("id", $worker_id)->first();
-        logger("worker", [$worker,$worker_id]);
+        logger("worker", [$worker, $worker_id]);
         if ($worker) {
-            $limit_access = UserTradeAccess::where("user_id",$this->getUserId())
-                ->where("user_trade_id",$worker->id)->first();
-            if($limit_access) {
+            $limit_access = UserTradeAccess::where("user_id", $this->getUserId())
+                ->where("user_trade_id", $worker->id)->first();
+            if ($limit_access) {
                 $name_worker = $worker->fullName ?: $worker->first_name . " " . $worker->last_name;
 
-                $message_menu = cache()->get("menu_".$this->getUserId()) ;
-                if($message_menu){
-                    $keyboard = data_get($message_menu,"keyboard");
+                $message_menu = cache()->get("menu_" . $this->getUserId());
+                if ($message_menu) {
+                    $keyboard = data_get($message_menu, "keyboard");
                     $text = $worker->fullName ?: $worker->first_name . " " . $worker->last_name;
-                    $keyboard[$worker_i]=  [[
+                    $keyboard[$worker_i] = [[
                         'text' => "  $text " . "\xE2\x9C\x85",
                         'callback_data' => "trade_limit_" . $worker->id
                     ]];
-                    logger("close",[$this->getUserId(),data_get($message_menu,"id"),"لیست همکاران",$keyboard]);
-                    $this->telegram_services->editMessageTextAndInlineKeyboard($this->getUserId(),data_get($message_menu,"id"),"لیست همکاران",$keyboard);
+                    logger("close", [$this->getUserId(), data_get($message_menu, "id"), "لیست همکاران", $keyboard]);
+                    $this->telegram_services->editMessageTextAndInlineKeyboard($this->getUserId(), data_get($message_menu, "id"), "لیست همکاران", $keyboard);
                 }
                 $limit_access->delete();
                 $this->telegram->sendMessage([
@@ -236,40 +235,41 @@ class ActionServices extends TextServices
                 "user_trade_id" => $worker_id,],
                 [
                     "limit_access" => $number
-            ]);
+                ]);
             $this->telegram->sendMessage(['chat_id' => $this->getUserId(), 'text' => 'حد ثابت شد']);
             cache()->forget($this->getKeyCache() . $this->getUserId());
-        }else{
+        } else {
             $this->telegram->sendMessage(['chat_id' => $this->getUserId(), 'text' => 'عدد وارد کنید']);
         }
     }
 
     public function rejectAll()
     {
-        $result =  false;
+        $result = false;
         $transfers = Transfer::where("user_id", $this->getUserId())
-            ->whereIn("status", [Transfer::STATUS_ACTIVE,Transfer::STATUS_ACTIVE_DO])
+            ->whereIn("status", [Transfer::STATUS_ACTIVE, Transfer::STATUS_ACTIVE_DO])
             ->get();
         $i = 0;
-        foreach ($transfers as $transfer){
-            $message = $transfer->message."\xF0\x9F\x9A\xAB";
+        foreach ($transfers as $transfer) {
+            $message = $transfer->message . "\xF0\x9F\x9A\xAB";
 
-            logger("tran".$message);
-            $this->telegram_services->editMessageTextAndInlineKeyboard($this->bot->chanel_id, $transfer->message_id,$message);
+            logger("tran" . $message);
+            $this->telegram_services->editMessageTextAndInlineKeyboard($this->bot->chanel_id, $transfer->message_id, $message);
             $transfer->status = Transfer::STATUS_DEACTIVATE;
             $transfer->update();
             $transfer->delete();
             $i++;
         }
-        logger("w",[$transfers->count() , $i == $transfers->count()]);
-        if($transfers->count() && $i == $transfers->count())
+        logger("w", [$transfers->count(), $i == $transfers->count()]);
+        if ($transfers->count() && $i == $transfers->count())
             return true;
         return $result;
     }
+
     public function checkWord()
     {
         $limit_trade = cache()->remember("s_price_trade", now()->addDay(1), function () {
-            $value = ["start"=>14000000,"end"=>15000000];
+            $value = ["start" => 14000000, "end" => 15000000];
             $setting = Setting::where("key", "s_price_trade")->first();
             if ($setting)
                 $value = data_get($setting, "value");
@@ -278,28 +278,21 @@ class ActionServices extends TextServices
         logger("limit_trade", [$limit_trade]);
 
 
-        $array = explode($this->getType(), $this->message);
-        $array_desc = explode(":", $this->message);
-
-        if (isset($array_desc[1]))
-            $description = $array_desc[1];
-
-        $suggest_price = data_get($array, 0);
+        $suggest_price = $this->getPrice();
 
         // طول رشته عدد را محاسبه کنید
         $length = strlen($suggest_price);
 
         // بررسی کنید که آیا طول عدد 3 یا 5 است
-        if ($length === 3 )
-            $start_trade = ((int)data_get($limit_trade,"start")/1000000)*1000000;
-        elseif($length === 5 )
-            $start_trade = ((int)($suggest_price*1000)/1000000)*1000000;
+        if ($length === 3)
+            $start_trade = ((int)data_get($limit_trade, "start") / 1000000) * 1000000;
+        elseif ($length === 5)
+            $start_trade = ((int)($suggest_price * 1000) / 1000000) * 1000000;
 
 
-        $price = $start_trade + ( $suggest_price* 1000);
+        $price = $start_trade + ($suggest_price * 1000);
 
-        $number = (int)data_get($array, 1, 1);
-        logger("check_transfer", [$price, $number, $array]);
+        $number = $this->getNumberOrder();
 
         $type_transaction = in_array($this->getType(), $this->list_type_buy) ? "buy" : "sell";
         $check_transfer = Transfer::where("price", $type_transaction == "buy" ? ">" : "<", $price)
@@ -318,6 +311,11 @@ class ActionServices extends TextServices
             $message = "لفظ پیشنهادی بهتر در کانال : \n\n";
             $message .= " \n\n";
             $message .= number_format($check_transfer->price, 0);
+            if ($this->getDescription()) {
+                $message .= "توضیحات ";
+                $message .= "\xE2\x9D\x97 : ";
+                $message .= $this->getDescription();
+            }
             $this->telegram_services->sendMessage($this->getUserId(), $message);
         } else {
 
@@ -357,7 +355,7 @@ class ActionServices extends TextServices
                 "number" => $number,
                 "price" => $price,
                 "status" => Transfer::STATUS_PENDING,
-                "message"=>$message
+                "message" => $message
             ]);
             $keyboard[0] = [
                 ['text' => "\xE2\x9C\x85	تایید", 'callback_data' => "transfer_buy_true"],

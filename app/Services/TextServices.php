@@ -22,6 +22,10 @@ class TextServices
     protected $list_type_buy_tommarow = ["خخ", "خفش", "خفن"];
 
     private $type;
+    private $price;
+
+    private $number_order;
+    private $description;
 
     private $type_message;
 
@@ -155,6 +159,58 @@ class TextServices
     public function getUser()
     {
         return $this->user;
+    }
+    /**
+     * @return mixed
+     */
+    public function getPrice()
+    {
+        return $this->price;
+    }
+
+    /**
+     * @param mixed $price
+     */
+    public function setPrice($price): void
+    {
+        $this->price = $price;
+        logger("price".$this->price);
+
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getNumberOrder()
+    {
+        return $this->number_order;
+    }
+
+    /**
+     * @param mixed $number_order
+     */
+    public function setNumberOrder($number_order): void
+    {
+        $this->number_order = $number_order;
+        logger("number order".$this->number_order);
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getDescription()
+    {
+        return $this->description;
+    }
+
+    /**
+     * @param mixed $description
+     */
+    public function setDescription($description): void
+    {
+        $this->description = $description;
+        logger("description".$this->description);
+
     }
 
     /**
@@ -291,7 +347,8 @@ class TextServices
     public function setPattern(): void
     {
 //        $this->pattern = "/^\d{3,5}" . $this->type . "\d{1}$/";
-        $this->pattern = "/^([0-9]{3}|[0-9]{5})$this->type([1-3]?)$/";
+//        $this->pattern = "/^([0-9]{3}|[0-9]{5})$this->type([1-3]?)$/";
+        $this->pattern = "/^([0-9]{3}|[0-9]{5})$this->type([1-3]?)(:.*)?$/u";
         logger("pattern", [$this->pattern, $this->type]);
     }
 
@@ -333,16 +390,17 @@ class TextServices
         if (in_array($this->message, $accept))
             return true;
         $im = implode("|",$this->list_type);
-        $p = "/^([0-9]{3}|[0-9]{5})($im)([1-3]?)$/";
-        logger($p,[preg_match($p, $this->message, $matches),$this->message]);
-        if (preg_match($p, $this->message, $matches)) {
-            collect($this->list_type)->contains(function (string $value, int $key) {
-                if (str_contains($this->message, $value)) {
-                    $this->setType($value);
-                    $this->setPattern();
-                    logger("set type", [$this->type,$this->pattern]);
-                }
-            });
+        $pattern = "/^([0-9]{3}|[0-9]{5})($im)([1-3]?)(:.*)?$/u";
+
+        logger($pattern,[preg_match($pattern, $this->message, $matches),$this->message]);
+        if (preg_match($pattern, $this->message, $matches)) {
+            $this->setPrice($matches[1]);
+            $this->setType($matches[2]);
+            $optionalNumber = isset($matches[3]) ?$matches[3]: '1'; // اگر گروه سوم خالی بود، مقدار ۱ قرار داده شود
+            $this->setNumberOrder($optionalNumber);
+            $description = isset($matches[4]) ? substr($matches[4], 1) : ''; // حذف ":" از ابتدای توضیحات
+            $this->setDescription($description);
+            $this->setPattern();
             logger("aa",[$this->pattern]);
             logger("aa",[preg_match($this->pattern, $this->message)]);
             if ($this->pattern && preg_match($this->pattern, $this->message))
