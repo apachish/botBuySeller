@@ -290,7 +290,7 @@ class TextServices
     public function setPattern(): void
     {
 //        $this->pattern = "/^\d{3,5}" . $this->type . "\d{1}$/";
-        $this->pattern = "/^([1-9]{3}|[1-9]{5})($this->type)([1-3]?)$/";
+        $this->pattern = "/^([0-9]{3}|[0-9]{5})$this->type([1-3]?)$/";
         logger("pattern", [$this->pattern, $this->type]);
     }
 
@@ -342,6 +342,7 @@ class TextServices
                     logger("set type", [$this->type,$this->pattern]);
                 }
             });
+            logger("aa",[preg_match($this->pattern, $this->message)]);
             logger("aa",[preg_match($this->pattern, $this->message)]);
             if ($this->pattern && preg_match($this->pattern, $this->message))
                 return true;
