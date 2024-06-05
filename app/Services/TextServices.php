@@ -290,7 +290,8 @@ class TextServices
      */
     public function setPattern(): void
     {
-        $this->pattern = "/^\d{3,5}" . $this->type . "\d{1}$/";
+//        $this->pattern = "/^\d{3,5}" . $this->type . "\d{1}$/";
+        $this->pattern = "/^([1-9]{3}|[1-9]{5})($this->type)([1-3]?)$/";
         logger("pattern", [$this->pattern, $this->type]);
     }
 
@@ -332,14 +333,18 @@ class TextServices
         logger("check message", [in_array($this->message, $accept), $accept]);
         if (in_array($this->message, $accept))
             return true;
-        collect($this->list_type)->contains(function (string $value, int $key) {
-            if (str_contains($this->message, $value)) {
-                $this->setType($value);
-                $this->setPattern();
-            }
-        });
-        if ($this->pattern && preg_match($this->pattern, $this->message))
-            return true;
+        $im = implode("|",$this->list_type);
+        $p = "/^([1-9]{3}|[1-9]{5})($im)([1-3]?)$/";
+        if (preg_match($p, $this->message, $matches)) {
+            collect($this->list_type)->contains(function (string $value, int $key) {
+                if (str_contains($this->message, $value)) {
+                    $this->setType($value);
+                    $this->setPattern();
+                }
+            });
+            if ($this->pattern && preg_match($this->pattern, $this->message))
+                return true;
+        }
         if($this->contact)
             return true;
 
