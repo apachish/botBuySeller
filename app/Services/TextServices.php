@@ -648,9 +648,11 @@ class TextServices
 
             case  "\xE2\x9D\x8Cغیر فعال فوری":
                 $this->telegram_services->kickChatMember($this->bot->chanel_id,$this->getUserId());
+                $this->user->status = false;
+                $this->user->update();
                 $this->user->delete();
                 cache()->forget("keyword_menu" . $this->getKeyCache() . $this->user->id);
-                $this->menu();
+                $this->menu([], false);
                 break;
             default:
                 return false;
