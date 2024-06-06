@@ -649,7 +649,8 @@ class TextServices
             case  "\xE2\x9D\x8Cغیر فعال فوری":
                 $this->telegram_services->kickChatMember($this->bot->chanel_id,$this->getUserId());
                 $this->user->delete();
-                $this->user->menu();
+                cache()->forget("keyword_menu" . $this->getKeyCache() . $this->user->id);
+                $this->menu();
                 break;
             default:
                 return false;
@@ -687,6 +688,8 @@ class TextServices
 
         } else {
             cache()->forget("keyword_menu" . $this->getKeyCache() . $this->user->id);
+            $this->telegram_services->deleteKeyboard($this->user_id);
+
         }
 
     }
