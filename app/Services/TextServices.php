@@ -498,8 +498,8 @@ class TextServices
             case  "\xE2\x9D\x8Cغیر فعال فوری":
                 $this->getAction();
                 break;
-            case  "/strat":
-            case  "strat":
+            case  "/start":
+            case  "start":
                 if($this->user && $this->user->role)
                     $this->user->change_menu = true;
                 break;
