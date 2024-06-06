@@ -144,8 +144,6 @@ class ActionServices extends TextServices
 
     public function transferBuy()
     {
-        $array = cache()->get("transfer_cache_buy_" . $this->getUserId());
-        logger("transfer_cache_buy_", [$array]);
         $data = str_replace('transfer_buy_', '', $this->getData());
         $array = explode("_",$data);
         $check = data_get($array,1);
