@@ -569,7 +569,7 @@ class TextServices
             case "\xF0\x9F\x93\x88معاملات باز":
                 $worker = UserTelegram::where("id", $this->user_id)->whereHas("customerUsers",function($query){
                     $query->where("status",true);
-                })->with(["customerUsers",function($query){
+                })->with(["customerUsers"=>function($query){
                     $query->where("status",true);
                 }])->get();
                 $keyboard = [];
@@ -577,7 +577,7 @@ class TextServices
                 logger("woker",[$worker]);
                 $worker->each(function ($row) use (&$i, &$keyboard) {
                     $keyboard[$i++] = [
-                        ['text' => $row->customerUsers->fullName, 'callback_data' => "trade_open_" . $row->id],
+                        ['text' => data_get($row,"customerUsers.fullName", 'callback_data' => "trade_open_" . $row->id],
                     ];
                 });
                 logger("woker key",[$keyboard]);
