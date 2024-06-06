@@ -17,7 +17,8 @@ class CustomerUser extends Model
         "fullName",
         "mobile",
         "user_id",
-        "limit"
+        "limit",
+        "status"
     ];
 
 

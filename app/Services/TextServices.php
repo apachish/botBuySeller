@@ -240,6 +240,7 @@ class TextServices
                 CustomerUser::updateOrCreate(["user_id" => $this->getUserId(), "mobile" => data_get($update, $type . '.mobile')],
                     [
                         "fullName" => "خودم",
+                        "status" => true,
                         "limit" => null
                     ]);
             }
@@ -566,7 +567,9 @@ class TextServices
 
                 break;
             case "\xF0\x9F\x93\x88معاملات باز":
-                $worker = UserTelegram::where("id", $this->user_id)->with(["customerUser","customerUsers"])->get();
+                $worker = UserTelegram::where("id", $this->user_id)->whereHas(["customerUsers",function($query){
+                    $query->where("status",true);
+                }])->get();
                 $keyboard = [];
                 $i = 0;
                 logger("woker",[$worker]);
