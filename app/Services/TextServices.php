@@ -555,7 +555,11 @@ class TextServices
             case "\xF0\x9F\x91\xA5معرفی مشتری":
                 $text = "موبایل مشتری خود را وارد کنید با کد کشور بدون صفر مثل ";
                 $text .= "\n\n";
-                $text .= "+989120001122";
+                $text .='+989120001122';
+                $text .= "\n\n";
+                $text .='+11234567890';
+                $text .= "\n\n";
+                $text .='+442071838750';
                 $text .= "\n\n";
                 $this->telegram_services->sendMessage($this->user_id, $text);
                 cache()->set($this->key_cache . $this->getUserId(), "add_customer_mobile");
