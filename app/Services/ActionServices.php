@@ -331,10 +331,7 @@ class ActionServices extends TextServices
                     !in_array($this->getType(), $this->list_type_sell_tommarow)
                 )
             ]);
-            if ($time->between($morning, $none, true) && (
-                    !in_array($this->getType(), $this->list_type_buy_tommarow) ||
-                    !in_array($this->getType(), $this->list_type_sell_tommarow)
-                )) {
+            if ($time->between($morning, $none, true) && !in_array($this->getType(), $this->list_type_tommarow)) {
                 $message .= " \xE2\x98\x80	";
             } else {
                 $message .= " \xE2\x8F\xB3	";

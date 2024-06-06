@@ -20,6 +20,7 @@ class TextServices
     protected $list_type_sell_n_buy_tom = ["خفن", "ففن"];
     protected $list_type_sell_tommarow = ["فف", "ففش", "ففن"];
     protected $list_type_buy_tommarow = ["خف", "خفش", "خفن"];
+    protected $list_type_tommarow = ["خف", "خفش", "خفن","فف", "ففش", "ففن"];
 
     private $type;
     private $price;
