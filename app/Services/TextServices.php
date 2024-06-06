@@ -459,7 +459,6 @@ class TextServices
             "text" => data_get($this->update, 'message.text'),
             "data" => json_encode($this->update)
         ]);
-        logger("check word",[$this->pattern, $this->message,preg_match($this->pattern, $this->message)]);
         if ($this->pattern && preg_match($this->pattern, $this->message))
             return $this->checkWord();
 
