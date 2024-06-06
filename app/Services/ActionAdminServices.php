@@ -152,6 +152,7 @@ class ActionAdminServices extends TextServices
                 $user_con->delete();
                 $response_text = "$fullName\n\n اکانت کاربریش حذف شد ";
                 $this->getTelegramServices()->sendMessage($this->getUserId(), $response_text);
+                $this->telegram_services->kickChatMember($this->bot->chanel_id,$user_con->id);
 
                 cache()->forget("keyword_menu".$this->getKeyCache().$user_con->id);
 
