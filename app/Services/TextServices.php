@@ -580,6 +580,7 @@ class TextServices
                         ['text' => $text, 'callback_data' => "trade_open_" . $row->id],
                     ];
                 });
+                logger("woker key",[$keyboard]);
                 $this->telegram_services->sendMessage($this->user_id, "شخص مورد نظر را انتخاب کنید", $keyboard);
                 break;
 
