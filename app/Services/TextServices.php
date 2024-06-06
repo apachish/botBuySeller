@@ -241,7 +241,11 @@ class TextServices
                         "limit" => null
                     ]);
             }
-        }elseif(!data_get($user_telegram,"deleted_at"))
+        }elseif(data_get($user_telegram,"deleted_at"))
+        {
+            cache()->forget("keyword_menu" . $this->getKeyCache() . $user_telegram->id);
+            $this->telegram_services->deleteKeyboard($user_telegram->id);
+        }else
             $this->user = $user_telegram;
     }
 
