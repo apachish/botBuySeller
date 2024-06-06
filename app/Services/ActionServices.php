@@ -26,8 +26,8 @@ class ActionServices extends TextServices
         $mobile = str_replace('add_customer_name_', '', $this->getMessageCache());
         $fullName = $this->getMessage();
 
-        logger("data add customer",[$mobile,$fullName]);
-        if ( $fullName && $mobile) {
+        logger("data add customer", [$mobile, $fullName]);
+        if ($fullName && $mobile) {
             CustomerUser::updateOrCreate(["user_id" => $this->getUserId(), "mobile" => $mobile],
                 [
                     "fullName" => $fullName,
@@ -51,18 +51,27 @@ class ActionServices extends TextServices
 
         }
     }
+
     public function addCustomer()
     {
-        $check = CustomerUser::where("mobile",$this->getMessage())->where("user_id","!=", $this->getUserId())->first();
-        if(!$check) {
-            cache()->set($this->getKeyCache() . $this->getUserId(), "add_customer_name_".$this->getMessage());
-            $message = "نام و نام خانوادگی مشتری خود را وارد کنید";
-        }else{
-            $message = "مشتری با این شماره تلفن امکان ثبت نمی باشد";
-            cache()->forget($this->getKeyCache() . $this->getUserId());
-        }
-        $this->telegram_services->sendMessage($this->getUserId(), $message);
+        $pattern = '/^\+\d{1,3}\d{4,14}(?:x.+)?$/';
+        $message = "شماره موبایل وارد شده نامعتبر می باشد ";
+        // بررسی اینکه شماره موبایل با الگو مطابقت دارد یا خیر
+        if (preg_match($pattern, $this->getMessage())) {
+            $check = CustomerUser::where("mobile", $this->getMessage())->where("user_id", "!=", $this->getUserId())->first();
+            // الگوی regex برای بررسی شماره موبایل با کد کشور
 
+
+            if (!$check) {
+                cache()->set($this->getKeyCache() . $this->getUserId(), "add_customer_name_" . $this->getMessage());
+                $message = "نام و نام خانوادگی مشتری خود را وارد کنید";
+            } else {
+                $message = "مشتری با این شماره تلفن امکان ثبت نمی باشد";
+                cache()->forget($this->getKeyCache() . $this->getUserId());
+            }
+        }
+
+        $this->telegram_services->sendMessage($this->getUserId(), $message);
 
 
     }
@@ -139,16 +148,16 @@ class ActionServices extends TextServices
     public function transferBuy()
     {
         $data = str_replace('transfer_buy_', '', $this->getData());
-        $array = explode("_",$data);
-        $check = data_get($array,0);
-        $word_id = data_get($array,1);
-        logger("data",[$check,$word_id]);
-        if(!$check && ! $word_id)
-             return false;
+        $array = explode("_", $data);
+        $check = data_get($array, 0);
+        $word_id = data_get($array, 1);
+        logger("data", [$check, $word_id]);
+        if (!$check && !$word_id)
+            return false;
         $word = WordTelegram::find($word_id);
-        logger("word",[$word]);
+        logger("word", [$word]);
 
-        if($word == null ) return false;
+        if ($word == null) return false;
 
         if ($check == "true") {
             Transfer::where("user_id", $this->getUserId())
@@ -158,13 +167,13 @@ class ActionServices extends TextServices
             $word->update();
             $order = [
                 "status" => Transfer::STATUS_ACTIVE,
-                "user_id"=>$this->getUserId(),
-                "type"=>data_get($word, "type"),
-                "number"=>data_get($word, "number"),
-                "price"=>data_get($word, "price"),
-                "message"=>data_get($word, "message"),
-                "date"=>data_get($word, "date"),
-                ];
+                "user_id" => $this->getUserId(),
+                "type" => data_get($word, "type"),
+                "number" => data_get($word, "number"),
+                "price" => data_get($word, "price"),
+                "message" => data_get($word, "message"),
+                "date" => data_get($word, "date"),
+            ];
             $transfer_new = Transfer::create($order);
             logger("a", [$this->getUserId(), $this->getMessageId(), []]);
             $this->telegram_services->editMessageReplyMarkup($this->getUserId(), $this->getMessageId(), new \stdClass());
@@ -338,7 +347,7 @@ class ActionServices extends TextServices
             $time = Carbon::now();
             $morning = Carbon::create($time->year, $time->month, $time->day, 10, 0, 0); //set time to 08:00
             $none = Carbon::create($time->year, $time->month, $time->day, 15, 00, 0); //set time to 18:00
-            logger("check day",[
+            logger("check day", [
                 $time->between($morning, $none, true),
                 (
                     !in_array($this->getType(), $this->list_type_buy_tommarow) ||
@@ -353,7 +362,7 @@ class ActionServices extends TextServices
                 $date = now()->addDay(1);
             }
 
-            if (str_contains($this->getType(),"ن")) {
+            if (str_contains($this->getType(), "ن")) {
                 $message .= " بی حواله ";
                 if (!$time->between($morning, $none, true) ||
                     in_array($this->getType(), $this->list_type_sell_n_buy_tom))
@@ -364,7 +373,7 @@ class ActionServices extends TextServices
                 $message .= "با حواله";
             $message .= $number;
             $message .= " تا ";
-            if (str_contains($this->getType(),"ش"))
+            if (str_contains($this->getType(), "ش"))
                 $message .= " شنا ";
 
 
@@ -375,9 +384,9 @@ class ActionServices extends TextServices
                 $message .= $this->getDescription();
             }
             $word_telegram = WordTelegram::create([
-                "user_id"=>$this->getUserId(),
-                "message"=>$message,
-                "status"=>WordTelegram::STATUS_PENDING,
+                "user_id" => $this->getUserId(),
+                "message" => $message,
+                "status" => WordTelegram::STATUS_PENDING,
                 "type" => $this->getType(),
                 "number" => $number,
                 "price" => $price,
@@ -389,10 +398,10 @@ class ActionServices extends TextServices
             ];
             logger("ke", [$this->getUserId(), $message, $keyboard]);
             $result_word = $this->telegram_services->MessageReplyMarkup($this->telegram, $this->getUserId(), $message, $keyboard);
-            if(data_get($result_word,"message_id")){
-                $word_telegram->message_id =data_get($result_word,"message_id");
+            if (data_get($result_word, "message_id")) {
+                $word_telegram->message_id = data_get($result_word, "message_id");
                 $word_telegram->update();
-            }else{
+            } else {
                 $word_telegram->delete();
             }
             return true;
