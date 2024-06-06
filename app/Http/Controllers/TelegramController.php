@@ -48,7 +48,7 @@ class TelegramController extends Controller
                 $text_services->actionByMessage();
 
 
-            if(!$text_services->getUser()->fullName && !$text_services->getUser()->mobile )
+            if(!$text_services->getUser()->fullName || !$text_services->getUser()->mobile )
                 return false;
             $i = 0;
             if ($text_services->getUser()->role == "colleague") {
