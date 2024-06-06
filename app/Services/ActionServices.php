@@ -148,9 +148,12 @@ class ActionServices extends TextServices
         $array = explode("_",$data);
         $check = data_get($array,1);
         $word_id = data_get($array,1);
+        logger("data",[$check,$word_id]);
         if(!$check && ! $word_id)
              return false;
         $word = WordTelegram::find($word_id);
+        logger("word",[$word]);
+
         if($word == null ) return false;
 
         if ($check == "true") {
