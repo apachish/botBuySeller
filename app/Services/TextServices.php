@@ -663,12 +663,11 @@ class TextServices
 
     private function sendMessageNewUser(): void
     {
-        if (isset($this->update["my_chat_member"])) {
             $this->telegram->sendMessage([
                 'chat_id' => $this->user_id,
                 'text' => 'خوش آمدید! به طبیعت گردی.'
             ]);
-        }
+
     }
 
     public function accessAdmin()
