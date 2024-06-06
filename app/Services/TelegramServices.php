@@ -319,7 +319,7 @@ class TelegramServices
         global $access_token, $channel_username;
         $url = "https://api.telegram.org/bot$access_token/kickChatMember";
         $post_fields = [
-            'chat_id' => "@$channel_username",
+            'chat_id' => "$channel_username",
             'user_id' => $user_id
         ];
 
@@ -413,7 +413,7 @@ class TelegramServices
 
     }
 
-    function sendRequestContactButton($chat_id,$text) {
+    public function sendRequestContactButton($chat_id,$text) {
         $url = "https://api.telegram.org/bot$this->access_token/sendMessage";
 
         $keyboard = [
@@ -444,6 +444,46 @@ class TelegramServices
         curl_close($ch);
 
         return json_decode($result, true);
+    }
+
+    public function kickChatMember( $channelId, $userId) {
+        $url = "https://api.telegram.org/bot$this->access_token/kickChatMember";
+        $data = [
+            'chat_id' => $channelId,
+            'user_id' => $userId
+        ];
+
+        $options = [
+            'http' => [
+                'method' => 'POST',
+                'header' => "Content-Type:application/x-www-form-urlencoded\r\n",
+                'content' => http_build_query($data),
+            ],
+        ];
+
+        $context = stream_context_create($options);
+        $response = file_get_contents($url, false, $context);
+        return json_decode($response, true);
+    }
+
+    public function banChatMember( $chatId, $userId) {
+        $url = "https://api.telegram.org/bot$this->access_token/banChatMember";
+        $data = [
+            'chat_id' => $chatId,
+            'user_id' => $userId
+        ];
+
+        $options = [
+            'http' => [
+                'method' => 'POST',
+                'header' => "Content-Type:application/x-www-form-urlencoded\r\n",
+                'content' => http_build_query($data),
+            ],
+        ];
+
+        $context = stream_context_create($options);
+        $response = file_get_contents($url, false, $context);
+        return json_decode($response, true);
     }
 
 }

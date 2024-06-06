@@ -639,7 +639,7 @@ class TextServices
                 $this->telegram_services->sendMessage($this->user_id, "تایید دو مرحله ای غیر فعال شد");
                 break;
 
-            case "\xE2\x9D\x8Cغیر فعال فوری":
+            case "\xE2\x9C\x8Cفعال سازی دو مرحله ای":
                 $this->user->verify_two = true;
                 $this->user->update();
                 $this->telegram_services->sendMessage($this->user_id, "تایید دو مرحله ای  فعال شد");
@@ -647,6 +647,8 @@ class TextServices
                 break;
 
             case  "\xE2\x9D\x8C	غیر فعال فوری":
+                $this->telegram_services->kickChatMember($this->bot->chanel_id,$this->getUserId());
+                $this->telegram_services->kickChatMember($this->bot->user_id,$this->getUserId());
                 $this->user->delete();
                 $this->user->menu();
                 break;
