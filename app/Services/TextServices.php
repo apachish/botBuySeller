@@ -241,7 +241,7 @@ class TextServices
                         "limit" => null
                     ]);
             }
-        }elseif(!data_get($user_telegram->deleted_at))
+        }elseif(!data_get($user_telegram,"deleted_at"))
             $this->user = $user_telegram;
     }
 
