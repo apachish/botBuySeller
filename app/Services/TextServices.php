@@ -644,7 +644,7 @@ class TextServices
                 $this->telegram_services->sendMessage($this->user_id, $help->value);
                 break;
 
-            case "\xE2\x81\x89راهنما":
+            case "راهنما\xE2\x81\x89":
                 $help = Setting::where("key", "help")->first();
                 $this->telegram_services->sendMessage($this->user_id, $help->value);
 
