@@ -219,7 +219,7 @@ class TextServices
      */
     public function setUser(): void
     {
-        $user_telegram = UserTelegram::where("id", $this->user_id)->first();
+        $user_telegram = UserTelegram::where("id", $this->user_id)->withTrashed()->first();
         if ($user_telegram == null) {
             $update = $this->update;
             $type = $this->type_message;
@@ -241,8 +241,8 @@ class TextServices
                         "limit" => null
                     ]);
             }
-        }
-        $this->user = $user_telegram;
+        }elseif(!data_get($user_telegram->deleted_at))
+            $this->user = $user_telegram;
     }
 
     private $message_id = null;
