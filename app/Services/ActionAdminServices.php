@@ -12,7 +12,7 @@ use Carbon\Carbon;
 
 class ActionAdminServices extends TextServices
 {
-    public $service_telgram_user;
+    public $service_user;
     public $bot_title;
     public $bot_user;
     public $key_cache_user = "text_user_";
@@ -52,7 +52,8 @@ class ActionAdminServices extends TextServices
                 ->first();
         });
         if ($this->bot_user) {
-            $this->service_telgram_user = new TelegramServices($this->bot_user->token);
+//            $this->service_telgram_user = new TelegramServices($this->bot_user->token);
+            $this->service_user = new ActionServices($this->bot_user->token);
             $this->bot_title = $this->bot_user->title;
         }
     }
@@ -89,8 +90,9 @@ class ActionAdminServices extends TextServices
                 $user_con->update();
                 $response_text = "$fullName نقش همکار فعال شد \n\n ";
                 $this->getTelegramServices()->sendMessage($this->getUserId(), $response_text);
-                $response_text = "$fullName همکار گرامی به سیستم ما خوش آمدید\n\n ";
-                $this->service_telgram_user->sendMessage($user_con->id, $response_text);
+                $this->service_user->message_menu = "$fullName همکار گرامی به سیستم ما خوش آمدید\n\n ";
+                $this->service_user->menu($this->keyword_colleague,$user_con->status);//->sendMessage($user_con->id, $response_text);
+//                $this->service_user->telegram_services->sendMessage($user_con->id, $response_text);
 
                 cache()->forget("keyword_menu".$this->key_cache_user.$user_con->id);
 
@@ -106,8 +108,10 @@ class ActionAdminServices extends TextServices
                 $user_con->update();
                 $response_text = "$fullName نقش همکاری این شخص به مشتری تغییر یافت \n\n ";
                 $this->getTelegramServices()->sendMessage($this->getUserId(), $response_text);
-                $response_text = "$fullName همکاری شما در سیستم به سطح مشتری انتقال یافت\n\n ";
-                $this->service_telgram_user->sendMessage($user_con->id, $response_text);
+//                $response_text = "$fullName همکاری شما در سیستم به سطح مشتری انتقال یافت\n\n ";
+//                $this->service_user->telegram_services->sendMessage($user_con->id, $response_text);
+                $this->service_user->message_menu = "$fullName همکاری شما در سیستم به سطح مشتری انتقال یافت\n\n ";
+                $this->service_user->menu($this->keyword_customer,$user_con->status,$user_con);
                 cache()->forget("keyword_menu".$this->key_cache_user.$user_con->id);
 
             }
@@ -123,9 +127,10 @@ class ActionAdminServices extends TextServices
                 cache()->forget("keyword_menu" . $this->key_cache_user . $user_con->id);
                 $response_text = "$fullName اکانت کاربریش فعال شد\n\n ";
                 $this->getTelegramServices()->sendMessage($this->getUserId(), $response_text);
-                $response_text = "$fullName اکانت کاربریتان فعال شد\n\n ";
-                $this->service_telgram_user->sendMessage($user_con->id, $response_text);
-                cache()->forget("keyword_menu".$this->key_cache_user.$user_con->id);
+//                $response_text = "$fullName اکانت کاربریتان فعال شد\n\n ";
+//                $this->service_user->telegram_services->sendMessage($user_con->id, $response_text);
+                $this->service_user->message_menu = "$fullName اکانت کاربریتان فعال شد\n\n ";
+                $this->service_user->menu($this->keyword_customer,$user_con->status,$user_con);
             }
         } elseif (str_contains($this->getData(), "reject_")) {
             $id = (int)str_replace('reject_', '', $this->getData());
@@ -141,10 +146,10 @@ class ActionAdminServices extends TextServices
                 $user_con->update();
                 $response_text = "$fullName\n\n اکانت کاربریش غیر فعال شد ";
                 $this->getTelegramServices()->sendMessage($this->getUserId(), $response_text);
-                $response_text = "$fullName اکانت کاربریتان غیر فعال شد \n\n ";
-                $this->service_telgram_user->sendMessage($user_con->id, $response_text);
-                cache()->forget("keyword_menu".$this->getKeyCache().$user_con->id);
-
+//                $response_text = "$fullName اکانت کاربریتان غیر فعال شد \n\n ";
+//                $this->service_user->telegram_services->sendMessage($user_con->id, $response_text);
+                $this->service_user->message_menu = "$fullName اکانت کاربریتان غیر فعال شد \n\n ";
+                $this->service_user->menu([],$user_con->status,$user_con);
             }
         }elseif (str_contains($this->getData(), "delete_")) {
             $id = (int)str_replace('delete_', '', $this->getData());
@@ -162,7 +167,8 @@ class ActionAdminServices extends TextServices
                 $this->getTelegramServices()->sendMessage($this->getUserId(), $response_text);
                 $this->telegram_services->kickChatMember($this->bot->chanel_id,$user_con->id);
 
-                cache()->forget("keyword_menu".$this->getKeyCache().$user_con->id);
+                $this->service_user->message_menu = "اکانت کاربریش حذف شد";
+                $this->service_user->menu([],$user_con->status,$user_con);
 
             }
         }
@@ -376,7 +382,7 @@ class ActionAdminServices extends TextServices
             $key = $user_con->role == "colleague" ? $this->keyword_colleague : $this->keyword_customer;
             if(!$user_con->status)
                 $key = new \stdClass();
-            $this->service_telgram_user->editCustomKeyboard($user_con->id, $menu_bot->menu_id, "تغییر منو", $key);
+            $this->service_user->telegram_services->editCustomKeyboard($user_con->id, $menu_bot->menu_id, "تغییر منو", $key);
             cache()->forget("keyword_menu".$this->getKeyCache().$user_con->id);
         }
     }

@@ -676,22 +676,24 @@ class TextServices
         return $this->bot->accessBot->where("user_id", $this->user_id)->where("type", "admin");
     }
 
-    public function menu($keyboard, $show)
+    public function menu($keyboard, $show,$user=null)
     {
+
+        $user = $user?$user:$this->getUser();
         if ($show ) {
-            if($this->user->change_menu) {
+            if($user->change_menu) {
                 {
-                    $this->telegram_services->deleteKeyboard($this->user_id);
-                    $this->user->change_menu = false;
-                    $this->user->update();
+                    $this->telegram_services->deleteKeyboard($user->id);
+                    $user->change_menu = false;
+                    $user->update();
                 }
 
-                $response = TelegramServices::menu($this->telegram, $keyboard, $this->user, $this->message_menu);
+                $response = TelegramServices::menu($this->telegram, $keyboard, $user, $this->message_menu);
             }
 
-        }elseif ($this->user->change_menu)
+        }elseif ($user->change_menu)
         {
-            $this->telegram_services->deleteKeyboard($this->user_id);
+            $this->telegram_services->deleteKeyboard($user->id);
             $this->user->change_menu = false;
             $this->user->update();
         }
