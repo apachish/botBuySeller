@@ -323,7 +323,7 @@ class ActionServices extends TextServices
                 $message .= " \xF0\x9F\x94\xB4	فروش";
             $time = Carbon::now();
             $morning = Carbon::create($time->year, $time->month, $time->day, 10, 0, 0); //set time to 08:00
-            $none = Carbon::create($time->year, $time->month, $time->day, 13, 15, 0); //set time to 18:00
+            $none = Carbon::create($time->year, $time->month, $time->day, 15, 00, 0); //set time to 18:00
             if ($time->between($morning, $none, true) & (
                     !in_array($this->getType(), $this->list_type_buy_tommarow) ||
                     !in_array($this->getType(), $this->list_type_sell_tommarow)
