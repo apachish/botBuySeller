@@ -566,7 +566,7 @@ class TextServices
 
                 break;
             case "\xF0\x9F\x93\x88معاملات باز":
-                $worker = UserTelegram::where("user_id", $this->user_id)->with(["customerUser","customerUsers"])->get();
+                $worker = UserTelegram::where("id", $this->user_id)->with(["customerUser","customerUsers"])->get();
                 $keyboard = [];
                 $i = 0;
                 logger("woker",[$worker]);
