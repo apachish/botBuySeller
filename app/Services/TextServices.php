@@ -446,7 +446,7 @@ class TextServices
     public function actionByMessage()
     {
         if (!$this->user->fullName) {
-            $text = "سلام به طبیعت گردی خوش آمدین لطفاٌ نام و نام خانوادگی وارد کنید";
+            $text = " لطفاٌ نام و نام خانوادگی وارد کنید";
             cache()->set($this->key_cache . $this->user_id, "add_fullName");
             $this->telegram->sendMessage(['chat_id' => $this->user_id, 'text' => $text]);
             return true;
