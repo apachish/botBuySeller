@@ -554,6 +554,7 @@ class TextServices
         switch ($this->message) {
             case "\xF0\x9F\x91\xA5معرفی مشتری":
                 $text = "موبایل مشتری خود را وارد کنید با کد کشور بدون صفر مثل ";
+                $text .= "\n\n";
                 $text .= "+989120001122";
                 $text .= "\n\n";
                 $this->telegram_services->sendMessage($this->user_id, $text);
