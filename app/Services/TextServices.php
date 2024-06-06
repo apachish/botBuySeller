@@ -566,9 +566,10 @@ class TextServices
 
                 break;
             case "\xF0\x9F\x93\x88معاملات باز":
-                $worker = UserTelegram::where("user_id", $this->user_id)->whereHas("customerUser")->get();
+                $worker = UserTelegram::where("user_id", $this->user_id)->with(["customerUser","customerUsers"])->get();
                 $keyboard = [];
                 $i = 0;
+                logger("woker",[$worker]);
                 $worker->each(function ($row) use (&$i, &$keyboard) {
                     $text = $row->fullName ?: $row->first_name . " " . $row->last_name;
 
