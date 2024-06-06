@@ -146,7 +146,7 @@ class ActionServices extends TextServices
     {
         $data = str_replace('transfer_buy_', '', $this->getData());
         $array = explode("_",$data);
-        $check = data_get($array,1);
+        $check = data_get($array,0);
         $word_id = data_get($array,1);
         logger("data",[$check,$word_id]);
         if(!$check && ! $word_id)
