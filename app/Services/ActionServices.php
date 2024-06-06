@@ -21,31 +21,15 @@ class ActionServices extends TextServices
         parent::__construct($token);
     }
 
-    public function addCustomer()
+    public function addCustomerName()
     {
-        $limit = null;
-        $message = $this->convertNumber($this->getMessage());
-        $array = explode(",", $message);
-        $mobile = null;
-        $fullName = null;
-        foreach ($array as $item) {
-            logger("item", [$item]);
-            $item = str_replace(":", "", $item);
-            if (str_contains($item, "موبایل")) {
-                $mobile = str_replace("موبایل", "", $item);
-            } elseif (str_contains($item, "نام و نام خانوادگی")) {
-                $fullName = str_replace("نام و نام خانوادگی", "", $item);
-            } elseif (str_contains($item, "حد")) {
-                $limit = str_replace("حد", "", $item);
-            }
-        }
-        logger("item", [$mobile, $fullName, $limit]);
+        $mobile = str_replace('request_transfer_', '', $this->getData());
+        $fullName = $this->getMessage();
 
-        if ($mobile && $fullName) {
+        if ( $fullName && $mobile) {
             CustomerUser::updateOrCreate(["user_id" => $this->getUserId(), "mobile" => $mobile],
                 [
                     "fullName" => $fullName,
-                    "limit" => $limit
                 ]);
             $message = "اطلاعات مشتری وارد شد";
             $message .= "\n\n";
@@ -55,22 +39,31 @@ class ActionServices extends TextServices
             $message .= "شماره همراه:";
             $message .= $mobile;
             $message .= "\n\n";
-            $message .= "حد مجاز:";
-            $message .= $limit === null ? "آزاد" : $limit;
+            $message = "پس از تایید مدیریت مشتری شما خواهد گشت ";
             $message .= "\n\n";
             $this->telegram_services->sendMessage($this->getUserId(), $message);
-            $message_share = "لینک را برای مشتری خود فورواد کرد تا پس از تایید  مدیر دسترسی به معامله خواهد داشت";
-            $message_share .= "\n\n";
-
-            $message_share .= "https://t.me/sell_buy_goldbot";
-            $this->telegram_services->sendMessage($this->getUserId(), $message_share);
             cache()->forget($this->getKeyCache() . $this->getUserId());
 
 
         } else {
-            $this->telegram_services->sendMessage($this->getUserId(), "اطلاعات وارد شده مشابه مثال باید باشه");
+            $this->telegram_services->sendMessage($this->getUserId(), "اطلاعات وارد شده مشکل دارد با ادمین سیستم تماس حاصل فرمایید یا مجددا معرفی مشتری بزنید");
 
         }
+    }
+    public function addCustomer()
+    {
+        $check = CustomerUser::where("mobile",$this->getMessage())->where("user_id","!=", $this->getUserId())->first();
+        if(!$check) {
+            cache()->set($this->getKeyCache() . $this->getUserId(), "add_customer_name_".$this->getMessage());
+            $message = "نام و نام خانوادگی مشتری خود را وارد کنید";
+        }else{
+            $message = "مشتری با این شماره تلفن امکان ثبت نمی باشد";
+            cache()->forget($this->getKeyCache() . $this->getUserId());
+        }
+        $this->telegram_services->sendMessage($this->getUserId(), $message);
+
+
+
     }
 
     public function addMobile()

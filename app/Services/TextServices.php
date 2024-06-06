@@ -435,7 +435,7 @@ class TextServices
     {
         if (is_array($this->message_cache) && str_contains(data_get($this->message_cache, "title"), "trade_number_limit"))
             return true;
-        elseif (str_contains($this->message_cache, "add_customer"))
+        elseif (str_contains($this->message_cache, "add_customer_"))
             return true;
         elseif (str_contains($this->message_cache, "add_fullName"))
             return true;
@@ -532,7 +532,9 @@ class TextServices
             $this->telegram->sendMessage(['chat_id' => $this->user_id, 'text' => 'متن نا معتبر می باشد']);
         elseif (is_array($this->message_cache) && str_contains(data_get($this->message_cache, "title"), "trade_number_limit"))
             $this->tradeNumberLimit();
-        elseif (str_contains($this->message_cache, "add_customer"))
+        elseif (str_contains($this->message_cache, "add_customer_name_"))
+            $this->addCustomerName();
+        elseif (str_contains($this->message_cache, "add_customer_mobile"))
             $this->addCustomer();
         elseif (str_contains($this->message_cache, "add_mobile"))
             $this->addMobile();
@@ -551,12 +553,10 @@ class TextServices
     {
         switch ($this->message) {
             case "\xF0\x9F\x91\xA5معرفی مشتری":
-                $text = "مشتری خود را به صورت زیر وارد کنید\n\n";
-                $text .= "موبایل:شماره موبایل,نام و نام خانوادگی :نام,حد:۳";
+                $text = "موبایل مشتری خود را وارد کنید";
                 $text .= "\n\n";
-                $text .= "در صورت وارد نکردن حد مقدار حد آن آزاد می باشد";
                 $this->telegram_services->sendMessage($this->user_id, $text);
-                cache()->set($this->key_cache . $this->getUserId(), "add_customer");
+                cache()->set($this->key_cache . $this->getUserId(), "add_customer_mobile");
 
                 break;
             case "\xF0\x9F\x93\x88معاملات باز":
