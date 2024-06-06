@@ -498,6 +498,11 @@ class TextServices
             case  "\xE2\x9D\x8Cغیر فعال فوری":
                 $this->getAction();
                 break;
+            case  "/strat":
+            case  "strat":
+                if($this->user && $this->user->role)
+                    $this->user->change_menu = true;
+                break;
             default:
                 $this->telegram->sendMessage(['chat_id' => $this->user_id, 'text' => 'متن نا معتبر می باشد']);
                 break;
