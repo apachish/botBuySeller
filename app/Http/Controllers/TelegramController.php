@@ -71,6 +71,8 @@ class TelegramController extends Controller
                 $exception->getMessage(),
                 $exception->getLine(),
                 $exception->getCode(),
+                $exception->getTrace(),
+                $exception->getFile()
             ]);
         }
 
