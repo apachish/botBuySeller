@@ -140,6 +140,22 @@ class ActionAdminServices extends TextServices
                 cache()->forget("keyword_menu".$this->getKeyCache().$user_con->id);
 
             }
+        }elseif (str_contains($this->getData(), "delete_")) {
+            $id = (int)str_replace('reject_', '', $this->getData());
+            $user_con = UserTelegram::where("id", $id)->first();
+            logger("rej", [$user_con, $id]);
+
+            if ($user_con) {
+                $fullName = $user_con->fullName ?: $user_con->first_name . " " . $user_con->last_name;
+                $user_con->status = false;
+                $user_con->update();
+                $user_con->delete();
+                $response_text = "$fullName\n\n اکانت کاربریش حذف شد ";
+                $this->getTelegramServices()->sendMessage($this->getUserId(), $response_text);
+
+                cache()->forget("keyword_menu".$this->getKeyCache().$user_con->id);
+
+            }
         }
     }
 
@@ -381,6 +397,7 @@ class ActionAdminServices extends TextServices
             $keyboard[$i++] = [
                 ['text' => "\xE2\x9C\x85 ", 'callback_data' => 'confirm_' . $user->id],
                 ['text' => "\xE2\x9D\x8C", 'callback_data' => 'reject_' . $user->id],
+                ['text' => "\xF0\x9F\x9A\xAF", 'callback_data' => 'delete_' . $user->id],
             ];
         });
         if ($pre)
