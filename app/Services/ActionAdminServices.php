@@ -141,7 +141,7 @@ class ActionAdminServices extends TextServices
 
             }
         }elseif (str_contains($this->getData(), "delete_")) {
-            $id = (int)str_replace('reject_', '', $this->getData());
+            $id = (int)str_replace('delete_', '', $this->getData());
             $user_con = UserTelegram::where("id", $id)->first();
             logger("rej", [$user_con, $id]);
 
