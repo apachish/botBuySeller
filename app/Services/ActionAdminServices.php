@@ -19,27 +19,27 @@ class ActionAdminServices extends TextServices
 
     protected $keyword_colleague = [
         [
-            ['text' => "\xF0\x9F\x91\xA5	معرفی مشتری"],
-            ['text' => "\xF0\x9F\x93\x8B	لیست همکاران"],
+            ['text' => "\xF0\x9F\x91\xA5معرفی مشتری"],
+            ['text' => "\xF0\x9F\x93\x8Bلیست همکاران"]
         ],
         [
-            ['text' => "\xF0\x9F\x93\x88	معاملات باز"]
+            ['text' => "\xF0\x9F\x93\x88معاملات باز"]
         ],
         [
-            ['text' => "\xF0\x9F\x93\x9A	قوانین"],
-            ['text' => "راهنما \xE2\x81\x89"]
+            ['text' => "\xF0\x9F\x93\x9Aقوانین"],
+            ['text' => "راهنما\xE2\x81\x89"]
         ], [
-            ['text' => "\xE2\x9C\x8C	فعال سازی دو مرحله ای"],
-            ['text' => "\xE2\x9D\x8C	غیر فعال فوری"],
+            ['text' => "\xE2\x9C\x8Cفعال سازی دو مرحله ای"],
+            ['text' => "\xE2\x9D\x8Cغیر فعال فوری"],
 
         ]];
     protected $keyword_customer = [
         [
-            ['text' => "\xF0\x9F\x93\x9A	قوانین"],
-            ['text' => "راهنما \xE2\x81\x89"]
+            ['text' => "\xF0\x9F\x93\x9Aقوانین"],
+            ['text' => "راهنما\xE2\x81\x89"]
         ], [
-            ['text' => "\xE2\x9C\x8C	فعال سازی دو مرحله ای"],
-            ['text' => "\xE2\x9D\x8C	غیر فعال فوری"],
+            ['text' => "\xE2\x9C\x8Cفعال سازی دو مرحله ای"],
+            ['text' => "\xE2\x9D\x8Cغیر فعال فوری"],
 
         ]];
 
