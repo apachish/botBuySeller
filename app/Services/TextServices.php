@@ -243,6 +243,7 @@ class TextServices
                         "limit" => null
                     ]);
             }
+            $this->user = $user_telegram;
         }elseif(data_get($user_telegram,"deleted_at"))
         {
             cache()->forget("keyword_menu" . $this->getKeyCache() . $user_telegram->id);
