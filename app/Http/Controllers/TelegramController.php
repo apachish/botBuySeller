@@ -61,7 +61,9 @@ class TelegramController extends Controller
             }
             $keyboard_menu[$i++] = [
                 ['text' => "\xF0\x9F\x93\x9Aقوانین"],
-                ['text' => "راهنما\xE2\x81\x89"]
+                ['text' => "راهنما\xE2\x81\x89"],
+                ['text' => "\xF0\x9F\x92\xB3\xF0\x9F\x8C\xB3حق اشتراک"]
+
             ];
             $keyboard_menu[$i++] = [
                 ['text' => $text_services->getUser()->verify_two ? "\xE2\x9A\xA0\xE2\x9D\x8Cغیرفعال سازی تایید دو مرحله ای" : "\xE2\x9C\x8Cفعال سازی دو مرحله ای"],

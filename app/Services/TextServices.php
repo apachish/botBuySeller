@@ -392,6 +392,7 @@ class TextServices
             "\xF0\x9F\x93\x8Bلیست همکاران",
             "\xF0\x9F\x93\x9Aقوانین",
             "راهنما\xE2\x81\x89",
+            "\xF0\x9F\x92\xB3\xF0\x9F\x8C\xB3حق اشتراک",
             "\xE2\x9A\xA0\xE2\x9D\x8Cغیرفعال سازی تایید دو مرحله ای",
             "\xE2\x9C\x8Cفعال سازی دو مرحله ای",
             "\xE2\x9D\x8Cغیر فعال فوری",
@@ -493,6 +494,7 @@ class TextServices
             case "\xF0\x9F\x93\x8Bلیست همکاران":
             case "\xF0\x9F\x93\x9Aقوانین":
             case "راهنما\xE2\x81\x89":
+            case "\xF0\x9F\x92\xB3\xF0\x9F\x8C\xB3حق اشتراک":
             case "\xE2\x9A\xA0\xE2\x9D\x8Cغیرفعال سازی تایید دو مرحله ای":
             case "\xE2\x9C\x8Cفعال سازی دو مرحله ای":
             case  "\xE2\x9D\x8Cغیر فعال فوری":
@@ -646,6 +648,11 @@ class TextServices
 
             case "راهنما\xE2\x81\x89":
                 $help = Setting::where("key", "help")->first();
+                $this->telegram_services->sendMessage($this->user_id, $help->value);
+
+                break;
+                case "\xF0\x9F\x92\xB3\xF0\x9F\x8C\xB3حق اشتراک":
+                $help = Setting::where("key", "membership")->first();
                 $this->telegram_services->sendMessage($this->user_id, $help->value);
 
                 break;

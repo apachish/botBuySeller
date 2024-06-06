@@ -50,6 +50,7 @@ class TelegramAdminController extends Controller
                 "📋 لیست کاربران",
                 "📋 لیست همکاران",
                 "📚  ویرایش قوانین",
+                "\xF0\x9F\x92\xB3\xF0\x9F\x8C\xB3ویرایش حق اشتراک",
                 "\xE2\x81\x89 ویرایش راهنما",
                 "📈محدود شروع مبلغ معاملات",
             ];
@@ -73,6 +74,9 @@ class TelegramAdminController extends Controller
                 ],
                 [
                     ['text' => "\xE2\x81\x89 ویرایش راهنما"]
+                ],
+                [
+                    ['text' =>  "\xF0\x9F\x92\xB3\xF0\x9F\x8C\xB3ویرایش حق اشتراک"]
                 ],
             ];
             $text_services->menu($keyboard_menu, $access);

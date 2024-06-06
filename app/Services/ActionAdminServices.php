@@ -27,7 +27,9 @@ class ActionAdminServices extends TextServices
         ],
         [
             ['text' => "\xF0\x9F\x93\x9Aقوانین"],
-            ['text' => "راهنما\xE2\x81\x89"]
+            ['text' => "راهنما\xE2\x81\x89"],
+            ['text' => "\xF0\x9F\x92\xB3\xF0\x9F\x8C\xB3حق اشتراک"]
+
         ], [
             ['text' => "\xE2\x9C\x8Cفعال سازی دو مرحله ای"],
             ['text' => "\xE2\x9D\x8Cغیر فعال فوری"],
@@ -36,7 +38,8 @@ class ActionAdminServices extends TextServices
     protected $keyword_customer = [
         [
             ['text' => "\xF0\x9F\x93\x9Aقوانین"],
-            ['text' => "راهنما\xE2\x81\x89"]
+            ['text' => "راهنما\xE2\x81\x89"],
+            ['text' => "\xF0\x9F\x92\xB3\xF0\x9F\x8C\xB3حق اشتراک"]
         ], [
             ['text' => "\xE2\x9C\x8Cفعال سازی دو مرحله ای"],
             ['text' => "\xE2\x9D\x8Cغیر فعال فوری"],
@@ -268,7 +271,22 @@ class ActionAdminServices extends TextServices
                 cache()->set("text_admin_" . $this->getUserId(), "help");
 
                 $this->getTelegramServices()->sendMessage($this->getUserId(), $response_text);
+            break;
+            case  "\xF0\x9F\x92\xB3\xF0\x9F\x8C\xB3ویرایش حق اشتراک":
+                $rule = Setting::where("key", "membership")->first();
 
+                if ($rule) {
+                    $response_text = $rule->value;
+
+                    $response_text .= "\n\n";
+                    $response_text .= "متن بالا متنن قبلی می  باشد ویرایش کنید";
+                } else
+                    $response_text = "متن حق اشتراک وارد کنید";
+
+                cache()->set("text_admin_" . $this->getUserId(), "membership");
+
+                $this->getTelegramServices()->sendMessage($this->getUserId(), $response_text);
+            break;
 
             case "📈محدود شروع مبلغ معاملات":
                 $s_price_trade = Setting::where("key", "s_price_trade")->first();
@@ -327,6 +345,19 @@ class ActionAdminServices extends TextServices
                 $response_text = "متن راهنما  بروزرسانی شد:";
                 $response_text .= "\n\n";
                 $response_text .= $rule->value;
+                $this->getTelegramServices()->sendMessage($this->getUserId(), $response_text);
+                cache()->forget("text_admin_" . $this->getUserId());
+                break;
+                case "membership":
+                $membership = Setting::updateOrCreate(
+                    ["key" => "membership"],
+                    ["value" => $this->getMessage()]
+                );
+
+
+                $response_text = "متن حق اشتراک  بروزرسانی شد:";
+                $response_text .= "\n\n";
+                $response_text .= $membership->value;
                 $this->getTelegramServices()->sendMessage($this->getUserId(), $response_text);
                 cache()->forget("text_admin_" . $this->getUserId());
                 break;
