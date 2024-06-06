@@ -575,7 +575,7 @@ class TextServices
                 logger("woker",[$worker]);
                 $worker->each(function ($row) use (&$i, &$keyboard) {
                     $keyboard[$i++] = [
-                        ['text' => $row->fullName, 'callback_data' => "trade_open_" . $row->id],
+                        ['text' => $row->customerUsers->fullName, 'callback_data' => "trade_open_" . $row->id],
                     ];
                 });
                 logger("woker key",[$keyboard]);
