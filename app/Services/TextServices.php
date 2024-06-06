@@ -445,6 +445,18 @@ class TextServices
 
     public function actionByMessage()
     {
+        if (!$this->user->fullName) {
+            $text = "سلام به طبیعت گردی خوش آمدین لطفاٌ نام و نام خانوادگی وارد کنید";
+            cache()->set($this->key_cache . $this->user_id, "add_fullName");
+            $this->telegram->sendMessage(['chat_id' => $this->user_id, 'text' => $text]);
+            return true;
+        } elseif (!$this->user->mobile) {
+            $text = "ممنون شماره خود را به اشتراک بگذارید";
+            $this->telegram_services->sendRequestContactButton($this->getUserId(), $text);
+            return true;
+
+        }
+
         /*
        * check message
        */
@@ -467,24 +479,6 @@ class TextServices
             return $this->checkWord();
 
         switch ($this->message) {
-            case '/start':
-            case 'start':
-                $text = $this->user->status ? "خوش آمدید" : "منتظر تایید مدیر سیستم باشید تا دسترسی به شما ارائه گردد";
-                $type_add = null;
-                if (!$this->user->fullName) {
-                    $text = "سلام به طبیعت گردی خوش آمدین لطفاٌ نام و نام خانوادگی وارد کنید";
-                    cache()->set($this->key_cache . $this->user_id, "add_fullName");
-                    $this->telegram->sendMessage(['chat_id' => $this->user_id, 'text' => $text]);
-
-                } elseif (!$this->user->mobile) {
-                    $text = "ممنون شماره خود را به اشتراک بگذارید";
-                    $this->telegram_services->sendRequestContactButton($this->getUserId(), $text);
-                }
-
-                break;
-            case '/help':
-                $this->telegram->sendMessage(['chat_id' => $this->user_id, 'text' => 'سلام! چطور می‌توانم به شما کمک کنم؟']);
-                break;
             case 'ن':
             case 'نشد':
                 if($this->rejectAll())
