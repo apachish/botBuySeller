@@ -10,6 +10,7 @@ use App\Models\Setting;
 use App\Models\Transfer;
 use App\Models\UserTelegram;
 use App\Models\UserTradeAccess;
+use App\Models\WordTelegram;
 use Carbon\Carbon;
 
 class ActionServices extends TextServices
@@ -145,14 +146,31 @@ class ActionServices extends TextServices
     {
         $array = cache()->get("transfer_cache_buy_" . $this->getUserId());
         logger("transfer_cache_buy_", [$array]);
-        $check = str_replace('transfer_buy_', '', $this->getData());
+        $data = str_replace('transfer_buy_', '', $this->getData());
+        $array = explode("_",$data);
+        $check = data_get($array,1);
+        $word_id = data_get($array,1);
+        if(!$check && ! $word_id)
+             return false;
+        $word = WordTelegram::find($word_id);
+        if($word == null ) return false;
 
-        if ($check == "true" && !empty($array)) {
+        if ($check == "true") {
             Transfer::where("user_id", $this->getUserId())
-                ->where("type", data_get($array, "type"))
+                ->where("type", data_get($word, "type"))
                 ->delete();
-            $array["status"] = Transfer::STATUS_ACTIVE;
-            $transfer_new = Transfer::create($array);
+            $word->status = WordTelegram::STATUS_ACCEPT;
+            $word->update();
+            $order = [
+                "status" => Transfer::STATUS_ACTIVE,
+                "user_id"=>$this->getUserId(),
+                "type"=>data_get($word, "type"),
+                "number"=>data_get($word, "number"),
+                "price"=>data_get($word, "price"),
+                "message"=>data_get($word, "message"),
+                "date"=>data_get($word, "date"),
+                ];
+            $transfer_new = Transfer::create($order);
             logger("a", [$this->getUserId(), $this->getMessageId(), []]);
             $this->telegram_services->editMessageReplyMarkup($this->getUserId(), $this->getMessageId(), new \stdClass());
             $this->telegram_services->sendMessage($this->getUserId(), "لفظ شما تایید شد\xE2\x9C\x85	");
@@ -164,8 +182,9 @@ class ActionServices extends TextServices
             $transfer_new->message_id = data_get($message_result, 'message_id');
             $transfer_new->update();
             dispatch(new DeactivateTransfer($transfer_new->id))->delay(now()->addMinute(1));
-            cache()->forget("transfer_cache_buy_" . $this->getUserId());
         } elseif ($check == "false") {
+            $word->status = WordTelegram::STATUS_REJECT;
+            $word->update();
             $this->telegram_services->editMessageReplyMarkup($this->getUserId(), $this->getMessageId(), new \stdClass());
             $this->telegram_services->sendMessage($this->getUserId(), "لفظ شما رد شد\xE2\x9D\x8C	");
 
@@ -333,8 +352,10 @@ class ActionServices extends TextServices
             ]);
             if ($time->between($morning, $none, true) && !in_array($this->getType(), $this->list_type_tommarow)) {
                 $message .= " \xE2\x98\x80	";
+                $date = now();
             } else {
                 $message .= " \xE2\x8F\xB3	";
+                $date = now()->addDay(1);
             }
 
             if (str_contains($this->getType(),"ن")) {
@@ -358,20 +379,27 @@ class ActionServices extends TextServices
                 $message .= "\xE2\x9D\x97 : ";
                 $message .= $this->getDescription();
             }
-            cache()->set("transfer_cache_buy_".$this->getType().$this->getUserId(), [
-                "user_id" => $this->getUserId(),
+            $word_telegram = WordTelegram::create([
+                "user_id"=>$this->getUserId(),
+                "message"=>$message,
+                "status"=>WordTelegram::STATUS_PENDING,
                 "type" => $this->getType(),
                 "number" => $number,
                 "price" => $price,
-                "status" => Transfer::STATUS_PENDING,
-                "message" => $message
+                "date" => $date,
             ]);
             $keyboard[0] = [
-                ['text' => "\xE2\x9C\x85	تایید", 'callback_data' => "transfer_buy_true"],
-                ['text' => "\xE2\x9D\x8C	رد", 'callback_data' => "transfer_buy_false"],
+                ['text' => "\xE2\x9C\x85	تایید", 'callback_data' => "transfer_buy_true_$word_telegram->id"],
+                ['text' => "\xE2\x9D\x8C	رد", 'callback_data' => "transfer_buy_false_$word_telegram->id"],
             ];
             logger("ke", [$this->getUserId(), $message, $keyboard]);
-            $this->telegram_services->MessageReplyMarkup($this->telegram, $this->getUserId(), $message, $keyboard);
+            $result_word = $this->telegram_services->MessageReplyMarkup($this->telegram, $this->getUserId(), $message, $keyboard);
+            if(data_get($result_word,"message_id")){
+                $word_telegram->message_id =data_get($result_word,"message_id");
+                $word_telegram->update();
+            }else{
+                $word_telegram->delete();
+            }
             return true;
         }
     }
