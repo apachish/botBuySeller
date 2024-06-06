@@ -443,7 +443,7 @@ class TextServices
         return false;
     }
 
-    public function getInfo()
+    public function actionByMessage()
     {
         if (!$this->user->fullName) {
             $text = " لطفاٌ نام و نام خانوادگی وارد کنید";
@@ -456,10 +456,7 @@ class TextServices
             return true;
 
         }
-    }
 
-    public function actionByMessage()
-    {
         /*
        * check message
        */
