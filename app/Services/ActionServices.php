@@ -147,7 +147,7 @@ class ActionServices extends TextServices
         logger("transfer_cache_buy_", [$array]);
         $check = str_replace('transfer_buy_', '', $this->getData());
 
-        if ($check == "true") {
+        if ($check == "true" && !empty($array)) {
             Transfer::where("user_id", $this->getUserId())
                 ->where("type", data_get($array, "type"))
                 ->delete();
@@ -358,7 +358,7 @@ class ActionServices extends TextServices
                 $message .= "\xE2\x9D\x97 : ";
                 $message .= $this->getDescription();
             }
-            cache()->set("transfer_cache_buy_" . $this->getUserId(), [
+            cache()->set("transfer_cache_buy_".$this->getType().$this->getUserId(), [
                 "user_id" => $this->getUserId(),
                 "type" => $this->getType(),
                 "number" => $number,
