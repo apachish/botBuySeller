@@ -662,11 +662,9 @@ class TextServices
     private function sendMessageNewUser(): void
     {
         if (isset($this->update["my_chat_member"])) {
-            $chatId = $this->update['my_chat_member']['from']['id']; // چت‌آیدی کاربر
-
             $this->telegram->sendMessage([
                 'chat_id' => $this->user_id,
-                'text' => 'خوش آمدید! این یک پیام خودکار به کاربر جدید است.'
+                'text' => 'خوش آمدید! به طبیعت گردی.'
             ]);
         }
     }
