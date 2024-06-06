@@ -684,19 +684,20 @@ class TextServices
 
     public function menu($keyboard, $show)
     {
+        if (cache()->get("keyword_menu" . $this->getKeyCache() . $this->user->id)) return true;
         if ($show) {
-            if (!cache()->get("keyword_menu" . $this->getKeyCache() . $this->user->id)) {
+
 
                 $this->telegram_services->deleteKeyboard($this->user_id);
                 $response = TelegramServices::menu($this->telegram, $keyboard, $this->user, $this->message_menu);
-                cache()->set("keyword_menu" . $this->getKeyCache() . $this->user->id, true);
-            }
 
         } else {
             cache()->forget("keyword_menu" . $this->getKeyCache() . $this->user->id);
             $this->telegram_services->deleteKeyboard($this->user_id);
 
         }
+        cache()->set("keyword_menu" . $this->getKeyCache() . $this->user->id, true);
+
 
     }
 
