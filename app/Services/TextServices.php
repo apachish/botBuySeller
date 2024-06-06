@@ -569,7 +569,9 @@ class TextServices
             case "\xF0\x9F\x93\x88معاملات باز":
                 $worker = UserTelegram::where("id", $this->user_id)->whereHas("customerUsers",function($query){
                     $query->where("status",true);
-                })->get();
+                })->with(["customerUsers",function($query){
+                    $query->where("status",true);
+                }])->get();
                 $keyboard = [];
                 $i = 0;
                 logger("woker",[$worker]);
