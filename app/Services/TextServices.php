@@ -231,6 +231,8 @@ class TextServices
                 "mobile" => data_get($update, $type . '.mobile'),
                 "username" => data_get($update, $type . '.from.username'),
                 "language_code" => data_get($update, $type . '.from.language_code'),
+                "role"=>null,
+                "status"=>false,
             ]);
             if ($update && $data) {
                 $user_telegram = UserTelegram::create($data);
@@ -676,20 +678,23 @@ class TextServices
 
     public function menu($keyboard, $show)
     {
-        if (cache()->get("keyword_menu" . $this->getKeyCache() . $this->user->id)) return true;
-        if ($show) {
+        if ($show ) {
+            if($this->user->change_menu) {
+                {
+                    $this->telegram_services->deleteKeyboard($this->user_id);
+                    $this->user->change_menu = false;
+                    $this->user->update();
+                }
 
-
-                $this->telegram_services->deleteKeyboard($this->user_id);
                 $response = TelegramServices::menu($this->telegram, $keyboard, $this->user, $this->message_menu);
+            }
 
-        } else {
-            cache()->forget("keyword_menu" . $this->getKeyCache() . $this->user->id);
+        }elseif ($this->user->change_menu)
+        {
             $this->telegram_services->deleteKeyboard($this->user_id);
-
+            $this->user->change_menu = false;
+            $this->user->update();
         }
-        cache()->set("keyword_menu" . $this->getKeyCache() . $this->user->id, true);
-
 
     }
 

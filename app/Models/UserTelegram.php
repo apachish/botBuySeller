@@ -29,7 +29,7 @@ class UserTelegram extends Model
         "verify_two",
         "agent_id",
         "role",
-        "menu"
+        "change_menu"
     ];
 
     use HasFactory;

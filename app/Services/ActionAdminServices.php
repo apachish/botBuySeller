@@ -85,6 +85,7 @@ class ActionAdminServices extends TextServices
             if ($user_con) {
                 $fullName = $user_con->fullName ?: $user_con->first_name . " " . $user_con->last_name;
                 $user_con->role = "colleague";
+                $user_con->change_menu = true;
                 $user_con->update();
                 $response_text = "$fullName نقش همکار فعال شد \n\n ";
                 $this->getTelegramServices()->sendMessage($this->getUserId(), $response_text);
@@ -101,6 +102,7 @@ class ActionAdminServices extends TextServices
             if ($user_con) {
                 $fullName = $user_con->fullName ?: $user_con->first_name . " " . $user_con->last_name;
                 $user_con->role = "customer";
+                $user_con->change_menu = true;
                 $user_con->update();
                 $response_text = "$fullName نقش همکاری این شخص به مشتری تغییر یافت \n\n ";
                 $this->getTelegramServices()->sendMessage($this->getUserId(), $response_text);
@@ -116,6 +118,7 @@ class ActionAdminServices extends TextServices
             if ($user_con) {
                 $fullName = $user_con->fullName ?: $user_con->first_name . " " . $user_con->last_name;
                 $user_con->status = true;
+                $user_con->change_menu = true;
                 $user_con->update();
                 cache()->forget("keyword_menu" . $this->key_cache_user . $user_con->id);
                 $response_text = "$fullName اکانت کاربریش فعال شد\n\n ";
@@ -132,6 +135,9 @@ class ActionAdminServices extends TextServices
             if ($user_con) {
                 $fullName = $user_con->fullName ?: $user_con->first_name . " " . $user_con->last_name;
                 $user_con->status = false;
+                $user_con->role = null;
+                $user_con->change_menu = true;
+
                 $user_con->update();
                 $response_text = "$fullName\n\n اکانت کاربریش غیر فعال شد ";
                 $this->getTelegramServices()->sendMessage($this->getUserId(), $response_text);
@@ -148,6 +154,8 @@ class ActionAdminServices extends TextServices
             if ($user_con) {
                 $fullName = $user_con->fullName ?: $user_con->first_name . " " . $user_con->last_name;
                 $user_con->status = false;
+                $user_con->role = null;
+                $user_con->change_menu = true;
                 $user_con->update();
                 $user_con->delete();
                 $response_text = "$fullName\n\n اکانت کاربریش حذف شد ";
