@@ -23,9 +23,10 @@ class ActionServices extends TextServices
 
     public function addCustomerName()
     {
-        $mobile = str_replace('add_customer_name_', '', $this->getData());
+        $mobile = str_replace('add_customer_name_', '', $this->getMessageCache());
         $fullName = $this->getMessage();
 
+        logger("data add customer",[$mobile,$fullName]);
         if ( $fullName && $mobile) {
             CustomerUser::updateOrCreate(["user_id" => $this->getUserId(), "mobile" => $mobile],
                 [
