@@ -21,59 +21,70 @@ class TelegramAdminController extends Controller
     public function setWebhook($token)
     {
 
-        $text_services = new ActionAdminServices($token);
+        try {
 
-        $access = $text_services->accessAdmin();
-        if ($access == null) return false;
 
-        $text_services->setTypeMessage();
-        $text_services->setUserId();
-        $text_services->setMessageId();
-        $text_services->setData();
-        $key_cache = "text_admin_";
-        $text_services->setKeyCache($key_cache);
-        $text_services->setMessage();
-        $text_services->setMessageCache();
-        $text_services->setUser();
-        if ($text_services->getData())
-            $text_services->actionData();
-        if($text_services->getMessageCache())
-            $text_services->actionTextCache();
-        elseif ($text_services->getMessage())
-            $text_services->actionText();
+            $text_services = new ActionAdminServices($token);
 
-        $access_text = [
-            "📞 دفترچه تلفن",
-            "📋 لیست کاربران",
-            "📋 لیست همکاران",
-            "📚  ویرایش قوانین",
-            "\xE2\x81\x89 ویرایش راهنما",
-            "📈محدود شروع مبلغ معاملات",
-        ];
+            $access = $text_services->accessAdmin();
+            if ($access == null) return false;
 
-        $text = "سلام! به منوی اصلی خوش آمدید.";
+            $text_services->setTypeMessage();
+            $text_services->setUserId();
+            $text_services->setMessageId();
+            $text_services->setData();
+            $key_cache = "text_admin_";
+            $text_services->setKeyCache($key_cache);
+            $text_services->setMessage();
+            $text_services->setMessageCache();
+            $text_services->setUser();
+            if ($text_services->getData())
+                $text_services->actionData();
+            if ($text_services->getMessageCache())
+                $text_services->actionTextCache();
+            elseif ($text_services->getMessage())
+                $text_services->actionText();
 
-        $keyboard_menu = [
-            [
-                ['text' => "📞 دفترچه تلفن"],
-                ['text' => "📈محدود شروع مبلغ معاملات"]
-            ],
-            [
-                ['text' =>"📋 لیست همکاران"],
-                ['text' => "📋 لیست کاربران"]
-            ],
+            $access_text = [
+                "📞 دفترچه تلفن",
+                "📋 لیست کاربران",
+                "📋 لیست همکاران",
+                "📚  ویرایش قوانین",
+                "\xE2\x81\x89 ویرایش راهنما",
+                "📈محدود شروع مبلغ معاملات",
+            ];
+
+            $text = "سلام! به منوی اصلی خوش آمدید.";
+
+            $keyboard_menu = [
+                [
+                    ['text' => "📞 دفترچه تلفن"],
+                    ['text' => "📈محدود شروع مبلغ معاملات"]
+                ],
+                [
+                    ['text' => "📋 لیست همکاران"],
+                    ['text' => "📋 لیست کاربران"]
+                ],
 //            [
 //                ['text' => "🔍 جستجو کاربر"]
 //            ],
-            [
-                ['text' => "📚  ویرایش قوانین"]
-            ],
-            [
-                ['text' => "\xE2\x81\x89 ویرایش راهنما"]
-            ],
-        ];
-        $text_services->menu($keyboard_menu,$access);
-
+                [
+                    ['text' => "📚  ویرایش قوانین"]
+                ],
+                [
+                    ['text' => "\xE2\x81\x89 ویرایش راهنما"]
+                ],
+            ];
+            $text_services->menu($keyboard_menu, $access);
+        }catch (\Exception $exception){
+            logger("get error",[
+                $exception->getMessage(),
+                $exception->getLine(),
+                $exception->getCode(),
+                $exception->getTrace(),
+                $exception->getFile()
+            ]);
+        }
 
     }
 
