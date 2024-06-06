@@ -34,8 +34,11 @@ class TelegramController extends Controller
             $text_services->setMessageCache();
             $text_services->setUser();
             logger("user",[$text_services->getUser()]);
-
+            $text_services->getInfo();
             if($text_services->getUser() == null) return false;
+
+            if(!$text_services->getUser()->fullName && !$text_services->getUser()->mobile )
+                return false;
 
             if ($text_services->getData())
                 $text_services->actionByData();
@@ -48,8 +51,7 @@ class TelegramController extends Controller
                 $text_services->actionByMessage();
 
 
-            if(!$text_services->getUser()->fullName && !$text_services->getUser()->mobile )
-                return false;
+
             $i = 0;
             if ($text_services->getUser()->role == "colleague") {
                 $keyboard_menu[$i++] = [
