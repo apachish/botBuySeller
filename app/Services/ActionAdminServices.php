@@ -91,10 +91,9 @@ class ActionAdminServices extends TextServices
                 $response_text = "$fullName نقش همکار فعال شد \n\n ";
                 $this->getTelegramServices()->sendMessage($this->getUserId(), $response_text);
                 $this->service_user->message_menu = "$fullName همکار گرامی به سیستم ما خوش آمدید\n\n ";
-                $this->service_user->menu($this->keyword_colleague,$user_con->status);//->sendMessage($user_con->id, $response_text);
+                $this->service_user->menu($this->keyword_colleague,$user_con->status,$user_con);//->sendMessage($user_con->id, $response_text);
 //                $this->service_user->telegram_services->sendMessage($user_con->id, $response_text);
 
-                cache()->forget("keyword_menu".$this->key_cache_user.$user_con->id);
 
             }
         } elseif (str_contains($this->getData(), "colleague_")) {
@@ -112,7 +111,6 @@ class ActionAdminServices extends TextServices
 //                $this->service_user->telegram_services->sendMessage($user_con->id, $response_text);
                 $this->service_user->message_menu = "$fullName همکاری شما در سیستم به سطح مشتری انتقال یافت\n\n ";
                 $this->service_user->menu($this->keyword_customer,$user_con->status,$user_con);
-                cache()->forget("keyword_menu".$this->key_cache_user.$user_con->id);
 
             }
         } elseif (str_contains($this->getData(), "confirm_")) {
