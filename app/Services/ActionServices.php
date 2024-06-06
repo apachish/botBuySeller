@@ -23,7 +23,7 @@ class ActionServices extends TextServices
 
     public function addCustomerName()
     {
-        $mobile = str_replace('request_transfer_', '', $this->getData());
+        $mobile = str_replace('add_customer_name_', '', $this->getData());
         $fullName = $this->getMessage();
 
         if ( $fullName && $mobile) {
