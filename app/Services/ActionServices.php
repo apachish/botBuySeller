@@ -588,12 +588,12 @@ class ActionServices extends TextServices
         $check_transfer = Transfer::where("price", $type_transaction == "buy" ? "<" : ">", $price)
             ->where("status", Transfer::STATUS_ACTIVE)
             ->where("type", $this->getType())
-            ->orWhere(function ($query) {
-                $query->whereIn("status", [
-                    Transfer::STATUS_ACTIVE_DO,
-                    Transfer::STATUS_ACTIVE_DONE
-                ])->where("updated", ">", now()->subMinute(1));
-            })
+//            ->orWhere(function ($query) {
+//                $query->whereIn("status", [
+//                    Transfer::STATUS_ACTIVE_DO,
+//                    Transfer::STATUS_ACTIVE_DONE
+//                ])->where("updated", ">", now()->subMinute(1));
+//            })
             ->first();
         if ($check_transfer) {
 //            $message = "قیمت پیشنهادی بهتری از لفظ شمادر کانال میباشد\n\n";
