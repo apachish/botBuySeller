@@ -323,6 +323,17 @@ class ActionServices extends TextServices
                 "date" => data_get($word, "date"),
                 "message_request" => data_get($word, "message_request"),
             ];
+
+            logger("order",[
+                "status" => Transfer::STATUS_ACTIVE,
+                "user_id" => $this->getUserId(),
+                "type" => data_get($word, "type"),
+                "number" => (int)data_get($word, "number"),
+                "price" => data_get($word, "price"),
+                "message" => data_get($word, "message"),
+                "date" => data_get($word, "date"),
+                "message_request" => data_get($word, "message_request"),
+            ];
             $transfer_new = Transfer::create($order);
             logger("a", [$this->getUserId(), $this->getMessageId(), []]);
             $this->telegram_services->editMessageReplyMarkup($this->getUserId(), $this->getMessageId(), new \stdClass());
