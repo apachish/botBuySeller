@@ -163,7 +163,6 @@ class ActionServices extends TextServices
 
                 $limit_day = null;
                 $use_day = null;
-                $access_number = null;
                 $transaction_party = null;
                 $request = new RequestTransfer();
                 $request->number = 0;
@@ -272,9 +271,12 @@ class ActionServices extends TextServices
                     $this->telegram_services->sendMessage($this->getUserId(), "متأسفانه امکان دریافت حواله برای شما در این معامله نمی باشد");
 
                 }
-            } catch (\Exception $e) {
+            } catch (\Exception $exception) {
 
-                logger("exp", [$e->getMessage(), $e->getLine()]);
+                logger("exp", [                $exception->getMessage(),
+                    $exception->getLine(),
+                    $exception->getCode(),
+                    $exception->getFile()]);
             }
         }
     }
