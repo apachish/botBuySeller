@@ -236,7 +236,7 @@ class ActionServices extends TextServices
                 }
 
 
-                if ($request->number) {
+                if (data_get($request_transfer,"number")) {
                     DailyRequestTransfer::updateOrCreate([
                         "request_id",
                         "transfer_id",
@@ -256,10 +256,10 @@ class ActionServices extends TextServices
                         $request_transfer["transfer_id"] = $transfer->user_id;
                         $request_transfer["price"] = $transfer->pric;
 
-                    $request->create($request_transfer);
+                    RequestTransfer::create($request_transfer);
                     $message = $transfer->message_request;
                     $message .= "\n\n";
-                    $message .= "مقدار:" . $request->number;
+                    $message .= "مقدار:" . data_get($request_transfer,"number");
                     $message .= "\n\n";
                     $message .= "نوع:" . getTypeTransfer($transfer->type);
                     $message .= "\n\n";
