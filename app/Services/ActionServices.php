@@ -229,8 +229,8 @@ class ActionServices extends TextServices
                 } else {
                     if ($transfer->number >= $num) {
                         $transfer->number -= $num;
-                        $request["number"] = $num;
-                        $request["status"] = "complete";
+                        $request_transfer["number"] = $num;
+                        $request_transfer["status"] = "complete";
                         logger("request", [$request]);
                     }
                 }
