@@ -162,7 +162,11 @@ class ActionServices extends TextServices
             try {
 
                 $limit_day = null;
+                $use_day = null;
+                $access_number = null;
                 $transaction_party = null;
+                $request = new RequestTransfer();
+                $request->number = 0;
                 if ($transfer->user->role == "customer")
                     $transaction_party = data_get($transfer, 'user.customerUser.headCustomer.fullName')."(".data_get($transfer, 'user.customerUser.fullName').")";
                 if ($transfer->user->role == "colleague")
@@ -187,43 +191,49 @@ class ActionServices extends TextServices
 
                 }
 
+                if($limit_day) {
+                    $use_day = 0;
+                    $daily_request = DailyRequestTransfer::where("request_id", $this->getUserId())
+                        ->where("transfer_id", $transfer->user_id)
+                        ->whereDate('created_at', now())->first();
+                    $daily_transfer = DailyRequestTransfer::where("transfer_id", $this->getUserId())
+                        ->where("request_id", $transfer->user_id)
+                        ->whereDate('created_at', now())->first();
 
-                $daily_request = DailyRequestTransfer::where("request_id", $this->getUserId())
-                    ->where("transfer_id", $transfer->user_id)
-                    ->whereDate('created_at', now())->first();
-                $daily_transfer = DailyRequestTransfer::where("transfer_id", $this->getUserId())
-                    ->where("request_id", $transfer->user_id)
-                    ->whereDate('created_at', now())->first();
+                    if (($daily_request && $daily_request->limit) && ($daily_transfer && $daily_transfer->limit)) {
+                        $use_day = $daily_request->use_day - $daily_transfer->limit;
+                        if ($use_day < 0)
+                            $use_day *= -1;
+                    }
+                    if (($daily_transfer && $daily_transfer->limit))
+                        $use_day = $daily_transfer->use_day;
+                    if (($daily_request && $daily_request->limit))
+                        $use_day = $daily_request->use_day;
 
-                $use_day = 0;
-                if (($daily_request && $daily_request->limit) && ($daily_transfer && $daily_transfer->limit)) {
-                    $use_day = $daily_request->use_day - $daily_transfer->limit;
-                    if ($use_day < 0)
-                        $use_day *= -1;
-                }
-                if (($daily_transfer && $daily_transfer->limit))
-                    $use_day = $daily_transfer->use_day;
-                if (($daily_request && $daily_request->limit))
-                    $use_day = $daily_request->use_day;
+                    $access_number = $limit_day - $use_day;
+                    if ($transfer->number >= $num) {
+                        if ($access_number >= $num) {
+                            $transfer->number -= $num;
+                            $use_day += $num;
+                            $request->number = $num;
+                            $request->status = "complete";
+                        } elseif ($access_number > 0) {
+                            $transfer->number -= $access_number;
+                            $use_day += $access_number;
+                            $request->number = $access_number;
+                            $request->status = "half";
 
-                $access_number = $limit_day - $use_day;
-                $request = new RequestTransfer();
-                $request->number = 0;
-                logger("num request",[$access_number,$limit_day,$transaction_party,$daily_request,$daily_transfer,$transfer->number , $num]);
-                if ($transfer->number >= $num) {
-                    if ($access_number >= $num) {
+                        }
+                    }
+                }else{
+                    if ($transfer->number >= $num) {
                         $transfer->number -= $num;
-                        $use_day += $num;
                         $request->number = $num;
                         $request->status = "complete";
-                    } elseif ($access_number > 0) {
-                        $transfer->number -= $access_number;
-                        $use_day += $access_number;
-                        $request->number = $access_number;
-                        $request->status = "half";
-
                     }
                 }
+
+
 
                 if ($request->number) {
                     DailyRequestTransfer::updateOrCreate([
