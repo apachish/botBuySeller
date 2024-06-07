@@ -276,6 +276,17 @@ class ActionServices extends TextServices
 
                     logger("message", [$message]);
                     $this->telegram_services->sendMessage($this->getUserId(), $message);
+                    $message = $transfer->message_request_me;
+                    $message .= "\n\n";
+                    $message .= "مقدار:" . data_get($request_transfer,"number")."کیلو";
+                    $message .= "\n\n";
+                    $message .= "نوع:" . getTypeTransfer($transfer->type);
+                    $message .= "\n\n";
+                    $message .= "طرف معامله:" . $transaction_party;
+                    $message .= "\n\n";
+                    $message .= "برای:" . toJalali($transfer->date,"Y/m/d");
+                    $message .= "\n\n";
+                    $message .= "       شماره حواله:" . data_get($request_transfer,'remittance_number');
                     $this->telegram_services->sendMessage($transfer->user_id, $message);
 
                 } else {
@@ -600,9 +611,12 @@ class ActionServices extends TextServices
             if (in_array($this->getType(), $this->list_type_buy)) {
                 $message .= " \xF0\x9F\x94\xB5	خرید";
                 $message_request = " \xF0\x9F\x94\xB5	خرید";
+                $message_request_me = " \xF0\x9F\x94\xB4	فروش";
             } elseif (in_array($this->getType(), $this->list_type_sell)) {
                 $message .= " \xF0\x9F\x94\xB4	فروش";
                 $message_request = " \xF0\x9F\x94\xB4	فروش";
+                $message_request_me = " \xF0\x9F\x94\xB5	خرید";
+
             }
             $time = Carbon::now();
             $morning = Carbon::create($time->year, $time->month, $time->day, 10, 0, 0); //set time to 08:00
@@ -617,16 +631,21 @@ class ActionServices extends TextServices
             if ($time->between($morning, $none, true) && !in_array($this->getType(), $this->list_type_tommarow)) {
                 $message .= " \xE2\x98\x80	";
                 $message_request .= " \xE2\x98\x80	";
+                $message_request_me .= " \xE2\x98\x80	";
                 $date = now()->format("Y-m-d");
             } else {
                 $message .= " \xE2\x8F\xB3	";
                 $message_request .= " \xE2\x8F\xB3	";
+                $message_request_me .= " \xE2\x8F\xB3	";
                 $date = now()->addDay(1)->format("Y-m-d");
             }
 
             $message_request .= "\n\n";
             $message_request .= "فی:";
             $message_request .= number_format($price, 0);
+            $message_request_me .= "\n\n";
+            $message_request_me .= "فی:";
+            $message_request_me .= number_format($price, 0);
             if (str_contains($this->getType(), "ن")) {
                 $message .= " بی حواله ";
                 if (!$time->between($morning, $none, true) ||
@@ -656,7 +675,8 @@ class ActionServices extends TextServices
                 "number" => (int)$number,
                 "price" => $price,
                 "date" => $date,
-                "message_request" => $message_request
+                "message_request" => $message_request,
+                "message_request_me" => $message_request_me
             ]);
             logger("word", [$word_telegram]);
             $keyboard[0] = [
