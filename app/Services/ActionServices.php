@@ -30,7 +30,7 @@ class ActionServices extends TextServices
 
         if ($customer_id) {
             $customer = CustomerUser::find($customer_id);
-            $customer->limit = $this->getMessage();
+            $customer->limit = (int)$this->getMessage();
             $customer->update();
             $message = "اطلاعات مشتری ثبت شد";
             $message .= "\n\n";
@@ -349,11 +349,11 @@ class ActionServices extends TextServices
             $date_p = toJalali($date,"Y_m_d");
             $message = ' گزارش ';
             $message .= $customer->fullName;
-            $message .= "تاریخ ".toJalali($date,"Y/m/d");
+            $message .= "  تاریخ   ".toJalali($date,"Y/m/d");
             $message .= "\n\n ";
             $this->telegram_services->editMessageTextAndInlineKeyboard($this->getUserId(), $message_id, $message);
             $request_transfer = RequestTransfer::with("transfer.user")->where("request_id",data_get($customer,"user.id"))->get();
-            if($request_transfer){
+            if($request_transfer->count()){
                 $pdf = Pdf::loadView('users.report_pdf', compact('date_p','request_transfer', 'customer'));
                 $name_file = $customer_id."_".$date_p.".pdf";
                 $path_report =  storage_path("app/public/report/" .$this->getUserId()."/".$name_file);
