@@ -67,15 +67,9 @@ class ActionServices extends TextServices
                 [
                     "fullName" => $fullName,
                 ]);
-            $message = "اطلاعات مشتری وارد شد";
+            $message = $fullName;
             $message .= "\n\n";
-            $message .= "نام مستعار:";
-            $message .= $fullName;
-            $message .= "\n\n";
-            $message .= "شماره همراه:";
-            $message .= $mobile;
-            $message .= "\n\n";
-            $message = "پس از تایید مدیریت مشتری شما خواهد گشت ";
+            $message = "پس از تایید مدیریت به لیست مشتریان شما اضافه خواهد شد ";
             $message .= "\n\n";
             $this->telegram_services->sendMessage($this->getUserId(), $message);
             cache()->forget($this->getKeyCache() . $this->getUserId());
