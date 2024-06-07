@@ -259,7 +259,7 @@ class ActionServices extends TextServices
                     $message .= "\n\n";
                     $message .= "       شماره حواله:" . $request->remittance_number;
 
-                    $this->telegram_services->sendMessage($this->getUserId(), "متأسفانه امکان دریافت حواله برای شما در این معامله نمی باشد");
+                    $this->telegram_services->sendMessage($this->getUserId(), $message);
 
                 } else {
                     $this->telegram_services->sendMessage($this->getUserId(), "متأسفانه امکان دریافت حواله برای شما در این معامله نمی باشد");
