@@ -617,11 +617,11 @@ class ActionServices extends TextServices
             if ($time->between($morning, $none, true) && !in_array($this->getType(), $this->list_type_tommarow)) {
                 $message .= " \xE2\x98\x80	";
                 $message_request .= " \xE2\x98\x80	";
-                $date = now();
+                $date = now()->format("Y-m-d");
             } else {
                 $message .= " \xE2\x8F\xB3	";
                 $message_request .= " \xE2\x8F\xB3	";
-                $date = now()->addDay(1);
+                $date = now()->addDay(1)->format("Y-m-d");
             }
 
             $message_request .= "\n\n";
@@ -653,7 +653,7 @@ class ActionServices extends TextServices
                 "message" => $message,
                 "status" => WordTelegram::STATUS_PENDING,
                 "type" => $this->getType(),
-                "number" => $number,
+                "number" => (int)$number,
                 "price" => $price,
                 "date" => $date,
                 "message_request" => $message_request
