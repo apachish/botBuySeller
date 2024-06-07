@@ -209,7 +209,7 @@ class ActionServices extends TextServices
                 $access_number = $limit_day - $use_day;
                 $request = new RequestTransfer();
                 $request->number = 0;
-                logger("num request",[$limit_day,$transaction_party,$daily_request,$daily_transfer,$transfer->number , $num]);
+                logger("num request",[$access_number,$limit_day,$transaction_party,$daily_request,$daily_transfer,$transfer->number , $num]);
                 if ($transfer->number >= $num) {
                     if ($access_number >= $num) {
                         $transfer->number -= $num;
