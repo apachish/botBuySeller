@@ -262,7 +262,8 @@ class ActionServices extends TextServices
                         $request_transfer["price"] = $transfer->pric;
 
                     RequestTransfer::create($request_transfer);
-                    $message = $transfer->message_request;
+
+                    $message = $transfer->message_request_me;
                     $message .= "\n\n";
                     $message .= "مقدار:" . data_get($request_transfer,"number")."کیلو";
                     $message .= "\n\n";
@@ -273,10 +274,11 @@ class ActionServices extends TextServices
                     $message .= "برای:" . toJalali($transfer->date,"Y/m/d");
                     $message .= "\n\n";
                     $message .= "       شماره حواله:" . data_get($request_transfer,'remittance_number');
-
                     logger("message", [$message]);
                     $this->telegram_services->sendMessage($this->getUserId(), $message);
-                    $message = $transfer->message_request_me;
+
+
+                    $message = $transfer->message_request;
                     $message .= "\n\n";
                     $message .= "مقدار:" . data_get($request_transfer,"number")."کیلو";
                     $message .= "\n\n";
