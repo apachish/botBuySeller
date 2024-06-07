@@ -260,6 +260,7 @@ class ActionServices extends TextServices
                     $message .= "       شماره حواله:" . $request->remittance_number;
 
                     $this->telegram_services->sendMessage($this->getUserId(), $message);
+                    $this->telegram_services->sendMessage($transfer->user_id, $message);
 
                 } else {
                     $this->telegram_services->sendMessage($this->getUserId(), "متأسفانه امکان دریافت حواله برای شما در این معامله نمی باشد");
