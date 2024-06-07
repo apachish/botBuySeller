@@ -6,12 +6,15 @@ namespace App\Services;
 use App\Jobs\DeactivateTransfer;
 use App\Models\CustomerUser;
 use App\Models\MessageTelegram;
+use App\Models\RequestTransfer;
 use App\Models\Setting;
 use App\Models\Transfer;
 use App\Models\UserTelegram;
 use App\Models\UserTradeAccess;
 use App\Models\WordTelegram;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
+use Telegram\Bot\FileUpload\InputFile;
 
 class ActionServices extends TextServices
 {
@@ -21,6 +24,36 @@ class ActionServices extends TextServices
         parent::__construct($token);
     }
 
+    public function addCustomerLimit()
+    {
+        $customer_id = str_replace('trade_open_limit_', '', $this->getMessageCache());
+
+        if ($customer_id) {
+            $customer = CustomerUser::find($customer_id);
+            $customer->limit = $this->getMessage();
+            $customer->update();
+            $message = "اطلاعات مشتری ثبت شد";
+            $message .= "\n\n";
+            $message .= "نام و نام خانوادگی:";
+            $message .= $customer->fullName;
+            $message .= "\n\n";
+            $message .= "شماره همراه:";
+            $message .= $customer->mobile;
+            $message .= "\n\n";
+            $message = "حد مجاز معامله ";
+            $message .= "\n\n";
+            $message .= $customer->limit;
+
+            $this->telegram_services->sendMessage($this->getUserId(), $message);
+            cache()->forget($this->getKeyCache() . $this->getUserId());
+            cache()->forget("trade_open_".$this->getUserId());
+
+
+        } else {
+            $this->telegram_services->sendMessage($this->getUserId(), "اطلاعات وارد شده مشکل دارد با ادمین سیستم تماس حاصل فرمایید یا مجددا معرفی مشتری بزنید");
+
+        }
+    }
     public function addCustomerName()
     {
         $mobile = str_replace('add_customer_name_', '', $this->getMessageCache());
@@ -244,6 +277,95 @@ class ActionServices extends TextServices
             ]);
             cache()->set($this->getKeyCache() . $this->getUserId(), ["title" => "trade_number_limit", "value" => $worker->id]);
         }
+    }
+
+    public function tradeOpen()
+    {
+        $customer_id = str_replace('trade_open_', '', $this->getData());
+        $message_id =  cache()->get("trade_open_".$this->getUserId());
+        if($customer_id && $message_id) {
+            $customer = CustomerUser::find($customer_id);
+            $keyboard[0] = [
+                ['text' => "\xF0\x9F\x94\x90	حد مجاز", 'callback_data' => "trade_open_limit_$customer_id"],
+                ['text' => "\xF0\x9F\x93\x9C	گزارش", 'callback_data' => "trade_open_report_$customer_id"],
+            ];
+            $message = "یکی از گزینه های زیر برای مشتری ";
+            $message .= "\n\n ";
+            $message .= $customer->fullName;
+            $this->telegram_services->editMessageTextAndInlineKeyboard($this->getUserId(), $message_id, $message, $keyboard);
+        }
+
+    }
+    public function tradeOpenLimit()
+    {
+        $customer_id = str_replace('trade_open_limit', '', $this->getData());
+        $message_id =  cache()->get("trade_open_".$this->getUserId());
+        if($customer_id && $message_id) {
+            $customer = CustomerUser::find($customer_id);
+            $message = "حد مجاز برای مشتری ";
+            $message .= "\n\n ";
+            $message .= $customer->fullName;
+            $this->telegram_services->editMessageTextAndInlineKeyboard($this->getUserId(), $message_id, $message);
+            cache()->set($this->getKeyCache() . $this->getUserId(),$this->getData());
+        }
+
+    }
+
+    public function tradeOpenReport()
+    {
+        $customer_id = str_replace('trade_open_report_', '', $this->getData());
+        $message_id =  cache()->get("trade_open_".$this->getUserId());
+        if($customer_id && $message_id) {
+            $customer = CustomerUser::find($customer_id);
+
+            $today = now()->format("Y-m-d");
+            $tomorrow = now()->addDay(1)->format("Y-m-d");
+            $keyboard[0] = [
+                ['text' => toJalali(now(),"Y/m/d"), 'callback_data' => "trade_open_report_date_".$customer_id."_".$today],
+                ['text' => toJalali(now()->addDay(1),"Y/m/d"), 'callback_data' => "trade_open_report_date_".$customer_id."_".$tomorrow],
+            ];
+            $message = ' گزارش ';
+            $message .= $customer->fullName;
+            $message .= "تاریخ های زیر را انتخاب کنید";
+            $message .= "\n\n ";
+            $this->telegram_services->editMessageTextAndInlineKeyboard($this->getUserId(), $message_id, $message, $keyboard);
+        }
+
+    }
+
+    public function tradeOpenReportDate()
+    {
+        $data = str_replace('trade_open_report_date_', '', $this->getData());
+        $array = explode("_",$data);
+        $customer_id = data_get($array,0);
+        $date = data_get($array,1);
+        $message_id =  cache()->get("trade_open_".$this->getUserId());
+        if($customer_id && $message_id) {
+            $customer = CustomerUser::with("user")->find($customer_id);
+
+            $date_p = toJalali($date,"Y_m_d");
+            $message = ' گزارش ';
+            $message .= $customer->fullName;
+            $message .= "تاریخ ".toJalali($date,"Y/m/d");
+            $message .= "\n\n ";
+            $this->telegram_services->editMessageTextAndInlineKeyboard($this->getUserId(), $message_id, $message);
+            $request_transfer = RequestTransfer::with("transfer.user")->where("request_id",data_get($customer,"user.id"))->get();
+            if($request_transfer){
+                $pdf = Pdf::loadView('users.report_pdf', compact('date_p','request_transfer', 'customer'));
+                $name_file = $customer_id."_".$date_p.".pdf";
+                $path_report =  storage_path("app/public/report/" .$this->getUserId()."/".$name_file);
+                $pdf->save($path_report);
+
+                $response = $this->telegram->sendDocument([
+                    'chat_id' => $this->getUserId(),
+                    'document' => InputFile::create($path_report, "$date_p.pdf")
+                ]);
+            }else{
+                $this->telegram->sendMessage(['chat_id' => $this->getUserId(), 'text' => 'معاله ای در این تاریخ انجام نشده']);
+            }
+
+        }
+
     }
 
     public function tradeNumberLimit()

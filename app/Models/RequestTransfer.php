@@ -22,5 +22,9 @@ class RequestTransfer extends Model
 
     use HasFactory;
 
+    public function transfer()
+    {
+        return $this->belongsTo(Transfer::class,"transfer_id","id");
+    }
 
 }

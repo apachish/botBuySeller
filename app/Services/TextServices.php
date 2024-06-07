@@ -375,7 +375,13 @@ class TextServices
     public function setContact(): void
     {
         if (isset($this->update['message']['contact']["phone_number"]))
+        {
             $this->contact = $this->convertNumber($this->update['message']['contact']["phone_number"]);
+            $customer = CustomerUser::where("user_id",$this->user_id)
+                ->where("fullName","خودم")->first();
+            if($customer)
+                $customer->update(["mobile"=> $this->contact]);
+        }
     }
 
     public function checkText()
@@ -436,6 +442,8 @@ class TextServices
     public function checkCache()
     {
         if (is_array($this->message_cache) && str_contains(data_get($this->message_cache, "title"), "trade_number_limit"))
+            return true;
+        elseif (str_contains($this->message_cache, "trade_open_limit_"))
             return true;
         elseif (str_contains($this->message_cache, "add_customer_"))
             return true;
@@ -528,6 +536,14 @@ class TextServices
             $this->tradeLimitClose();
         elseif (str_contains($this->data, "trade_limit_"))
             $this->tradeLimit();
+        elseif (str_contains($this->data, "trade_open_limit_"))
+            $this->tradeOpenLimit();
+        elseif (str_contains($this->data, "trade_open_report_date_"))
+            $this->tradeOpenReportDate();
+        elseif (str_contains($this->data, "trade_open_report_"))
+            $this->tradeOpenReport();
+        elseif (str_contains($this->data, "trade_open_"))
+            $this->tradeOpen();
 
     }
 
@@ -542,6 +558,8 @@ class TextServices
             $this->tradeNumberLimit();
         elseif (str_contains($this->message_cache, "add_customer_name_"))
             $this->addCustomerName();
+        elseif (str_contains($this->message_cache, "trade_open_limit_"))
+            $this->addCustomerLimit();
         elseif (str_contains($this->message_cache, "add_customer_mobile"))
             $this->addCustomer();
         elseif (str_contains($this->message_cache, "add_mobile"))
@@ -574,6 +592,7 @@ class TextServices
 
                 break;
             case "\xF0\x9F\x93\x88معاملات باز":
+                cache()->forget("trade_open_".$this->user_id);
                 $worker = CustomerUser::where("user_id",$this->user_id)
                     ->with("user")
                     ->whereHas("user")
@@ -587,7 +606,8 @@ class TextServices
                     ];
                 });
                 logger("woker key",[$keyboard]);
-                $this->telegram_services->MessageReplyMarkup($this->telegram,$this->user_id, "شخص مورد نظر را انتخاب کنید", $keyboard);
+                $message_id =  $this->telegram_services->MessageReplyMarkup($this->telegram,$this->user_id, "شخص مورد نظر را انتخاب کنید", $keyboard);
+                cache()->set("trade_open_".$this->user_id,$message_id);
                 break;
 
             case "\xF0\x9F\x93\x8Bلیست همکاران":

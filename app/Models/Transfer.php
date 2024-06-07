@@ -25,6 +25,7 @@ class Transfer extends Model
         "price",
         "status",
         "message",
+        "description",
         "message_id",
         "date"
     ];
@@ -32,4 +33,8 @@ class Transfer extends Model
     use HasFactory;
 
 
+    public function user()
+    {
+        return $this->belongsTo(UserTelegram::class,"user_id","id");
+    }
 }
