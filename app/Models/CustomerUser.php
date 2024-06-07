@@ -29,6 +29,11 @@ class CustomerUser extends Model
         return $this->belongsTo(UserTelegram::class,"mobile","mobile");
     }
 
+    public function headCustomer()
+    {
+        return $this->belongsTo(UserTelegram::class,"user_id","id");
+    }
+
 
 
 

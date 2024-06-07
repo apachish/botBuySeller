@@ -27,7 +27,8 @@ class Transfer extends Model
         "message",
         "description",
         "message_id",
-        "date"
+        "date",
+        "message_request"
     ];
 
     use HasFactory;

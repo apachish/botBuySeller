@@ -5,6 +5,7 @@ namespace App\Services;
 
 use App\Jobs\DeactivateTransfer;
 use App\Models\CustomerUser;
+use App\Models\DailyRequestTransfer;
 use App\Models\MessageTelegram;
 use App\Models\RequestTransfer;
 use App\Models\Setting;
@@ -46,7 +47,7 @@ class ActionServices extends TextServices
 
             $this->telegram_services->sendMessage($this->getUserId(), $message);
             cache()->forget($this->getKeyCache() . $this->getUserId());
-            cache()->forget("trade_open_".$this->getUserId());
+            cache()->forget("trade_open_" . $this->getUserId());
 
 
         } else {
@@ -54,6 +55,7 @@ class ActionServices extends TextServices
 
         }
     }
+
     public function addCustomerName()
     {
         $mobile = str_replace('add_customer_name_', '', $this->getMessageCache());
@@ -164,13 +166,105 @@ class ActionServices extends TextServices
         $transfer = Transfer::find($id);
         if ($transfer) {
             try {
+
+                $limit_day = null;
+                $transaction_party = null;
+                if ($transfer->user->role == "customer")
+                    $transaction_party = data_get($transfer, 'user.customerUser.headCustomer.fullName')."(".data_get($transfer, 'user.customerUser.fullName').")";
+                if ($transfer->user->role == "colleague")
+                    $transaction_party = data_get($transfer, 'user.fullName');
+
+                if ($this->getUser()->role == "customer") {
+                    $customer = CustomerUser::where("mobile", $this->getUser())->first();
+                    if ($customer && $customer->limit)
+                        $limit_day = $customer->limit;
+
+                } elseif ($this->getUser()->role == "colleague") {
+                    $user_request = UserTradeAccess::where("user_id", $this->getUserId())
+                        ->where("user_trade_id", $transfer->user_id)->first();
+                    $user_transfer = UserTradeAccess::where("user_id", $transfer->user_id)
+                        ->where("user_trade_id", $this->getUserId())->first();
+                    if (($user_request && $user_request->limit) && ($user_transfer && $user_transfer->limit))
+                        $limit_day = min($user_request->limit, $user_transfer->limit);
+                    if (($user_transfer && $user_transfer->limit))
+                        $limit_day = $user_transfer->limit;
+                    if (($user_request && $user_request->limit))
+                        $limit_day = $user_request->limit;
+
+                }
+
+
+                $daily_request = DailyRequestTransfer::where("request_id", $this->getUserId())
+                    ->where("transfer_id", $transfer->user_id)
+                    ->whereDate('created_at', now())->first();
+                $daily_transfer = DailyRequestTransfer::where("transfer_id", $this->getUserId())
+                    ->where("request_id", $transfer->user_id)
+                    ->whereDate('created_at', now())->first();
+
+                $use_day = 0;
+                if (($daily_request && $daily_request->limit) && ($daily_transfer && $daily_transfer->limit)) {
+                    $use_day = $daily_request->use_day - $daily_transfer->limit;
+                    if ($use_day < 0)
+                        $use_day *= -1;
+                }
+                if (($daily_transfer && $daily_transfer->limit))
+                    $use_day = $daily_transfer->use_day;
+                if (($daily_request && $daily_request->limit))
+                    $use_day = $daily_request->use_day;
+
+                $access_number = $limit_day - $use_day;
+                $request = new RequestTransfer();
+                $request->number = 0;
                 if ($transfer->number >= $num)
-                    $transfer->number -= $num;
-                $keyboard = self::getKeyboardRequest($transfer);
+                    if ($access_number >= $num) {
+                        $transfer->number -= $num;
+                        $use_day += $num;
+                        $request->number = $num;
+                        $request->status = "complete";
+                    } elseif ($access_number > 0) {
+                        $transfer->number -= $access_number;
+                        $use_day += $access_number;
+                        $request->number = $access_number;
+                        $request->status = "half";
+
+                    }
+
+                if ($request->number) {
+                    DailyRequestTransfer::updateOrCreate([
+                        "request_id",
+                        "transfer_id",
+                    ], [
+                        "limit" => $limit_day,
+                        "use_day" => $use_day
+                    ]);
+
+                    $keyboard = self::getKeyboardRequest($transfer);
 
 
-                $this->telegram_services->editMessageTextAndInlineKeyboard($this->bot->chanel_id, $transfer->message_id, $transfer->message, $keyboard);
-                $transfer->update();
+                    $this->telegram_services->editMessageTextAndInlineKeyboard($this->bot->chanel_id, $transfer->message_id, $transfer->message, $keyboard);
+                    $transfer->update();
+                    $request->request_id = $this->getUserId();
+                    $request->transfer_id = $transfer->user_id;
+                    $request->price = $transfer->price;
+                    $request->create();
+                    $message = $transfer->message_request;
+                    $message .= "\n\n";
+                    $message .= "مقدار:" . $request->number;
+                    $message .= "\n\n";
+                    $message .= "نوع:" . getTypeTransfer($transfer->type);
+                    $message .= "\n\n";
+                    $message .= "طرف معامله:".$transaction_party;
+                    $message .= "\n\n";
+                    $message .= "برای:" . toJalali($transfer->date);
+                    $message .= "\n\n";
+                    $message .= "       شماره حواله:" . $request->remittance_number;
+
+                    $this->telegram_services->sendMessage($this->getUserId(), "متأسفانه امکان دریافت حواله برای شما در این معامله نمی باشد");
+
+                } else {
+                    $this->telegram_services->sendMessage($this->getUserId(), "متأسفانه امکان دریافت حواله برای شما در این معامله نمی باشد");
+
+                }
             } catch (\Exception $e) {
 
                 logger("exp", [$e->getMessage(), $e->getLine()]);
@@ -206,6 +300,7 @@ class ActionServices extends TextServices
                 "price" => data_get($word, "price"),
                 "message" => data_get($word, "message"),
                 "date" => data_get($word, "date"),
+                "message_request" => data_get($word, "message_request"),
             ];
             $transfer_new = Transfer::create($order);
             logger("a", [$this->getUserId(), $this->getMessageId(), []]);
@@ -282,8 +377,8 @@ class ActionServices extends TextServices
     public function tradeOpen()
     {
         $customer_id = str_replace('trade_open_', '', $this->getData());
-        $message_id =  cache()->get("trade_open_".$this->getUserId());
-        if($customer_id && $message_id) {
+        $message_id = cache()->get("trade_open_" . $this->getUserId());
+        if ($customer_id && $message_id) {
             $customer = CustomerUser::find($customer_id);
             $keyboard[0] = [
                 ['text' => "\xF0\x9F\x94\x90	حد مجاز", 'callback_data' => "trade_open_limit_$customer_id"],
@@ -296,14 +391,15 @@ class ActionServices extends TextServices
         }
 
     }
+
     public function tradeOpenLimit()
     {
         $customer_id = str_replace('trade_open_limit_', '', $this->getData());
-        $message_id =  cache()->get("trade_open_".$this->getUserId());
-        if($customer_id && $message_id) {
+        $message_id = cache()->get("trade_open_" . $this->getUserId());
+        if ($customer_id && $message_id) {
             $customer = CustomerUser::find($customer_id);
-            logger("customer",[$customer,$customer_id,$message_id]);
-            if($customer) {
+            logger("customer", [$customer, $customer_id, $message_id]);
+            if ($customer) {
                 $message = "حد مجاز برای مشتری ";
                 $message .= "\n\n ";
                 $message .= $customer->fullName;
@@ -317,15 +413,15 @@ class ActionServices extends TextServices
     public function tradeOpenReport()
     {
         $customer_id = str_replace('trade_open_report_', '', $this->getData());
-        $message_id =  cache()->get("trade_open_".$this->getUserId());
-        if($customer_id && $message_id) {
+        $message_id = cache()->get("trade_open_" . $this->getUserId());
+        if ($customer_id && $message_id) {
             $customer = CustomerUser::find($customer_id);
 
             $today = now()->format("Y-m-d");
             $tomorrow = now()->addDay(1)->format("Y-m-d");
             $keyboard[0] = [
-                ['text' => toJalali(now(),"Y/m/d"), 'callback_data' => "trade_open_report_date_".$customer_id."_".$today],
-                ['text' => toJalali(now()->addDay(1),"Y/m/d"), 'callback_data' => "trade_open_report_date_".$customer_id."_".$tomorrow],
+                ['text' => toJalali(now(), "Y/m/d"), 'callback_data' => "trade_open_report_date_" . $customer_id . "_" . $today],
+                ['text' => toJalali(now()->addDay(1), "Y/m/d"), 'callback_data' => "trade_open_report_date_" . $customer_id . "_" . $tomorrow],
             ];
             $message = ' گزارش ';
             $message .= $customer->fullName;
@@ -339,31 +435,31 @@ class ActionServices extends TextServices
     public function tradeOpenReportDate()
     {
         $data = str_replace('trade_open_report_date_', '', $this->getData());
-        $array = explode("_",$data);
-        $customer_id = data_get($array,0);
-        $date = data_get($array,1);
-        $message_id =  cache()->get("trade_open_".$this->getUserId());
-        if($customer_id && $message_id) {
+        $array = explode("_", $data);
+        $customer_id = data_get($array, 0);
+        $date = data_get($array, 1);
+        $message_id = cache()->get("trade_open_" . $this->getUserId());
+        if ($customer_id && $message_id) {
             $customer = CustomerUser::with("user")->find($customer_id);
 
-            $date_p = toJalali($date,"Y_m_d");
+            $date_p = toJalali($date, "Y_m_d");
             $message = ' گزارش ';
             $message .= $customer->fullName;
-            $message .= "  تاریخ   ".toJalali($date,"Y/m/d");
+            $message .= "  تاریخ   " . toJalali($date, "Y/m/d");
             $message .= "\n\n ";
             $this->telegram_services->editMessageTextAndInlineKeyboard($this->getUserId(), $message_id, $message);
-            $request_transfer = RequestTransfer::with("transfer.user")->where("request_id",data_get($customer,"user.id"))->get();
-            if($request_transfer->count()){
-                $pdf = Pdf::loadView('users.report_pdf', compact('date_p','request_transfer', 'customer'));
-                $name_file = $customer_id."_".$date_p.".pdf";
-                $path_report =  storage_path("app/public/report/" .$this->getUserId()."/".$name_file);
+            $request_transfer = RequestTransfer::with("transfer.user")->where("request_id", data_get($customer, "user.id"))->get();
+            if ($request_transfer->count()) {
+                $pdf = Pdf::loadView('users.report_pdf', compact('date_p', 'request_transfer', 'customer'));
+                $name_file = $customer_id . "_" . $date_p . ".pdf";
+                $path_report = storage_path("app/public/report/" . $this->getUserId() . "/" . $name_file);
                 $pdf->save($path_report);
 
                 $response = $this->telegram->sendDocument([
                     'chat_id' => $this->getUserId(),
                     'document' => InputFile::create($path_report, "$date_p.pdf")
                 ]);
-            }else{
+            } else {
                 $this->telegram->sendMessage(['chat_id' => $this->getUserId(), 'text' => 'معاله ای در این تاریخ انجام نشده']);
             }
 
@@ -465,10 +561,14 @@ class ActionServices extends TextServices
 
             $price_format = number_format($price, 0);
             $message = $price_format;
-            if (in_array($this->getType(), $this->list_type_buy))
+            $message_request = null;
+            if (in_array($this->getType(), $this->list_type_buy)) {
                 $message .= " \xF0\x9F\x94\xB5	خرید";
-            elseif (in_array($this->getType(), $this->list_type_sell))
+                $message_request = " \xF0\x9F\x94\xB5	خرید";
+            } elseif (in_array($this->getType(), $this->list_type_sell)) {
                 $message .= " \xF0\x9F\x94\xB4	فروش";
+                $message_request = " \xF0\x9F\x94\xB4	فروش";
+            }
             $time = Carbon::now();
             $morning = Carbon::create($time->year, $time->month, $time->day, 10, 0, 0); //set time to 08:00
             $none = Carbon::create($time->year, $time->month, $time->day, 15, 00, 0); //set time to 18:00
@@ -481,12 +581,17 @@ class ActionServices extends TextServices
             ]);
             if ($time->between($morning, $none, true) && !in_array($this->getType(), $this->list_type_tommarow)) {
                 $message .= " \xE2\x98\x80	";
+                $message_request .= " \xE2\x98\x80	";
                 $date = now();
             } else {
                 $message .= " \xE2\x8F\xB3	";
+                $message_request .= " \xE2\x8F\xB3	";
                 $date = now()->addDay(1);
             }
 
+            $message_request .= "\n\n";
+            $message_request .= "فی:";
+            $message_request .= number_format($price, 0);
             if (str_contains($this->getType(), "ن")) {
                 $message .= " بی حواله ";
                 if (!$time->between($morning, $none, true) ||
@@ -516,6 +621,7 @@ class ActionServices extends TextServices
                 "number" => $number,
                 "price" => $price,
                 "date" => $date,
+                "message_request" => $message_request
             ]);
             $keyboard[0] = [
                 ['text' => "\xE2\x9C\x85	تایید", 'callback_data' => "transfer_buy_true_$word_telegram->id"],

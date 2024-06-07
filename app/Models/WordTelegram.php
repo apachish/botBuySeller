@@ -24,6 +24,7 @@ class WordTelegram extends EloquentModel
         "status",
         "type",
         "number",
+        "message_request",
         "price",
         "date"
     ];

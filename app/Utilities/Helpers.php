@@ -38,6 +38,21 @@ if (!function_exists('getTypeOrder')) {
     }
 }
 
+if (!function_exists('generateUniqueSixDigitCode')) {
+    function generateUniqueSixDigitCode() {
+        // دریافت زمان فعلی بر حسب میلی‌ثانیه
+        $microtime = microtime(true);
+
+        // تبدیل زمان به رشته
+        $microtimeString = str_replace('.', '', $microtime);
+
+        // تبدیل رشته به عدد و سپس به عدد شش رقمی
+        $sixDigitCode = substr($microtimeString, -6);
+
+        return $sixDigitCode;
+    }
+}
+
 if (!function_exists('getTypeTransfer')) {
     function getTypeTransfer($type)
     {
