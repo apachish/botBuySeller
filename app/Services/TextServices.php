@@ -411,7 +411,7 @@ class TextServices
             $optionalNumber = isset($matches[3]) && $matches[3]?$matches[3]: '1'; // اگر گروه سوم خالی بود، مقدار ۱ قرار داده شود
             logger("aa",[ $optionalNumber, $optionalNumber < 1 ,  $optionalNumber > 3]);
 
-            if ($optionalNumber < 1 && $optionalNumber > 3)
+            if ($optionalNumber < 1 || $optionalNumber > 3)
             {
                 $this->telegram_services->sendMessage($this->getUserId(), "❌ حداکثر تعداد برای هر لفظ ۳ تا میباشد ❌");
                 return false;
