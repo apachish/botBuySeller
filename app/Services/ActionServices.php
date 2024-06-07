@@ -232,6 +232,7 @@ class ActionServices extends TextServices
                         $transfer->number -= $num;
                         $request->number = $num;
                         $request->status = "complete";
+                        logger("request",[$request]);
                     }
                 }
 
@@ -267,6 +268,7 @@ class ActionServices extends TextServices
                     $message .= "\n\n";
                     $message .= "       شماره حواله:" . $request->remittance_number;
 
+                    logger("message",[$message]);
                     $this->telegram_services->sendMessage($this->getUserId(), $message);
                     $this->telegram_services->sendMessage($transfer->user_id, $message);
 
