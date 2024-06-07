@@ -434,6 +434,10 @@ class TextServices
         if (str_contains($this->data, "request_transfer_") ||
             str_contains($this->data, "transfer_buy_") ||
             str_contains($this->data, "trade_limit_") ||
+            str_contains($this->data, "trade_open_limit_") ||
+            str_contains($this->data, "trade_open_report_date_") ||
+            str_contains($this->data, "trade_open_report_") ||
+            str_contains($this->data, "trade_open_") ||
             str_contains($this->data, "trade_limit_close_"))
             return true;
         return false;
