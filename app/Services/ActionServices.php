@@ -69,7 +69,7 @@ class ActionServices extends TextServices
                 ]);
             $message = "اطلاعات مشتری وارد شد";
             $message .= "\n\n";
-            $message .= "نام و نام خانوادگی:";
+            $message .= "نام مستعار:";
             $message .= $fullName;
             $message .= "\n\n";
             $message .= "شماره همراه:";
@@ -99,7 +99,7 @@ class ActionServices extends TextServices
 
             if (!$check) {
                 cache()->set($this->getKeyCache() . $this->getUserId(), "add_customer_name_" . $this->getMessage());
-                $message = "نام و نام خانوادگی مشتری خود را وارد کنید";
+                $message = "نام مستعار مشتری خود را وارد کنید";
             } else {
                 $message = "مشتری با این شماره تلفن امکان ثبت نمی باشد";
                 cache()->forget($this->getKeyCache() . $this->getUserId());
