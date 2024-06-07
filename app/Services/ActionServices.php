@@ -333,6 +333,7 @@ class ActionServices extends TextServices
                 "message" => data_get($word, "message"),
                 "date" => data_get($word, "date"),
                 "message_request" => data_get($word, "message_request"),
+                "message_request_me" => data_get($word, "message_request_me"),
             ];
 
             logger("order",[
