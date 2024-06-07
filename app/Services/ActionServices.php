@@ -209,6 +209,7 @@ class ActionServices extends TextServices
                 $access_number = $limit_day - $use_day;
                 $request = new RequestTransfer();
                 $request->number = 0;
+                logger("num request",[$limit_day,$transaction_party,$daily_request,$daily_transfer,$transfer->number , $num]);
                 if ($transfer->number >= $num)
                     if ($access_number >= $num) {
                         $transfer->number -= $num;
@@ -510,6 +511,9 @@ class ActionServices extends TextServices
 
     public function checkWord()
     {
+        if($this->getNumberOrder()<1 && $this->getNumberOrder()>3)
+            $this->telegram_services->sendMessage($this->getUserId(), "❌ حداکثر تعداد برای هر لفظ ۳ تا میباشد ❌");
+
         $limit_trade = cache()->remember("s_price_trade", now()->addDay(1), function () {
             $value = ["start" => 14000000, "end" => 15000000];
             $setting = Setting::where("key", "s_price_trade")->first();
