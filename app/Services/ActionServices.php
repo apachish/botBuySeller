@@ -306,7 +306,7 @@ class ActionServices extends TextServices
 
             logger("test", [$this->bot->chanel_id, $message, $keyboard]);
             $message_result = $this->telegram_services->MessageReplyMarkup($this->telegram, $this->bot->chanel_id, $message, $keyboard);
-            $transfer_new->message_id = data_get($message_result, 'message_id');
+            $transfer_new->message_id = $message_result;
             $transfer_new->update();
             dispatch(new DeactivateTransfer($transfer_new->id))->delay(now()->addMinute(1));
         } elseif ($check == "false") {
