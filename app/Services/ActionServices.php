@@ -626,7 +626,7 @@ class ActionServices extends TextServices
                 ['text' => "\xE2\x9D\x8C	رد", 'callback_data' => "transfer_buy_false_$word_telegram->id"],
             ];
             logger("ke", [$this->getUserId(), $message, $keyboard]);
-            $result_word = $this->telegram_services->MessageReplyMarkup($this->telegram, $this->getUserId(), $message, $keyboard);
+            $result_word = $this->telegram_services->MessageReplyMarkup($this->telegram, $this->getUserId(), $message, $keyboard,false);
             if (data_get($result_word, "message_id")) {
                 $word_telegram->message_id = data_get($result_word, "message_id");
                 $word_telegram->update();

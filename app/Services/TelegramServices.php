@@ -73,7 +73,7 @@ class TelegramServices
         return $result;
     }
 
-    public function MessageReplyMarkup($telegram, $chat_id, $text, $keyboard)
+    public function MessageReplyMarkup($telegram, $chat_id, $text, $keyboard,$cache_use=true)
     {
 //        $keyboard = [
 //            'inline_keyboard' => [
@@ -100,7 +100,7 @@ class TelegramServices
         ]);
         logger("reponse", [$response,$reply_markup]);
 
-        if (data_get($response, "message_id"))
+        if (data_get($response, "message_id") && $cache_use)
         {
             if(cache()->get($this->menu_key.$chat_id))
             {
