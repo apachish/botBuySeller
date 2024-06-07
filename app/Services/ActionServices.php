@@ -333,7 +333,7 @@ class ActionServices extends TextServices
                 "message" => data_get($word, "message"),
                 "date" => data_get($word, "date"),
                 "message_request" => data_get($word, "message_request"),
-            ];
+            ]);
             $transfer_new = Transfer::create($order);
             logger("a", [$this->getUserId(), $this->getMessageId(), []]);
             $this->telegram_services->editMessageReplyMarkup($this->getUserId(), $this->getMessageId(), new \stdClass());
