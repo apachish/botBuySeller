@@ -621,14 +621,15 @@ class ActionServices extends TextServices
                 "date" => $date,
                 "message_request" => $message_request
             ]);
+            logger("word",[$word_telegram]);
             $keyboard[0] = [
                 ['text' => "\xE2\x9C\x85	تایید", 'callback_data' => "transfer_buy_true_$word_telegram->id"],
                 ['text' => "\xE2\x9D\x8C	رد", 'callback_data' => "transfer_buy_false_$word_telegram->id"],
             ];
             logger("ke", [$this->getUserId(), $message, $keyboard]);
             $result_word = $this->telegram_services->MessageReplyMarkup($this->telegram, $this->getUserId(), $message, $keyboard,false);
-            if (data_get($result_word, "message_id")) {
-                $word_telegram->message_id = data_get($result_word, "message_id");
+            if ($result_word) {
+                $word_telegram->message_id = $result_word;
                 $word_telegram->update();
             } else {
                 $word_telegram->delete();
