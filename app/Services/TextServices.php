@@ -463,12 +463,12 @@ class TextServices
     public function actionByMessage()
     {
         if (!$this->user->fullName) {
-            $text = " لطفاٌ نام و نام خانوادگی وارد کنید";
+            $text = " لطفا نام و نام خانوادگی وارد کنید";
             cache()->set($this->key_cache . $this->user_id, "add_fullName");
             $this->telegram->sendMessage(['chat_id' => $this->user_id, 'text' => $text]);
             return true;
         } elseif (!$this->user->mobile) {
-            $text = "ممنون شماره خود را به اشتراک بگذارید";
+            $text = "لطفا شماره خود را به اشتراک بگذارید";
             $this->telegram_services->sendRequestContactButton($this->getUserId(), $text);
             return true;
 
