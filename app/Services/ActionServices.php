@@ -157,7 +157,10 @@ class ActionServices extends TextServices
         $info = explode("_", $array);
         $id = data_get($info, 0);
         $num = (int)data_get($info, 1);
+        logger("request",[$num,$id]);
         $transfer = Transfer::find($id);
+        logger("Transfer",[$transfer]);
+
         if ($transfer) {
             try {
 
