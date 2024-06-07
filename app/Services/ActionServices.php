@@ -354,8 +354,8 @@ class ActionServices extends TextServices
 
     public function tradeLimit()
     {
-        $worker_id = (int)str_replace('trade_limit_', '', $this->getData());
-
+         $data = str_replace('trade_limit_', '', $this->getData());
+        $worker_id = (int)
         $worker = UserTelegram::where("id", $worker_id)->first();
         logger("worker", [$worker]);
         if ($worker) {
@@ -476,6 +476,9 @@ class ActionServices extends TextServices
                     "limit_access" => $number
                 ]);
             $this->telegram->sendMessage(['chat_id' => $this->getUserId(), 'text' => 'حد ثابت شد']);
+            $data_old = cache()->get("menu_List_worker_".$this->getUserId());
+            $message_id = data_get($data_old,"id",null);
+            $this->listWorker($page,$message_id);
             cache()->forget($this->getKeyCache() . $this->getUserId());
         } else {
             $this->telegram->sendMessage(['chat_id' => $this->getUserId(), 'text' => 'عدد وارد کنید']);

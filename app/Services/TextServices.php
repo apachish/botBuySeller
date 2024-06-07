@@ -532,6 +532,20 @@ class TextServices
         */
         if (!$this->checkData())
             $this->telegram->sendMessage(['chat_id' => $this->user_id, 'text' => 'متن نا معتبر می باشد']);
+        elseif (str_contains($this->getData(), "pre_worker_")) {
+            $page = str_replace('pre_worker_', '', $this->getData());
+            $data_old = cache()->get("menu_List_worker_".$this->getUserId());
+            $message_id = data_get($data_old,"id",null);
+            if($message_id)
+                $this->listWorker($page,$message_id);
+        }elseif (str_contains($this->getData(), "next_worker_")) {
+            $page = str_replace('next_worker_', '', $this->getData());
+            $data_old = cache()->get("menu_List_worker_".$this->getUserId());
+            $message_id = data_get($data_old,"id",null);
+            logger("aa",[$data_old,$message_id,$page]);
+            if($message_id)
+                $this->listWorker($page,$message_id);
+        }
         elseif (str_contains($this->data, "request_transfer_"))
             $this->requestTransfer();
         elseif (str_contains($this->data, "transfer_buy_"))
@@ -615,53 +629,7 @@ class TextServices
                 break;
 
             case "\xF0\x9F\x93\x8Bلیست همکاران":
-                $text = "      لیست  همکاران    ";
-                $text .= "\n\n";
-                $text .= "میزان حد معامله خود با همکاران خود مشخص کنید";
-                $users = UserTelegram::where("id", "!=", $this->user_id)
-                    ->where("role", "colleague")
-                    ->simplePaginate(5);
-                logger("users", [$users]);
-                $page = $users->currentPage();
-                $next = $users->nextPageUrl();
-                $pre = $users->previousPageUrl();
-                logger("page", [$next, $page, $pre]);
-                $keyboard = [];
-                $i = 0;
-                $userTradeAccess = $this->user->userTradeAccess;
-                logger("userTradeAccess", [$userTradeAccess]);
-                $users->each(function ($user) use (&$keyboard, &$i, $userTradeAccess) {
-                    $text = $user->fullName ?: $user->first_name . " " . $user->last_name;
-                    $limit_trade = $userTradeAccess->where("user_trade_id", $user->id)->first();
-
-
-                    logger('limit_trade', [$limit_trade, data_get($limit_trade, "limit_access")]);
-
-                    if ($limit_trade)
-                        $keyboard[$i] = [
-                            [
-                                'text' => "  مجاز تا " . data_get($limit_trade, "limit_access") . "  تا ",
-                                'callback_data' => "trade_limit_" . $user->id
-                            ],
-                            [
-                                'text' => "  $text " . "\xE2\x9D\x8C",
-                                'callback_data' => "trade_limit_close_" . $user->id . "_" . $i
-                            ]
-                        ];
-                    else
-                        $keyboard[$i][] = [
-                            'text' => "  $text " . "\xE2\x9C\x85",
-                            'callback_data' => "trade_limit_" . $user->id
-                        ];
-                    $i++;
-                });
-                logger("keyboard", [$keyboard]);
-                if ($pre)
-                    $keyboard[$i][] = ['text' => "قبلی", "callback_data" => "pre"];
-                if ($pre)
-                    $keyboard[$i][] = ['text' => "بعدی", "callback_data" => "next"];
-
-                $this->telegram_services->MessageReplyMarkup($this->telegram, $this->user_id, $text, $keyboard);
+                $this->listWorker();
                 break;
 
             case "\xF0\x9F\x93\x9Aقوانین":
@@ -761,6 +729,65 @@ class TextServices
         $western = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'];
         $eastern = ['۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹', '۰'];
         return str_replace($eastern, $western, $value);
+    }
+
+    /**
+     * @return void
+     */
+    protected function listWorker($page=1,$message_id=null):void
+    {
+        $text = "      لیست  همکاران    ";
+        $text .= "\n\n";
+        $text .= "میزان حد معامله خود با همکاران خود مشخص کنید";
+        $users = UserTelegram::where("id", "!=", $this->user_id)
+            ->where("role", "colleague")
+            ->simplePaginate(5, ['*'], 'page', $page);
+        logger("users", [$users]);
+        $page = $users->currentPage();
+        $next = $users->nextPageUrl() ? (int)str_replace("?page=","",strstr($users->nextPageUrl(), "?page=")) : null;
+        $pre = $users->previousPageUrl() ? (int)str_replace("?page=","",strstr($users->previousPageUrl(), "?page=")) : null;
+        $keyboard = [];
+        $i = 0;
+        $userTradeAccess = $this->user->userTradeAccess;
+        logger("userTradeAccess", [$userTradeAccess]);
+        $users->each(function ($user) use (&$keyboard, &$i, $userTradeAccess,$page) {
+            $text = $user->fullName ?: $user->first_name . " " . $user->last_name;
+            $limit_trade = $userTradeAccess->where("user_trade_id", $user->id)->first();
+
+
+            logger('limit_trade', [$limit_trade, data_get($limit_trade, "limit_access")]);
+
+            if ($limit_trade)
+                $keyboard[$i] = [
+                    [
+                        'text' => "  مجاز تا " . data_get($limit_trade, "limit_access") . "  تا ",
+                        'callback_data' => "trade_limit_" . $user->id."_".$page
+                    ],
+                    [
+                        'text' => "  $text " . "\xE2\x9D\x8C",
+                        'callback_data' => "trade_limit_close_" . $user->id . "_" . $i."_".$page
+                    ]
+                ];
+            else
+                $keyboard[$i][] = [
+                    'text' => "  $text " . "\xE2\x9C\x85",
+                    'callback_data' => "trade_limit_" . $user->id."_".$page
+                ];
+            $i++;
+        });
+        logger("keyboard", [$keyboard]);
+        if ($pre)
+            $keyboard[$i][] = ['text' => "قبلی", "callback_data" => "pre_worker_".$pre];
+        if ($next)
+            $keyboard[$i][] = ['text' => "بعدی", "callback_data" => "next_worker_" . $next];
+
+        if($message_id)
+            $this->getTelegramServices()->editMessageTextAndInlineKeyboard( $this->getUserId(),$message_id, $text, $keyboard);
+        else
+        {
+            $this->getTelegramServices()->menu_key = "menu_List_worker_";
+            $menu = $this->getTelegramServices()->MessageReplyMarkup($this->getTelegram(), $this->getUserId(), $text, $keyboard);
+        }
     }
 
 }
