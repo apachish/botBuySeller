@@ -157,9 +157,9 @@ class ActionServices extends TextServices
         $info = explode("_", $array);
         $id = data_get($info, 0);
         $num = (int)data_get($info, 1);
-        logger("request",[$num,$id]);
+        logger("request", [$num, $id]);
         $transfer = Transfer::find($id);
-        logger("Transfer",[$transfer]);
+        logger("Transfer", [$transfer]);
 
         if ($transfer) {
             try {
@@ -167,10 +167,9 @@ class ActionServices extends TextServices
                 $limit_day = null;
                 $use_day = null;
                 $transaction_party = null;
-                $request = new RequestTransfer();
-                $request->number = 0;
+                $request_transfer = [];
                 if ($transfer->user->role == "customer")
-                    $transaction_party = data_get($transfer, 'user.customerUser.headCustomer.fullName')."(".data_get($transfer, 'user.customerUser.fullName').")";
+                    $transaction_party = data_get($transfer, 'user.customerUser.headCustomer.fullName') . "(" . data_get($transfer, 'user.customerUser.fullName') . ")";
                 if ($transfer->user->role == "colleague")
                     $transaction_party = data_get($transfer, 'user.fullName');
 
@@ -193,7 +192,7 @@ class ActionServices extends TextServices
 
                 }
 
-                if($limit_day) {
+                if ($limit_day) {
                     $use_day = 0;
                     $daily_request = DailyRequestTransfer::where("request_id", $this->getUserId())
                         ->where("transfer_id", $transfer->user_id)
@@ -217,25 +216,24 @@ class ActionServices extends TextServices
                         if ($access_number >= $num) {
                             $transfer->number -= $num;
                             $use_day += $num;
-                            $request->number = $num;
-                            $request->status = "complete";
+//                            $request->number = $num;
+//                            $request->status = "complete";
                         } elseif ($access_number > 0) {
                             $transfer->number -= $access_number;
                             $use_day += $access_number;
-                            $request->number = $access_number;
-                            $request->status = "half";
+//                            $request->number = $access_number;
+//                            $request->status = "half";
 
                         }
                     }
-                }else{
+                } else {
                     if ($transfer->number >= $num) {
                         $transfer->number -= $num;
-                        $request->number = $num;
-                        $request->status = "complete";
-                        logger("request",[$request]);
+                        $request["number"] = $num;
+                        $request["status"] = "complete";
+                        logger("request", [$request]);
                     }
                 }
-
 
 
                 if ($request->number) {
@@ -252,23 +250,26 @@ class ActionServices extends TextServices
 
                     $this->telegram_services->editMessageTextAndInlineKeyboard($this->bot->chanel_id, $transfer->message_id, $transfer->message, $keyboard);
                     $transfer->update();
-                    $request->request_id = $this->getUserId();
-                    $request->transfer_id = $transfer->user_id;
-                    $request->price = $transfer->price;
-                    $request->create();
+
+                        $request_transfer["remittance_number"] = generateUniqueSixDigitCode();
+                        $request_transfer["request_id"] = $this->getUserId();
+                        $request_transfer["transfer_id"] = $transfer->user_id;
+                        $request_transfer["price"] = $transfer->pric;
+
+                    $request->create($request_transfer);
                     $message = $transfer->message_request;
                     $message .= "\n\n";
                     $message .= "مقدار:" . $request->number;
                     $message .= "\n\n";
                     $message .= "نوع:" . getTypeTransfer($transfer->type);
                     $message .= "\n\n";
-                    $message .= "طرف معامله:".$transaction_party;
+                    $message .= "طرف معامله:" . $transaction_party;
                     $message .= "\n\n";
                     $message .= "برای:" . toJalali($transfer->date);
                     $message .= "\n\n";
-                    $message .= "       شماره حواله:" . $request->remittance_number;
+                    $message .= "       شماره حواله:" . data_get($request_transfer,'remittance_number');
 
-                    logger("message",[$message]);
+                    logger("message", [$message]);
                     $this->telegram_services->sendMessage($this->getUserId(), $message);
                     $this->telegram_services->sendMessage($transfer->user_id, $message);
 
@@ -278,7 +279,7 @@ class ActionServices extends TextServices
                 }
             } catch (\Exception $exception) {
 
-                logger("exp", [                $exception->getMessage(),
+                logger("exp", [$exception->getMessage(),
                     $exception->getLine(),
                     $exception->getCode(),
                     $exception->getFile()]);
@@ -373,7 +374,7 @@ class ActionServices extends TextServices
 
     public function tradeLimit()
     {
-         $data = str_replace('trade_limit_', '', $this->getData());
+        $data = str_replace('trade_limit_', '', $this->getData());
         $worker_id = (int)
         $worker = UserTelegram::where("id", $worker_id)->first();
         logger("worker", [$worker]);
@@ -495,9 +496,9 @@ class ActionServices extends TextServices
                     "limit_access" => $number
                 ]);
             $this->telegram->sendMessage(['chat_id' => $this->getUserId(), 'text' => 'حد ثابت شد']);
-            $data_old = cache()->get("menu_List_worker_".$this->getUserId());
-            $message_id = data_get($data_old,"id",null);
-            $this->listWorker($page,$message_id);
+            $data_old = cache()->get("menu_List_worker_" . $this->getUserId());
+            $message_id = data_get($data_old, "id", null);
+            $this->listWorker($page, $message_id);
             cache()->forget($this->getKeyCache() . $this->getUserId());
         } else {
             $this->telegram->sendMessage(['chat_id' => $this->getUserId(), 'text' => 'عدد وارد کنید']);
@@ -529,7 +530,7 @@ class ActionServices extends TextServices
 
     public function checkWord()
     {
-        if($this->getNumberOrder()<1 && $this->getNumberOrder()>3)
+        if ($this->getNumberOrder() < 1 && $this->getNumberOrder() > 3)
             $this->telegram_services->sendMessage($this->getUserId(), "❌ حداکثر تعداد برای هر لفظ ۳ تا میباشد ❌");
 
         $limit_trade = cache()->remember("s_price_trade", now()->addDay(1), function () {
@@ -643,13 +644,13 @@ class ActionServices extends TextServices
                 "date" => $date,
                 "message_request" => $message_request
             ]);
-            logger("word",[$word_telegram]);
+            logger("word", [$word_telegram]);
             $keyboard[0] = [
                 ['text' => "\xE2\x9C\x85	تایید", 'callback_data' => "transfer_buy_true_$word_telegram->id"],
                 ['text' => "\xE2\x9D\x8C	رد", 'callback_data' => "transfer_buy_false_$word_telegram->id"],
             ];
             logger("ke", [$this->getUserId(), $message, $keyboard]);
-            $result_word = $this->telegram_services->MessageReplyMarkup($this->telegram, $this->getUserId(), $message, $keyboard,false);
+            $result_word = $this->telegram_services->MessageReplyMarkup($this->telegram, $this->getUserId(), $message, $keyboard, false);
             if ($result_word) {
                 $word_telegram->message_id = $result_word;
                 $word_telegram->update();

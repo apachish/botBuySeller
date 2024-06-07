@@ -23,16 +23,6 @@ class RequestTransfer extends Model
 
     use HasFactory;
 
-    public static function boot()
-    {
-        parent::boot();
-
-        static::creating(function ($model) {
-                $model->remittance_number = generateUniqueSixDigitCode();
-        });
-    }
-
-
     public function transfer()
     {
         return $this->belongsTo(Transfer::class,"transfer_id","id");
