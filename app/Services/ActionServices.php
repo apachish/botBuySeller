@@ -298,15 +298,18 @@ class ActionServices extends TextServices
     }
     public function tradeOpenLimit()
     {
-        $customer_id = str_replace('trade_open_limit', '', $this->getData());
+        $customer_id = str_replace('trade_open_limit_', '', $this->getData());
         $message_id =  cache()->get("trade_open_".$this->getUserId());
         if($customer_id && $message_id) {
             $customer = CustomerUser::find($customer_id);
-            $message = "حد مجاز برای مشتری ";
-            $message .= "\n\n ";
-            $message .= $customer->fullName;
-            $this->telegram_services->editMessageTextAndInlineKeyboard($this->getUserId(), $message_id, $message);
-            cache()->set($this->getKeyCache() . $this->getUserId(),$this->getData());
+            logger("customer",[$customer,$customer_id,$message_id]);
+            if($customer) {
+                $message = "حد مجاز برای مشتری ";
+                $message .= "\n\n ";
+                $message .= $customer->fullName;
+                $this->telegram_services->editMessageTextAndInlineKeyboard($this->getUserId(), $message_id, $message);
+                cache()->set($this->getKeyCache() . $this->getUserId(), $this->getData());
+            }
         }
 
     }
