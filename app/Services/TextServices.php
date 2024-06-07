@@ -408,8 +408,8 @@ class TextServices
         $im = implode("|",$this->list_type);
         $pattern_un = "/^([0-9]{3}|[0-9]{5})($im)([4-9]?)(:.*)?$/u";
         if (preg_match($pattern_un, $this->message, $matches)) {
-            logger("aa",[$this->getNumberOrder(),$this->getNumberOrder() < 1 , $this->getNumberOrder() > 3]);
             $optionalNumber = isset($matches[3]) && $matches[3]?$matches[3]: '1'; // اگر گروه سوم خالی بود، مقدار ۱ قرار داده شود
+            logger("aa",[ $optionalNumber, $optionalNumber < 1 ,  $optionalNumber > 3]);
 
             if ($optionalNumber < 1 && $optionalNumber > 3)
             {
