@@ -80,6 +80,7 @@ class ActionAdminServices extends TextServices
             $page = str_replace('next_', '', $this->getData());
             $data_old = cache()->get("menu_List_user_".$this->getUserId());
             $message_id = data_get($data_old,"id",null);
+            logger("aa",[$data_old,$message_id,$page]);
             if($message_id)
                 $this->listUser($page,$message_id);
         } elseif (str_contains($this->getData(), "customer_")) {
@@ -432,6 +433,7 @@ class ActionAdminServices extends TextServices
         $keyboard = [];
         $i = 0;
 
+        logger("users",[$users]);
         $users->each(function ($user) use (&$keyboard, &$i) {
             $text = $user->fullName ?: $user->first_name . " " . $user->last_name;
             $text .= $user->role == "colleague" ? "(همکار)" : "(مشتری)";

@@ -542,7 +542,6 @@ class TextServices
             $page = str_replace('next_worker_', '', $this->getData());
             $data_old = cache()->get("menu_List_worker_".$this->getUserId());
             $message_id = data_get($data_old,"id",null);
-            logger("aa",[$data_old,$message_id,$page]);
             if($message_id)
                 $this->listWorker($page,$message_id);
         }
