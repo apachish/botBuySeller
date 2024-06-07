@@ -24,6 +24,11 @@ class CustomerUser extends Model
         "status"
     ];
 
+    public function user()
+    {
+        return $this->belongsTo(UserTelegram::class,"mobile","mobile");
+    }
+
 
 
 
