@@ -231,7 +231,7 @@ class ActionServices extends TextServices
                         $transfer->number -= $num;
                         $request_transfer["number"] = $num;
                         $request_transfer["status"] = "complete";
-                        logger("request", [$request]);
+                        logger("request", [$request_transfer]);
                     }
                 }
 
