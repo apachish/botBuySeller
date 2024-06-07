@@ -533,8 +533,12 @@ class ActionServices extends TextServices
 
     public function checkWord()
     {
+        logger("aa",[$this->getNumberOrder(),$this->getNumberOrder() < 1 , $this->getNumberOrder() > 3]);
         if ($this->getNumberOrder() < 1 && $this->getNumberOrder() > 3)
+        {
             $this->telegram_services->sendMessage($this->getUserId(), "❌ حداکثر تعداد برای هر لفظ ۳ تا میباشد ❌");
+            return false;
+        }
 
         $limit_trade = cache()->remember("s_price_trade", now()->addDay(1), function () {
             $value = ["start" => 14000000, "end" => 15000000];
