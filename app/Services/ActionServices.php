@@ -40,7 +40,7 @@ class ActionServices extends TextServices
             $message .= "شماره همراه:";
             $message .= $customer->mobile;
             $message .= "\n\n";
-            $message = "حد مجاز معامله ";
+            $message .= "حد مجاز معامله ";
             $message .= "\n\n";
             $message .= $customer->limit;
 
