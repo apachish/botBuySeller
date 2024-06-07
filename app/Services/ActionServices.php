@@ -227,6 +227,7 @@ class ActionServices extends TextServices
                         }
                     }
                 } else {
+                    logger("check",[$transfer->number , $num,$transfer->number >= $num]);
                     if ($transfer->number >= $num) {
                         $transfer->number -= $num;
                         $request_transfer["number"] = $num;
