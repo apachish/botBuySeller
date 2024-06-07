@@ -284,7 +284,7 @@ class ActionServices extends TextServices
                     $message .= "\n\n";
                     $message .= "نوع:" . getTypeTransfer($transfer->type);
                     $message .= "\n\n";
-                    $message .= "طرف معامله:" . $transaction_party;
+                    $message .= "طرف معامله:" . $this->getUser()->fullName;
                     $message .= "\n\n";
                     $message .= "برای:" . toJalali($transfer->date,"Y/m/d");
                     $message .= "\n\n";
