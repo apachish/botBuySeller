@@ -183,6 +183,8 @@ class ActionServices extends TextServices
                         ->where("user_trade_id", $transfer->user_id)->first();
                     $user_transfer = UserTradeAccess::where("user_id", $transfer->user_id)
                         ->where("user_trade_id", $this->getUserId())->first();
+
+                    logger("www",[$user_request,$user_transfer]);
                     if (($user_request && $user_request->limit) && ($user_transfer && $user_transfer->limit))
                         $limit_day = min($user_request->limit, $user_transfer->limit);
                     if (($user_transfer && $user_transfer->limit))
@@ -192,6 +194,7 @@ class ActionServices extends TextServices
 
                 }
 
+                logger("limit_day",[$limit_day]);
                 if ($limit_day) {
                     $use_day = 0;
                     $daily_request = DailyRequestTransfer::where("request_id", $this->getUserId())
