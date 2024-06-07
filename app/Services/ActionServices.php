@@ -264,13 +264,13 @@ class ActionServices extends TextServices
                     RequestTransfer::create($request_transfer);
                     $message = $transfer->message_request;
                     $message .= "\n\n";
-                    $message .= "مقدار:" . data_get($request_transfer,"number");
+                    $message .= "مقدار:" . data_get($request_transfer,"number")."کیلو";
                     $message .= "\n\n";
                     $message .= "نوع:" . getTypeTransfer($transfer->type);
                     $message .= "\n\n";
                     $message .= "طرف معامله:" . $transaction_party;
                     $message .= "\n\n";
-                    $message .= "برای:" . toJalali($transfer->date);
+                    $message .= "برای:" . toJalali($transfer->date,"Y/m/d");
                     $message .= "\n\n";
                     $message .= "       شماره حواله:" . data_get($request_transfer,'remittance_number');
 
