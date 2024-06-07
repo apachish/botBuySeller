@@ -574,10 +574,13 @@ class TextServices
 
                 break;
             case "\xF0\x9F\x93\x88معاملات باز":
-                $worker = UserTelegram::where("id", $this->user_id)->whereHas("customerUser",function($query){
+                $worker = UserTelegram::whereHas("customerUser",function($query){
                     $query->where("status",true);
+                    $query->where("user_id", $this->user_id);
                 })->with(["customerUser"=>function($query){
                     $query->where("status",true);
+                    $query->where("user_id", $this->user_id);
+
                 }])->get();
                 $keyboard = [];
                 $i = 0;
