@@ -156,7 +156,7 @@ class ActionServices extends TextServices
         $array = str_replace('request_transfer_', '', $this->getData());
         $info = explode("_", $array);
         $id = data_get($info, 0);
-        $num = data_get($info, 1);
+        $num = (int)data_get($info, 1);
         $transfer = Transfer::find($id);
         if ($transfer) {
             try {
@@ -210,7 +210,7 @@ class ActionServices extends TextServices
                 $request = new RequestTransfer();
                 $request->number = 0;
                 logger("num request",[$limit_day,$transaction_party,$daily_request,$daily_transfer,$transfer->number , $num]);
-                if ($transfer->number >= $num)
+                if ($transfer->number >= $num) {
                     if ($access_number >= $num) {
                         $transfer->number -= $num;
                         $use_day += $num;
@@ -223,6 +223,7 @@ class ActionServices extends TextServices
                         $request->status = "half";
 
                     }
+                }
 
                 if ($request->number) {
                     DailyRequestTransfer::updateOrCreate([
@@ -292,7 +293,7 @@ class ActionServices extends TextServices
                 "status" => Transfer::STATUS_ACTIVE,
                 "user_id" => $this->getUserId(),
                 "type" => data_get($word, "type"),
-                "number" => data_get($word, "number"),
+                "number" => (int)data_get($word, "number"),
                 "price" => data_get($word, "price"),
                 "message" => data_get($word, "message"),
                 "date" => data_get($word, "date"),
