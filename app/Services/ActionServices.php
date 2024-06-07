@@ -239,8 +239,8 @@ class ActionServices extends TextServices
                 if (data_get($request_transfer,"number")) {
                     logger("number".data_get($request_transfer,"number"));
                     DailyRequestTransfer::updateOrCreate([
-                        "request_id",
-                        "transfer_id",
+                        "request_id"=>$this->getUserId(),
+                        "transfer_id"=>$transfer->user_id,
                     ], [
                         "limit" => $limit_day,
                         "use_day" => $use_day
