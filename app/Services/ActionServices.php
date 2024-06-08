@@ -194,35 +194,26 @@ class ActionServices extends TextServices
                         $limit_day = $user_request->limit_access;
 
                 }
-
+                $buyer_id = $transfer_type == "buy"?$transfer->user_id:$this->getUserId();
+                $seller_id = $transfer_type == "buy"?$this->getUserId():$transfer->user_id;
                 logger("limit_day", [$limit_day]);
+                logger("limit_day", [$buyer_id,$seller_id]);
                 if ($limit_day) {
-                    $query =  DailyRequestTransfer::where("request_id", $this->getUserId())
-                        ->where("transfer_id", $transfer->user_id)
-                        ->whereDate('created_at', now());
-                    $daily_request = $query->get();
-
-                    logger("daily_request",[$daily_request->count(),$daily_request]);
-                    if ($daily_request->count()) {
-
-                        $r_buy = $daily_request->where("type", "buy")->sum("use_day");
-                        $r_sell = $daily_request->where("type", "sell")->sum("use_day");
-                        if($transfer_type == "buy")
-                            $n = $r_sell - $num;
-                        elseif($transfer_type == "sell")
-                            $n = $r_buy - $num;
-                        if($n == 0)
-                            $query->delete();
-                        elseif($n > 0)
-                            $query->where("type",$transfer_type=="buy"?"sell":"buy")->delete();
-                        elseif($n < 0 )
-                            $num =  $limit_day + $n;
-                        logger("sss",[$r_buy,$r_sell,$n,$limit_day,$num]);
-                    }else{
-                        $num = $limit_day;
-                        logger("limit_day",[$limit_day,$num]);
-
+                    $quantity = 0;
+                    // بررسی حد معاملات
+                    if($transfer_type == "buy"){
+                        $query_sell = DailyRequestTransfer::where("seller_id",$seller_id)->where("buyer_id",$buyer_id)->get();
+                        $quantity = $query_sell->sum("use_day");
+                    }if($transfer_type == "sell") {
+                        $query_buy = DailyRequestTransfer::where("seller_id", $buyer_id)->where("buyer_id", $seller_id)->get();
+                        $quantity = $query_buy->sum("use_day");
                     }
+                    $a =0;
+                    if($quantity)
+                        $a = $num - $quantity;
+
+                    $num = $a+$limit_day;
+
 
                     $transfer->number -= $num;
                     $request_transfer["number"] = $num;
@@ -246,11 +237,10 @@ class ActionServices extends TextServices
                 if (data_get($request_transfer, "number")) {
                     logger("number" . data_get($request_transfer, "number"));
                     DailyRequestTransfer::updateOrCreate([
-                        "request_id" => $this->getUserId(),
-                        "transfer_id" => $transfer->user_id,
+                        "seller_id" => $this->getUserId(),
+                        "buyer_id" => $transfer->user_id,
                     ], [
                         "use_day" => $use_day,
-                        "type" => $transfer_type
                     ]);
 
                     $keyboard = self::getKeyboardRequest($transfer);
