@@ -373,11 +373,10 @@ class ActionServices extends TextServices
     {
         $array = explode("_", str_replace('trade_limit_close_', '', $this->getData()));
         $worker_id = (int)data_get($array, 0);
-        $worker_i = (int)data_get($array, 1);
-        $page = (int)data_get($array, 2);
+        $page = (int)data_get($array, 1);
 
         $worker = UserTelegram::where("id", $worker_id)->first();
-        logger("worker", [$worker, $worker_id]);
+        logger("worker", [$worker_id,$worker, $page]);
         if ($worker) {
             $limit_access = UserTradeAccess::where("user_id", $this->getUserId())
                 ->where("user_trade_id", $worker->id)->first();
@@ -396,6 +395,7 @@ class ActionServices extends TextServices
 //                    $this->telegram_services->editMessageTextAndInlineKeyboard($this->getUserId(), data_get($message_menu, "id"), "لیست همکاران", $keyboard);
 //                }
                 $data_old = cache()->get("menu_List_worker_" . $this->getUserId());
+                logger("menu_List_worker_",[$data_old]);
                 $message_id = data_get($data_old, "id", null);
                 $this->listWorker($page, $message_id);
                 $limit_access->delete();
