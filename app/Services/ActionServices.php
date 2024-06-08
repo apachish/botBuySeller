@@ -217,12 +217,14 @@ class ActionServices extends TextServices
                             $query->where("type",$transfer_type=="buy"?"sell":"buy")->delete();
                         elseif($n < 0 )
                             $num =  $limit_day + $n;
+                    }else{
+                        $num = $limit_day;
                     }
 
-                    $transfer->number -= $limit_day;
-                    $request_transfer["number"] = $limit_day;
-
-                    $request_transfer["status"] = $limit_day== $transfer->number ?"complete":"half";
+                    $transfer->number -= $num;
+                    $request_transfer["number"] = $num;
+                    $use_day = $num;
+                    $request_transfer["status"] = $num== $transfer->number ?"complete":"half";
                 } else {
                     logger("check", [$transfer->number, $num, $transfer->number >= $num]);
                     if ($transfer->number >= $num) {
@@ -231,6 +233,7 @@ class ActionServices extends TextServices
 
                         $request_transfer["status"] = $num== $transfer->number ?"complete":"half";
                         logger("request", [$request_transfer]);
+                        $use_day = $num;
                     }
                 }
 
