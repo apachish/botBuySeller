@@ -21,7 +21,7 @@ class TelegramSupportController extends Controller
             logger("user",[$text_services->getUser()]);
             if($text_services->getUser() == null) return false;
 
-            if ($text_services->getMessage() && $text_services->checkText())
+            if ($text_services->getMessage())
                 $text_services->supportByMessage();
 
         }catch (\Exception $exception){
