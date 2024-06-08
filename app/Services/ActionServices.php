@@ -184,7 +184,7 @@ class ActionServices extends TextServices
                     $user_transfer = UserTradeAccess::where("user_id", $transfer->user_id)
                         ->where("user_trade_id", $this->getUserId())->first();
 
-                    logger("www",[$user_request,$user_transfer]);
+                    logger("www", [$user_request, $user_transfer]);
                     if (($user_request && $user_request->limit) && ($user_transfer && $user_transfer->limit))
                         $limit_day = min($user_request->limit, $user_transfer->limit);
                     if (($user_transfer && $user_transfer->limit))
@@ -194,7 +194,7 @@ class ActionServices extends TextServices
 
                 }
 
-                logger("limit_day",[$limit_day]);
+                logger("limit_day", [$limit_day]);
                 if ($limit_day) {
                     $use_day = 0;
                     $daily_request = DailyRequestTransfer::where("request_id", $this->getUserId())
@@ -230,7 +230,7 @@ class ActionServices extends TextServices
                         }
                     }
                 } else {
-                    logger("check",[$transfer->number , $num,$transfer->number >= $num]);
+                    logger("check", [$transfer->number, $num, $transfer->number >= $num]);
                     if ($transfer->number >= $num) {
                         $transfer->number -= $num;
                         $request_transfer["number"] = $num;
@@ -240,11 +240,11 @@ class ActionServices extends TextServices
                 }
 
 
-                if (data_get($request_transfer,"number")) {
-                    logger("number".data_get($request_transfer,"number"));
+                if (data_get($request_transfer, "number")) {
+                    logger("number" . data_get($request_transfer, "number"));
                     DailyRequestTransfer::updateOrCreate([
-                        "request_id"=>$this->getUserId(),
-                        "transfer_id"=>$transfer->user_id,
+                        "request_id" => $this->getUserId(),
+                        "transfer_id" => $transfer->user_id,
                     ], [
                         "limit" => $limit_day,
                         "use_day" => $use_day
@@ -256,39 +256,39 @@ class ActionServices extends TextServices
                     $this->telegram_services->editMessageTextAndInlineKeyboard($this->bot->chanel_id, $transfer->message_id, $transfer->message, $keyboard);
                     $transfer->update();
 
-                        $request_transfer["remittance_number"] = generateUniqueSixDigitCode();
-                        $request_transfer["request_id"] = $this->getUserId();
-                        $request_transfer["transfer_id"] = $transfer->user_id;
-                        $request_transfer["price"] = $transfer->pric;
+                    $request_transfer["remittance_number"] = generateUniqueSixDigitCode();
+                    $request_transfer["request_id"] = $this->getUserId();
+                    $request_transfer["transfer_id"] = $transfer->user_id;
+                    $request_transfer["price"] = $transfer->pric;
 
                     RequestTransfer::create($request_transfer);
 
                     $message = $transfer->message_request_me;
                     $message .= "\n\n";
-                    $message .= "مقدار:" . data_get($request_transfer,"number")."کیلو";
+                    $message .= "مقدار:" . data_get($request_transfer, "number") . "کیلو";
                     $message .= "\n\n";
                     $message .= "نوع:" . getTypeTransfer($transfer->type);
                     $message .= "\n\n";
                     $message .= "طرف معامله:" . $transaction_party;
                     $message .= "\n\n";
-                    $message .= "برای:" . toJalali($transfer->date,"Y/m/d");
+                    $message .= "برای:" . toJalali($transfer->date, "Y/m/d");
                     $message .= "\n\n";
-                    $message .= "       شماره حواله:" . data_get($request_transfer,'remittance_number');
+                    $message .= "       شماره حواله:" . data_get($request_transfer, 'remittance_number');
                     logger("message", [$message]);
                     $this->telegram_services->sendMessage($this->getUserId(), $message);
 
 
                     $message = $transfer->message_request;
                     $message .= "\n\n";
-                    $message .= "مقدار:" . data_get($request_transfer,"number")."کیلو";
+                    $message .= "مقدار:" . data_get($request_transfer, "number") . "کیلو";
                     $message .= "\n\n";
                     $message .= "نوع:" . getTypeTransfer($transfer->type);
                     $message .= "\n\n";
                     $message .= "طرف معامله:" . $this->getUser()->fullName;
                     $message .= "\n\n";
-                    $message .= "برای:" . toJalali($transfer->date,"Y/m/d");
+                    $message .= "برای:" . toJalali($transfer->date, "Y/m/d");
                     $message .= "\n\n";
-                    $message .= "       شماره حواله:" . data_get($request_transfer,'remittance_number');
+                    $message .= "       شماره حواله:" . data_get($request_transfer, 'remittance_number');
                     $this->telegram_services->sendMessage($transfer->user_id, $message);
 
                 } else {
@@ -338,7 +338,7 @@ class ActionServices extends TextServices
                 "message_request_me" => data_get($word, "message_request_me"),
             ];
 
-            logger("order",[
+            logger("order", [
                 "status" => Transfer::STATUS_ACTIVE,
                 "user_id" => $this->getUserId(),
                 "type" => data_get($word, "type"),
@@ -374,6 +374,7 @@ class ActionServices extends TextServices
         $array = explode("_", str_replace('trade_limit_close_', '', $this->getData()));
         $worker_id = (int)data_get($array, 0);
         $worker_i = (int)data_get($array, 1);
+        $page = (int)data_get($array, 2);
 
         $worker = UserTelegram::where("id", $worker_id)->first();
         logger("worker", [$worker, $worker_id]);
@@ -383,17 +384,20 @@ class ActionServices extends TextServices
             if ($limit_access) {
                 $name_worker = $worker->fullName ?: $worker->first_name . " " . $worker->last_name;
 
-                $message_menu = cache()->get("menu_" . $this->getUserId());
-                if ($message_menu) {
-                    $keyboard = data_get($message_menu, "keyboard");
-                    $text = $worker->fullName ?: $worker->first_name . " " . $worker->last_name;
-                    $keyboard[$worker_i] = [[
-                        'text' => "  $text " . "\xE2\x9C\x85",
-                        'callback_data' => "trade_limit_" . $worker->id
-                    ]];
-                    logger("close", [$this->getUserId(), data_get($message_menu, "id"), "لیست همکاران", $keyboard]);
-                    $this->telegram_services->editMessageTextAndInlineKeyboard($this->getUserId(), data_get($message_menu, "id"), "لیست همکاران", $keyboard);
-                }
+//                $message_menu = cache()->get("menu_" . $this->getUserId());
+//                if ($message_menu) {
+//                    $keyboard = data_get($message_menu, "keyboard");
+//                    $text = $worker->fullName ?: $worker->first_name . " " . $worker->last_name;
+//                    $keyboard[$worker_i] = [[
+//                        'text' => "  $text " . "\xE2\x9C\x85",
+//                        'callback_data' => "trade_limit_" . $worker->id
+//                    ]];
+//                    logger("close", [$this->getUserId(), data_get($message_menu, "id"), "لیست همکاران", $keyboard]);
+//                    $this->telegram_services->editMessageTextAndInlineKeyboard($this->getUserId(), data_get($message_menu, "id"), "لیست همکاران", $keyboard);
+//                }
+                $data_old = cache()->get("menu_List_worker_" . $this->getUserId());
+                $message_id = data_get($data_old, "id", null);
+                $this->listWorker($page, $message_id);
                 $limit_access->delete();
                 $this->telegram->sendMessage([
                     'chat_id' => $this->getUserId(),
@@ -406,7 +410,8 @@ class ActionServices extends TextServices
     public function tradeLimit()
     {
         $data = str_replace('trade_limit_', '', $this->getData());
-        $worker_id = (int)
+        $worker_id = (int)data_get($data, 0);
+        $page = (int)data_get($data, 1);
         $worker = UserTelegram::where("id", $worker_id)->first();
         logger("worker", [$worker]);
         if ($worker) {
@@ -416,7 +421,7 @@ class ActionServices extends TextServices
                 'chat_id' => $this->getUserId(),
                 'text' => "حد مجازی که می خواهید با $name_worker داشته باشید را وارد کنید "
             ]);
-            cache()->set($this->getKeyCache() . $this->getUserId(), ["title" => "trade_number_limit", "value" => $worker->id]);
+            cache()->set($this->getKeyCache() . $this->getUserId(), ["title" => "trade_number_limit", "value" => $worker->id, "page" => $page]);
         }
     }
 
@@ -520,6 +525,7 @@ class ActionServices extends TextServices
         $number = (int)$this->convertNumber($this->getMessage());
         if (is_numeric($number)) {
             $worker_id = (int)data_get($data_cache, "value");
+            $page = (int)data_get($data_cache, "page");
             UserTradeAccess::updateOrCreate([
                 "user_id" => $this->getUserId(),
                 "user_trade_id" => $worker_id,],
