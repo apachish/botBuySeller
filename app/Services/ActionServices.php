@@ -219,12 +219,10 @@ class ActionServices extends TextServices
                             $num =  $limit_day + $n;
                     }
 
+                    $transfer->number -= $limit_day;
+                    $request_transfer["number"] = $limit_day;
 
-
-                    $transfer->number -= $num;
-                    $request_transfer["number"] = $num;
-
-                    $request_transfer["status"] = $num== $transfer->number ?"complete":"half";
+                    $request_transfer["status"] = $limit_day== $transfer->number ?"complete":"half";
                 } else {
                     logger("check", [$transfer->number, $num, $transfer->number >= $num]);
                     if ($transfer->number >= $num) {
