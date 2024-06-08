@@ -161,7 +161,7 @@ class ActionServices extends TextServices
         logger("request", [$num, $id]);
         $transfer = Transfer::find($id);
         logger("Transfer", [$transfer]);
-
+        $transfer_type = getTypeOrder($transfer->type);
         if ($transfer) {
             try {
 
@@ -198,43 +198,39 @@ class ActionServices extends TextServices
                 logger("limit_day", [$limit_day]);
                 if ($limit_day) {
                     $use_day = 0;
-                    $daily_request = DailyRequestTransfer::where("request_id", $this->getUserId())
+                    $query =  DailyRequestTransfer::where("request_id", $this->getUserId())
                         ->where("transfer_id", $transfer->user_id)
-                        ->whereDate('created_at', now())->first();
-                    $daily_transfer = DailyRequestTransfer::where("transfer_id", $this->getUserId())
-                        ->where("request_id", $transfer->user_id)
-                        ->whereDate('created_at', now())->first();
-
-                    if (($daily_request && $daily_request->limit) && ($daily_transfer && $daily_transfer->limit)) {
-                        $use_day = $daily_request->use_day - $daily_transfer->limit;
-                        if ($use_day < 0)
-                            $use_day *= -1;
+                        ->whereDate('created_at', now());
+                    $daily_request = $query->get();
+                    $r_buy = 0;
+                    $r_sell = 0;
+                    if ($daily_request) {
+                        $r_buy = $daily_request->where("type", "buy")->sum("use_day");
+                        $r_sell = $daily_request->where("type", "sell")->sum("use_day");
                     }
-                    elseif (($daily_transfer && $daily_transfer->limit))
-                        $use_day = $daily_transfer->use_day;
-                    elseif (($daily_request && $daily_request->limit))
-                        $use_day = $daily_request->use_day;
 
-                    $access_number = $limit_day - $use_day;
-                    if ($transfer->number >= $num) {
-                        if ($access_number >= $num) {
-                            $transfer->number -= $num;
-                            $use_day += $num;
-                            $request_transfer["number"] = $num;
-                            $request_transfer["status"] = "complete";
-                        } elseif ($access_number > 0) {
-                            $transfer->number -= $access_number;
-                            $use_day += $access_number;
-                            $request_transfer["number"] = $access_number;
-                            $request_transfer["status"] = "half";
-                        }
-                    }
+                    if($transfer_type == "buy")
+                        $n = $r_sell - $num;
+                    elseif($transfer_type == "sell")
+                        $n = $r_buy - $num;
+                    if($n == 0)
+                        $query->delete();
+                    elseif($n > 0)
+                        $query->where("type",$transfer_type=="buy"?"sell":"buy")->delete();
+                    elseif($n < 0 )
+                        $num =  $limit_day + $n;
+
+                    $transfer->number -= $num;
+                    $request_transfer["number"] = $num;
+
+                    $request_transfer["status"] = $num== $transfer->number ?"complete":"half";
                 } else {
                     logger("check", [$transfer->number, $num, $transfer->number >= $num]);
                     if ($transfer->number >= $num) {
                         $transfer->number -= $num;
                         $request_transfer["number"] = $num;
-                        $request_transfer["status"] = "complete";
+
+                        $request_transfer["status"] = $num== $transfer->number ?"complete":"half";
                         logger("request", [$request_transfer]);
                     }
                 }
@@ -246,21 +242,20 @@ class ActionServices extends TextServices
                         "request_id" => $this->getUserId(),
                         "transfer_id" => $transfer->user_id,
                     ], [
-                        "limit" => $limit_day,
-                        "use_day" => $use_day
+                        "use_day" => $use_day,
+                        "type" => $transfer_type
                     ]);
 
                     $keyboard = self::getKeyboardRequest($transfer);
 
                     $trade_message = $transfer->message;
-                    if($transfer->number == 0)
-                    {
+                    if ($transfer->number == 0) {
                         $trade_message .= "\xE2\x9C\x85	🤝🏼";
-                        $transfer->status= Transfer::STATUS_ACTIVE_DONE;
+                        $transfer->status = Transfer::STATUS_ACTIVE_DONE;
                         $transfer->update();
                     }
 
-                    $this->telegram_services->editMessageTextAndInlineKeyboard($this->bot->chanel_id, $transfer->message_id,$trade_message , $keyboard);
+                    $this->telegram_services->editMessageTextAndInlineKeyboard($this->bot->chanel_id, $transfer->message_id, $trade_message, $keyboard);
                     $transfer->update();
 
                     $request_transfer["remittance_number"] = generateUniqueSixDigitCode();
@@ -383,7 +378,7 @@ class ActionServices extends TextServices
         $page = (int)data_get($array, 1);
 
         $worker = UserTelegram::where("id", $worker_id)->first();
-        logger("worker", [$worker_id,$worker, $page]);
+        logger("worker", [$worker_id, $worker, $page]);
         if ($worker) {
             $limit_access = UserTradeAccess::where("user_id", $this->getUserId())
                 ->where("user_trade_id", $worker->id)->first();
@@ -402,7 +397,7 @@ class ActionServices extends TextServices
 //                    $this->telegram_services->editMessageTextAndInlineKeyboard($this->getUserId(), data_get($message_menu, "id"), "لیست همکاران", $keyboard);
 //                }
                 $data_old = cache()->get("menu_List_worker_" . $this->getUserId());
-                logger("menu_List_worker_",[$data_old]);
+                logger("menu_List_worker_", [$data_old]);
                 $message_id = data_get($data_old, "id", null);
                 $limit_access->delete();
                 $this->listWorker($page, $message_id);
@@ -417,7 +412,7 @@ class ActionServices extends TextServices
     public function tradeLimit()
     {
         $data = str_replace('trade_limit_', '', $this->getData());
-        $data = explode("_",$data);
+        $data = explode("_", $data);
         $worker_id = (int)data_get($data, 0);
         $page = (int)data_get($data, 1);
         $worker = UserTelegram::where("id", $worker_id)->first();

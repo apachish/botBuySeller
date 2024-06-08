@@ -18,7 +18,7 @@ class DailyRequestTransfer extends Model
     protected $fillable = [
         "request_id",
         "transfer_id",
-        "limit",
+        "type",
         "use_day"
     ];
 }
