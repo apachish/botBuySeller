@@ -410,6 +410,7 @@ class ActionServices extends TextServices
     public function tradeLimit()
     {
         $data = str_replace('trade_limit_', '', $this->getData());
+        $data = explode("_",$data);
         $worker_id = (int)data_get($data, 0);
         $page = (int)data_get($data, 1);
         $worker = UserTelegram::where("id", $worker_id)->first();
