@@ -256,8 +256,9 @@ class ActionServices extends TextServices
                     $trade_message = $transfer->message;
                     if($transfer->number == 0)
                     {
-                        $transfer->status= Transfer::STATUS_ACTIVE_DONE;
                         $trade_message .= "\xE2\x9C\x85	🤝🏼";
+                        $transfer->status= Transfer::STATUS_ACTIVE_DONE;
+                        $transfer->update();
                     }
 
                     $this->telegram_services->editMessageTextAndInlineKeyboard($this->bot->chanel_id, $transfer->message_id,$trade_message , $keyboard);
