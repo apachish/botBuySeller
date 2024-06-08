@@ -194,9 +194,9 @@ class ActionServices extends TextServices
                         $limit_day = $user_request->limit_access;
 
                 }
-                logger("type_t".$transfer_type);
-                $buyer_id = $transfer_type == "buy"?$transfer->user_id:$this->getUserId();
-                $seller_id = $transfer_type == "sell"?$transfer->user_id:$this->getUserId();
+                logger("type_t".$transfer_type,[$transfer->user_id,$this->getUserId()]);
+                $buyer_id = $transfer_type == "buy"?$this->getUserId():$transfer->user_id;
+                $seller_id = $transfer_type == "sell"?$this->getUserId():$transfer->user_id;
                 logger("limit_day", [$limit_day]);
                 logger("limit_day", [$buyer_id,$seller_id]);
                 if ($limit_day) {
