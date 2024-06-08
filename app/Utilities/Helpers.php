@@ -18,6 +18,35 @@ if (!function_exists('getPriceFormat')) {
 
     }
 }
+if (!function_exists('cleanInput')) {
+    function cleanInput($input) {
+        // استفاده از یک الگو برای جدا کردن بخش‌ها
+        $pattern = '/^(\d+)\s*([فف|خخ|خ|ف|خفش|خش|ففش|فش|خن|خفن|فن|ففن])\s*(\d?)(:\s*(.*))?$/u';
+
+        if (preg_match($pattern, $input, $matches)) {
+            // حذف فضای خالی از بخش‌های مورد نیاز
+            $number = preg_replace('/\s+/', '', $matches[1]);
+            $letters = preg_replace('/\s+/', '', $matches[2]);
+            $optional_number = preg_replace('/\s+/', '', $matches[3]);
+            $comment = isset($matches[5]) ? $matches[5] : '';
+
+            // ساختن رشته نهایی
+            $cleanedInput = $number . $letters . $optional_number;
+            if (!empty($comment)) {
+                $cleanedInput .= ':' . $comment;
+            }
+            return $cleanedInput;
+        }
+        return $input; // اگر الگو تطابق نداشت، همان ورودی را برگردانید
+    }
+}
+if (!function_exists('getPriceFormat')) {
+    function getPriceFormat($money)
+    {
+        return number_format($money, 0);
+
+    }
+}
 
 if (!function_exists('getTypeTitleOrder')) {
     function getTypeTitleOrder($type)

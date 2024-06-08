@@ -286,7 +286,7 @@ class TextServices
      */
     public function setMessage(): void
     {
-        $this->message = isset($this->update['message']['text']) ? $this->convertNumber(trim($this->update['message']['text'])) : null;
+        $this->message = isset($this->update['message']['text']) ? $this->convertNumber(cleanInput($this->update['message']['text'])) : null;
         logger("message", [$this->message]);
     }
 
@@ -357,7 +357,7 @@ class TextServices
     {
 //        $this->pattern = "/^\d{3,5}" . $this->type . "\d{1}$/";
 //        $this->pattern = "/^([0-9]{3}|[0-9]{5})$this->type([1-3]?)$/";
-        $this->pattern = "/^([0-9]{3}|[0-9]{5})\s*$this->type\s*([1-3]?)(:.*)?$/u";
+        $this->pattern = "/^([0-9]{3}|[0-9]{5})$this->type([1-3]?)(:.*)?$/u";
         logger("pattern", [$this->pattern, $this->type]);
     }
 
@@ -406,7 +406,7 @@ class TextServices
         if (in_array($this->message, $accept))
             return true;
         $im = implode("|",$this->list_type);
-        $pattern_un = "/^([0-9]{3}|[0-9]{5})\s*($im)\s*([4-9]?)(:.*)?$/u";
+        $pattern_un = "/^([0-9]{3}|[0-9]{5})($im)([4-9]?)(:.*)?$/u";
         if (preg_match($pattern_un, $this->message, $matches)) {
             $optionalNumber = isset($matches[3]) && $matches[3]?$matches[3]: '1'; // اگر گروه سوم خالی بود، مقدار ۱ قرار داده شود
             logger("aa",[ $optionalNumber, $optionalNumber < 1 ,  $optionalNumber > 3]);
@@ -417,7 +417,7 @@ class TextServices
                 return false;
             }
         }
-        $pattern = "/^([0-9]{3}|[0-9]{5})\s*($im)([1-3]?)\s*(:.*)?$/u";
+        $pattern = "/^([0-9]{3}|[0-9]{5})($im)([1-3]?)(:.*)?$/u";
 
         logger($pattern,[preg_match($pattern, $this->message, $matches),$this->message]);
         if (preg_match($pattern, $this->message, $matches)) {
