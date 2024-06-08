@@ -188,9 +188,9 @@ class ActionServices extends TextServices
                     logger("www", [$user_request, $user_transfer]);
                     if (($user_request && $user_request->limit_access) && ($user_transfer && $user_transfer->limit_access))
                         $limit_day = min($user_request->limit_access, $user_transfer->limit_access);
-                    if (($user_transfer && $user_transfer->limit_access))
+                    elseif (($user_transfer && $user_transfer->limit_access))
                         $limit_day = $user_transfer->limit_access;
-                    if (($user_request && $user_request->limit_access))
+                    elseif (($user_request && $user_request->limit_access))
                         $limit_day = $user_request->limit_access;
 
                 }
@@ -210,9 +210,9 @@ class ActionServices extends TextServices
                         if ($use_day < 0)
                             $use_day *= -1;
                     }
-                    if (($daily_transfer && $daily_transfer->limit))
+                    elseif (($daily_transfer && $daily_transfer->limit))
                         $use_day = $daily_transfer->use_day;
-                    if (($daily_request && $daily_request->limit))
+                    elseif (($daily_request && $daily_request->limit))
                         $use_day = $daily_request->use_day;
 
                     $access_number = $limit_day - $use_day;
