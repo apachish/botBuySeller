@@ -21,7 +21,7 @@ if (!function_exists('getPriceFormat')) {
 if (!function_exists('cleanInput')) {
     function cleanInput($input) {
         // استفاده از یک الگو برای جدا کردن بخش‌ها
-        $pattern = '/^(\d+)\s*([فف|خخ|خ|ف|خفش|خش|ففش|فش|خن|خفن|فن|ففن])\s*(\d?)(:\s*(.*))?$/u';
+        $pattern = '/^(\d+)\s*([فف|خف|خ|ف|خفش|خش|ففش|فش|خن|خفن|فن|ففن])\s*(\d?)(:\s*(.*))?$/u';
 
         if (preg_match($pattern, $input, $matches)) {
             // حذف فضای خالی از بخش‌های مورد نیاز
