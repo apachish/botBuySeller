@@ -197,13 +197,13 @@ class ActionServices extends TextServices
 
                 logger("limit_day", [$limit_day]);
                 if ($limit_day) {
-                    $use_day = 0;
                     $query =  DailyRequestTransfer::where("request_id", $this->getUserId())
                         ->where("transfer_id", $transfer->user_id)
                         ->whereDate('created_at', now());
                     $daily_request = $query->get();
 
-                    if ($daily_request) {
+                    logger("daily_request",[$daily_request->count(),$daily_request]);
+                    if ($daily_request->count()) {
 
                         $r_buy = $daily_request->where("type", "buy")->sum("use_day");
                         $r_sell = $daily_request->where("type", "sell")->sum("use_day");
@@ -217,14 +217,19 @@ class ActionServices extends TextServices
                             $query->where("type",$transfer_type=="buy"?"sell":"buy")->delete();
                         elseif($n < 0 )
                             $num =  $limit_day + $n;
+                        logger("sss",[$r_buy,$r_sell,$n,$limit_day,$num]);
                     }else{
                         $num = $limit_day;
+                        logger("limit_day",[$limit_day,$num]);
+
                     }
 
                     $transfer->number -= $num;
                     $request_transfer["number"] = $num;
                     $use_day = $num;
-                    $request_transfer["status"] = $num== $transfer->number ?"complete":"half";
+                    logger("use_day",[$use_day]);
+
+                    $request_transfer["status"] =  $transfer->number==0 ?"complete":"half";
                 } else {
                     logger("check", [$transfer->number, $num, $transfer->number >= $num]);
                     if ($transfer->number >= $num) {
@@ -263,7 +268,7 @@ class ActionServices extends TextServices
                     $request_transfer["remittance_number"] = generateUniqueSixDigitCode();
                     $request_transfer["request_id"] = $this->getUserId();
                     $request_transfer["transfer_id"] = $transfer->user_id;
-                    $request_transfer["price"] = $transfer->pric;
+                    $request_transfer["price"] = $transfer->price;
 
                     RequestTransfer::create($request_transfer);
 
