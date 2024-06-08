@@ -202,23 +202,24 @@ class ActionServices extends TextServices
                         ->where("transfer_id", $transfer->user_id)
                         ->whereDate('created_at', now());
                     $daily_request = $query->get();
-                    $r_buy = 0;
-                    $r_sell = 0;
+
                     if ($daily_request) {
+
                         $r_buy = $daily_request->where("type", "buy")->sum("use_day");
                         $r_sell = $daily_request->where("type", "sell")->sum("use_day");
+                        if($transfer_type == "buy")
+                            $n = $r_sell - $num;
+                        elseif($transfer_type == "sell")
+                            $n = $r_buy - $num;
+                        if($n == 0)
+                            $query->delete();
+                        elseif($n > 0)
+                            $query->where("type",$transfer_type=="buy"?"sell":"buy")->delete();
+                        elseif($n < 0 )
+                            $num =  $limit_day + $n;
                     }
 
-                    if($transfer_type == "buy")
-                        $n = $r_sell - $num;
-                    elseif($transfer_type == "sell")
-                        $n = $r_buy - $num;
-                    if($n == 0)
-                        $query->delete();
-                    elseif($n > 0)
-                        $query->where("type",$transfer_type=="buy"?"sell":"buy")->delete();
-                    elseif($n < 0 )
-                        $num =  $limit_day + $n;
+
 
                     $transfer->number -= $num;
                     $request_transfer["number"] = $num;
