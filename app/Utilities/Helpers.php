@@ -20,7 +20,6 @@ if (!function_exists('getPriceFormat')) {
 }
 if (!function_exists('cleanInput')) {
     function cleanInput($input) {
-        logger("input check clean",[$input,preg_match($pattern, $input, $matches)]);
         // استفاده از یک الگو برای جدا کردن بخش‌ها
         $pattern = '/^(\d+)\s*([فف|خف|خ|ف|خفش|خش|ففش|فش|خن|خفن|فن|ففن])\s*(\d?)(:\s*(.*))?$/u';
         logger("input check clean",[$input,preg_match($pattern, $input, $matches)]);
