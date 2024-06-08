@@ -23,7 +23,10 @@ Route::post('/set/webhook/{token}',
 
 
 Route::post('admin/set/webhook/{token}',
-    [\App\Http\Controllers\TelegramAdminController::class,'setWebhook'])->name('set.webhook');
+    [\App\Http\Controllers\TelegramAdminController::class,'setWebhook'])->name('set.webhook.admin');
 
 Route::post('support/set/webhook/{token}',
-    [\App\Http\Controllers\TelegramSupportController::class,'setWebhook'])->name('set.webhook');
+    [\App\Http\Controllers\TelegramSupportController::class,'setWebhook'])->name('set.webhook.support');
+
+Route::post('customer/set/webhook/{token}',
+    [\App\Http\Controllers\TelegramCustomerController::class,'setWebhook'])->name('set.webhook.customer');
