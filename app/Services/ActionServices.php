@@ -214,7 +214,9 @@ class ActionServices extends TextServices
                     }
                     logger("quantity".$quantity);
                     if($quantity)
-                        $num = $limit_day + $quantity;
+                        $a = $limit_day + $quantity;
+                        if($a <= $num)
+                            $num = $a;
                     else
                         $num = $limit_day;
 
