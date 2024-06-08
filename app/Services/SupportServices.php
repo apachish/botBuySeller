@@ -28,15 +28,22 @@ class SupportServices extends TextServices
 
     public function supportByMessage()
     {
-        SupportTelegram::create([
-            "update_id" => data_get($this->update, '$this->update_id'),
-            "message_id" => data_get($this->update, 'message.message_id'),
-            "user_telegram_id" => $this->getUserId(),
-            "text" => data_get($this->update, 'message.text'),
-            "data" => json_encode($this->update)
-        ]);
+        if($this->getMessage() == "/start" ||$this->getMessage() =="strat")
+        {
+            $this->telegram_services->sendMessage($this->getUserId(), "پیام خود را بگذارید در اسراع وقت بررسی می شود ");
 
-        $this->telegram_services->sendMessage($this->getUserId(), "پیام شما دریافت شد پس از بررسی با شما تماس حاصل می شود ");
+        }else{
+            SupportTelegram::create([
+                "update_id" => data_get($this->update, '$this->update_id'),
+                "message_id" => data_get($this->update, 'message.message_id'),
+                "user_telegram_id" => $this->getUserId(),
+                "text" =>$this->getMessage() ,
+                "data" => $this->update
+            ]);
+
+            $this->telegram_services->sendMessage($this->getUserId(), "پیام شما دریافت شد پس از بررسی با شما تماس حاصل می شود ");
+        }
+
 
     }
 }
