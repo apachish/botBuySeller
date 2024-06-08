@@ -213,11 +213,11 @@ class ActionServices extends TextServices
                         $quantity = $query_buy->sum("use_day");
                     }
                     logger("quantity".$quantity);
-                    if($quantity)
+                    if($quantity) {
                         $a = $limit_day + $quantity;
-                        if($a <= $num)
+                        if ($a <= $num)
                             $num = $a;
-                    else
+                    }else
                         $num = $limit_day;
 
 
