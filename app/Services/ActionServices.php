@@ -132,15 +132,16 @@ class ActionServices extends TextServices
     {
         $this->getUser()->fullName = $this->message;
         $this->getUser()->update();
+        cache()->forget($this->getKeyCache() . $this->getUserId());
         if (!$this->getUser()->mobile) {
             $text = "ممنون شماره خود را به اشتراک بگذارید";
             $this->telegram_services->sendRequestContactButton($this->getUserId(), $text);
+            cache()->set($this->getKeyCache() . $this->getUserId(), "add_mobile");
+
         } elseif (!$this->getUser()->status) {
             cache()->set($this->getKeyCache() . $this->getUserId(), "pending_accept");
             $text = "منتظر تایید مدیر سیستم باشید تا دسترسی به شما ارائه گردد";
             $this->telegram->sendMessage(['chat_id' => $this->getUserId(), 'text' => $text]);
-        } else {
-            cache()->forget($this->getKeyCache() . $this->getUserId());
         }
     }
 
