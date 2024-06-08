@@ -207,17 +207,16 @@ class ActionServices extends TextServices
                         logger("buyyyyyy",[$query_sell]);
 
                         $quantity = $query_sell->sum("use_day");
-                    }if($transfer_type == "sell") {
+                    }elseif($transfer_type == "sell") {
                         $query_buy = DailyRequestTransfer::where("seller_id", $buyer_id)->where("buyer_id", $seller_id)->get();
                         logger("seeeeeelll",[$query_buy]);
                         $quantity = $query_buy->sum("use_day");
                     }
-                    $a =0;
                     logger("quantity".$quantity);
                     if($quantity)
-                        $a = $num - $quantity;
-
-                    $num = $a+$limit_day;
+                        $num = $limit_day + $quantity;
+                    else
+                        $num = $limit_day;
 
 
                     $transfer->number -= $num;
