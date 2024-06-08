@@ -186,12 +186,12 @@ class ActionServices extends TextServices
                         ->where("user_trade_id", $this->getUserId())->first();
 
                     logger("www", [$user_request, $user_transfer]);
-                    if (($user_request && $user_request->limit) && ($user_transfer && $user_transfer->limit))
-                        $limit_day = min($user_request->limit, $user_transfer->limit);
-                    if (($user_transfer && $user_transfer->limit))
-                        $limit_day = $user_transfer->limit;
-                    if (($user_request && $user_request->limit))
-                        $limit_day = $user_request->limit;
+                    if (($user_request && $user_request->limit_access) && ($user_transfer && $user_transfer->limit_access))
+                        $limit_day = min($user_request->limit_access, $user_transfer->limit_access);
+                    if (($user_transfer && $user_transfer->limit_access))
+                        $limit_day = $user_transfer->limit_access;
+                    if (($user_request && $user_request->limit_access))
+                        $limit_day = $user_request->limit_access;
 
                 }
 
@@ -220,14 +220,13 @@ class ActionServices extends TextServices
                         if ($access_number >= $num) {
                             $transfer->number -= $num;
                             $use_day += $num;
-//                            $request->number = $num;
-//                            $request->status = "complete";
+                            $request_transfer["number"] = $num;
+                            $request_transfer["status"] = "complete";
                         } elseif ($access_number > 0) {
                             $transfer->number -= $access_number;
                             $use_day += $access_number;
-//                            $request->number = $access_number;
-//                            $request->status = "half";
-
+                            $request_transfer["number"] = $access_number;
+                            $request_transfer["status"] = "half";
                         }
                     }
                 } else {
