@@ -253,8 +253,11 @@ class ActionServices extends TextServices
 
                     $keyboard = self::getKeyboardRequest($transfer);
 
+                    $trade_message = $transfer->message;
+                    if($transfer->number == 0)
+                        $trade_message .= "\xE2\x9C\x85	🤝🏼";
 
-                    $this->telegram_services->editMessageTextAndInlineKeyboard($this->bot->chanel_id, $transfer->message_id, $transfer->message, $keyboard);
+                    $this->telegram_services->editMessageTextAndInlineKeyboard($this->bot->chanel_id, $transfer->message_id,$trade_message , $keyboard);
                     $transfer->update();
 
                     $request_transfer["remittance_number"] = generateUniqueSixDigitCode();
