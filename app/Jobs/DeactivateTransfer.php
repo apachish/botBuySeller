@@ -36,7 +36,9 @@ class DeactivateTransfer implements ShouldQueue
             $token = $bot->token;
             $text_services = new TextServices($token);
 
-            $transfer = Transfer::find($this->transfer_id);
+            $transfer = Transfer::where("number",">",0)
+                ->whereIn("status",[Transfer::STATUS_ACTIVE,Transfer::STATUS_ACTIVE_DO])
+                ->find($this->transfer_id);
             if($transfer) {
                 $message = $transfer->message."\xF0\x9F\x95\x9B	";
                 $text_services->getTelegramServices()->editMessageTextAndInlineKeyboard($bot->chanel_id, $transfer->message_id, $message);
