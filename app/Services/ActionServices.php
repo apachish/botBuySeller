@@ -397,8 +397,8 @@ class ActionServices extends TextServices
                 $data_old = cache()->get("menu_List_worker_" . $this->getUserId());
                 logger("menu_List_worker_",[$data_old]);
                 $message_id = data_get($data_old, "id", null);
-                $this->listWorker($page, $message_id);
                 $limit_access->delete();
+                $this->listWorker($page, $message_id);
                 $this->telegram->sendMessage([
                     'chat_id' => $this->getUserId(),
                     'text' => "حد مجاز برای $name_worker نا محدود شد "

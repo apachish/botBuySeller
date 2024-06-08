@@ -758,7 +758,6 @@ class TextServices
         $pre = $users->previousPageUrl() ? (int)str_replace("?page=","",strstr($users->previousPageUrl(), "?page=")) : null;
         $keyboard = [];
         $i = 0;
-        $this->user->refresh();
         $userTradeAccess = $this->user->userTradeAccess;
         logger("userTradeAccess", [$userTradeAccess]);
         $users->each(function ($user) use (&$keyboard, &$i, $userTradeAccess,$page) {
