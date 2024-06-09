@@ -197,30 +197,11 @@ class ActionServices extends TextServices
                 logger("type_t".$transfer_type,[$transfer->user_id,$this->getUserId()]);
                 $buyer_id = $transfer_type == "buy"?$transfer->user_id:$this->getUserId();
                 $seller_id = $transfer_type == "sell"?$transfer->user_id:$this->getUserId();
+
                 logger("limit_day", [$limit_day]);
                 logger("limit_day", [$buyer_id,$seller_id]);
                 if ($limit_day) {
-                    $quantity = 0;
-                    // بررسی حد معاملات
-                    if($transfer_type == "buy"){
-                        $query_sell = DailyRequestTransfer::where("seller_id",$seller_id)->where("buyer_id",$buyer_id)->get();
-                        logger("buyyyyyy",[$query_sell]);
-
-                        $quantity = $query_sell->sum("use_day");
-                    }elseif($transfer_type == "sell") {
-                        $query_buy = DailyRequestTransfer::where("seller_id", $buyer_id)->where("buyer_id", $seller_id)->get();
-                        logger("seeeeeelll",[$query_buy]);
-                        $quantity = $query_buy->sum("use_day");
-                    }
-                    logger("quantity".$quantity);
-                    if($quantity) {
-                        $a = $limit_day + $quantity;
-                        if ($a <= $num)
-                            $num = $a;
-                    }else
-                        $num = $limit_day;
-
-
+                   $num = $this->performTransaction($seller_id,$buyer_id,$num,$limit_day);
                     $transfer->number -= $num;
                     $request_transfer["number"] = $num;
                     $use_day = $num;
@@ -308,6 +289,34 @@ class ActionServices extends TextServices
                     $exception->getTrace(),
                     $exception->getFile()]);
             }
+        }
+    }
+
+    private function performTransaction($seller_id, $buyer_id, $quantity,$max_trade_limit)
+    {
+        if (!$seller_id || !$buyer_id) {
+            dd(['error' => 'User not found'], 404);
+        }
+
+        $total_sold_by_seller = DailyRequestTransfer::where('seller_id', $seller_id)
+            ->where('buyer_id', $buyer_id)->sum('use_day');
+        $total_sold_by_buyer = DailyRequestTransfer::where('seller_id', $buyer_id)
+            ->where('buyer_id', $seller_id)->sum('use_day');
+
+
+        $available_to_sell = $max_trade_limit - $total_sold_by_seller + $total_sold_by_buyer;
+        $new_quantity = min($quantity, $available_to_sell);
+
+        if ($new_quantity > 0) {
+            DailyRequestTransfer::create([
+                'seller_id' => $seller_id,
+                'buyer_id' => $buyer_id,
+                'use_day' => $new_quantity,
+            ]);
+
+            return $new_quantity;
+        } else {
+            return false;
         }
     }
 
