@@ -295,7 +295,7 @@ class ActionServices extends TextServices
     private function performTransaction($seller_id, $buyer_id, $quantity,$max_trade_limit)
     {
         if (!$seller_id || !$buyer_id) {
-            dd(['error' => 'User not found'], 404);
+            return 0;
         }
 
         $total_sold_by_seller = DailyRequestTransfer::where('seller_id', $seller_id)
