@@ -222,6 +222,24 @@ if (!function_exists('getUnitNumber')) {
     }
 }
 
+if (!function_exists('getUnitPrice')) {
+    function getUnitPrice($number)
+    {
+        $base = null;
+        $number = convertNumber($number);
+        if ($number >= 99999999999)
+            $base = 1000000000000;
+        elseif ($number >= 999999999)
+            $base = 1000000000 ;
+        elseif ($number >= 99999)
+            $base = 1000000;
+        elseif ($number >= 999)
+            $base = 1000;
+        return  $base;
+
+    }
+}
+
 if (!function_exists('number_format')) {
     function number_format($number, $decimal_precision = 0, $decimals_separator = '.', $thousands_separator = ',')
     {

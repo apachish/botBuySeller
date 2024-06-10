@@ -599,9 +599,19 @@ class ActionServices extends TextServices
 
         // بررسی کنید که آیا طول عدد 3 یا 5 است
         if ($length === 3)
-            $start_trade = ((int)data_get($limit_trade, "start") / 1000000) * 1000000;
+        {
+            $start_price = (int)data_get($limit_trade, "start");
+            $unit = getUnitPrice($start_price);
+        }
         elseif ($length === 5)
-            $start_trade = ((int)($suggest_price * 1000) / 1000000) * 1000000;
+        {
+            $start_price = (int)($suggest_price * 1000);
+            $unit = getUnitPrice($start_price);
+            $suggest_price = $suggest_price % 1000;
+
+        }
+        $start_trade = floor($start_price/$unit)*$unit;
+
 
 
         $price = $start_trade + ($suggest_price * 1000);
