@@ -691,8 +691,10 @@ class ActionServices extends TextServices
                 $message .= "با حواله";
             $message .= $number;
             $message .= " تا ";
-            if (str_contains($this->getType(), "ش"))
+            if (in_array($this->getType(), $this->list_type_floating))
                 $message .= " شنا ";
+            elseif (in_array($this->getType(), $this->list_type_reverse))
+                $message .= " معکوس ";
 
 
             if ($this->getDescription()) {

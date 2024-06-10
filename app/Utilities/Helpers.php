@@ -21,7 +21,7 @@ if (!function_exists('getPriceFormat')) {
 if (!function_exists('cleanInput')) {
     function cleanInput($input) {
         // استفاده از یک الگو برای جدا کردن بخش‌ها
-        $pattern = '/^(\d+)\s*( خفن|خفش|ففش|ففن|فف|خف|خش|فش|خن|فن|خ|ف)\s*(\d?)(:\s*(.*))?$/u';
+        $pattern = '/^(\d+)\s*( خفن|خفش|ففش|ففن|خفم|ففم|فف|خف|فم|خم|خش|فش|خن|فن|خ|ف)\s*(\d?)(:\s*(.*))?$/u';
 
         if (preg_match($pattern, $input, $matches)) {
             // حذف فضای خالی از بخش‌های مورد نیاز
@@ -51,18 +51,18 @@ if (!function_exists('getPriceFormat')) {
 if (!function_exists('getTypeTitleOrder')) {
     function getTypeTitleOrder($type)
     {
-        if(in_array($type,[ "خفش", "خش", "خفن", "خن","خف", "خ"]))
+        if(in_array($type, ["خفم","خفش","خفن","خش","خن","خم","خف","خ"]))
             return "خرید";
-        elseif(in_array($type,["ففش", "فش",  "ففن","فن","فف", "ف"]))
+        elseif(in_array($type,["ففم","ففش","ففن","فش","فن","فم","فف","ف"]))
             return "فروش";
     }
 }
 if (!function_exists('getTypeOrder')) {
     function getTypeOrder($type)
     {
-        if(in_array($type,[ "خفش", "خش", "خفن", "خن","خف", "خ"]))
+        if(in_array($type,["خفم","خفش","خفن","خش","خن","خم","خف","خ"]))
             return "buy";
-        elseif(in_array($type,["ففش", "فش",  "ففن","فن","فف", "ف"]))
+        elseif(in_array($type,["ففم","ففش","ففن","فش","فن","فم","فف","ف"]))
             return "sell";
     }
 }
@@ -91,6 +91,8 @@ if (!function_exists('getTypeTransfer')) {
             return "شناوری";
         elseif(in_array($type,["خفن","ففن","خن","فن"]))
             return "نقدی";
+        elseif(in_array($type,["ففم","خفم","فم","خم"]))
+            return "معکوس";
 
     }
 }
