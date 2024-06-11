@@ -701,7 +701,7 @@ class TextServices
 
     public function accessAdmin()
     {
-        return $this->bot->accessBot?$this->bot->accessBot->where("user_id", $this->user_id)->where("type", "admin"):false;
+        return $this->bot && $this->bot->accessBot?$this->bot->accessBot->where("user_id", $this->user_id)->where("type", "admin"):false;
     }
 
     public function menu($keyboard, $show,$user=null)
