@@ -497,7 +497,7 @@ class ActionAdminServices extends TextServices
                $query->orWhere("mobile","like","%".$filter."%");
             });
         }
-        $users = simplePaginate(4, ['*'], 'page', $page);
+        $users = $users->simplePaginate(4, ['*'], 'page', $page);
         $page = $users->currentPage();
         $next = $users->nextPageUrl() ? (int)str_replace("?page=", "", strstr($users->nextPageUrl(), "?page=")) : null;
         $pre = $users->previousPageUrl() ? (int)str_replace("?page=", "", strstr($users->previousPageUrl(), "?page=")) : null;
