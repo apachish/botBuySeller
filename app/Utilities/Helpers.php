@@ -18,6 +18,14 @@ if (!function_exists('getPriceFormat')) {
 
     }
 }
+
+if (!function_exists('isValidTime')) {
+    function isValidTime($time) {
+        $pattern = '/^([01]\d|2[0-3]):([0-5]\d)$/';
+        return preg_match($pattern, $time);
+    }
+
+}
 if (!function_exists('cleanInput')) {
     function cleanInput($input) {
         // استفاده از یک الگو برای جدا کردن بخش‌ها

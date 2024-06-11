@@ -70,19 +70,19 @@ class ActionAdminServices extends TextServices
             $tel = "[$tel]";//(tel:$tel)
             $response_text = "برای تماس با شماره زیر کلیک کنید:\n\n$tel";
             $this->getTelegramServices()->sendMessage($this->getUserId(), $response_text);
-        }elseif (str_contains($this->getData(), "pre_")) {
+        } elseif (str_contains($this->getData(), "pre_")) {
             $page = str_replace('pre_', '', $this->getData());
-            $data_old = cache()->get("menu_List_user_".$this->getUserId());
-            $message_id = data_get($data_old,"id",null);
-            if($message_id)
-                $this->listUser($page,$message_id);
-        }elseif (str_contains($this->getData(), "next_")) {
+            $data_old = cache()->get("menu_List_user_" . $this->getUserId());
+            $message_id = data_get($data_old, "id", null);
+            if ($message_id)
+                $this->listUser($page, $message_id);
+        } elseif (str_contains($this->getData(), "next_")) {
             $page = str_replace('next_', '', $this->getData());
-            $data_old = cache()->get("menu_List_user_".$this->getUserId());
-            $message_id = data_get($data_old,"id",null);
-            logger("aa",[$data_old,$message_id,$page]);
-            if($message_id)
-                $this->listUser($page,$message_id);
+            $data_old = cache()->get("menu_List_user_" . $this->getUserId());
+            $message_id = data_get($data_old, "id", null);
+            logger("aa", [$data_old, $message_id, $page]);
+            if ($message_id)
+                $this->listUser($page, $message_id);
         } elseif (str_contains($this->getData(), "customer_")) {
             $id = (int)str_replace('customer_', '', $this->getData());
             $user_con = UserTelegram::where("id", $id)->first();
@@ -95,7 +95,7 @@ class ActionAdminServices extends TextServices
                 $response_text = "$fullName نقش همکار فعال شد \n\n ";
                 $this->getTelegramServices()->sendMessage($this->getUserId(), $response_text);
                 $this->service_user->message_menu = "$fullName همکار گرامی به سیستم ما خوش آمدید\n\n ";
-                $this->service_user->menu($this->keyword_colleague,$user_con->status,$user_con);//->sendMessage($user_con->id, $response_text);
+                $this->service_user->menu($this->keyword_colleague, $user_con->status, $user_con);//->sendMessage($user_con->id, $response_text);
 //                $this->service_user->telegram_services->sendMessage($user_con->id, $response_text);
 
 
@@ -114,7 +114,7 @@ class ActionAdminServices extends TextServices
 //                $response_text = "$fullName همکاری شما در سیستم به سطح مشتری انتقال یافت\n\n ";
 //                $this->service_user->telegram_services->sendMessage($user_con->id, $response_text);
                 $this->service_user->message_menu = "$fullName همکاری شما در سیستم به سطح مشتری انتقال یافت\n\n ";
-                $this->service_user->menu($this->keyword_customer,$user_con->status,$user_con);
+                $this->service_user->menu($this->keyword_customer, $user_con->status, $user_con);
 
             }
         } elseif (str_contains($this->getData(), "confirm_")) {
@@ -132,7 +132,7 @@ class ActionAdminServices extends TextServices
 //                $response_text = "$fullName اکانت کاربریتان فعال شد\n\n ";
 //                $this->service_user->telegram_services->sendMessage($user_con->id, $response_text);
                 $this->service_user->message_menu = "$fullName اکانت کاربریتان فعال شد\n\n ";
-                $this->service_user->menu($this->keyword_customer,$user_con->status,$user_con);
+                $this->service_user->menu($this->keyword_customer, $user_con->status, $user_con);
             }
         } elseif (str_contains($this->getData(), "reject_")) {
             $id = (int)str_replace('reject_', '', $this->getData());
@@ -151,9 +151,9 @@ class ActionAdminServices extends TextServices
 //                $response_text = "$fullName اکانت کاربریتان غیر فعال شد \n\n ";
 //                $this->service_user->telegram_services->sendMessage($user_con->id, $response_text);
                 $this->service_user->message_menu = "$fullName اکانت کاربریتان غیر فعال شد \n\n ";
-                $this->service_user->menu([],$user_con->status,$user_con);
+                $this->service_user->menu([], $user_con->status, $user_con);
             }
-        }elseif (str_contains($this->getData(), "delete_")) {
+        } elseif (str_contains($this->getData(), "delete_")) {
             $id = (int)str_replace('delete_', '', $this->getData());
             $user_con = UserTelegram::where("id", $id)->first();
             logger("rej", [$user_con, $id]);
@@ -167,10 +167,10 @@ class ActionAdminServices extends TextServices
                 $user_con->delete();
                 $response_text = "$fullName\n\n اکانت کاربریش حذف شد ";
                 $this->getTelegramServices()->sendMessage($this->getUserId(), $response_text);
-                $this->telegram_services->kickChatMember($this->bot->chanel_id,$user_con->id);
+                $this->telegram_services->kickChatMember($this->bot->chanel_id, $user_con->id);
 
                 $this->service_user->message_menu = "اکانت کاربریش حذف شد";
-                $this->service_user->menu([],$user_con->status,$user_con);
+                $this->service_user->menu([], $user_con->status, $user_con);
 
             }
         }
@@ -180,69 +180,10 @@ class ActionAdminServices extends TextServices
     {
         logger("actionText", [$this->getMessage()]);
         switch ($this->getMessage()) {
-            case "📞 دفترچه تلفن":
-                $text = "لیست شماره تلفن کاربران";
-                $contacts = UserTelegram::whereNotNull("mobile")->simplePaginate(5);
-                $page = $contacts->currentPage();
-                $next = $contacts->nextPageUrl();
-                $pre = $contacts->previousPageUrl();
-                logger("page", [$next, $page, $pre]);
-//                    $contacts = new ContactResourceCollection($contacts);
-                $keyboard = [];
-                $i = 0;
-
-                $contacts->each(function ($contact) use (&$keyboard, &$i) {
-                    $keyboard[$i++][] = [
-                        "text" => $contact->fullName ?: $contact->first_name . " " . $contact->last_name,
-                        'callback_data' => "tel:" . $contact->mobile,
-
-                    ];
-                });
-                logger("keyboard", [$keyboard]);
-                if ($pre)
-                    $keyboard[$i][] = ['text' => "قبلی", "callback_data" => "pre"];
-                if ($pre)
-                    $keyboard[$i][] = ['text' => "بعدی", "callback_data" => "next"];
-
-                $this->getTelegramServices()->MessageReplyMarkup($this->getTelegram(), $this->getUserId(), $text, $keyboard);
-                break;
-            case "📋 لیست همکاران":
-                $text = "لیست  همکاران";
-                $users = UserTelegram::where("role", "colleague")->simplePaginate(5);
-                $page = $users->currentPage();
-                $next = $users->nextPageUrl();
-                $pre = $users->previousPageUrl();
-                logger("page", [$users,$next, $page, $pre]);
-                $keyboard = [];
-                $i = 0;
-
-                $users->each(function ($user) use (&$keyboard, &$i) {
-                    $text = $user->fullName ?: $user->first_name . " " . $user->last_name;
-                    $keyboard[$i++] = [
-                        ['text' => "  $text ", 'callback_data' => $user->id],
-                    ];
-//                    $keyboard[$i++] = [
-//                        ['text' => "\xE2\x9C\x85 ", 'callback_data' => 'confirm_' . $user->id],
-//                        ['text' => "\xE2\x9D\x8C", 'callback_data' => 'reject_' . $user->id],
-//                    ];
-                });
-                logger("keyboard", [$keyboard]);
-                if ($pre)
-                    $keyboard[$i][] = ['text' => "قبلی", "callback_data" => "pre"];
-                if ($pre)
-                    $keyboard[$i][] = ['text' => "بعدی", "callback_data" => "next"];
-
-                $this->getTelegramServices()->MessageReplyMarkup($this->getTelegram(), $this->getUserId(), $text, $keyboard);
-                break;
-            case "📋 لیست کاربران":
+            case "\xF0\x9F\x9A\xBBلیست کاربران":
                 $this->listUser();
                 break;
-            case "تعداد کاربران":
-                $response_text = UserTelegram::count();
-                $this->getTelegramServices()->sendMessage($this->getUserId(), $response_text);
-                break;
-
-            case "📚  ویرایش قوانین":
+            case "\xF0\x9F\x93\x9Aویرایش قوانین":
                 $rule = Setting::where("key", "rule")->first();
 
                 if ($rule) {
@@ -252,13 +193,12 @@ class ActionAdminServices extends TextServices
                 } else
                     $response_text = "متن قواتین وارد کنید";
 
-                cache()->set("text_admin_" . $this->getUserId(), "rule");
+                cache()->set($this->getKeyCache() . $this->getUserId(), "rule");
 
                 $this->getTelegramServices()->sendMessage($this->getUserId(), $response_text);
 
                 break;
-
-            case  "\xE2\x81\x89 ویرایش راهنما":
+            case  "\xE2\x81\x89ویرایش راهنما":
                 $rule = Setting::where("key", "help")->first();
 
                 if ($rule) {
@@ -269,49 +209,103 @@ class ActionAdminServices extends TextServices
                 } else
                     $response_text = "متن راهنما وارد کنید";
 
-                cache()->set("text_admin_" . $this->getUserId(), "help");
+                cache()->set($this->getKeyCache() . $this->getUserId(), "help");
 
                 $this->getTelegramServices()->sendMessage($this->getUserId(), $response_text);
-            break;
+                break;
             case  "\xF0\x9F\x92\xB3\xF0\x9F\x8C\xB3ویرایش حق اشتراک":
                 $rule = Setting::where("key", "membership")->first();
 
                 if ($rule) {
-                    $response_text = $rule->value;
-
+                    $response_text = "متن حق اشتراک وارد کنید";
+                    $response_text .= $rule->value;
                     $response_text .= "\n\n";
-                    $response_text .= "متن بالا متنن قبلی می  باشد ویرایش کنید";
+                    $response_text .= "می توانید ویرایش کنید";
                 } else
                     $response_text = "متن حق اشتراک وارد کنید";
 
-                cache()->set("text_admin_" . $this->getUserId(), "membership");
+                cache()->set($this->getKeyCache() . $this->getUserId(), "membership");
 
                 $this->getTelegramServices()->sendMessage($this->getUserId(), $response_text);
-            break;
+                break;
+            case  "\xF0\x9F\x92\xB1ویرایش کیف پول حق اشتراک":
+                $wallet_membership = Setting::where("key", "wallet_membership")->first();
 
-            case "📈محدود شروع مبلغ معاملات":
-                $s_price_trade = Setting::where("key", "s_price_trade")->first();
+                if ($wallet_membership) {
+                    $response_text = "کیف پول حق اشتراک وارد شده";
 
+                    $response_text .= $wallet_membership->value;
+
+                    $response_text .= "\n\n";
+                    $response_text .= "می توانید ویرایش کنید";
+                } else
+                    $response_text = "کیف پول حق اشتراک وارد کنید";
+
+                cache()->set($this->getKeyCache() . $this->getUserId(), "wallet_membership");
+
+                $this->getTelegramServices()->sendMessage($this->getUserId(), $response_text);
+                break;
+            case "\xF0\x9F\x93\x88شروع مبلغ معامله":
+                $s_price_trade = Setting::where("key", "start_price_trade")->first();
                 if ($s_price_trade) {
-                    $response_text = "محدود معامله   قبلا شد:";
+                    $response_text = "شروع معامله   تنظیم شد:";
                     $response_text .= "\n\n";
-                    $response_text .= "از مبلغ";
+                    $response_text .= " مبلغ";
                     $response_text .= "\n\n";
-
-                    $response_text .= number_format(data_get($s_price_trade, "value.start"), 0);
-                    $response_text .= "\n\n";
-
-                    $response_text .= "تا مبلغ";
-                    $response_text .= "\n\n";
-
-                    $response_text .= number_format(data_get($s_price_trade, "value.end"), 0);
+                    $response_text .= number_format(data_get($s_price_trade, "value"), 0);
                     $response_text .= "\n\n";
                 } else {
-                    $response_text = "محدود شروع مبلغ وارد شده باید به صورت \n\n";
-                    $response_text .= "14000000:15000000 \n\n";
+                    $response_text = " شروع مبلغ وارد شده باید به صورت \n\n";
+                    $response_text .= "14000000 \n\n";
                 }
-                cache()->set("text_admin_" . $this->getUserId(), "s_price_trade");
+                cache()->set($this->getKeyCache() . $this->getUserId(), "start_price_trade");
 
+                $this->getTelegramServices()->sendMessage($this->getUserId(), $response_text);
+
+                break;
+            case "\xE2\x8C\x9Aساعت شروع فعالیت":
+                $hours_of_operation = Setting::where("key", "start_hours_of_operation")->first();
+                if ($hours_of_operation) {
+                    $response_text = "ساعت شروع تنظیم شد:";
+                    $response_text .= "\n\n";
+                    $response_text .= "\n\n";
+                    $response_text .= number_format(data_get($hours_of_operation, "value"), 0);
+                    $response_text .= "\n\n";
+                } else {
+                    $response_text = " شروع  وارد شده باید به صورت \n\n";
+                    $response_text .= "09:00 \n\n";
+                }
+                cache()->set($this->getKeyCache() . $this->getUserId(), "start_hours_of_operation");
+
+                $this->getTelegramServices()->sendMessage($this->getUserId(), $response_text);
+
+                break;
+            case "\xE2\x8F\xB0ساعت پایان فعالیت":
+                $hours_of_operation = Setting::where("key", "end_hours_of_operation")->first();
+                if ($hours_of_operation) {
+                    $response_text = "ساعت پایان تنظیم شد:";
+                    $response_text .= "\n\n";
+                    $response_text .= "\n\n";
+                    $response_text .= number_format(data_get($hours_of_operation, "value"), 0);
+                    $response_text .= "\n\n";
+                } else {
+                    $response_text = " پایان  وارد شده باید به صورت \n\n";
+                    $response_text .= "22:00 \n\n";
+                }
+                cache()->set($this->getKeyCache() . $this->getUserId(), "end_hours_of_operation");
+
+                $this->getTelegramServices()->sendMessage($this->getUserId(), $response_text);
+
+                break;
+
+            case "\xE2\x98\x81تعطیل":
+                $date = now()->format("Y-m-d");
+                $start_price_trade = Setting::updateOrCreate(
+                    ["key" => "vacation"],
+                    ["value" => $date]
+                );
+                $response_text = toJalali($date);
+                $response_text .= " تعطیل شد";
                 $this->getTelegramServices()->sendMessage($this->getUserId(), $response_text);
 
                 break;
@@ -334,7 +328,7 @@ class ActionAdminServices extends TextServices
                 $response_text .= "\n\n";
                 $response_text .= $rule->value;
                 $this->getTelegramServices()->sendMessage($this->getUserId(), $response_text);
-                cache()->forget("text_admin_" . $this->getUserId());
+                cache()->forget($this->getKeyCache() . $this->getUserId());
                 break;
             case "help":
                 $rule = Setting::updateOrCreate(
@@ -347,9 +341,9 @@ class ActionAdminServices extends TextServices
                 $response_text .= "\n\n";
                 $response_text .= $rule->value;
                 $this->getTelegramServices()->sendMessage($this->getUserId(), $response_text);
-                cache()->forget("text_admin_" . $this->getUserId());
+                cache()->forget($this->getKeyCache() . $this->getUserId());
                 break;
-                case "membership":
+            case "membership":
                 $membership = Setting::updateOrCreate(
                     ["key" => "membership"],
                     ["value" => $this->getMessage()]
@@ -360,42 +354,78 @@ class ActionAdminServices extends TextServices
                 $response_text .= "\n\n";
                 $response_text .= $membership->value;
                 $this->getTelegramServices()->sendMessage($this->getUserId(), $response_text);
-                cache()->forget("text_admin_" . $this->getUserId());
+                cache()->forget($this->getKeyCache() . $this->getUserId());
                 break;
-            case "s_price_trade":
-                $s_price_trade = $this->getMessage();
-                if ($s_price_trade) {
-                    $limit_price = explode(":", $this->convertNumber($s_price_trade));
-                    if (data_get($limit_price, 0) && data_get($limit_price, 1)) {
-                        $rule = Setting::updateOrCreate(
-                            ["key" => "s_price_trade"],
-                            ["value" =>
-                                ["start" => data_get($limit_price, 0),
-                                    "end" => data_get($limit_price, 1)]
-                            ]
-                        );
+            case "wallet_membership":
+                $membership = Setting::updateOrCreate(
+                    ["key" => "wallet_membership"],
+                    ["value" => $this->getMessage()]
+                );
 
-                        $response_text = "محدوده معامله   بروزرسانی شد:";
-                        $response_text .= "\n\n";
-                        $response_text .= "از مبلغ";
-                        $response_text .= "\n\n";
-                        $response_text .= number_format(data_get($limit_price, 0), 0);
-                        $response_text .= "\n\n";
-                        $response_text .= "تا مبلغ";
-                        $response_text .= "\n\n";
 
-                        $response_text .= number_format(data_get($limit_price, 1), 0);
-                        $response_text .= "\n\n";
-                        $this->getTelegramServices()->sendMessage($this->getUserId(), $response_text);
-                        cache()->forget("text_admin_" . $this->getUserId());
-                    } else {
-                        $this->getTelegramServices()->sendMessage($this->getUserId(), "محدوده وارد شده معامله  صحیخ نمی باشد");
+                $response_text = "کیف پول حق اشتراک  بروزرسانی شد:";
+                $response_text .= "\n\n";
+                $response_text .= $membership->value;
+                $response_text .= "\n\n";
 
-                    }
+                $this->getTelegramServices()->sendMessage($this->getUserId(), $response_text);
+                cache()->forget($this->getKeyCache() . $this->getUserId());
+                break;
+            case "start_price_trade":
+                $start_price_trade = $this->getMessage();
+                if (is_numeric($start_price_trade) && $start_price_trade > 0) {
+                    $start_price_trade = Setting::updateOrCreate(
+                        ["key" => "start_price_trade"],
+                        ["value" => (int)$start_price_trade]
+                    );
+
+                    $response_text = "شروع معامله   بروزرسانی شد:";
+                    $response_text .= "\n\n";
+                    $response_text .= " مبلغ";
+                    $response_text .= "\n\n";
+                    $response_text .= number_format(data_get($start_price_trade, "value"), 0);
+                    $response_text .= "\n\n";
+                    $this->getTelegramServices()->sendMessage($this->getUserId(), $response_text);
+                    cache()->forget($this->getKeyCache() . $this->getUserId());
                 } else {
-                    $this->getTelegramServices()->sendMessage($this->getUserId(), "محدوده وارد شده معامله  صحیخ نمی باشد");
+                    $this->getTelegramServices()->sendMessage($this->getUserId(), "مبلغ وارد شده معامله  صحیخ نمی باشد");
 
                 }
+                break;
+            case "start_hours_of_operation":
+                if(isValidTime($this->getMessage())) {
+
+                    $strat = Setting::updateOrCreate(
+                        ["key" => "start_hours_of_operation"],
+                        ["value" => $this->getMessage()]
+                    );
+
+
+                    $response_text = "زمان شروع معاملات:";
+                    $response_text .= "\n\n";
+                    $response_text .= $strat->value;
+                    $this->getTelegramServices()->sendMessage($this->getUserId(), $response_text);
+                    cache()->forget($this->getKeyCache() . $this->getUserId());
+                }else{
+                    $this->getTelegramServices()->sendMessage($this->getUserId(), "ساختار وارد شده ساعت باید باشد 09:00");
+
+                }
+                break;
+            case "end_hours_of_operation":
+                if(isValidTime($this->getMessage())) {
+                    $strat = Setting::updateOrCreate(
+                        ["key" => "end_hours_of_operation"],
+                        ["value" => $this->getMessage()]
+                    );
+
+
+                    $response_text = "زمان پایان معاملات:";
+                    $response_text .= "\n\n";
+                    $response_text .= $strat->value;
+                    $this->getTelegramServices()->sendMessage($this->getUserId(), $response_text);
+                    cache()->forget($this->getKeyCache() . $this->getUserId());
+                }else
+                    $this->getTelegramServices()->sendMessage($this->getUserId(), "ساختار وارد شده ساعت باید باشد 22:00");
                 break;
         }
     }
@@ -407,20 +437,20 @@ class ActionAdminServices extends TextServices
     public function changeMenu($user_con): void
     {
         $menu_bot = BotMenuUser::where("user_id", $user_con->id)->where("bot_id", $this->bot_user->id)->first();
-        logger("menu bot",[$menu_bot]);
+        logger("menu bot", [$menu_bot]);
         if ($menu_bot) {
             $key = $user_con->role == "colleague" ? $this->keyword_colleague : $this->keyword_customer;
-            if(!$user_con->status)
+            if (!$user_con->status)
                 $key = new \stdClass();
             $this->service_user->telegram_services->editCustomKeyboard($user_con->id, $menu_bot->menu_id, "تغییر منو", $key);
-            cache()->forget("keyword_menu".$this->getKeyCache().$user_con->id);
+            cache()->forget("keyword_menu" . $this->getKeyCache() . $user_con->id);
         }
     }
 
     /**
      * @return void
      */
-    public function listUser($page=1,$message_id=null)
+    public function listUser($page = 1, $message_id = null)
     {
         $text = "\n\nلیست  کاربران";
         $text .= "\n\n";
@@ -428,12 +458,12 @@ class ActionAdminServices extends TextServices
 
         $users = UserTelegram::simplePaginate(4, ['*'], 'page', $page);
         $page = $users->currentPage();
-        $next = $users->nextPageUrl() ? (int)str_replace("?page=","",strstr($users->nextPageUrl(), "?page=")) : null;
-        $pre = $users->previousPageUrl() ? (int)str_replace("?page=","",strstr($users->previousPageUrl(), "?page=")) : null;
+        $next = $users->nextPageUrl() ? (int)str_replace("?page=", "", strstr($users->nextPageUrl(), "?page=")) : null;
+        $pre = $users->previousPageUrl() ? (int)str_replace("?page=", "", strstr($users->previousPageUrl(), "?page=")) : null;
         $keyboard = [];
         $i = 0;
 
-        logger("users",[$users]);
+        logger("users", [$users]);
         $users->each(function ($user) use (&$keyboard, &$i) {
             $text = $user->fullName ?: $user->first_name . " " . $user->last_name;
             $text .= $user->role == "colleague" ? "(همکار)" : "(مشتری)";
@@ -447,14 +477,13 @@ class ActionAdminServices extends TextServices
             ];
         });
         if ($pre)
-            $keyboard[$i][] = ['text' => "قبلی", "callback_data" => "pre_".$pre];
+            $keyboard[$i][] = ['text' => "قبلی", "callback_data" => "pre_" . $pre];
         if ($next)
             $keyboard[$i][] = ['text' => "بعدی", "callback_data" => "next_" . $next];
 
-        if($message_id)
-            $this->getTelegramServices()->editMessageTextAndInlineKeyboard( $this->getUserId(),$message_id, $text, $keyboard);
-        else
-        {
+        if ($message_id)
+            $this->getTelegramServices()->editMessageTextAndInlineKeyboard($this->getUserId(), $message_id, $text, $keyboard);
+        else {
             $this->getTelegramServices()->menu_key = "menu_List_user_";
             $menu = $this->getTelegramServices()->MessageReplyMarkup($this->getTelegram(), $this->getUserId(), $text, $keyboard);
         }

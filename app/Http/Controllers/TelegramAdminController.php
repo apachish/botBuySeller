@@ -49,7 +49,9 @@ class TelegramAdminController extends Controller
                 "\xF0\x9F\x9A\xBBلیست کاربران",
                 "جستجو کاربر\xF0\x9F\x94\x8D",
                 "\xF0\x9F\x93\x88شروع مبلغ معامله",
-                "\xE2\x8C\x9Aساعت فعالیت",
+                "\xE2\x8C\x9Aساعت شروع فعالیت",
+                "\xE2\x8F\xB0ساعت پایان فعالیت",
+                "\xE2\x98\x81تعطیل",
                 "\xF0\x9F\x9A\xA9حذف پیام ها",
                 "\xF0\x9F\x93\x9Aویرایش قوانین",
                 "\xE2\x81\x89ویرایش راهنما",
@@ -68,8 +70,9 @@ class TelegramAdminController extends Controller
                 ],
                 [
                     ['text' => "\xF0\x9F\x93\x88شروع مبلغ معامله"],
-                    ['text' => "\xE2\x8C\x9Aساعت فعالیت"],
-                    ['text' => "\xF0\x9F\x9A\xA9حذف پیام ها"],
+                    ['text' => "\xE2\x8C\x9Aساعت شروع فعالیت"],
+                    ['text' => "\xE2\x8C\x9Aساعت پایان فعالیت"],
+                    ['text' => "\xE2\x8C\x9Aتعطیل"],
                 ],
                 [
                     ['text' => "\xF0\x9F\x93\x9Aویرایش قوانین"],
@@ -81,7 +84,8 @@ class TelegramAdminController extends Controller
                 ],
                 [
                     ['text' => "\xF0\x9F\x92\xACلیست پیام ها کاربران"],
-                    ['text' => "\xF0\x9F\x93\x81ارسال فایل"]
+                    ['text' => "\xF0\x9F\x93\x81ارسال فایل"],
+                    ['text' => "\xF0\x9F\x9A\xA9حذف پیام ها"],
                 ],
             ];
             $text_services->menu($keyboard_menu, $access);
