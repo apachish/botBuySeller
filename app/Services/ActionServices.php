@@ -160,6 +160,11 @@ class ActionServices extends TextServices
         $num = (int)data_get($info, 1);
         logger("request", [$num, $id]);
         $transfer = Transfer::find($id);
+        if($transfer->user_id == $this->getUserId())
+        {
+            $this->telegram_services->sendMessage($this->getUserId(), "متأسفانه امکان دریافت حواله برای شما در این معامله نمی باشد");
+            return true;
+        }
         logger("Transfer", [$transfer]);
         $transfer_type = getTypeOrder($transfer->type);
         if ($transfer) {
@@ -299,8 +304,10 @@ class ActionServices extends TextServices
         }
 
         $total_sold_by_seller = DailyRequestTransfer::where('seller_id', $seller_id)
+            ->whereDate("created_at",now())
             ->where('buyer_id', $buyer_id)->sum('use_day');
         $total_sold_by_buyer = DailyRequestTransfer::where('seller_id', $buyer_id)
+            ->whereDate("created_at",now())
             ->where('buyer_id', $seller_id)->sum('use_day');
 
 
