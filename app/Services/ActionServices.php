@@ -500,7 +500,7 @@ class ActionServices extends TextServices
                 ['text' => toJalali(now()->addDay(1), "Y/m/d"), 'callback_data' => "trade_open_report_date_" . $customer_id . "_" . $tomorrow],
             ];
             $message = ' گزارش ';
-            $message .= $customer->fullName;
+            $message .= $customer?$customer->fullName:$this->getUser()->fullName;
             $message .= "تاریخ های زیر را انتخاب کنید";
             $message .= "\n\n ";
             $this->telegram_services->editMessageTextAndInlineKeyboard($this->getUserId(), $message_id, $message, $keyboard);
