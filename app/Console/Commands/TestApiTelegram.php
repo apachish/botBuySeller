@@ -52,7 +52,9 @@ class TestApiTelegram extends Command
         $total_sold_by_seller = DailyRequestTransfer::where('seller_id', $seller_id)->where('buyer_id', $buyer_id)->sum('use_day');
         $total_sold_by_buyer = DailyRequestTransfer::where('seller_id', $buyer_id)->where('buyer_id', $seller_id)->sum('use_day');
         $customer = CustomerUser::where("mobile", $buyer->mobile)->first();
+        dd($customer);
         $max_trade_limit = $customer->limit;
+        dd($max_trade_limit);
         $available_to_sell = $max_trade_limit - $total_sold_by_seller + $total_sold_by_buyer;
         $new_quantity = min($quantity, $available_to_sell);
 
