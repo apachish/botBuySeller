@@ -89,7 +89,7 @@ class ActionServices extends TextServices
         if (preg_match($pattern, $this->getMessage())) {
             $check = CustomerUser::where("mobile", $this->getMessage())
                 ->where("user_id", "!=", $this->getUserId())
-                ->where("fullName", "!=", "خودم")->first();
+                ->first();
             // الگوی regex برای بررسی شماره موبایل با کد کشور
 
 
