@@ -462,7 +462,7 @@ class ActionServices extends TextServices
 
             $message = "یکی از گزینه های زیر برای مشتری ";
             $message .= "\n\n ";
-            $message .= $customer->fullName;
+            $message .= $customer?$customer->fullName:$this->getUser()->fullName;
             $this->telegram_services->editMessageTextAndInlineKeyboard($this->getUserId(), $message_id, $message, $keyboard);
         }
 
