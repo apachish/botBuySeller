@@ -207,6 +207,11 @@ class ActionAdminServices extends TextServices
             case "\xF0\x9F\x9A\xBBلیست کاربران":
                 $this->listUser();
                 break;
+            case "جستجو کاربر\xF0\x9F\x94\x8D":
+                cache()->set($this->getKeyCache() . $this->getUserId(), "find_user");
+                $this->getTelegramServices()->sendMessage($this->getUserId(), "شماره تلفن یا نام و نام خانوادگی کاربر مورد نظر وارد کنید");
+
+                break;
             case "\xF0\x9F\x93\x9Aویرایش قوانین":
                 $rule = Setting::where("key", "rule")->first();
 
@@ -341,6 +346,11 @@ class ActionAdminServices extends TextServices
     {
         logger("cache", [$this->getMessageCache()]);
         switch ($this->getMessageCache()) {
+            case "find_user":
+                $this->listUser(1,null,$this->getMessage());
+
+                cache()->forget($this->getKeyCache() . $this->getUserId());
+                break;
             case "rule":
                 $rule = Setting::updateOrCreate(
                     ["key" => "rule"],
@@ -474,13 +484,20 @@ class ActionAdminServices extends TextServices
     /**
      * @return void
      */
-    public function listUser($page = 1, $message_id = null)
+    public function listUser($page = 1, $message_id = null,$filter=null)
     {
         $text = "\n\nلیست  کاربران";
         $text .= "\n\n";
         $text .= "با کلیک بر\xE2\x9D\x8C کاربر غیر فعال شده و با کلیک بر \xE2\x9C\x85 کاربرفعال گردید در صورت کلیک بر روی اسم شخص نوع کاربر از مشتری به همکار و همکار به مشتری تغییر می کنند ";
 
-        $users = UserTelegram::simplePaginate(4, ['*'], 'page', $page);
+        $users = UserTelegram::query();
+        if($filter){
+            $users->where(function ($query) use ($filter){
+               $query->where("fullName","like","%".$filter."%");
+               $query->orWhere("mobile","like","%".$filter."%");
+            });
+        }
+        $users = simplePaginate(4, ['*'], 'page', $page);
         $page = $users->currentPage();
         $next = $users->nextPageUrl() ? (int)str_replace("?page=", "", strstr($users->nextPageUrl(), "?page=")) : null;
         $pre = $users->previousPageUrl() ? (int)str_replace("?page=", "", strstr($users->previousPageUrl(), "?page=")) : null;
