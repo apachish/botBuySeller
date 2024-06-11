@@ -94,20 +94,30 @@ class ActionAdminServices extends TextServices
             $response_text = "برای تماس با شماره زیر کلیک کنید:\n\n$tel";
             $this->getTelegramServices()->sendMessage($this->getUserId(), $response_text);
         } elseif (str_contains($this->getData(), "pre_")) {
-            $page = str_replace('pre_', '', $this->getData());
+            $data = str_replace('pre_', '', $this->getData());
+            $array = explode("_",$data);
+            $page = (int)data_get($array,0);
+            $filter = data_get($array,1,null);
             $data_old = cache()->get("menu_List_user_" . $this->getUserId());
             $message_id = data_get($data_old, "id", null);
             if ($message_id)
-                $this->listUser($page, $message_id);
+                $this->listUser($page, $message_id,$filter);
         } elseif (str_contains($this->getData(), "next_")) {
-            $page = str_replace('next_', '', $this->getData());
+            $data = str_replace('next_', '', $this->getData());
+            $array = explode("_",$data);
+            $page = (int)data_get($array,0);
+            $filter = data_get($array,1,null);
             $data_old = cache()->get("menu_List_user_" . $this->getUserId());
             $message_id = data_get($data_old, "id", null);
             logger("aa", [$data_old, $message_id, $page]);
             if ($message_id)
-                $this->listUser($page, $message_id);
+                $this->listUser($page, $message_id,$filter);
         } elseif (str_contains($this->getData(), "customer_")) {
-            $id = (int)str_replace('customer_', '', $this->getData());
+            $data = str_replace('customer_', '', $this->getData());
+            $array = explode("_",$data);
+            $id = (int)data_get($array,0);
+            $page = (int)data_get($array,1);
+            $filter = data_get($array,2,null);
             $user_con = UserTelegram::where("id", $id)->first();
             logger("con", [$user_con, $id]);
             if ($user_con) {
@@ -120,11 +130,17 @@ class ActionAdminServices extends TextServices
                 $this->service_user->message_menu = "$fullName همکار گرامی به سیستم ما خوش آمدید\n\n ";
                 $this->service_user->menu($this->keyword_colleague, $user_con->status, $user_con);//->sendMessage($user_con->id, $response_text);
 //                $this->service_user->telegram_services->sendMessage($user_con->id, $response_text);
-
+                $data_old = cache()->get("menu_List_user_" . $this->getUserId());
+                $message_id = data_get($data_old, "id", null);
+                $this->listUser($page,$message_id,$filter);
 
             }
         } elseif (str_contains($this->getData(), "colleague_")) {
-            $id = (int)str_replace('colleague_', '', $this->getData());
+            $data = str_replace('colleague_', '', $this->getData());
+            $array = explode("_",$data);
+            $id = (int)data_get($array,0);
+            $page = (int)data_get($array,1);
+            $filter = data_get($array,2,null);
             $user_con = UserTelegram::where("id", $id)->first();
             logger("con", [$user_con, $id]);
             if ($user_con) {
@@ -138,10 +154,16 @@ class ActionAdminServices extends TextServices
 //                $this->service_user->telegram_services->sendMessage($user_con->id, $response_text);
                 $this->service_user->message_menu = "$fullName همکاری شما در سیستم به سطح مشتری انتقال یافت\n\n ";
                 $this->service_user->menu($this->keyword_customer, $user_con->status, $user_con);
-
+                $data_old = cache()->get("menu_List_user_" . $this->getUserId());
+                $message_id = data_get($data_old, "id", null);
+                $this->listUser($page,$message_id,$filter);
             }
         } elseif (str_contains($this->getData(), "confirm_")) {
-            $id = (int)str_replace('confirm_', '', $this->getData());
+            $data = str_replace('confirm_', '', $this->getData());
+            $array = explode("_",$data);
+            $id = (int)data_get($array,0);
+            $page = (int)data_get($array,1);
+            $filter = data_get($array,2,null);
             $user_con = UserTelegram::where("id", $id)->first();
             logger("con", [$user_con, $id]);
             if ($user_con) {
@@ -156,9 +178,42 @@ class ActionAdminServices extends TextServices
 //                $this->service_user->telegram_services->sendMessage($user_con->id, $response_text);
                 $this->service_user->message_menu = "$fullName اکانت کاربریتان فعال شد\n\n ";
                 $this->service_user->menu($this->keyword_customer, $user_con->status, $user_con);
+                $data_old = cache()->get("menu_List_user_" . $this->getUserId());
+                $message_id = data_get($data_old, "id", null);
+                $this->listUser($page,$message_id,$filter);
+            }
+        }elseif (str_contains($this->getData(), "active_")) {
+            $data = str_replace('confirm_', '', $this->getData());
+            $array = explode("_",$data);
+            $id = (int)data_get($array,0);
+            $page = (int)data_get($array,1);
+            $filter = data_get($array,2,null);
+            $user_con = UserTelegram::where("id", $id)->first();
+            logger("con", [$user_con, $id]);
+            if ($user_con) {
+                $fullName = $user_con->fullName ?: $user_con->first_name . " " . $user_con->last_name;
+                $user_con->status = true;
+                $user_con->change_menu = true;
+                $user_con->deleted_at = null;
+                $user_con->update();
+                cache()->forget("keyword_menu" . $this->key_cache_user . $user_con->id);
+                $response_text = "$fullName اکانت کاربریش فعال شد\n\n ";
+                $this->getTelegramServices()->sendMessage($this->getUserId(), $response_text);
+//                $response_text = "$fullName اکانت کاربریتان فعال شد\n\n ";
+//                $this->service_user->telegram_services->sendMessage($user_con->id, $response_text);
+                $this->service_user->message_menu = "$fullName اکانت کاربریتان فعال شد\n\n ";
+                $this->service_user->menu($this->keyword_customer, $user_con->status, $user_con);
+                $data_old = cache()->get("menu_List_user_" . $this->getUserId());
+                $message_id = data_get($data_old, "id", null);
+                $this->listUser($page,$message_id,$filter);
             }
         } elseif (str_contains($this->getData(), "reject_")) {
-            $id = (int)str_replace('reject_', '', $this->getData());
+            $data = str_replace('reject_', '', $this->getData());
+            $array = explode("_",$data);
+            $id = (int)data_get($array,0);
+            $page = (int)data_get($array,1);
+            $filter = data_get($array,2,null);
+
             $user_con = UserTelegram::where("id", $id)->first();
             logger("rej", [$user_con, $id]);
 
@@ -175,9 +230,18 @@ class ActionAdminServices extends TextServices
 //                $this->service_user->telegram_services->sendMessage($user_con->id, $response_text);
                 $this->service_user->message_menu = "$fullName اکانت کاربریتان غیر فعال شد \n\n ";
                 $this->service_user->menu([], $user_con->status, $user_con);
+                $data_old = cache()->get("menu_List_user_" . $this->getUserId());
+                $message_id = data_get($data_old, "id", null);
+                $this->listUser($page,$message_id,$filter);
             }
         } elseif (str_contains($this->getData(), "delete_")) {
-            $id = (int)str_replace('delete_', '', $this->getData());
+
+            $data = str_replace('delete_', '', $this->getData());
+            $array = explode("_",$data);
+            $id = (int)data_get($array,0);
+            $page = (int)data_get($array,1);
+            $filter = data_get($array,2,null);
+
             $user_con = UserTelegram::where("id", $id)->first();
             logger("rej", [$user_con, $id]);
 
@@ -194,6 +258,10 @@ class ActionAdminServices extends TextServices
 
                 $this->service_user->message_menu = "اکانت کاربریش حذف شد";
                 $this->service_user->menu([], $user_con->status, $user_con);
+                $this->listUser($page);
+                $data_old = cache()->get("menu_List_user_" . $this->getUserId());
+                $message_id = data_get($data_old, "id", null);
+                $this->listUser($page,$message_id,$filter);
 
             }
         }
@@ -505,22 +573,36 @@ class ActionAdminServices extends TextServices
         $i = 0;
 
         logger("users", [$users]);
-        $users->each(function ($user) use (&$keyboard, &$i) {
+        $users->each(function ($user) use (&$keyboard, &$i,$page,$filter){
             $text = $user->fullName ?: $user->first_name . " " . $user->last_name;
             $text .= $user->role == "colleague" ? "(همکار)" : "(مشتری)";
             $keyboard[$i++] = [
-                ['text' => "  $text  ", 'callback_data' => ($user->role == "colleague" ? "colleague_" : "customer_") . $user->id],
+                ['text' => "  $text  ", 'callback_data' => ($user->role == "colleague" ? "colleague_" : "customer_") . $user->id."_".$page],
             ];
-            $keyboard[$i++] = [
-                ['text' => "\xE2\x9C\x85 ", 'callback_data' => 'confirm_' . $user->id],
-                ['text' => "\xE2\x9D\x8C", 'callback_data' => 'reject_' . $user->id],
-                ['text' => "\xF0\x9F\x9A\xAF", 'callback_data' => 'delete_' . $user->id],
+            $key_i =  $user->id."_".$page;
+            if($filter)
+                $key_i.="_".$filter;
+            $array = [
+                ['text' => "\xE2\x9C\x8F", 'callback_data' => 'edit_' . $key_i],
+                ['text' => "\xF0\x9F\x91\xA4", 'callback_data' => 'sub_customer_' . $key_i],
             ];
+            if($user->deleted_at)
+                $array[] =['text' => "\xF0\x9F\x86\x97", 'callback_data' => 'active_' . $key_i];
+            else {
+                $array[] = ['text' => "\xF0\x9F\x9A\xAF", 'callback_data' => 'delete_' . $key_i];
+                if($user->status)
+                    $array[]= ['text' => "\xE2\x9D\x8C", 'callback_data' => 'reject_' . $key_i];
+                else
+                    $array[]= ['text' => "\xE2\x9C\x85 ", 'callback_data' => 'confirm_' . $key_i];
+
+            }
+
+            $keyboard[$i++] = $array;
         });
         if ($pre)
-            $keyboard[$i][] = ['text' => "قبلی", "callback_data" => "pre_" . $pre];
+            $keyboard[$i][] = ['text' => "قبلی", "callback_data" => "pre_" . $pre.($filter?"_".$filter:null)];
         if ($next)
-            $keyboard[$i][] = ['text' => "بعدی", "callback_data" => "next_" . $next];
+            $keyboard[$i][] = ['text' => "بعدی", "callback_data" => "next_" . $next.($filter?"_".$filter:null)];
 
         if ($message_id)
             $this->getTelegramServices()->editMessageTextAndInlineKeyboard($this->getUserId(), $message_id, $text, $keyboard);
