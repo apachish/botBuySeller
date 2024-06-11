@@ -40,26 +40,12 @@ class TelegramAdminController extends Controller
             $text_services->setUser();
             if ($text_services->getData())
                 $text_services->actionData();
-            if ($text_services->getMessageCache())
+            if ($text_services->getMessageCache()  && !$text_services->checkMessage())
                 $text_services->actionTextCache();
             elseif ($text_services->getMessage())
                 $text_services->actionText();
 
-            $access_text = [
-                "\xF0\x9F\x9A\xBBلیست کاربران",
-                "جستجو کاربر\xF0\x9F\x94\x8D",
-                "\xF0\x9F\x93\x88شروع مبلغ معامله",
-                "\xE2\x8C\x9Aساعت شروع",
-                "\xE2\x8F\xB0ساعت پایان",
-                "\xE2\x98\x81تعطیل",
-                "\xF0\x9F\x9A\xA9حذف پیام ها",
-                "\xF0\x9F\x93\x9Aویرایش قوانین",
-                "\xE2\x81\x89ویرایش راهنما",
-                "\xF0\x9F\x92\xB3\xF0\x9F\x8C\xB3ویرایش حق اشتراک",
-                "\xF0\x9F\x92\xB1کیف پول",
-                "\xF0\x9F\x92\xACلیست پیام ها کاربران",
-                "\xF0\x9F\x93\x81ارسال فایل"
-            ];
+
 
             $text = "سلام! به منوی اصلی خوش آمدید.";
 
