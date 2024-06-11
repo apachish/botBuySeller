@@ -383,6 +383,8 @@ class TextServices
             $this->contact = $this->convertNumber($this->update['message']['contact']["phone_number"]);
             $customer = CustomerUser::where("user_id",$this->user_id)
                 ->where("fullName","خودم")->first();
+            if(!str_contains($this->contact,"+"))
+                $this->contact = "+".$this->contact;
             if($customer)
                 $customer->update(["mobile"=> $this->contact]);
         }
