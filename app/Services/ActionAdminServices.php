@@ -281,7 +281,7 @@ class ActionAdminServices extends TextServices
                 $message  .= "\n\n";
                 $message  .= "می باشد لطفا نام و نام خانوادگی وارد کنید ";
                 $this->getTelegramServices()->sendMessage($this->getUserId(), $message);
-                cache()->set($this->getKeyCache() . $this->getUserId(), "edit_name_done_".$this->getData());
+                cache()->set($this->getKeyCache() . $this->getUserId(), "edit_name_done_".$data);
             }
         }elseif (str_contains($this->getData(), "edit_mobile_")) {
 
@@ -299,7 +299,7 @@ class ActionAdminServices extends TextServices
                 $message  .= "\n\n";
                 $message  .= "می باشد لطفا موبایل وارد کنید ";
                 $this->getTelegramServices()->sendMessage($this->getUserId(), $message);
-                cache()->set($this->getKeyCache() . $this->getUserId(), "edit_mobile_done_".$this->getData());
+                cache()->set($this->getKeyCache() . $this->getUserId(), "edit_mobile_done_".$data);
             }
         }
     }
