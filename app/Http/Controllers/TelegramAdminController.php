@@ -46,42 +46,47 @@ class TelegramAdminController extends Controller
                 $text_services->actionText();
 
             $access_text = [
-                "📞 دفترچه تلفن",
-                "📋 لیست کاربران",
-                "📋 لیست همکاران",
-                "📚  ویرایش قوانین",
+                "\xF0\x9F\x9A\xBBلیست کاربران",
+                "جستجو کاربر\xF0\x9F\x94\x8D",
+                "\xF0\x9F\x93\x88شروع مبلغ معامله",
+                "\xE2\x8C\x9Aساعت فعالیت",
+                "\xF0\x9F\x9A\xA9حذف پیام ها",
+                "\xF0\x9F\x93\x9Aویرایش قوانین",
+                "\xE2\x81\x89ویرایش راهنما",
                 "\xF0\x9F\x92\xB3\xF0\x9F\x8C\xB3ویرایش حق اشتراک",
-                "\xE2\x81\x89 ویرایش راهنما",
-                "📈محدود شروع مبلغ معاملات",
+                "\xF0\x9F\x92\xB1ویرایش کیف پول حق اشتراک",
+                "\xF0\x9F\x92\xACلیست پیام ها کاربران",
+                "\xF0\x9F\x93\x81ارسال فایل"
             ];
 
             $text = "سلام! به منوی اصلی خوش آمدید.";
 
             $keyboard_menu = [
                 [
-                    ['text' => "📞 دفترچه تلفن"],
-                    ['text' => "📈محدود شروع مبلغ معاملات"]
+                    ['text' => "\xF0\x9F\x9A\xBBلیست کاربران"],
+                    ['text' => "جستجو کاربر\xF0\x9F\x94\x8D"],
                 ],
                 [
-                    ['text' => "📋 لیست همکاران"],
-                    ['text' => "📋 لیست کاربران"]
-                ],
-//            [
-//                ['text' => "🔍 جستجو کاربر"]
-//            ],
-                [
-                    ['text' => "📚  ویرایش قوانین"]
+                    ['text' => "\xF0\x9F\x93\x88شروع مبلغ معامله"],
+                    ['text' => "\xE2\x8C\x9Aساعت فعالیت"],
+                    ['text' => "\xF0\x9F\x9A\xA9حذف پیام ها"],
                 ],
                 [
-                    ['text' => "\xE2\x81\x89 ویرایش راهنما"]
+                    ['text' => "\xF0\x9F\x93\x9Aویرایش قوانین"],
+                    ['text' => "\xE2\x81\x89ویرایش راهنما"],
                 ],
                 [
-                    ['text' =>  "\xF0\x9F\x92\xB3\xF0\x9F\x8C\xB3ویرایش حق اشتراک"]
+                    ['text' => "\xF0\x9F\x92\xB3\xF0\x9F\x8C\xB3ویرایش حق اشتراک"],
+                    ['text' => "\xF0\x9F\x92\xB1ویرایش کیف پول حق اشتراک"]
+                ],
+                [
+                    ['text' => "\xF0\x9F\x92\xACلیست پیام ها کاربران"],
+                    ['text' => "\xF0\x9F\x93\x81ارسال فایل"]
                 ],
             ];
             $text_services->menu($keyboard_menu, $access);
-        }catch (\Exception $exception){
-            logger("get error",[
+        } catch (\Exception $exception) {
+            logger("get error", [
                 $exception->getMessage(),
                 $exception->getLine(),
                 $exception->getCode(),
