@@ -464,11 +464,13 @@ class ActionAdminServices extends TextServices
             $key_case = "edit_name_done_";
         elseif(str_contains($this->getMessageCache(), "edit_mobile_done_"))
             $key_case = "edit_mobile_done_";
+        logger($key_case);
         switch ($key_case) {
 
             case "edit_name_done_":
                 $data = str_replace('edit_name_done_', '', $this->getMessageCache());
                 $array = explode("_",$data);
+                logger("array",[$array]);
                 $id = (int)data_get($array,0);
                 $page = (int)data_get($array,1);
                 $filter = data_get($array,2,null);
