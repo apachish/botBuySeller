@@ -26,7 +26,7 @@ class ActionAdminServices extends TextServices
             "\xF0\x9F\x93\x88شروع مبلغ معامله",
             "\xE2\x8C\x9Aساعت شروع",
             "\xE2\x8F\xB0ساعت پایان",
-            "\xE2\x98\x81تعطیل",
+            "\xE2\x98\x81تعطیل/باز",
             "\xF0\x9F\x9A\xA9حذف پیام ها",
             "\xF0\x9F\x93\x9Aویرایش قوانین",
             "\xE2\x81\x89ویرایش راهنما",
@@ -264,6 +264,43 @@ class ActionAdminServices extends TextServices
                 $this->listUser($page,$message_id,$filter);
 
             }
+        }elseif (str_contains($this->getData(), "edit_name_")) {
+
+            $data = str_replace('edit_name_', '', $this->getData());
+            $array = explode("_",$data);
+            $id = (int)data_get($array,0);
+            $page = (int)data_get($array,1);
+            $filter = data_get($array,2,null);
+
+            $user_con = UserTelegram::where("id", $id)->first();
+            logger("rej", [$user_con, $id]);
+
+            if ($user_con) {
+                $fullName = $user_con->fullName ?: $user_con->first_name . " " . $user_con->last_name;
+                $message  = $fullName;
+                $message  .= "\n\n";
+                $message  .= "می باشد لطفا نام و نام خانوادگی وارد کنید ";
+                $this->getTelegramServices()->sendMessage($this->getUserId(), $message);
+                cache()->set($this->getKeyCache() . $this->getUserId(), "edit_name_done_".$this->getData());
+            }
+        }elseif (str_contains($this->getData(), "edit_mobile_")) {
+
+            $data = str_replace('edit_mobile_', '', $this->getData());
+            $array = explode("_",$data);
+            $id = (int)data_get($array,0);
+            $page = (int)data_get($array,1);
+            $filter = data_get($array,2,null);
+
+            $user_con = UserTelegram::where("id", $id)->first();
+            logger("edit_mobile_done_", [$user_con, $id]);
+
+            if ($user_con) {
+                $message  = $user_con->mobile;
+                $message  .= "\n\n";
+                $message  .= "می باشد لطفا موبایل وارد کنید ";
+                $this->getTelegramServices()->sendMessage($this->getUserId(), $message);
+                cache()->set($this->getKeyCache() . $this->getUserId(), "edit_mobile_done_".$this->getData());
+            }
         }
     }
 
@@ -395,15 +432,24 @@ class ActionAdminServices extends TextServices
 
                 break;
 
-            case "\xE2\x98\x81تعطیل":
+            case "\xE2\x98\x81تعطیل/باز":
                 $date = now()->format("Y-m-d");
-                $start_price_trade = Setting::updateOrCreate(
-                    ["key" => "vacation"],
-                    ["value" => $date]
-                );
-                $response_text = toJalali($date);
-                $response_text .= " تعطیل شد";
+                $holiday = Setting::where("key","vacation")->first();
+                $response_text = toJalali($date,"Y/m/d");
+                if($holiday && $holiday->value)
+                {
+                    $response_text .= " باز شد";
+                    $holiday->value =  null;
+                    $holiday->update();
+                }else {
+                    $response_text .= " تعطیل شد";
+                    $holiday = Setting::updateOrCreate(
+                        ["key" => "vacation"],
+                        ["value" => $date]
+                    );
+                }
                 $this->getTelegramServices()->sendMessage($this->getUserId(), $response_text);
+
 
                 break;
 
@@ -412,8 +458,71 @@ class ActionAdminServices extends TextServices
 
     public function actionTextCache()
     {
+        $key_case = $this->getMessageCache();
         logger("cache", [$this->getMessageCache()]);
-        switch ($this->getMessageCache()) {
+        if(str_contains($this->getMessageCache(), "edit_name_done_"))
+            $key_case = "edit_name_done_";
+        elseif(str_contains($this->getMessageCache(), "edit_mobile_done_"))
+            $key_case = "edit_mobile_done_";
+        switch ($key_case) {
+
+            case "edit_name_done_":
+                $data = str_replace('edit_name_done_', '', $this->getMessageCache());
+                $array = explode("_",$data);
+                $id = (int)data_get($array,0);
+                $page = (int)data_get($array,1);
+                $filter = data_get($array,2,null);
+
+                $user_con = UserTelegram::where("id", $id)->first();
+                logger("rej", [$user_con, $id]);
+
+                if ($user_con) {
+                    $user_con->fullName = $this->getMessage();
+                    $user_con->update();
+                    $message  = $user_con->fullName;
+                    $message  .= "\n\n";
+                    $message  .= "نام و نام خانوادگی بروزرسانی شد ";
+                    $this->getTelegramServices()->sendMessage($this->getUserId(), $message);
+                }
+                $data_old = cache()->get("menu_List_user_" . $this->getUserId());
+                $message_id = data_get($data_old, "id", null);
+                $this->listUser($page,$message_id,$filter);
+                cache()->forget($this->getKeyCache() . $this->getUserId());
+                break;
+            case "edit_mobile_done_":
+                $pattern = '/^\+\d{1,3}\d{4,14}(?:x.+)?$/';
+                if (preg_match($pattern, $this->getMessage())) {
+                    $data = str_replace('edit_mobile_done_', '', $this->getMessageCache());
+                    $array = explode("_", $data);
+                    $id = (int)data_get($array, 0);
+                    $page = (int)data_get($array, 1);
+                    $filter = data_get($array, 2, null);
+
+                    $user_con = UserTelegram::where("id", $id)->first();
+                    logger("rej", [$user_con, $id]);
+
+                    if ($user_con) {
+                        $user_con->mobile = $this->getMessage();
+                        $user_con->update();
+                        $message = $user_con->fullName;
+                        $message .= "\n\n";
+                        $message .= "نام و نام خانوادگی بروزرسانی شد ";
+                        $this->getTelegramServices()->sendMessage($this->getUserId(), $message);
+                    }
+                    $data_old = cache()->get("menu_List_user_" . $this->getUserId());
+                    $message_id = data_get($data_old, "id", null);
+                    $this->listUser($page, $message_id, $filter);
+                    cache()->forget($this->getKeyCache() . $this->getUserId());
+                }else{
+                    $text = "موبایل مشتری باید با کد کشور بدون صفر مثل ";
+                    $text .= "\n\n";
+                    $text .='+989120001122';
+                    $text .= "\n\n";
+                    $text .='+11234567890';
+
+                    $this->telegram_services->sendMessage($this->getUserId(), $text);
+                }
+                break;
             case "find_user":
                 $this->listUser(1,null,$this->getMessage());
 
@@ -583,7 +692,8 @@ class ActionAdminServices extends TextServices
             if($filter)
                 $key_i.="_".$filter;
             $array = [
-                ['text' => "\xE2\x9C\x8F", 'callback_data' => 'edit_' . $key_i],
+                ['text' => "\xE2\x9C\x8F\xF0\x9F\x91\xA8", 'callback_data' => 'edit_name_' . $key_i],
+                ['text' => "\xE2\x9C\x8F\xF0\x9F\x93\xB1", 'callback_data' => 'edit_mobile_' . $key_i],
                 ['text' => "\xF0\x9F\x91\xA4", 'callback_data' => 'sub_customer_' . $key_i],
             ];
             if($user->deleted_at)

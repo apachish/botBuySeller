@@ -60,7 +60,7 @@ class TelegramAdminController extends Controller
                 [
                     ['text' => "\xE2\x8C\x9Aساعت شروع"],
                     ['text' => "\xE2\x8F\xB0ساعت پایان"],
-                    ['text' => "\xE2\x98\x81تعطیل"],
+                    ['text' => "\xE2\x98\x81تعطیل/باز"],
                 ],
                 [
                     ['text' => "\xF0\x9F\x93\x9Aویرایش قوانین"],
