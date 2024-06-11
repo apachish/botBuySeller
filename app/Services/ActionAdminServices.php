@@ -228,7 +228,7 @@ class ActionAdminServices extends TextServices
 
                 $this->getTelegramServices()->sendMessage($this->getUserId(), $response_text);
                 break;
-            case  "\xF0\x9F\x92\xB1ویرایش کیف پول حق اشتراک":
+            case  "\xF0\x9F\x92\xB1کیف پول":
                 $wallet_membership = Setting::where("key", "wallet_membership")->first();
 
                 if ($wallet_membership) {
@@ -263,7 +263,7 @@ class ActionAdminServices extends TextServices
                 $this->getTelegramServices()->sendMessage($this->getUserId(), $response_text);
 
                 break;
-            case "\xE2\x8C\x9Aساعت شروع فعالیت":
+            case "\xE2\x8C\x9Aساعت شروع":
                 $hours_of_operation = Setting::where("key", "start_hours_of_operation")->first();
                 if ($hours_of_operation) {
                     $response_text = "ساعت شروع تنظیم شد:";
@@ -280,7 +280,7 @@ class ActionAdminServices extends TextServices
                 $this->getTelegramServices()->sendMessage($this->getUserId(), $response_text);
 
                 break;
-            case "\xE2\x8F\xB0ساعت پایان فعالیت":
+            case "\xE2\x8F\xB0ساعت پایان":
                 $hours_of_operation = Setting::where("key", "end_hours_of_operation")->first();
                 if ($hours_of_operation) {
                     $response_text = "ساعت پایان تنظیم شد:";
