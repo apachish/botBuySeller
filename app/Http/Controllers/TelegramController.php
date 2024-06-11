@@ -55,10 +55,11 @@ class TelegramController extends Controller
                     ['text' => "\xF0\x9F\x91\xA5معرفی مشتری"],
                     ['text' => "\xF0\x9F\x93\x8Bلیست همکاران"],
                 ];
-                $keyboard_menu[$i++] = [
-                    ['text' => "\xF0\x9F\x93\x88معاملات باز"]
-                ];
+
             }
+            $keyboard_menu[$i++] = [
+                ['text' => "\xF0\x9F\x93\x88معاملات باز"]
+            ];
             $keyboard_menu[$i++] = [
                 ['text' => "\xF0\x9F\x93\x9Aقوانین"],
                 ['text' => "راهنما\xE2\x81\x89"],

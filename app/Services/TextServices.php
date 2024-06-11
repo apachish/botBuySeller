@@ -241,12 +241,6 @@ class TextServices
             if ($update && $data) {
                 $user_telegram = UserTelegram::create($data);
                 $this->sendMessageNewUser();
-                CustomerUser::updateOrCreate(["user_id" => $this->getUserId(), "mobile" => data_get($update, $type . '.mobile')],
-                    [
-                        "fullName" => "خودم",
-                        "status" => true,
-                        "limit" => null
-                    ]);
             }
             $this->user = $user_telegram;
         }elseif(data_get($user_telegram,"deleted_at"))
@@ -381,12 +375,8 @@ class TextServices
         if (isset($this->update['message']['contact']["phone_number"]))
         {
             $this->contact = $this->convertNumber($this->update['message']['contact']["phone_number"]);
-            $customer = CustomerUser::where("user_id",$this->user_id)
-                ->where("fullName","خودم")->first();
             if(!str_contains($this->contact,"+"))
                 $this->contact = "+".$this->contact;
-            if($customer)
-                $customer->update(["mobile"=> $this->contact]);
         }
     }
 
@@ -634,6 +624,9 @@ class TextServices
                 $keyboard = [];
                 $i = 0;
                 logger("woker",[$worker]);
+                $keyboard[$i++] = [
+                    ['text' => "خودم", 'callback_data' => "trade_open_" . $this->getUserId()],
+                ];
                 $worker->each(function ($row) use (&$i, &$keyboard) {
                     $keyboard[$i++] = [
                         ['text' => $row->fullName, 'callback_data' => "trade_open_" . $row->id],

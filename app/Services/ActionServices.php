@@ -162,8 +162,7 @@ class ActionServices extends TextServices
         $num = (int)data_get($info, 1);
         logger("request", [$num, $id]);
         $transfer = Transfer::find($id);
-        if($transfer->user_id == $this->getUserId())
-        {
+        if ($transfer->user_id == $this->getUserId()) {
             $this->telegram_services->sendMessage($this->getUserId(), "متأسفانه امکان دریافت حواله برای شما در این معامله نمی باشد");
             return true;
         }
@@ -182,9 +181,9 @@ class ActionServices extends TextServices
                     $transaction_party = data_get($transfer, 'user.fullName');
 
                 if ($this->getUser()->role == "customer") {
-                    logger("customer",[$this->getUser()->role]);
+                    logger("customer", [$this->getUser()->role]);
                     $customer = CustomerUser::where("mobile", $this->getUser()->mobile)->first();
-                    logger("limit customer",[$customer]);
+                    logger("limit customer", [$customer]);
                     if ($customer && $customer->limit)
                         $limit_day = $customer->limit;
 
@@ -203,27 +202,27 @@ class ActionServices extends TextServices
                         $limit_day = $user_request->limit_access;
 
                 }
-                logger("type_t".$transfer_type,[$transfer->user_id,$this->getUserId()]);
-                $buyer_id = $transfer_type == "buy"?$transfer->user_id:$this->getUserId();
-                $seller_id = $transfer_type == "sell"?$transfer->user_id:$this->getUserId();
+                logger("type_t" . $transfer_type, [$transfer->user_id, $this->getUserId()]);
+                $buyer_id = $transfer_type == "buy" ? $transfer->user_id : $this->getUserId();
+                $seller_id = $transfer_type == "sell" ? $transfer->user_id : $this->getUserId();
 
                 logger("limit_day", [$limit_day]);
-                logger("limit_day", [$buyer_id,$seller_id]);
+                logger("limit_day", [$buyer_id, $seller_id]);
                 if ($limit_day) {
-                   $num = $this->performTransaction($seller_id,$buyer_id,$num,$limit_day);
+                    $num = $this->performTransaction($seller_id, $buyer_id, $num, $limit_day);
                     $transfer->number -= $num;
                     $request_transfer["number"] = $num;
                     $use_day = $num;
-                    logger("use_day",[$use_day]);
+                    logger("use_day", [$use_day]);
 
-                    $request_transfer["status"] =  $transfer->number==0 ?"complete":"half";
+                    $request_transfer["status"] = $transfer->number == 0 ? "complete" : "half";
                 } else {
                     logger("check", [$transfer->number, $num, $transfer->number >= $num]);
                     if ($transfer->number >= $num) {
                         $transfer->number -= $num;
                         $request_transfer["number"] = $num;
 
-                        $request_transfer["status"] = $num== $transfer->number ?"complete":"half";
+                        $request_transfer["status"] = $num == $transfer->number ? "complete" : "half";
                         logger("request", [$request_transfer]);
                         $use_day = $num;
                     }
@@ -301,17 +300,17 @@ class ActionServices extends TextServices
         }
     }
 
-    private function performTransaction($seller_id, $buyer_id, $quantity,$max_trade_limit)
+    private function performTransaction($seller_id, $buyer_id, $quantity, $max_trade_limit)
     {
         if (!$seller_id || !$buyer_id) {
             return 0;
         }
 
         $total_sold_by_seller = DailyRequestTransfer::where('seller_id', $seller_id)
-            ->whereDate("created_at",now())
+            ->whereDate("created_at", now())
             ->where('buyer_id', $buyer_id)->sum('use_day');
         $total_sold_by_buyer = DailyRequestTransfer::where('seller_id', $buyer_id)
-            ->whereDate("created_at",now())
+            ->whereDate("created_at", now())
             ->where('buyer_id', $seller_id)->sum('use_day');
 
 
@@ -457,10 +456,10 @@ class ActionServices extends TextServices
         $message_id = cache()->get("trade_open_" . $this->getUserId());
         if ($customer_id && $message_id) {
             $customer = CustomerUser::find($customer_id);
-            $keyboard[0] = [
-                ['text' => "\xF0\x9F\x94\x90	حد مجاز", 'callback_data' => "trade_open_limit_$customer_id"],
-                ['text' => "\xF0\x9F\x93\x9C	گزارش", 'callback_data' => "trade_open_report_$customer_id"],
-            ];
+            if ($customer_id != $this->getUserId() && $this->getUser()->role == "colleague")
+                $keyboard[0][] = ['text' => "\xF0\x9F\x94\x90	حد مجاز", 'callback_data' => "trade_open_limit_$customer_id"];
+            $keyboard[0][] = ['text' => "\xF0\x9F\x93\x9C	گزارش", 'callback_data' => "trade_open_report_$customer_id"];
+
             $message = "یکی از گزینه های زیر برای مشتری ";
             $message .= "\n\n ";
             $message .= $customer->fullName;
@@ -609,20 +608,16 @@ class ActionServices extends TextServices
         $length = strlen($suggest_price);
 
         // بررسی کنید که آیا طول عدد 3 یا 5 است
-        if ($length === 3)
-        {
+        if ($length === 3) {
             $start_price = (int)data_get($limit_trade, "start");
             $unit = getUnitPrice($start_price);
-        }
-        elseif ($length === 5)
-        {
+        } elseif ($length === 5) {
             $start_price = (int)($suggest_price * 1000);
             $unit = getUnitPrice($start_price);
             $suggest_price = $suggest_price % 1000;
 
         }
-        $start_trade = floor($start_price/$unit)*$unit;
-
+        $start_trade = floor($start_price / $unit) * $unit;
 
 
         $price = $start_trade + ($suggest_price * 1000);
