@@ -182,7 +182,7 @@ class ActionServices extends TextServices
                     $transaction_party = data_get($transfer, 'user.fullName');
 
                 if ($this->getUser()->role == "customer") {
-                    $customer = CustomerUser::where("mobile", $this->getUser())->first();
+                    $customer = CustomerUser::where("mobile", $this->getUser()->mobile)->first();
                     if ($customer && $customer->limit)
                         $limit_day = $customer->limit;
 

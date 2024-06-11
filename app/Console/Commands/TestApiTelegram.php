@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\Bot;
 use App\Models\BotMenuUser;
+use App\Models\CustomerUser;
 use App\Models\DailyRequestTransfer;
 use App\Models\UserTelegram;
 use App\Models\UserTradeAccess;
@@ -50,8 +51,8 @@ class TestApiTelegram extends Command
 
         $total_sold_by_seller = DailyRequestTransfer::where('seller_id', $seller_id)->where('buyer_id', $buyer_id)->sum('use_day');
         $total_sold_by_buyer = DailyRequestTransfer::where('seller_id', $buyer_id)->where('buyer_id', $seller_id)->sum('use_day');
-
-        $max_trade_limit = 3;
+        $customer = CustomerUser::where("mobile", $buyer->mobile)->first();
+        $max_trade_limit = $customer->limit;
         $available_to_sell = $max_trade_limit - $total_sold_by_seller + $total_sold_by_buyer;
         $new_quantity = min($quantity, $available_to_sell);
 
