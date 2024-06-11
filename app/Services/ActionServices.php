@@ -87,7 +87,9 @@ class ActionServices extends TextServices
         $message = "شماره موبایل وارد شده نامعتبر می باشد ";
         // بررسی اینکه شماره موبایل با الگو مطابقت دارد یا خیر
         if (preg_match($pattern, $this->getMessage())) {
-            $check = CustomerUser::where("mobile", $this->getMessage())->where("user_id", "!=", $this->getUserId())->first();
+            $check = CustomerUser::where("mobile", $this->getMessage())
+                ->where("user_id", "!=", $this->getUserId())
+                ->where("fullName", "!=", "خودم")->first();
             // الگوی regex برای بررسی شماره موبایل با کد کشور
 
 
