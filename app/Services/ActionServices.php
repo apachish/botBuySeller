@@ -536,7 +536,7 @@ class ActionServices extends TextServices
 //                $path_report = storage_path($path. $name_file);
 //                logger("path_re",[$path_report]);
 //                $pdf->save($path_report);
-                $mpdf = new \Mpdf\Mpdf();
+                $mpdf = new \Mpdf\Mpdf(['tempDir' => public_path("tmp")]);
                 $html = view('users.report_pdf',compact('date_p', 'request_transfer', 'customer'))->render();
                 $mpdf->WriteHTML($html);
                 $document = $mpdf->Output('document.pdf', 'I');
