@@ -252,7 +252,7 @@ class ActionServices extends TextServices
 
                     $request_transfer["remittance_number"] = generateUniqueSixDigitCode();
                     $request_transfer["request_id"] = $this->getUserId();
-                    $request_transfer["transfer_id"] = $transfer->user_id;
+                    $request_transfer["transfer_id"] = $transfer->id;
                     $request_transfer["price"] = $transfer->price;
 
                     RequestTransfer::create($request_transfer);
