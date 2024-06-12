@@ -513,7 +513,7 @@ class ActionServices extends TextServices
     {
         $data = str_replace('trade_open_report_date_', '', $this->getData());
         $array = explode("_", $data);
-        $customer_id = data_get($array, 0);
+        $customer_id = (int)data_get($array, 0);
         $date = data_get($array, 1);
         $message_id = cache()->get("trade_open_" . $this->getUserId());
         if ($customer_id && $message_id) {
