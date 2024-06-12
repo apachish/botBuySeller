@@ -542,7 +542,7 @@ class ActionServices extends TextServices
                 $document = $mpdf->Output('document.pdf', 'I');
                 $response = $this->telegram->sendDocument([
                     'chat_id' => $this->getUserId(),
-                    'document' => $document
+                    'document' =>InputFile::create($document, "$date_p.pdf")
                 ]);
                 logger("sendDocument",[$response]);
 
