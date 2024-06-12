@@ -8,7 +8,7 @@ use App\Models\UserTelegram;
 use App\Services\TelegramServices;
 use Illuminate\Console\Command;
 
-class DeleteMessageChanel extends Command
+class DeleteUserChanel extends Command
 {
     /**
      * The name and signature of the console command.
