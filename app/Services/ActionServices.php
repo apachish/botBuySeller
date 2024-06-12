@@ -254,6 +254,7 @@ class ActionServices extends TextServices
                     $request_transfer["request_id"] = $this->getUserId();
                     $request_transfer["transfer_id"] = $transfer->id;
                     $request_transfer["price"] = $transfer->price;
+                    $request_transfer["type"] = getTypeOrder(data_get($transfer,"type"))=="buy"?"sell":"buy";
 
                     RequestTransfer::create($request_transfer);
 

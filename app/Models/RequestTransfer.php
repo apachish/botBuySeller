@@ -18,14 +18,15 @@ class RequestTransfer extends Model
         "number",
         "price",
         "status",
-        "remittance_number"
+        "remittance_number",
+        "type"
     ];
 
     use HasFactory;
 
     public function transfer()
     {
-        return $this->belongsTo(Transfer::class,"transfer_id","id");
+        return $this->belongsTo(Transfer::class);
     }
 
 }

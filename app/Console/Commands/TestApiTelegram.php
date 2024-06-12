@@ -41,14 +41,20 @@ class TestApiTelegram extends Command
         $customer = CustomerUser::with("user")->find($customer_id);
         $date = now();
         $date_p = toJalali($date, "Y_m_d");
-        $request_transfer = RequestTransfer::with("transfer.user")->where("request_id", $customer_id)->get();
+        $request_transfer = RequestTransfer::with("transfer.user")
+            ->whereDate("created_at",$date)
+            ->where("request_id", $customer_id)->get();
         logger("request_transfer",[$request_transfer,$customer_id,$request_transfer->count()]);
         if ($request_transfer->count()) {
-            $request_transfer = $request_transfer->toArray();
-            $mpdf = new \Mpdf\Mpdf();
-            $html = view('users.report',compact('date_p', 'request_transfer', 'customer'))->render();
+            $mpdf = new \Mpdf\Mpdf(['tempDir' => public_path("tmp")]);
+            $html = view('users.report_pdf',compact('date_p', 'request_transfer', 'customer'))->render();
             $mpdf->WriteHTML($html);
-            $mpdf->Output('document.pdf', 'I');
+            $name_file = $customer_id . "_" . $date_p . ".pdf";
+            $path = "app/public/report/" . $customer_id . "/" ;
+            makeDirectoryStorage($path);
+            $path_report = storage_path($path. $name_file);
+            logger("path_re",[$path_report]);
+            $document = $mpdf->Output($path_report, 'F');exit;
 //            $name_file = $customer_id . "_" . $date_p . ".pdf";
 //            $path = "app/public/report/" . $customer_id . "/" ;
 ////            dd($pdf->getFontMetrics());

@@ -138,7 +138,7 @@
             <tr>
                 @php
                     $color = "dodgerblue";
-                    $type = getTypeOrder(data_get($item,"transfer.type"));
+                    $type = data_get($item,"type");
                     if($type == "sell")
                         $color = "#ef4444";
                 @endphp
