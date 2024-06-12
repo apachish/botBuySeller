@@ -39,7 +39,7 @@ class DeleteUserChanel extends Command
             $users = UserTelegram::all();
             foreach ($users as $user)
             {
-                $this->telegram_services->kickChatMember($this->bot->chanel_id, $user->id);
+                $telegram->kickChatMember($this->bot->chanel_id, $user->id);
             }
             logger("end delete Message");
         }
