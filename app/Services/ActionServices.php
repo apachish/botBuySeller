@@ -526,17 +526,21 @@ class ActionServices extends TextServices
             $message .= "\n\n ";
             $this->telegram_services->editMessageTextAndInlineKeyboard($this->getUserId(), $message_id, $message);
             $request_transfer = RequestTransfer::with("transfer.user")->where("request_id", $customer_id)->get();
+            logger("request_transfer",[$request_transfer,$customer_id,$request_transfer->count()]);
             if ($request_transfer->count()) {
                 $customer = $customer?:$this->getUser();
                 $pdf = Pdf::loadView('users.report_pdf', compact('date_p', 'request_transfer', 'customer'));
                 $name_file = $customer_id . "_" . $date_p . ".pdf";
                 $path_report = storage_path("app/public/report/" . $this->getUserId() . "/" . $name_file);
+                logger("path_re",[$path_report]);
                 $pdf->save($path_report);
 
                 $response = $this->telegram->sendDocument([
                     'chat_id' => $this->getUserId(),
                     'document' => InputFile::create($path_report, "$date_p.pdf")
                 ]);
+                logger("sendDocument",[$response]);
+
             } else {
                 $this->telegram->sendMessage(['chat_id' => $this->getUserId(), 'text' => 'معاله ای در این تاریخ انجام نشده']);
             }
