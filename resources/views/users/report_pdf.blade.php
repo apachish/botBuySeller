@@ -44,6 +44,7 @@
         }
         li {
             list-style:none;
+            direction: rtl;
             flex:1;
         }
         li:last-child {
@@ -101,7 +102,7 @@
         }
     </style>
 </head>
-<body>
+<body dir="rtl">
 <article>
     <ul>
         <li class="bg-purple">

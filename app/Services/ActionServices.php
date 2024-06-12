@@ -525,7 +525,9 @@ class ActionServices extends TextServices
             $message .= "  تاریخ   " . toJalali($date, "Y/m/d");
             $message .= "\n\n ";
             $this->telegram_services->editMessageTextAndInlineKeyboard($this->getUserId(), $message_id, $message);
-            $request_transfer = RequestTransfer::with("transfer.user")->where("request_id", $customer_id)->get();
+            $request_transfer = RequestTransfer::with("transfer.user")
+                ->whereDate("created_at",$date)
+                ->where("request_id", $customer_id)->get();
             logger("request_transfer",[$request_transfer,$customer_id,$request_transfer->count()]);
             if ($request_transfer->count()) {
                 $customer = $customer?:$this->getUser();
