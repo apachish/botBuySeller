@@ -1,0 +1,224 @@
+  2024-06-07 19:45:30 App\Jobs\DeactivateTransfer .................... RUNNING
+  2024-06-07 19:45:30 App\Jobs\DeactivateTransfer .............. 124.71ms DONE
+  2024-06-07 19:46:30 App\Jobs\DeactivateTransfer .................... RUNNING
+  2024-06-07 19:46:31 App\Jobs\DeactivateTransfer .............. 124.16ms DONE
+  2024-06-07 19:46:58 App\Jobs\DeactivateTransfer .................... RUNNING
+  2024-06-07 19:46:58 App\Jobs\DeactivateTransfer .............. 110.44ms DONE
+  2024-06-07 19:47:39 App\Jobs\DeactivateTransfer .................... RUNNING
+  2024-06-07 19:47:40 App\Jobs\DeactivateTransfer .............. 134.02ms DONE
+  2024-06-07 19:55:31 App\Jobs\DeactivateTransfer .................... RUNNING
+  2024-06-07 19:55:31 App\Jobs\DeactivateTransfer .............. 172.96ms DONE
+  2024-06-07 19:58:13 App\Jobs\DeactivateTransfer .................... RUNNING
+  2024-06-07 19:58:13 App\Jobs\DeactivateTransfer .............. 211.03ms DONE
+  2024-06-07 20:01:01 App\Jobs\DeactivateTransfer .................... RUNNING
+  2024-06-07 20:01:01 App\Jobs\DeactivateTransfer .............. 229.15ms DONE
+  2024-06-07 20:11:19 App\Jobs\DeactivateTransfer .................... RUNNING
+  2024-06-07 20:11:20 App\Jobs\DeactivateTransfer .............. 175.57ms DONE
+  2024-06-07 20:24:59 App\Jobs\DeactivateTransfer .................... RUNNING
+  2024-06-07 20:24:59 App\Jobs\DeactivateTransfer .............. 249.24ms DONE
+  2024-06-07 20:28:59 App\Jobs\DeactivateTransfer .................... RUNNING
+  2024-06-07 20:28:59 App\Jobs\DeactivateTransfer .............. 143.95ms DONE
+  2024-06-07 20:32:14 App\Jobs\DeactivateTransfer .................... RUNNING
+  2024-06-07 20:32:14 App\Jobs\DeactivateTransfer ................ 9.75ms DONE
+  2024-06-07 20:32:41 App\Jobs\DeactivateTransfer .................... RUNNING
+  2024-06-07 20:32:41 App\Jobs\DeactivateTransfer .............. 140.78ms DONE
+  2024-06-07 21:01:58 App\Jobs\DeactivateTransfer .................... RUNNING
+  2024-06-07 21:01:59 App\Jobs\DeactivateTransfer .............. 356.60ms DONE
+  2024-06-07 21:11:50 App\Jobs\DeactivateTransfer .................... RUNNING
+  2024-06-07 21:11:50 App\Jobs\DeactivateTransfer .............. 227.78ms DONE
+  2024-06-07 21:12:53 App\Jobs\DeactivateTransfer .................... RUNNING
+  2024-06-07 21:12:53 App\Jobs\DeactivateTransfer ............... 59.80ms DONE
+  2024-06-07 21:13:02 App\Jobs\DeactivateTransfer .................... RUNNING
+  2024-06-07 21:13:02 App\Jobs\DeactivateTransfer ............... 60.33ms DONE
+  2024-06-07 21:13:17 App\Jobs\DeactivateTransfer .................... RUNNING
+  2024-06-07 21:13:17 App\Jobs\DeactivateTransfer .............. 182.50ms DONE
+  2024-06-07 21:15:17 App\Jobs\DeactivateTransfer .................... RUNNING
+  2024-06-07 21:15:17 App\Jobs\DeactivateTransfer .............. 230.12ms DONE
+  2024-06-07 21:19:11 App\Jobs\DeactivateTransfer .................... RUNNING
+  2024-06-07 21:19:11 App\Jobs\DeactivateTransfer .............. 179.15ms DONE
+  2024-06-07 21:24:44 App\Jobs\DeactivateTransfer .................... RUNNING
+  2024-06-07 21:24:44 App\Jobs\DeactivateTransfer .............. 193.88ms DONE
+  2024-06-07 21:27:05 App\Jobs\DeactivateTransfer .................... RUNNING
+  2024-06-07 21:27:06 App\Jobs\DeactivateTransfer .............. 153.87ms DONE
+  2024-06-07 21:29:36 App\Jobs\DeactivateTransfer .................... RUNNING
+  2024-06-07 21:29:36 App\Jobs\DeactivateTransfer .............. 183.54ms DONE
+  2024-06-07 21:35:27 App\Jobs\DeactivateTransfer .................... RUNNING
+  2024-06-07 21:35:27 App\Jobs\DeactivateTransfer ............... 10.57ms DONE
+  2024-06-07 21:36:00 App\Jobs\DeactivateTransfer .................... RUNNING
+  2024-06-07 21:36:00 App\Jobs\DeactivateTransfer .............. 143.27ms DONE
+  2024-06-07 21:53:22 App\Jobs\DeactivateTransfer .................... RUNNING
+  2024-06-07 21:53:23 App\Jobs\DeactivateTransfer .............. 169.06ms DONE
+  2024-06-07 22:04:12 App\Jobs\DeactivateTransfer .................... RUNNING
+  2024-06-07 22:04:12 App\Jobs\DeactivateTransfer .............. 161.28ms DONE
+  2024-06-07 22:10:27 App\Jobs\DeactivateTransfer .................... RUNNING
+  2024-06-07 22:10:27 App\Jobs\DeactivateTransfer .............. 295.44ms DONE
+  2024-06-07 22:19:21 App\Jobs\DeactivateTransfer .................... RUNNING
+  2024-06-07 22:19:21 App\Jobs\DeactivateTransfer .............. 177.43ms DONE
+  2024-06-07 22:36:54 App\Jobs\DeactivateTransfer .................... RUNNING
+  2024-06-07 22:36:54 App\Jobs\DeactivateTransfer .............. 247.28ms DONE
+  2024-06-07 22:39:12 App\Jobs\DeactivateTransfer .................... RUNNING
+  2024-06-07 22:39:12 App\Jobs\DeactivateTransfer .............. 188.53ms DONE
+  2024-06-07 22:39:16 App\Jobs\DeactivateTransfer .................... RUNNING
+  2024-06-07 22:39:16 App\Jobs\DeactivateTransfer .............. 172.58ms DONE
+  2024-06-07 22:39:45 App\Jobs\DeactivateTransfer .................... RUNNING
+  2024-06-07 22:39:45 App\Jobs\DeactivateTransfer .............. 126.33ms DONE
+  2024-06-07 22:41:37 App\Jobs\DeactivateTransfer .................... RUNNING
+  2024-06-07 22:41:37 App\Jobs\DeactivateTransfer .............. 318.83ms DONE
+  2024-06-07 22:55:49 App\Jobs\DeactivateTransfer .................... RUNNING
+  2024-06-07 22:55:49 App\Jobs\DeactivateTransfer .............. 251.65ms DONE
+  2024-06-07 23:15:11 App\Jobs\DeactivateTransfer .................... RUNNING
+  2024-06-07 23:15:11 App\Jobs\DeactivateTransfer .............. 169.79ms DONE
+  2024-06-07 23:15:44 App\Jobs\DeactivateTransfer .................... RUNNING
+  2024-06-07 23:15:44 App\Jobs\DeactivateTransfer .............. 172.59ms DONE
+  2024-06-07 23:20:32 App\Jobs\DeactivateTransfer .................... RUNNING
+  2024-06-07 23:20:32 App\Jobs\DeactivateTransfer .............. 151.36ms DONE
+  2024-06-07 23:21:56 App\Jobs\DeactivateTransfer .................... RUNNING
+  2024-06-07 23:21:57 App\Jobs\DeactivateTransfer .............. 166.01ms DONE
+  2024-06-07 23:39:59 App\Jobs\DeactivateTransfer .................... RUNNING
+  2024-06-07 23:39:59 App\Jobs\DeactivateTransfer .............. 314.55ms DONE
+  2024-06-08 00:32:33 App\Jobs\DeactivateTransfer .................... RUNNING
+  2024-06-08 00:32:34 App\Jobs\DeactivateTransfer .............. 205.91ms DONE
+  2024-06-08 00:37:34 App\Jobs\DeactivateTransfer .................... RUNNING
+  2024-06-08 00:37:34 App\Jobs\DeactivateTransfer .............. 204.43ms DONE
+  2024-06-08 00:39:07 App\Jobs\DeactivateTransfer .................... RUNNING
+  2024-06-08 00:39:07 App\Jobs\DeactivateTransfer .............. 179.10ms DONE
+  2024-06-08 00:41:15 App\Jobs\DeactivateTransfer .................... RUNNING
+  2024-06-08 00:41:15 App\Jobs\DeactivateTransfer .............. 181.96ms DONE
+  2024-06-08 00:43:34 App\Jobs\DeactivateTransfer .................... RUNNING
+  2024-06-08 00:43:34 App\Jobs\DeactivateTransfer ................ 9.40ms DONE
+  2024-06-08 00:44:30 App\Jobs\DeactivateTransfer .................... RUNNING
+  2024-06-08 00:44:30 App\Jobs\DeactivateTransfer .............. 124.04ms DONE
+  2024-06-08 00:50:16 App\Jobs\DeactivateTransfer .................... RUNNING
+  2024-06-08 00:50:17 App\Jobs\DeactivateTransfer .............. 195.90ms DONE
+  2024-06-08 12:30:16 App\Jobs\DeactivateTransfer .................... RUNNING
+  2024-06-08 12:30:16 App\Jobs\DeactivateTransfer .............. 174.01ms DONE
+  2024-06-08 12:31:11 App\Jobs\DeactivateTransfer .................... RUNNING
+  2024-06-08 12:31:11 App\Jobs\DeactivateTransfer .............. 232.88ms DONE
+  2024-06-08 12:32:07 App\Jobs\DeactivateTransfer .................... RUNNING
+  2024-06-08 12:32:07 App\Jobs\DeactivateTransfer .............. 232.44ms DONE
+  2024-06-08 12:35:53 App\Jobs\DeactivateTransfer .................... RUNNING
+  2024-06-08 12:35:53 App\Jobs\DeactivateTransfer ............... 50.41ms DONE
+  2024-06-08 12:48:06 App\Jobs\DeactivateTransfer .................... RUNNING
+  2024-06-08 12:48:06 App\Jobs\DeactivateTransfer ............... 63.25ms DONE
+  2024-06-08 12:48:18 App\Jobs\DeactivateTransfer .................... RUNNING
+  2024-06-08 12:48:18 App\Jobs\DeactivateTransfer ............... 52.75ms DONE
+  2024-06-08 14:48:57 App\Jobs\DeactivateTransfer .................... RUNNING
+  2024-06-08 14:48:57 App\Jobs\DeactivateTransfer ............... 65.22ms DONE
+  2024-06-08 22:33:23 App\Jobs\DeactivateTransfer .................... RUNNING
+  2024-06-08 22:33:23 App\Jobs\DeactivateTransfer ............... 55.25ms DONE
+  2024-06-08 22:37:20 App\Jobs\DeactivateTransfer .................... RUNNING
+  2024-06-08 22:37:20 App\Jobs\DeactivateTransfer .............. 198.03ms DONE
+  2024-06-08 22:38:26 App\Jobs\DeactivateTransfer .................... RUNNING
+  2024-06-08 22:38:26 App\Jobs\DeactivateTransfer ............... 12.60ms DONE
+  2024-06-08 22:41:07 App\Jobs\DeactivateTransfer .................... RUNNING
+  2024-06-08 22:41:07 App\Jobs\DeactivateTransfer .............. 270.49ms DONE
+  2024-06-08 22:41:54 App\Jobs\DeactivateTransfer .................... RUNNING
+  2024-06-08 22:41:54 App\Jobs\DeactivateTransfer .............. 292.92ms DONE
+  2024-06-08 22:49:24 App\Jobs\DeactivateTransfer .................... RUNNING
+  2024-06-08 22:49:24 App\Jobs\DeactivateTransfer .............. 263.95ms DONE
+  2024-06-08 22:50:15 App\Jobs\DeactivateTransfer .................... RUNNING
+  2024-06-08 22:50:15 App\Jobs\DeactivateTransfer .............. 396.65ms DONE
+  2024-06-08 23:43:07 App\Jobs\DeactivateTransfer .................... RUNNING
+  2024-06-08 23:43:07 App\Jobs\DeactivateTransfer .................... RUNNING
+  2024-06-08 23:43:07 App\Jobs\DeactivateTransfer ............... 61.89ms DONE
+  2024-06-08 23:43:07 App\Jobs\DeactivateTransfer .............. 296.85ms DONE
+  2024-06-08 23:46:22 App\Jobs\DeactivateTransfer .................... RUNNING
+  2024-06-08 23:46:22 App\Jobs\DeactivateTransfer ............... 10.96ms DONE
+  2024-06-08 23:49:29 App\Jobs\DeactivateTransfer .................... RUNNING
+  2024-06-08 23:49:29 App\Jobs\DeactivateTransfer ................ 9.90ms DONE
+  2024-06-08 23:51:11 App\Jobs\DeactivateTransfer .................... RUNNING
+  2024-06-08 23:51:11 App\Jobs\DeactivateTransfer .............. 140.18ms DONE
+  2024-06-08 23:59:56 App\Jobs\DeactivateTransfer .................... RUNNING
+  2024-06-08 23:59:56 App\Jobs\DeactivateTransfer .............. 146.60ms DONE
+  2024-06-09 00:00:32 App\Jobs\DeactivateTransfer .................... RUNNING
+  2024-06-09 00:00:32 App\Jobs\DeactivateTransfer .............. 185.12ms DONE
+  2024-06-09 01:02:13 App\Jobs\DeactivateTransfer .................... RUNNING
+  2024-06-09 01:02:13 App\Jobs\DeactivateTransfer .............. 170.93ms DONE
+  2024-06-09 01:02:59 App\Jobs\DeactivateTransfer .................... RUNNING
+  2024-06-09 01:02:59 App\Jobs\DeactivateTransfer .............. 166.87ms DONE
+  2024-06-09 01:04:46 App\Jobs\DeactivateTransfer .................... RUNNING
+  2024-06-09 01:04:46 App\Jobs\DeactivateTransfer .............. 199.38ms DONE
+  2024-06-09 01:05:06 App\Jobs\DeactivateTransfer .................... RUNNING
+  2024-06-09 01:05:06 App\Jobs\DeactivateTransfer ............... 66.35ms DONE
+  2024-06-09 01:09:45 App\Jobs\DeactivateTransfer .................... RUNNING
+  2024-06-09 01:09:45 App\Jobs\DeactivateTransfer .............. 156.59ms DONE
+  2024-06-09 01:10:09 App\Jobs\DeactivateTransfer .................... RUNNING
+  2024-06-09 01:10:10 App\Jobs\DeactivateTransfer ............... 55.54ms DONE
+  2024-06-09 01:11:28 App\Jobs\DeactivateTransfer .................... RUNNING
+  2024-06-09 01:11:28 App\Jobs\DeactivateTransfer .............. 120.54ms DONE
+  2024-06-09 01:11:43 App\Jobs\DeactivateTransfer .................... RUNNING
+  2024-06-09 01:11:43 App\Jobs\DeactivateTransfer ................ 8.02ms DONE
+  2024-06-09 01:17:18 App\Jobs\DeactivateTransfer .................... RUNNING
+  2024-06-09 01:17:18 App\Jobs\DeactivateTransfer .............. 125.91ms DONE
+  2024-06-09 01:17:31 App\Jobs\DeactivateTransfer .................... RUNNING
+  2024-06-09 01:17:31 App\Jobs\DeactivateTransfer ................ 7.41ms DONE
+  2024-06-09 01:22:50 App\Jobs\DeactivateTransfer .................... RUNNING
+  2024-06-09 01:22:50 App\Jobs\DeactivateTransfer .............. 160.77ms DONE
+  2024-06-09 01:23:33 App\Jobs\DeactivateTransfer .................... RUNNING
+  2024-06-09 01:23:33 App\Jobs\DeactivateTransfer ............... 79.12ms DONE
+  2024-06-09 01:31:39 App\Jobs\DeactivateTransfer .................... RUNNING
+  2024-06-09 01:31:39 App\Jobs\DeactivateTransfer .............. 172.08ms DONE
+  2024-06-09 01:32:08 App\Jobs\DeactivateTransfer .................... RUNNING
+  2024-06-09 01:32:08 App\Jobs\DeactivateTransfer ................ 8.54ms DONE
+  2024-06-09 01:34:50 App\Jobs\DeactivateTransfer .................... RUNNING
+  2024-06-09 01:34:50 App\Jobs\DeactivateTransfer .............. 138.67ms DONE
+  2024-06-09 01:35:09 App\Jobs\DeactivateTransfer .................... RUNNING
+  2024-06-09 01:35:09 App\Jobs\DeactivateTransfer ............... 86.20ms DONE
+  2024-06-09 01:42:49 App\Jobs\DeactivateTransfer .................... RUNNING
+  2024-06-09 01:42:49 App\Jobs\DeactivateTransfer .............. 169.48ms DONE
+  2024-06-09 01:44:12 App\Jobs\DeactivateTransfer .................... RUNNING
+  2024-06-09 01:44:12 App\Jobs\DeactivateTransfer ............... 65.53ms DONE
+  2024-06-09 01:44:28 App\Jobs\DeactivateTransfer .................... RUNNING
+  2024-06-09 01:44:28 App\Jobs\DeactivateTransfer .............. 228.19ms DONE
+  2024-06-09 01:45:02 App\Jobs\DeactivateTransfer .................... RUNNING
+  2024-06-09 01:45:02 App\Jobs\DeactivateTransfer ............... 90.44ms DONE
+  2024-06-09 18:06:38 App\Jobs\DeactivateTransfer .................... RUNNING
+  2024-06-09 18:06:38 App\Jobs\DeactivateTransfer .............. 190.55ms DONE
+  2024-06-09 18:07:16 App\Jobs\DeactivateTransfer .................... RUNNING
+  2024-06-09 18:07:16 App\Jobs\DeactivateTransfer ............... 66.80ms DONE
+  2024-06-09 19:10:04 App\Jobs\DeactivateTransfer .................... RUNNING
+  2024-06-09 19:10:04 App\Jobs\DeactivateTransfer .............. 191.70ms DONE
+  2024-06-09 20:01:53 App\Jobs\DeactivateTransfer .................... RUNNING
+  2024-06-09 20:01:53 App\Jobs\DeactivateTransfer .............. 151.61ms DONE
+  2024-06-09 20:02:51 App\Jobs\DeactivateTransfer .................... RUNNING
+  2024-06-09 20:02:51 App\Jobs\DeactivateTransfer .............. 176.41ms DONE
+  2024-06-09 20:04:47 App\Jobs\DeactivateTransfer .................... RUNNING
+  2024-06-09 20:04:47 App\Jobs\DeactivateTransfer ............... 65.79ms DONE
+  2024-06-09 20:05:08 App\Jobs\DeactivateTransfer .................... RUNNING
+  2024-06-09 20:05:08 App\Jobs\DeactivateTransfer .............. 240.55ms DONE
+  2024-06-10 11:36:03 App\Jobs\DeactivateTransfer .................... RUNNING
+  2024-06-10 11:36:03 App\Jobs\DeactivateTransfer .............. 239.38ms DONE
+  2024-06-10 11:36:23 App\Jobs\DeactivateTransfer .................... RUNNING
+  2024-06-10 11:36:23 App\Jobs\DeactivateTransfer .............. 179.20ms DONE
+  2024-06-10 11:36:42 App\Jobs\DeactivateTransfer .................... RUNNING
+  2024-06-10 11:36:42 App\Jobs\DeactivateTransfer .............. 107.68ms DONE
+  2024-06-10 11:36:59 App\Jobs\DeactivateTransfer .................... RUNNING
+  2024-06-10 11:36:59 App\Jobs\DeactivateTransfer .............. 112.05ms DONE
+  2024-06-10 12:13:53 App\Jobs\DeactivateTransfer .................... RUNNING
+  2024-06-10 12:13:53 App\Jobs\DeactivateTransfer ............... 65.02ms DONE
+  2024-06-10 12:17:25 App\Jobs\DeactivateTransfer .................... RUNNING
+  2024-06-10 12:17:25 App\Jobs\DeactivateTransfer ............... 72.72ms DONE
+  2024-06-10 17:17:51 App\Jobs\DeactivateTransfer .................... RUNNING
+  2024-06-10 17:17:51 App\Jobs\DeactivateTransfer ............... 73.20ms DONE
+  2024-06-11 17:00:11 App\Jobs\DeactivateTransfer .................... RUNNING
+  2024-06-11 17:00:11 App\Jobs\DeactivateTransfer ............... 65.43ms DONE
+  2024-06-11 17:01:05 App\Jobs\DeactivateTransfer .................... RUNNING
+  2024-06-11 17:01:05 App\Jobs\DeactivateTransfer .............. 163.29ms DONE
+  2024-06-11 17:02:49 App\Jobs\DeactivateTransfer .................... RUNNING
+  2024-06-11 17:02:49 App\Jobs\DeactivateTransfer ............... 54.88ms DONE
+  2024-06-11 22:00:31 App\Jobs\DeactivateTransfer .................... RUNNING
+  2024-06-11 22:00:31 App\Jobs\DeactivateTransfer ............... 56.63ms DONE
+  2024-06-11 22:20:25 App\Jobs\DeactivateTransfer .................... RUNNING
+  2024-06-11 22:20:25 App\Jobs\DeactivateTransfer ............... 56.24ms DONE
+  2024-06-11 22:47:36 App\Jobs\DeactivateTransfer .................... RUNNING
+  2024-06-11 22:47:36 App\Jobs\DeactivateTransfer .............. 185.78ms DONE
+  2024-06-11 22:48:57 App\Jobs\DeactivateTransfer .................... RUNNING
+  2024-06-11 22:48:57 App\Jobs\DeactivateTransfer .............. 165.30ms DONE
+  2024-06-11 23:08:48 App\Jobs\DeactivateTransfer .................... RUNNING
+  2024-06-11 23:08:48 App\Jobs\DeactivateTransfer ............... 57.24ms DONE
+  2024-06-11 23:16:46 App\Jobs\DeactivateTransfer .................... RUNNING
+  2024-06-11 23:16:46 App\Jobs\DeactivateTransfer .............. 370.69ms DONE
+  2024-06-12 10:20:16 App\Jobs\DeactivateTransfer .................... RUNNING
+  2024-06-12 10:20:16 App\Jobs\DeactivateTransfer .............. 198.32ms DONE
+  2024-06-12 10:24:23 App\Jobs\DeactivateTransfer .................... RUNNING
+  2024-06-12 10:24:23 App\Jobs\DeactivateTransfer ............... 70.94ms DONE

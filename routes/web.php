@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    $mpdf = new \Mpdf\Mpdf();
+    $mpdf = new \Mpdf\Mpdf(['tempDir' => public_path("tmp")]);
     $html = view('users.report')->render();
     $mpdf->WriteHTML($html);
     return $mpdf->Output('document.pdf', 'I');
