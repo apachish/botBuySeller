@@ -133,7 +133,7 @@
         </tr>
         </thead>
         <tbody>
-        @foreach(array_filter($request_transfer) as $i=> $item)
+        @foreach($request_transfer as $i=> $item)
             <tr>
                 @php
                     $color = "dodgerblue";
