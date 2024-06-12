@@ -539,10 +539,15 @@ class ActionServices extends TextServices
                 $mpdf = new \Mpdf\Mpdf(['tempDir' => public_path("tmp")]);
                 $html = view('users.report_pdf',compact('date_p', 'request_transfer', 'customer'))->render();
                 $mpdf->WriteHTML($html);
-                $document = $mpdf->Output('document.pdf', 'I');
+                $name_file = $customer_id . "_" . $date_p . ".pdf";
+                $path = "app/public/report/" . $this->getUserId() . "/" ;
+                makeDirectoryStorage($path);
+                $path_report = storage_path($path. $name_file);
+                logger("path_re",[$path_report]);
+                $document = $mpdf->Output($path_report, 'F');
                 $response = $this->telegram->sendDocument([
                     'chat_id' => $this->getUserId(),
-                    'document' =>InputFile::create($document, "$date_p.pdf")
+                    'document' =>InputFile::create($path_report, "$date_p.pdf")
                 ]);
                 logger("sendDocument",[$response]);
 
