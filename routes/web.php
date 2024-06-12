@@ -14,5 +14,11 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    $mpdf = new \Mpdf\Mpdf();
+    $html = view('users.report')->render();
+    $mpdf->WriteHTML($html);
+    return $mpdf->Output('document.pdf', 'I');
+//    \Barryvdh\DomPDF\Facade\Pdf::setOption(['dpi' => 150, 'defaultFont' => 'sans-serif']);
+//    $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('users.report');
+//    return $pdf->stream('document.pdf');
 });

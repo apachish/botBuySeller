@@ -6,11 +6,14 @@ use App\Models\Bot;
 use App\Models\BotMenuUser;
 use App\Models\CustomerUser;
 use App\Models\DailyRequestTransfer;
+use App\Models\RequestTransfer;
 use App\Models\UserTelegram;
 use App\Models\UserTradeAccess;
 use App\Services\TelegramServices;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Console\Command;
 use Telegram\Bot\Api;
+use Telegram\Bot\FileUpload\InputFile;
 use Telegram\Bot\Keyboard\Keyboard;
 
 class TestApiTelegram extends Command
@@ -34,6 +37,32 @@ class TestApiTelegram extends Command
      */
     public function handle()
     {
+        $customer_id = (int)$this->ask('What is  customer_id?');
+        $customer = CustomerUser::with("user")->find($customer_id);
+        $date = now();
+        $date_p = toJalali($date, "Y_m_d");
+        $request_transfer = RequestTransfer::with("transfer.user")->where("request_id", $customer_id)->get();
+        logger("request_transfer",[$request_transfer,$customer_id,$request_transfer->count()]);
+        if ($request_transfer->count()) {
+            $request_transfer = $request_transfer->toArray();
+            $mpdf = new \Mpdf\Mpdf();
+            $html = view('users.report',compact('date_p', 'request_transfer', 'customer'))->render();
+            $mpdf->WriteHTML($html);
+            $mpdf->Output('document.pdf', 'I');
+//            $name_file = $customer_id . "_" . $date_p . ".pdf";
+//            $path = "app/public/report/" . $customer_id . "/" ;
+////            dd($pdf->getFontMetrics());
+//            makeDirectoryStorage($path);
+//            $path_report = storage_path($path. $name_file);
+//            logger("path_re",[$path_report]);
+//
+//            $pdf->save($path_report);
+
+            $f = InputFile::create($path_report, "$date_p.pdf");
+            logger("sendDocument",[$f]);
+
+        }
+        exit;
         $seller_id = (int)$this->ask('What is  seller_id?');
         $buyer_id= (int)$this->ask('What is  buyer_id?');
         $quantity = (int)$this->ask('What is  quantity ?');

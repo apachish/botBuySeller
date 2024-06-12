@@ -10,6 +10,20 @@ use Propaganistas\LaravelPhone\PhoneNumber;
 use Armanbroker\Structure\Score\Models\Cost;
 use Armanbroker\Structure\Setting\Models\Definition;
 
+if (!function_exists('makeDirectoryStorage')) {
+    function makeDirectoryStorage($path)
+    {
+        $array_path = array_filter(explode("/", $path));
+        $base_path = "";
+        foreach ($array_path as $create_path) {
+            $base_path .= "/" . $create_path;
+            if (!is_dir(storage_path($base_path))) {
+                File::makeDirectory(storage_path($base_path), $mode = 0777, true, true);
+
+            }
+        }
+    }
+}
 
 if (!function_exists('getPriceFormat')) {
     function getPriceFormat($money)
