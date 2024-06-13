@@ -721,7 +721,7 @@ class TextServices
 
         $user = $user?$user:$this->getUser();
         if ($show ) {
-            if($user->change_menu) {
+            if($user && $user->change_menu) {
                 {
                     $this->telegram_services->deleteKeyboard($user->id);
                     $user->change_menu = false;
