@@ -24,6 +24,7 @@ class ActionAdminServices extends TextServices
             "\xF0\x9F\x9A\xBBلیست کاربران",
             "جستجو کاربر\xF0\x9F\x94\x8D",
             "\xF0\x9F\x93\x88شروع مبلغ معامله",
+            "\xF0\x9F\x93\x88سقف مبلغ معامله",
             "\xE2\x8C\x9Aساعت شروع",
             "\xE2\x8F\xB0ساعت پایان",
             "\xE2\x98\x81تعطیل/باز",
@@ -254,7 +255,11 @@ class ActionAdminServices extends TextServices
                 $user_con->delete();
                 $response_text = "$fullName\n\n اکانت کاربریش حذف شد ";
                 $this->getTelegramServices()->sendMessage($this->getUserId(), $response_text);
-                $this->telegram_services->kickChatMember($this->bot->chanel_id, $user_con->id);
+                $this->telegram->kickChatMember(
+                    [
+                        'chat_id' => $this->bot->chanel_id,
+                        'user_id' => $user_con->id,
+                    ]);
 
                 $this->service_user->message_menu = "اکانت کاربریش حذف شد";
                 $this->service_user->menu([], $user_con->status, $user_con);
@@ -397,6 +402,24 @@ class ActionAdminServices extends TextServices
                 $this->getTelegramServices()->sendMessage($this->getUserId(), $response_text);
 
                 break;
+            case "\xF0\x9F\x93\x88سقف مبلغ معامله":
+                $s_price_trade = Setting::where("key", "end_price_trade")->first();
+                if ($s_price_trade) {
+                    $response_text = "سقف مبلغ معامله   تنظیم شد:";
+                    $response_text .= "\n\n";
+                    $response_text .= " مبلغ";
+                    $response_text .= "\n\n";
+                    $response_text .= number_format(data_get($s_price_trade, "value"), 0);
+                    $response_text .= "\n\n";
+                } else {
+                    $response_text = " شروع مبلغ وارد شده باید به صورت \n\n";
+                    $response_text .= "14000000 \n\n";
+                }
+                cache()->set($this->getKeyCache() . $this->getUserId(), "end_price_trade");
+
+                $this->getTelegramServices()->sendMessage($this->getUserId(), $response_text);
+
+                break;
             case "\xE2\x8C\x9Aساعت شروع":
                 $hours_of_operation = Setting::where("key", "start_hours_of_operation")->first();
                 if ($hours_of_operation) {
@@ -449,7 +472,7 @@ class ActionAdminServices extends TextServices
                     );
                 }
                 $this->getTelegramServices()->sendMessage($this->getUserId(), $response_text);
-
+                cache()->forget("parameter_need");
 
                 break;
 
@@ -600,8 +623,32 @@ class ActionAdminServices extends TextServices
                     $response_text .= "\n\n";
                     $this->getTelegramServices()->sendMessage($this->getUserId(), $response_text);
                     cache()->forget($this->getKeyCache() . $this->getUserId());
+                    cache()->forget("start_price_trade");
                 } else {
                     $this->getTelegramServices()->sendMessage($this->getUserId(), "مبلغ وارد شده معامله  صحیخ نمی باشد");
+
+                }
+                break;
+                case "end_price_trade":
+                $end_price_trade = $this->getMessage();
+                if (is_numeric($end_price_trade) && $end_price_trade > 0) {
+                    $end_price_trade = Setting::updateOrCreate(
+                        ["key" => "end_price_trade"],
+                        ["value" => (int)$end_price_trade]
+                    );
+
+                    $response_text = "سقف مبلغ معامله بروزرسانی شد:";
+                    $response_text .= "\n\n";
+                    $response_text .= " مبلغ";
+                    $response_text .= "\n\n";
+                    $response_text .= number_format(data_get($end_price_trade, "value"), 0);
+                    $response_text .= "\n\n";
+                    $this->getTelegramServices()->sendMessage($this->getUserId(), $response_text);
+                    cache()->forget($this->getKeyCache() . $this->getUserId());
+                    cache()->forget("end_price_trade");
+
+                } else {
+                    $this->getTelegramServices()->sendMessage($this->getUserId(), "مبلغ وارد شده سقف مبلغ صحیخ نمی باشد");
 
                 }
                 break;
@@ -619,6 +666,7 @@ class ActionAdminServices extends TextServices
                     $response_text .= $strat->value;
                     $this->getTelegramServices()->sendMessage($this->getUserId(), $response_text);
                     cache()->forget($this->getKeyCache() . $this->getUserId());
+                    cache()->forget("parameter_need");
                 }else{
                     $this->getTelegramServices()->sendMessage($this->getUserId(), "ساختار وارد شده ساعت باید باشد 09:00");
 
@@ -637,6 +685,7 @@ class ActionAdminServices extends TextServices
                     $response_text .= $strat->value;
                     $this->getTelegramServices()->sendMessage($this->getUserId(), $response_text);
                     cache()->forget($this->getKeyCache() . $this->getUserId());
+                    cache()->forget("parameter_need");
                 }else
                     $this->getTelegramServices()->sendMessage($this->getUserId(), "ساختار وارد شده ساعت باید باشد 22:00");
                 break;

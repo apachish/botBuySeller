@@ -175,10 +175,7 @@ class ActionServices extends TextServices
                 $use_day = null;
                 $transaction_party = null;
                 $request_transfer = [];
-                if ($transfer->user->role == "customer")
-                    $transaction_party = data_get($transfer, 'user.customerUser.headCustomer.fullName') . "(" . data_get($transfer, 'user.customerUser.fullName') . ")";
-                if ($transfer->user->role == "colleague")
-                    $transaction_party = data_get($transfer, 'user.fullName');
+
 
                 if ($this->getUser()->role == "customer") {
                     logger("customer", [$this->getUser()->role]);
@@ -257,6 +254,18 @@ class ActionServices extends TextServices
                     $request_transfer["type"] = getTypeOrder(data_get($transfer,"type"))=="buy"?"sell":"buy";
 
                     RequestTransfer::create($request_transfer);
+                    if(cache()->get("transfer_accept_".$transfer_type)) {
+// گرفتن تاریخ و زمان فعلی
+                        $now = Carbon::now();
+
+// تنظیم زمان به ۲۳:۵۹:۰۰ امروزی
+                        $endOfDay = $now->copy()->setTime(23, 59, 0);
+                        cache()->set("transfer_accept_" . $transfer_type, $transfer->price, $endOfDay);
+                    }
+                    if ($transfer->user->role == "customer")
+                        $transaction_party = data_get($transfer, 'user.customerUser.headCustomer.fullName') . "(" . data_get($transfer, 'user.customerUser.fullName') . ")";
+                    if ($transfer->user->role == "colleague")
+                        $transaction_party = data_get($transfer, 'user.fullName');
 
                     $message = $transfer->message_request_me;
                     $message .= "\n\n";
@@ -264,6 +273,7 @@ class ActionServices extends TextServices
                     $message .= "\n\n";
                     $message .= "نوع:" . getTypeTransfer($transfer->type);
                     $message .= "\n\n";
+
                     $message .= "طرف معامله:" . $transaction_party;
                     $message .= "\n\n";
                     $message .= "برای:" . toJalali($transfer->date, "Y/m/d");
@@ -611,24 +621,73 @@ class ActionServices extends TextServices
 
     public function checkWord()
     {
-        $limit_trade = cache()->remember("s_price_trade", now()->addDay(1), function () {
-            $value = ["start" => 14000000, "end" => 15000000];
-            $setting = Setting::where("key", "s_price_trade")->first();
-            if ($setting)
-                $value = data_get($setting, "value");
-            return $value;
-        });
-        logger("limit_trade", [$limit_trade]);
-
-
         $suggest_price = $this->getPrice();
+
+        $parameter = cache()->remember("parameter_need",now()->setTime(23,59),function (){
+           return Setting::whereIn("key",["start_hours_of_operation","end_hours_of_operation","vacation"])->get()->keyBy("key");
+        });
+        if(data_get($parameter,"vacation.value"))
+        {
+            $this->telegram_services->sendMessage($this->getUserId(), "تعطیل می باشد");
+            return  false;
+        }
+//        // گرفتن زمان فعلی
+//        $now = Carbon::now();
+//
+//// تعریف زمان 09:00 امروز
+//        $nineAM = Carbon::createFromTime(9, 0, 0);
+//
+//// چک کردن اینکه آیا زمان فعلی قبل یا بعد از 09:00 است
+//        if ($now->lessThan($nineAM)) {
+//            echo "زمان فعلی قبل از 09:00 است.";
+//        } elseif ($now->greaterThan($nineAM)) {
+//            echo "زمان فعلی بعد از 09:00 است.";
+//        }
+//        if(data_get($parameter,"start_hours_of_operation.value"))
+//            $this->telegram_services->sendMessage($this->getUserId(), "تعطیل می باشد");
+        if(cache()->get("transfer_accept_".$this->getType())) {
+            $start_trade_s = cache()->remember("start_price_trade", now()->addDay(1), function () {
+                $value = 14000000;
+                $setting = Setting::where("key", "start_price_trade")->first();
+                if ($setting)
+                    $value = data_get($setting, "value");
+                return $value;
+            });
+            $end_trade_s = cache()->remember("end_price_trade", now()->addDay(1), function () {
+                $value = 14200000;
+                $setting = Setting::where("key", "end_price_trade")->first();
+                if ($setting)
+                    $value = data_get($setting, "value");
+                return $value;
+            });
+            logger("start", [$start_trade_s]);
+            logger("end", [$end_trade_s]);
+
+            if($suggest_price <= $start_trade_s || $suggest_price <= $end_trade_s)
+            {
+                $message ="مبلغ وارد شده باید در بازه";
+                $message .= "\n\n";
+                $message .= $start_trade_s;
+                $message .= "\n\n";
+                $message .= "تا";
+                $message .= "\n\n";
+                $message .= $end_trade_s;
+
+                $this->telegram_services->sendMessage($this->getUserId(), $message);
+                return  false;
+            }
+
+        }
+
+
+
 
         // طول رشته عدد را محاسبه کنید
         $length = strlen($suggest_price);
 
         // بررسی کنید که آیا طول عدد 3 یا 5 است
         if ($length === 3) {
-            $start_price = (int)data_get($limit_trade, "start");
+            $start_price = (int)data_get($start_trade_s, "start");
             $unit = getUnitPrice($start_price);
         } elseif ($length === 5) {
             $start_price = (int)($suggest_price * 1000);
