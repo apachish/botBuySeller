@@ -676,20 +676,28 @@ class ActionServices extends TextServices
             $this->telegram_services->sendMessage($this->getUserId(), "تعطیل می باشد");
             return  false;
         }
-//        // گرفتن زمان فعلی
-//        $now = Carbon::now();
-//
-//// تعریف زمان 09:00 امروز
-//        $nineAM = Carbon::createFromTime(9, 0, 0);
-//
-//// چک کردن اینکه آیا زمان فعلی قبل یا بعد از 09:00 است
-//        if ($now->lessThan($nineAM)) {
-//            echo "زمان فعلی قبل از 09:00 است.";
-//        } elseif ($now->greaterThan($nineAM)) {
-//            echo "زمان فعلی بعد از 09:00 است.";
-//        }
-//        if(data_get($parameter,"start_hours_of_operation.value"))
-//            $this->telegram_services->sendMessage($this->getUserId(), "تعطیل می باشد");
+        // گرفتن زمان فعلی
+        $now = Carbon::now();
+
+// تعریف زمان 09:00 امروز
+        $array_time_s  = explode(":",data_get($parameter,"start_hours_of_operation.value","09:00"));
+        $array_time_e  = explode(":",data_get($parameter,"end_hours_of_operation.value","22:00"));
+        $start_time = Carbon::createFromTime(data_get($array_time_s,0), data_get($array_time_s,1), 0);
+        $end_time = Carbon::createFromTime(data_get($array_time_e,0), data_get($array_time_e,1), 0);
+
+// چک کردن اینکه آیا زمان فعلی قبل یا بعد از 09:00 است
+        if ($now->lessThan($start_time)) {
+            $message_s = " زمان شروع بازار ";
+            $message_s .= data_get($parameter,"start_hours_of_operation.value","09:00");
+            $message_s .= "می باشد";
+            $this->telegram_services->sendMessage($this->getUserId(), $message_s);
+            return  false;
+        } elseif ($now->greaterThan($end_time)) {
+            $this->telegram_services->sendMessage($this->getUserId(), "تعطیل می باشد");
+            return  false;
+        }
+        if(data_get($parameter,"start_hours_of_operation.value"))
+            $this->telegram_services->sendMessage($this->getUserId(), "تعطیل می باشد");
         if(cache()->get("transfer_accept_".$this->getType())) {
             $start_trade_s = cache()->remember("start_price_trade", now()->addDay(1), function () {
                 $value = 14000000;
