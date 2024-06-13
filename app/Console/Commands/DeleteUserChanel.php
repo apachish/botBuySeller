@@ -7,6 +7,7 @@ use App\Models\Transfer;
 use App\Models\UserTelegram;
 use App\Services\TelegramServices;
 use Illuminate\Console\Command;
+use Telegram\Bot\Api;
 
 class DeleteUserChanel extends Command
 {
@@ -35,12 +36,26 @@ class DeleteUserChanel extends Command
             logger("delete Message");
             // تعیین تاریخ مورد نظر
             $targetDate = now()->subDay(1); // تاریخ مورد نظر برای حذف پیام‌ها (فرمت YYYY-MM-DD)
-            $telegram = new TelegramServices($bot->token);
             $users = UserTelegram::all();
+            $telegram = new Api($bot->token);
             foreach ($users as $user)
             {
-                $telegram->kickUserFromChannel($bot->chanel_id, $user->id);
-                $telegram->kickChatMember($bot->chanel_id, $user->id);
+
+                try {
+                    // خارج کردن کاربر از کانال
+                    $response = $telegram->kickChatMember([
+                        'chat_id' => $bot->chanel_id,
+                        'user_id' => $user->id,
+                    ]);
+
+                    if ($response) {
+                        echo "User has been successfully removed from the channel.";
+                    } else {
+                        echo "Failed to remove user from the channel.";
+                    }
+                } catch (\Exception $e) {
+                    echo "Error: " . $e->getMessage();
+                }
             }
             logger("end delete Message");
         }
