@@ -4,6 +4,7 @@ namespace App\Services;
 
 
 use App\Jobs\DeactivateTransfer;
+use App\Models\Bot;
 use App\Models\CustomerUser;
 use App\Models\DailyRequestTransfer;
 use App\Models\MessageTelegram;
@@ -15,14 +16,19 @@ use App\Models\UserTradeAccess;
 use App\Models\WordTelegram;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
+use Telegram\Bot\Api;
 use Telegram\Bot\FileUpload\InputFile;
 
 class ActionServices extends TextServices
 {
 
+    protected  $telegram_customer;
     public function __construct($token)
     {
         parent::__construct($token);
+        $bot_customer  = Bot::where("title","botCustomer")->first();
+        if($bot_customer)
+            $this->telegram_customer = new Api($bot_customer->token);
     }
 
     public function addCustomerLimit()
@@ -174,6 +180,7 @@ class ActionServices extends TextServices
                 $limit_day = null;
                 $use_day = null;
                 $transaction_party = null;
+                $transaction_party_req = null;
                 $request_transfer = [];
 
 
@@ -262,39 +269,77 @@ class ActionServices extends TextServices
                         $endOfDay = $now->copy()->setTime(23, 59, 0);
                         cache()->set("transfer_accept_" . $transfer_type, $transfer->price, $endOfDay);
                     }
-                    if ($transfer->user->role == "customer")
-                        $transaction_party = data_get($transfer, 'user.customerUser.headCustomer.fullName') . "(" . data_get($transfer, 'user.customerUser.fullName') . ")";
-                    if ($transfer->user->role == "colleague")
-                        $transaction_party = data_get($transfer, 'user.fullName');
+                    if ($transfer->user->role == "customer" && $this->getUser()->role =="customer") {
+                        $transaction_party_req = "مشاهده فقط برای سرگروه";
+                        $transaction_party_req_s = data_get($transfer, 'user.customerUser.headCustomer.fullName') . "(" . data_get($transfer, 'user.customerUser.fullName') . ")";
+                        $transaction_party = "مشاهده فقط برای سرگروه";
+                        $transaction_party_s = data_get($this->getUser(), 'customerUser.headCustomer.fullName') . "(" . data_get($this->getUser(), 'customerUser.fullName') . ")";
 
+                    }elseif($transfer->user->role == "colleague" && $this->getUser()->role =="customer"){
+                        $transaction_party_req = "مشاهده فقط برای سرگروه";
+                        $transaction_party_req_s = data_get($transfer, 'user.customerUser.headCustomer.fullName') . "(" . data_get($transfer, 'user.customerUser.fullName') . ")";
+                        $transaction_party = data_get($transfer, 'user.customerUser.headCustomer.fullName') . "(" . data_get($transfer, 'user.customerUser.fullName') . ")";
+                    }elseif ($transfer->user->role == "customer" && $this->getUser()->role =="colleague"){
+                        $transaction_party_req = data_get($transfer, 'user.customerUser.headCustomer.fullName') . "(" . data_get($transfer, 'user.customerUser.fullName') . ")";
+                        $transaction_party = "مشاهده فقط برای سرگروه";
+                        $transaction_party_s = data_get($this->getUser(), 'customerUser.headCustomer.fullName') . "(" . data_get($this->getUser(), 'customerUser.fullName') . ")";
+                    }elseif ($transfer->user->role == "colleague" && $this->getUser()->role =="colleague"){
+                        $transaction_party_req = data_get($transfer, 'user.fullName');
+                        $transaction_party = $this->getUser()->fullName;
+                    }
+
+                    /*
+                     * send for request
+                     */
                     $message = $transfer->message_request_me;
                     $message .= "\n\n";
                     $message .= "مقدار:" . data_get($request_transfer, "number") . "کیلو";
                     $message .= "\n\n";
                     $message .= "نوع:" . getTypeTransfer($transfer->type);
                     $message .= "\n\n";
-
-                    $message .= "طرف معامله:" . $transaction_party;
+                    $message .= "طرف معامله:" . $transaction_party_req;
                     $message .= "\n\n";
                     $message .= "برای:" . toJalali($transfer->date, "Y/m/d");
                     $message .= "\n\n";
                     $message .= "       شماره حواله:" . data_get($request_transfer, 'remittance_number');
-                    logger("message", [$message]);
                     $this->telegram_services->sendMessage($this->getUserId(), $message);
+                    if($this->getUser()->role =="customer")
+                    {
+                        $message = str_replace($transaction_party_req,$transaction_party_req_s,$message);
+                        $this->telegram_customer->sendMessage(
+                            [
+                                'chat_id' => data_get($this->getUser(), 'customerUser.headCustomer.id'),
+                                'text' => $message,
+                            ]
+                            );
+                    }
 
-
+                    /*
+                    * send for  owner
+                    */
                     $message = $transfer->message_request;
                     $message .= "\n\n";
                     $message .= "مقدار:" . data_get($request_transfer, "number") . "کیلو";
                     $message .= "\n\n";
                     $message .= "نوع:" . getTypeTransfer($transfer->type);
                     $message .= "\n\n";
-                    $message .= "طرف معامله:" . $this->getUser()->fullName;
+                    $message .= "طرف معامله:" . $transaction_party;
                     $message .= "\n\n";
                     $message .= "برای:" . toJalali($transfer->date, "Y/m/d");
                     $message .= "\n\n";
                     $message .= "       شماره حواله:" . data_get($request_transfer, 'remittance_number');
                     $this->telegram_services->sendMessage($transfer->user_id, $message);
+                    if($transfer->user->role =="customer")
+                    {
+                        $message = str_replace($transaction_party,$transaction_party_s,$message);
+                        $this->telegram_customer->sendMessage(
+                            [
+                                'chat_id' => data_get($transfer->user, 'customerUser.headCustomer.id'),
+                                'text' => $message,
+                            ]
+                        );
+                    }
+
 
                 } else {
                     $this->telegram_services->sendMessage($this->getUserId(), "متأسفانه امکان دریافت حواله برای شما در این معامله نمی باشد");
