@@ -671,11 +671,24 @@ class TextServices
                 break;
 
             case  "\xE2\x9D\x8Cغیر فعال فوری":
-                $this->telegram->kickChatMember(
-                    [
-                        'chat_id' => $this->bot->chanel_id,
-                        'user_id' => $this->user->id,
-                    ]);
+
+
+                try {
+                    // خارج کردن کاربر از کانال
+                    $response =  $this->telegram->kickChatMember(
+                        [
+                            'chat_id' => $this->bot->chanel_id,
+                            'user_id' => $this->user->id,
+                        ]);
+
+                    if ($response) {
+                        logger( "User has been successfully removed from the channel.");
+                    } else {
+                        logger("Failed to remove user from the channel.");
+                    }
+                } catch (\Exception $e) {
+                    logger( "Error: " . $e->getMessage());
+                }
                 $this->user->status = false;
                 $this->user->update();
                 $this->user->delete();

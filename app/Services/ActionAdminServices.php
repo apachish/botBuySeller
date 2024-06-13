@@ -255,12 +255,23 @@ class ActionAdminServices extends TextServices
                 $user_con->delete();
                 $response_text = "$fullName\n\n اکانت کاربریش حذف شد ";
                 $this->getTelegramServices()->sendMessage($this->getUserId(), $response_text);
-                $this->telegram->kickChatMember(
-                    [
-                        'chat_id' => $this->bot->chanel_id,
-                        'user_id' => $user_con->id,
-                    ]);
 
+                try {
+                    // خارج کردن کاربر از کانال
+                    $response =  $this->telegram->kickChatMember(
+                        [
+                            'chat_id' => $this->bot->chanel_id,
+                            'user_id' => $user_con->id,
+                        ]);
+
+                    if ($response) {
+                        logger( "User has been successfully removed from the channel.");
+                    } else {
+                        logger( "Failed to remove user from the channel.");
+                    }
+                } catch (\Exception $e) {
+                    logger( "Error: " . $e->getMessage());
+                }
                 $this->service_user->message_menu = "اکانت کاربریش حذف شد";
                 $this->service_user->menu([], $user_con->status, $user_con);
                 $this->listUser($page);
