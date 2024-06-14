@@ -229,8 +229,8 @@ class ActionAdminServices extends TextServices
                     'member_limit' => 1, // تعداد اعضای جدیدی که با این لینک می‌توانند بپیوندند
                 ]);
 
-                logger("r",[$response]);
-                $inviteLink = $response->getResult()['invite_link'];
+                logger("r",[$response,data_get($response,"invite_link")]);
+                $inviteLink = data_get($response,"invite_link");
 
                 logger("link",[$inviteLink]);
                 $this->telegram->sendMessage([
@@ -238,7 +238,7 @@ class ActionAdminServices extends TextServices
                     'text' => "لینک دعوت کانال برای کاربر ارسال شد",
                 ]);
                 // ارسال لینک دعوت به کاربر
-                $this->service_user->sendMessage($user_con->id,"لطفا با استفاده از لینک دعوت[فقط یک ساعت معتبر می باشد] به کانال بپیوندید: " . $inviteLink);
+                $this->telegram_services->sendMessage($user_con->id,"لطفا با استفاده از لینک دعوت[فقط یک ساعت معتبر می باشد] به کانال بپیوندید: " . $inviteLink);
             }
         } elseif (str_contains($this->getData(), "confirm_")) {
             $data = str_replace('confirm_', '', $this->getData());
