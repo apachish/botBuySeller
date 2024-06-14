@@ -183,7 +183,9 @@ class ActionServices extends TextServices
                 $limit_day = null;
                 $use_day = null;
                 $transaction_party = null;
+                $transaction_party_s = null;
                 $transaction_party_req = null;
+                $transaction_party_req_s = null;
                 $request_transfer = [];
 
 
