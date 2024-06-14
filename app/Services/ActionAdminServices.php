@@ -5,6 +5,7 @@ namespace App\Services;
 
 use App\Models\Bot;
 use App\Models\BotMenuUser;
+use App\Models\CustomerUser;
 use App\Models\Setting;
 use App\Models\Transfer;
 use App\Models\UserTelegram;
@@ -159,6 +160,50 @@ class ActionAdminServices extends TextServices
                 $data_old = cache()->get("menu_List_user_" . $this->getUserId());
                 $message_id = data_get($data_old, "id", null);
                 $this->listUser($page,$message_id,$filter);
+            }
+        }elseif (str_contains($this->getData(), "active_sub_customer_")) {
+            $data = str_replace('active_sub_customer_', '', $this->getData());
+            $array = explode("_",$data);
+            $customer = CustomerUser::with("parentCustomer")->find(data_get($array,0));
+            if($customer){
+                $customer->status = true;
+                $customer->update();
+                $user_con = $customer->parentCustomer;
+                cache()->get("sub_customer".$user_con->id);
+
+                $this->subcustomer($user_con);
+            }
+        }elseif (str_contains($this->getData(), "reject_sub_customer_")) {
+            $data = str_replace('active_sub_customer_', '', $this->getData());
+            $array = explode("_",$data);
+            $customer = CustomerUser::with("parentCustomer")->find(data_get($array,0));
+            if($customer){
+                $customer->status = false;
+                $customer->update();
+                $user_con = $customer->parentCustomer;
+                cache()->get("sub_customer".$user_con->id);
+
+                $this->subcustomer($user_con);
+            }
+        }elseif (str_contains($this->getData(), "return_menu_")) {
+            $data = str_replace('sub_customer_', '', $this->getData());
+            $array = explode("_",$data);
+            $id = (int)data_get($array,0);
+            $page = (int)data_get($array,1);
+            $filter = data_get($array,2,null);
+            $data_old = cache()->get("menu_List_user_" . $this->getUserId());
+            $message_id = data_get($data_old, "id", null);
+            $this->listUser($page,$message_id,$filter);
+        }elseif (str_contains($this->getData(), "sub_customer_")) {
+            $data = str_replace('sub_customer_', '', $this->getData());
+            $array = explode("_",$data);
+            $id = (int)data_get($array,0);
+            $page = (int)data_get($array,1);
+            $filter = data_get($array,2,null);
+            $user_con = UserTelegram::where("id", $id)->with("customerUsers")->first();
+            logger("con", [$user_con, $id]);
+            if ($user_con) {
+                $this->subcustomer($user_con, $data);
             }
         } elseif (str_contains($this->getData(), "confirm_")) {
             $data = str_replace('confirm_', '', $this->getData());
@@ -783,5 +828,42 @@ class ActionAdminServices extends TextServices
             $this->getTelegramServices()->menu_key = "menu_List_user_";
             $menu = $this->getTelegramServices()->MessageReplyMarkup($this->getTelegram(), $this->getUserId(), $text, $keyboard);
         }
+    }
+
+    /**
+     * @param $user_con
+     * @param mixed $data
+     * @return void
+     * @throws \Psr\Container\ContainerExceptionInterface
+     * @throws \Psr\Container\NotFoundExceptionInterface
+     */
+    private function subcustomer($user_con, mixed $data): void
+    {
+        $data_old = cache()->get("menu_List_user_" . $this->getUserId());
+        $message_id = data_get($data_old, "id", null);
+        $text = "لیست مشتریان";
+        $text .= "\n\n";
+        $text .= $user_con->fullName ?: $user_con->first_name . " " . $user_con->last_name;
+        $keyboard = [];
+        $i = 0;
+        cache()->set("sub_customer".$user_con->id,$data);
+        foreach ($user_con->customerUsers as $j => $cus) {
+            $title = $cus->fullName;
+            $title .= $cus->user->fullName ? "(" . $cus->user->fullName . ")" : null;
+            $act = $cus->status ? "\xE2\x9D\x8C" : "\xE2\x9C\x85 ";
+            $keyboard[$i++] = [
+                [
+                    'text' => $title . $act,
+                    'callback_data' => ($cus->status ? "active_sub_customer_" : "reject_sub_customer_") . $cus->id . "_" . $user_con->id
+                ],
+            ];
+        }
+        $keyboard[$i++] = [
+            [
+                'text' => "برگشت",
+                'callback_data' => "return_menu_" . $data
+            ],
+        ];
+        $this->getTelegramServices()->editMessageTextAndInlineKeyboard($this->getUserId(), $message_id, $text, $keyboard);
     }
 }
