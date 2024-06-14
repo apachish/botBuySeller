@@ -698,6 +698,11 @@ class ActionServices extends TextServices
         }
         if(data_get($parameter,"start_hours_of_operation.value"))
             $this->telegram_services->sendMessage($this->getUserId(), "تعطیل می باشد");
+
+
+        // طول رشته عدد را محاسبه کنید
+        $length = strlen($suggest_price);
+
         if(!cache()->get("transfer_accept_".$this->getType())) {
             $start_trade_s = cache()->remember("start_price_trade", now()->addDay(1), function () {
                 $value = 14000000;
@@ -715,7 +720,17 @@ class ActionServices extends TextServices
             });
             logger("start", [$start_trade_s]);
             logger("end", [$end_trade_s]);
+            logger("end", [$end_trade_s]);
+            // بررسی کنید که آیا طول عدد 3 یا 5 است
+            if ($length === 3) {
+                $start_price = (int)data_get($start_trade_s, "start");
+                $unit = getUnitPrice($start_price);
+            } elseif ($length === 5) {
+                $start_price = (int)($suggest_price * 1000);
+                $unit = getUnitPrice($start_price);
+                $suggest_price = $suggest_price % 1000;
 
+            }
             if($suggest_price <= $start_trade_s || $suggest_price <= $end_trade_s)
             {
                 $message ="مبلغ وارد شده باید در بازه";
@@ -732,24 +747,23 @@ class ActionServices extends TextServices
 
         }else{
             $start_trade_s =  (int) cache()->get("transfer_accept_".$this->getType());
+            // بررسی کنید که آیا طول عدد 3 یا 5 است
+            if ($length === 3) {
+                $start_price = (int)data_get($start_trade_s, "start");
+                $unit = getUnitPrice($start_price);
+            } elseif ($length === 5) {
+                $start_price = (int)($suggest_price * 1000);
+                $unit = getUnitPrice($start_price);
+                $suggest_price = $suggest_price % 1000;
+
+            }
         }
 
 
 
 
-        // طول رشته عدد را محاسبه کنید
-        $length = strlen($suggest_price);
 
-        // بررسی کنید که آیا طول عدد 3 یا 5 است
-        if ($length === 3) {
-            $start_price = (int)data_get($start_trade_s, "start");
-            $unit = getUnitPrice($start_price);
-        } elseif ($length === 5) {
-            $start_price = (int)($suggest_price * 1000);
-            $unit = getUnitPrice($start_price);
-            $suggest_price = $suggest_price % 1000;
 
-        }
         $start_trade = floor($start_price / $unit) * $unit;
 
 
