@@ -82,7 +82,7 @@ if (!function_exists('getTypeTitleOrder')) {
 if (!function_exists('getTypeOrder')) {
     function getTypeOrder($type)
     {
-        if(in_array($type,["ففپ","ففم","ففش","ففن","فش","فن","فم","فف","فپ","ف"]))
+        if(in_array($type,["خفپ","خفم","خفش","خفن","خش","خن","خم","خف","خپ","خ"]))
             return "buy";
         elseif(in_array($type,["ففپ","ففم","ففش","ففن","فش","فن","فم","فف","فپ","ف"]))
             return "sell";
