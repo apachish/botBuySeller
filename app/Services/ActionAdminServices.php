@@ -190,7 +190,7 @@ class ActionAdminServices extends TextServices
             $id = (int)data_get($array,0);
             $page = (int)data_get($array,1);
             $filter = data_get($array,2,null);
-            $user_con = UserTelegram::where("id", $id)->first();
+            $user_con = UserTelegram::where("id", $id)->withTrashed()->first();
             logger("con", [$user_con, $id]);
             if ($user_con) {
                 $fullName = $user_con->fullName ?: $user_con->first_name . " " . $user_con->last_name;
