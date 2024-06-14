@@ -216,14 +216,14 @@ class ActionAdminServices extends TextServices
             logger("con", [$user_con, $id]);
             if ($user_con) {
                 logger("link",[
-                    $this->bot_user,
-                    'chat_id' => $this->bot_user->chanel_id,
+                    $this->bot,
+                    'chat_id' => $this->bot->chanel_id,
                     'expire_date' => time() + 3600, // لینک به مدت 24 ساعت معتبر است
                     'name' => Str::slug($user_con->fullName,"_"),
                     'member_limit' => 1, // تعداد اعضای جدیدی که با این لینک می‌توانند بپیوندند
                 ]);
                 $response = $this->telegram->createChatInviteLink([
-                    'chat_id' => $this->bot_user->chanel_id,
+                    'chat_id' => (int)$this->bot->chanel_id,
                     'name' => Str::slug($user_con->fullName,"_"),
                     'expire_date' => time() + 3600, // لینک به مدت 24 ساعت معتبر است
                     'member_limit' => 1, // تعداد اعضای جدیدی که با این لینک می‌توانند بپیوندند
