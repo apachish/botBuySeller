@@ -274,13 +274,13 @@ class ActionServices extends TextServices
                     }
                     if ($transfer->user->role == "customer" && $this->getUser()->role =="customer") {
                         $transaction_party_req = "مشاهده فقط برای سرگروه";
-                        $transaction_party_req_s = data_get($this->getUser(), 'user.customer.headCustomer.fullName') . "(" . data_get($this->getUser(), 'customer.headCustomer.fullName') . ")";
+                        $transaction_party_req_s = data_get($this->getUser(), 'customer.headCustomer.fullName') . "(" . data_get($this->getUser(), 'customer.fullName') . ")";
                         $transaction_party = "مشاهده فقط برای سرگروه";
                         $transaction_party_s = data_get($transfer, 'user.customer.headCustomer.fullName') . "(" . data_get($transfer, 'user.customer.fullName') . ")";
 
                     }elseif($transfer->user->role == "colleague" && $this->getUser()->role =="customer"){
                         $transaction_party_req = "مشاهده فقط برای سرگروه";
-                        $transaction_party_req_s = data_get($this->getUser(), 'user.customer.headCustomer.fullName') . "(" . data_get($this->getUser(), 'customer.headCustomer.fullName') . ")";
+                        $transaction_party_req_s = data_get($this->getUser(), 'customer.headCustomer.fullName') . "(" . data_get($this->getUser(), 'customer.fullName') . ")";
                         $transaction_party = data_get($transfer, 'user.customerUser.headCustomer.fullName') . "(" . data_get($transfer, 'user.customerUser.fullName') . ")";
                     }elseif ($transfer->user->role == "customer" && $this->getUser()->role =="colleague"){
                         $transaction_party_req = data_get($transfer, 'user.customerUser.headCustomer.fullName') . "(" . data_get($transfer, 'user.customerUser.fullName') . ")";
@@ -318,7 +318,11 @@ class ActionServices extends TextServices
                     if($this->getUser()->role =="customer")
                     {
                         $message = str_replace($transaction_party_req,$transaction_party_req_s,$message);
-                        logger("message2",[$message]);
+                        logger("message2",[
+                            'chat_id' => data_get($this->getUser(), 'customer.user_id'),
+                            'text' => $message,
+                        ]);
+                        logger("telegram_customer",[$this->telegram_customer]);
                         $this->telegram_customer->sendMessage(
                             [
                                 'chat_id' => data_get($this->getUser(), 'customer.user_id'),
