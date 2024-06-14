@@ -165,6 +165,7 @@ class ActionAdminServices extends TextServices
         }
         elseif (str_contains($this->getData(), "sub_customer_")) {
             $data = str_replace('sub_customer_', '', $this->getData());
+            logger("sub_customer_",[$data]);
             $array = explode("_",$data);
             $id = (int)data_get($array,0);
             $page = (int)data_get($array,1);
