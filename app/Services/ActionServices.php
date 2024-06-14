@@ -291,6 +291,14 @@ class ActionServices extends TextServices
                         $transaction_party = $this->getUser()->fullName;
                     }
 
+                    logger("tr",[
+                        $transaction_party,
+                        $transaction_party_req,
+                        $transaction_party_s,
+                        $transaction_party_req_s,
+                        $transfer->user,
+                        $this->getUser()
+                    ]);
                     /*
                      * send for request
                      */
@@ -305,16 +313,19 @@ class ActionServices extends TextServices
                     $message .= "برای:" . toJalali($transfer->date, "Y/m/d");
                     $message .= "\n\n";
                     $message .= "       شماره حواله:" . data_get($request_transfer, 'remittance_number');
+                    logger("message1",[$message]);
                     $this->telegram_services->sendMessage($this->getUserId(), $message);
                     if($this->getUser()->role =="customer")
                     {
                         $message = str_replace($transaction_party_req,$transaction_party_req_s,$message);
+                        logger("message2",[$message]);
                         $this->telegram_customer->sendMessage(
                             [
                                 'chat_id' => data_get($this->getUser(), 'customerUser.headCustomer.id'),
                                 'text' => $message,
                             ]
                             );
+
                     }
 
                     /*
@@ -331,10 +342,13 @@ class ActionServices extends TextServices
                     $message .= "برای:" . toJalali($transfer->date, "Y/m/d");
                     $message .= "\n\n";
                     $message .= "       شماره حواله:" . data_get($request_transfer, 'remittance_number');
+
+                    logger("message3",[$message]);
                     $this->telegram_services->sendMessage($transfer->user_id, $message);
                     if($transfer->user->role =="customer")
                     {
                         $message = str_replace($transaction_party,$transaction_party_s,$message);
+                        logger("message4",[$message]);
                         $this->telegram_customer->sendMessage(
                             [
                                 'chat_id' => data_get($transfer->user, 'customerUser.headCustomer.id'),
