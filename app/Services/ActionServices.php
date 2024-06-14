@@ -716,9 +716,9 @@ class ActionServices extends TextServices
             logger("start", [$start_trade_s]);
             logger("end", [$end_trade_s]);
             $price = $this->getPriceTrade($suggest_price, $start_trade_s);
-            logger("end", [$price,$price <= $start_trade_s , $price <= $end_trade_s]);
+            logger("end", [$price,$price < $start_trade_s , $price > $end_trade_s]);
 
-            if($price <= $start_trade_s || $price <= $end_trade_s)
+            if($price < $start_trade_s || $price > $end_trade_s)
             {
                 $message ="مبلغ وارد شده باید در بازه";
                 $message .= "\n\n";
