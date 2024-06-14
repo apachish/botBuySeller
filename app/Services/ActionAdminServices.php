@@ -21,6 +21,7 @@ class ActionAdminServices extends TextServices
     {
 
         $access_text = [
+            "/start",
             "\xF0\x9F\x9A\xBBلیست کاربران",
             "جستجو کاربر\xF0\x9F\x94\x8D",
             "\xF0\x9F\x93\x88شروع مبلغ معامله",
