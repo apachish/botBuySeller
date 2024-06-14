@@ -127,9 +127,9 @@ class ActionAdminServices extends TextServices
                 $customer->status = true;
                 $customer->update();
                 $user_con = $customer->headCustomer;
-                cache()->get("sub_customer".$customer->user_id);
+                $data_menu = cache()->get("sub_customer".$customer->user_id);
 
-                $this->subcustomer($user_con);
+                $this->subcustomer($user_con,$data_menu);
             }
         }elseif (str_contains($this->getData(), "reject_sub_customer_")) {
             $data = str_replace('reject_sub_customer_', '', $this->getData());
