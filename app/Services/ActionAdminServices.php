@@ -162,7 +162,20 @@ class ActionAdminServices extends TextServices
                 $message_id = data_get($data_old, "id", null);
                 $this->listUser($page,$message_id,$filter);
             }
-        }elseif (str_contains($this->getData(), "active_sub_customer_")) {
+        }
+        elseif (str_contains($this->getData(), "sub_customer_")) {
+            $data = str_replace('sub_customer_', '', $this->getData());
+            $array = explode("_",$data);
+            $id = (int)data_get($array,0);
+            $page = (int)data_get($array,1);
+            $filter = data_get($array,2,null);
+            $user_con = UserTelegram::where("id", $id)->with("customerUsers")->first();
+            logger("con", [$user_con, $id]);
+            if ($user_con) {
+                $this->subcustomer($user_con, $data);
+            }
+        }
+        elseif (str_contains($this->getData(), "active_sub_customer_")) {
             $data = str_replace('active_sub_customer_', '', $this->getData());
             $array = explode("_",$data);
             $customer = CustomerUser::with("parentCustomer")->find(data_get($array,0));
@@ -175,7 +188,7 @@ class ActionAdminServices extends TextServices
                 $this->subcustomer($user_con);
             }
         }elseif (str_contains($this->getData(), "reject_sub_customer_")) {
-            $data = str_replace('active_sub_customer_', '', $this->getData());
+            $data = str_replace('reject_sub_customer_', '', $this->getData());
             $array = explode("_",$data);
             $customer = CustomerUser::with("parentCustomer")->find(data_get($array,0));
             if($customer){
@@ -187,7 +200,7 @@ class ActionAdminServices extends TextServices
                 $this->subcustomer($user_con);
             }
         }elseif (str_contains($this->getData(), "return_menu_")) {
-            $data = str_replace('sub_customer_', '', $this->getData());
+            $data = str_replace('return_menu_', '', $this->getData());
             $array = explode("_",$data);
             $id = (int)data_get($array,0);
             $page = (int)data_get($array,1);
@@ -195,17 +208,6 @@ class ActionAdminServices extends TextServices
             $data_old = cache()->get("menu_List_user_" . $this->getUserId());
             $message_id = data_get($data_old, "id", null);
             $this->listUser($page,$message_id,$filter);
-        }elseif (str_contains($this->getData(), "sub_customer_")) {
-            $data = str_replace('sub_customer_', '', $this->getData());
-            $array = explode("_",$data);
-            $id = (int)data_get($array,0);
-            $page = (int)data_get($array,1);
-            $filter = data_get($array,2,null);
-            $user_con = UserTelegram::where("id", $id)->with("customerUsers")->first();
-            logger("con", [$user_con, $id]);
-            if ($user_con) {
-                $this->subcustomer($user_con, $data);
-            }
         }elseif (str_contains($this->getData(), "add_chanel_")) {
             $data = str_replace('add_chanel_', '', $this->getData());
             $array = explode("_",$data);
