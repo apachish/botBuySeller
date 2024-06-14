@@ -698,11 +698,6 @@ class ActionServices extends TextServices
         }
         if(data_get($parameter,"start_hours_of_operation.value"))
             $this->telegram_services->sendMessage($this->getUserId(), "تعطیل می باشد");
-
-
-        // طول رشته عدد را محاسبه کنید
-        $length = strlen($suggest_price);
-
         if(!cache()->get("transfer_accept_".$this->getType())) {
             $start_trade_s = cache()->remember("start_price_trade", now()->addDay(1), function () {
                 $value = 14000000;
@@ -720,19 +715,10 @@ class ActionServices extends TextServices
             });
             logger("start", [$start_trade_s]);
             logger("end", [$end_trade_s]);
-            // بررسی کنید که آیا طول عدد 3 یا 5 است
-            if ($length === 3) {
-                $start_price = (int)data_get($start_trade_s, "start");
-                $unit = getUnitPrice($start_price);
-            } elseif ($length === 5) {
-                $start_price = (int)($suggest_price * 1000);
-                $unit = getUnitPrice($start_price);
-                $suggest_price = $suggest_price % 1000;
+            $price = $this->getPriceTrade($suggest_price, $start_trade_s);
+            logger("end", [$price]);
 
-            }
-            logger("end", [$suggest_price]);
-
-            if($suggest_price <= $start_trade_s || $suggest_price <= $end_trade_s)
+            if($price <= $start_trade_s || $price <= $end_trade_s)
             {
                 $message ="مبلغ وارد شده باید در بازه";
                 $message .= "\n\n";
@@ -748,27 +734,10 @@ class ActionServices extends TextServices
 
         }else{
             $start_trade_s =  (int) cache()->get("transfer_accept_".$this->getType());
-            // بررسی کنید که آیا طول عدد 3 یا 5 است
-            if ($length === 3) {
-                $start_price = (int)data_get($start_trade_s, "start");
-                $unit = getUnitPrice($start_price);
-            } elseif ($length === 5) {
-                $start_price = (int)($suggest_price * 1000);
-                $unit = getUnitPrice($start_price);
-                $suggest_price = $suggest_price % 1000;
+            $price = $this->getPriceTrade($suggest_price, $start_trade_s);
 
-            }
         }
 
-
-
-
-
-
-        $start_trade = floor($start_price / $unit) * $unit;
-
-
-        $price = $start_trade + ($suggest_price * 1000);
 
         $number = $this->getNumberOrder();
 
@@ -910,5 +879,32 @@ class ActionServices extends TextServices
             $keyboard = null;
         logger("key", [$keyboard]);
         return $keyboard;
+    }
+
+    /**
+     * @param mixed $suggest_price
+     * @param mixed $start_trade_s
+     * @return float|int
+     */
+    private function getPriceTrade(mixed $suggest_price, mixed $start_trade_s): int|float
+    {
+// طول رشته عدد را محاسبه کنید
+        $length = strlen($suggest_price);
+
+        // بررسی کنید که آیا طول عدد 3 یا 5 است
+        if ($length === 3) {
+            $start_price = (int)data_get($start_trade_s, "start");
+            $unit = getUnitPrice($start_price);
+        } elseif ($length === 5) {
+            $start_price = (int)($suggest_price * 1000);
+            $unit = getUnitPrice($start_price);
+            $suggest_price = $suggest_price % 1000;
+
+        }
+        $start_trade = floor($start_price / $unit) * $unit;
+
+
+        $price = $start_trade + ($suggest_price * 1000);
+        return $price;
     }
 }
