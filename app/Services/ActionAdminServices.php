@@ -116,7 +116,46 @@ class ActionAdminServices extends TextServices
             logger("aa", [$data_old, $message_id, $page]);
             if ($message_id)
                 $this->listUser($page, $message_id,$filter);
-        } elseif (str_contains($this->getData(), "customer_")) {
+        }
+        elseif (str_contains($this->getData(), "sub_customer_")) {
+            $data = str_replace('sub_customer_', '', $this->getData());
+            logger("sub_customer_",[$data]);
+            $array = explode("_",$data);
+            $id = (int)data_get($array,0);
+            $page = (int)data_get($array,1);
+            $filter = data_get($array,2,null);
+            $user_con = UserTelegram::where("id", $id)->with("customerUsers")->first();
+            logger("con", [$user_con, $id]);
+            if ($user_con) {
+                $this->subcustomer($user_con, $data);
+            }
+        }
+        elseif (str_contains($this->getData(), "active_sub_customer_")) {
+            $data = str_replace('active_sub_customer_', '', $this->getData());
+            $array = explode("_",$data);
+            $customer = CustomerUser::with("parentCustomer")->find(data_get($array,0));
+            if($customer){
+                $customer->status = true;
+                $customer->update();
+                $user_con = $customer->parentCustomer;
+                cache()->get("sub_customer".$user_con->id);
+
+                $this->subcustomer($user_con);
+            }
+        }elseif (str_contains($this->getData(), "reject_sub_customer_")) {
+            $data = str_replace('reject_sub_customer_', '', $this->getData());
+            $array = explode("_",$data);
+            $customer = CustomerUser::with("parentCustomer")->find(data_get($array,0));
+            if($customer){
+                $customer->status = false;
+                $customer->update();
+                $user_con = $customer->parentCustomer;
+                cache()->get("sub_customer".$user_con->id);
+
+                $this->subcustomer($user_con);
+            }
+        }
+        elseif (str_contains($this->getData(), "customer_")) {
             $data = str_replace('customer_', '', $this->getData());
             $array = explode("_",$data);
             $id = (int)data_get($array,0);
@@ -163,44 +202,7 @@ class ActionAdminServices extends TextServices
                 $this->listUser($page,$message_id,$filter);
             }
         }
-        elseif (str_contains($this->getData(), "sub_customer_")) {
-            $data = str_replace('sub_customer_', '', $this->getData());
-            logger("sub_customer_",[$data]);
-            $array = explode("_",$data);
-            $id = (int)data_get($array,0);
-            $page = (int)data_get($array,1);
-            $filter = data_get($array,2,null);
-            $user_con = UserTelegram::where("id", $id)->with("customerUsers")->first();
-            logger("con", [$user_con, $id]);
-            if ($user_con) {
-                $this->subcustomer($user_con, $data);
-            }
-        }
-        elseif (str_contains($this->getData(), "active_sub_customer_")) {
-            $data = str_replace('active_sub_customer_', '', $this->getData());
-            $array = explode("_",$data);
-            $customer = CustomerUser::with("parentCustomer")->find(data_get($array,0));
-            if($customer){
-                $customer->status = true;
-                $customer->update();
-                $user_con = $customer->parentCustomer;
-                cache()->get("sub_customer".$user_con->id);
-
-                $this->subcustomer($user_con);
-            }
-        }elseif (str_contains($this->getData(), "reject_sub_customer_")) {
-            $data = str_replace('reject_sub_customer_', '', $this->getData());
-            $array = explode("_",$data);
-            $customer = CustomerUser::with("parentCustomer")->find(data_get($array,0));
-            if($customer){
-                $customer->status = false;
-                $customer->update();
-                $user_con = $customer->parentCustomer;
-                cache()->get("sub_customer".$user_con->id);
-
-                $this->subcustomer($user_con);
-            }
-        }elseif (str_contains($this->getData(), "return_menu_")) {
+       elseif (str_contains($this->getData(), "return_menu_")) {
             $data = str_replace('return_menu_', '', $this->getData());
             $array = explode("_",$data);
             $id = (int)data_get($array,0);
