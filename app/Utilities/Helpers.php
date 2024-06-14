@@ -43,7 +43,7 @@ if (!function_exists('isValidTime')) {
 if (!function_exists('cleanInput')) {
     function cleanInput($input) {
         // استفاده از یک الگو برای جدا کردن بخش‌ها
-        $pattern = '/^(\d+)\s*( خفن|خفش|ففش|ففن|خفم|ففم|فف|خف|فم|خم|خش|فش|خن|فن|خ|ف)\s*(\d?)(:\s*(.*))?$/u';
+        $pattern = '/^(\d+)\s*( خفن|خفش|ففش|ففن|خفپ|ففپ|خفم|ففم|فف|خف|فپ|خپ|فم|خم|خش|فش|خن|فن|خ|ف)\s*(\d?)(:\s*(.*))?$/u';
 
         if (preg_match($pattern, $input, $matches)) {
             // حذف فضای خالی از بخش‌های مورد نیاز
@@ -73,18 +73,18 @@ if (!function_exists('getPriceFormat')) {
 if (!function_exists('getTypeTitleOrder')) {
     function getTypeTitleOrder($type)
     {
-        if(in_array($type, ["خفم","خفش","خفن","خش","خن","خم","خف","خ"]))
+        if(in_array($type, ["خفپ","خفم","خفش","خفن","خش","خن","خم","خف","خپ","خ"]))
             return "خرید";
-        elseif(in_array($type,["ففم","ففش","ففن","فش","فن","فم","فف","ف"]))
+        elseif(in_array($type,["ففپ","ففم","ففش","ففن","فش","فن","فم","فف","فپ","ف"]))
             return "فروش";
     }
 }
 if (!function_exists('getTypeOrder')) {
     function getTypeOrder($type)
     {
-        if(in_array($type,["خفم","خفش","خفن","خش","خن","خم","خف","خ"]))
+        if(in_array($type,["ففپ","ففم","ففش","ففن","فش","فن","فم","فف","فپ","ف"]))
             return "buy";
-        elseif(in_array($type,["ففم","ففش","ففن","فش","فن","فم","فف","ف"]))
+        elseif(in_array($type,["ففپ","ففم","ففش","ففن","فش","فن","فم","فف","فپ","ف"]))
             return "sell";
     }
 }

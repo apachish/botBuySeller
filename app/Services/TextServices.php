@@ -14,9 +14,9 @@ use Telegram\Bot\Api;
 
 class TextServices
 {
-    private $list_type = [  "خفم","ففم","خفن","خفش","ففش","ففن","فف","خف","خش","فش","خن","فن","خم","فم","خ","ف"];
-    protected $list_type_buy = ["خفم","خفش","خفن","خش","خن","خم","خف","خ"];
-    protected $list_type_sell = ["ففم","ففش","ففن","فش","فن","فم","فف","ف"];
+    private $list_type = [  "خفپ","ففپ","خفم","ففم","خفن","خفش","ففش","ففن","فف","خف","خش","فش","خن","فن","خم","فم","خپ","فپ","خ","ف"];
+    protected $list_type_buy = ["خفپ","خفم","خفش","خفن","خش","خن","خم","خف","خپ","خ"];
+    protected $list_type_sell = ["ففپ","ففم","ففش","ففن","فش","فن","فم","فف","فپ","ف"];
     protected $list_type_sell_n_buy_tom = ["خفن","ففن"];
     protected $list_type_sell_tommarow = ["فف", "ففش", "ففن", "ففم"];
     protected $list_type_buy_tommarow = ["خف", "خفش", "خفن", "خفم"];
@@ -24,7 +24,7 @@ class TextServices
     protected $list_type_normal= ["فف","خف","خ","ف"];
     protected $list_type_floating = ["خفش","ففش","خش","فش"];
     protected $list_type_cash = ["خفن","ففن","خن","فن"];
-    protected $list_type_reverse = ["ففم","خفم","فم","خم"];
+    protected $list_type_reverse = ["خفپ","ففپ","ففم","خفم","فم","خم","خپ","فپ"];
 
     private $type;
     private $price;
