@@ -206,7 +206,7 @@ class ActionAdminServices extends TextServices
                 $this->subcustomer($user_con, $data);
             }
         }elseif (str_contains($this->getData(), "add_chanel_")) {
-            $data = str_replace('sub_customer_', '', $this->getData());
+            $data = str_replace('add_chanel_', '', $this->getData());
             $array = explode("_",$data);
             $id = (int)data_get($array,0);
             $page = (int)data_get($array,1);
