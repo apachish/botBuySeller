@@ -28,7 +28,10 @@ class ActionServices extends TextServices
         parent::__construct($token);
         $bot_customer  = Bot::where("title","botCustomer")->first();
         if($bot_customer)
+        {
+            logger("bot customer",[$bot_customer]);
             $this->telegram_customer = new Api($bot_customer->token);
+        }
     }
 
     public function addCustomerLimit()
@@ -271,18 +274,18 @@ class ActionServices extends TextServices
                     }
                     if ($transfer->user->role == "customer" && $this->getUser()->role =="customer") {
                         $transaction_party_req = "مشاهده فقط برای سرگروه";
-                        $transaction_party_req_s = data_get($transfer, 'user.customerUser.headCustomer.fullName') . "(" . data_get($transfer, 'user.customerUser.fullName') . ")";
+                        $transaction_party_req_s = data_get($this->getUser(), 'user.customerUser.headCustomer.fullName') . "(" . data_get($this->getUser(), 'customerUser.headCustomer.fullName') . ")";
                         $transaction_party = "مشاهده فقط برای سرگروه";
-                        $transaction_party_s = data_get($this->getUser(), 'customerUser.headCustomer.fullName') . "(" . data_get($this->getUser(), 'customerUser.fullName') . ")";
+                        $transaction_party_s = data_get($transfer, 'user.customerUser.headCustomer.fullName') . "(" . data_get($transfer, 'user.customerUser.fullName') . ")";
 
                     }elseif($transfer->user->role == "colleague" && $this->getUser()->role =="customer"){
                         $transaction_party_req = "مشاهده فقط برای سرگروه";
-                        $transaction_party_req_s = data_get($transfer, 'user.customerUser.headCustomer.fullName') . "(" . data_get($transfer, 'user.customerUser.fullName') . ")";
+                        $transaction_party_req_s = data_get($this->getUser(), 'user.customerUser.headCustomer.fullName') . "(" . data_get($this->getUser(), 'customerUser.headCustomer.fullName') . ")";
                         $transaction_party = data_get($transfer, 'user.customerUser.headCustomer.fullName') . "(" . data_get($transfer, 'user.customerUser.fullName') . ")";
                     }elseif ($transfer->user->role == "customer" && $this->getUser()->role =="colleague"){
                         $transaction_party_req = data_get($transfer, 'user.customerUser.headCustomer.fullName') . "(" . data_get($transfer, 'user.customerUser.fullName') . ")";
                         $transaction_party = "مشاهده فقط برای سرگروه";
-                        $transaction_party_s = data_get($this->getUser(), 'customerUser.headCustomer.fullName') . "(" . data_get($this->getUser(), 'customerUser.fullName') . ")";
+                        $transaction_party_s = data_get($transfer, 'user.customerUser.headCustomer.fullName') . "(" . data_get($transfer, 'user.customerUser.fullName') . ")";
                     }elseif ($transfer->user->role == "colleague" && $this->getUser()->role =="colleague"){
                         $transaction_party_req = data_get($transfer, 'user.fullName');
                         $transaction_party = $this->getUser()->fullName;
