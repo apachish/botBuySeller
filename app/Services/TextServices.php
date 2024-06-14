@@ -719,6 +719,7 @@ class TextServices
     public function menu($keyboard, $show,$user=null)
     {
 
+        logger("menu",[$keyboard, $show,$user]);
         $user = $user?$user:$this->getUser();
         if ($show ) {
             if($user && $user->change_menu) {
