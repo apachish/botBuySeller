@@ -22,7 +22,7 @@ use Telegram\Bot\FileUpload\InputFile;
 class ActionServices extends TextServices
 {
 
-    protected  $telegram_customer;
+    protected  $service_customer;
     public function __construct($token)
     {
         parent::__construct($token);
@@ -30,7 +30,7 @@ class ActionServices extends TextServices
         if($bot_customer)
         {
             logger("bot customer",[$bot_customer]);
-            $this->telegram_customer = new Api($bot_customer->token);
+            $this->service_customer = new ActionServices($bot_customer->token);
         }
     }
 
@@ -323,11 +323,9 @@ class ActionServices extends TextServices
                             'text' => $message,
                         ]);
                         logger("telegram_customer",[$this->telegram_customer]);
-                        $this->telegram_customer->sendMessage(
-                            [
-                                'chat_id' => data_get($this->getUser(), 'customer.user_id'),
-                                'text' => $message,
-                            ]
+                        $this->service_customer->telegram_services->sendMessage(
+                            data_get($this->getUser(), 'customer.user_id'),
+                               $message,
                             );
 
                     }
@@ -353,11 +351,9 @@ class ActionServices extends TextServices
                     {
                         $message = str_replace($transaction_party,$transaction_party_s,$message);
                         logger("message4",[$message]);
-                        $this->telegram_customer->sendMessage(
-                            [
-                                'chat_id' => data_get($transfer->user, 'customerUser.user_id'),
-                                'text' => $message,
-                            ]
+                        $this->service_customer->telegram_services->sendMessage(
+                            data_get($transfer->user, 'customerUser.user_id'),
+                            $message,
                         );
                     }
 
