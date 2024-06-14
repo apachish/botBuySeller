@@ -205,6 +205,33 @@ class ActionAdminServices extends TextServices
             if ($user_con) {
                 $this->subcustomer($user_con, $data);
             }
+        }elseif (str_contains($this->getData(), "add_chanel_")) {
+            $data = str_replace('sub_customer_', '', $this->getData());
+            $array = explode("_",$data);
+            $id = (int)data_get($array,0);
+            $page = (int)data_get($array,1);
+            $filter = data_get($array,2,null);
+            $user_con = UserTelegram::where("id", $id)->with("customerUsers")->first();
+            logger("con", [$user_con, $id]);
+            if ($user_con) {
+                $response = $this->telegram->createChatInviteLink([
+                    'chat_id' => $this->bot->chanel_id,
+                    'expire_date' => time() + 3600, // لینک به مدت 24 ساعت معتبر است
+                    'member_limit' => 1, // تعداد اعضای جدیدی که با این لینک می‌توانند بپیوندند
+                ]);
+
+                $inviteLink = $response->getResult()['invite_link'];
+
+                $this->telegram->sendMessage([
+                    'chat_id' => $this->getUserId(),
+                    'text' => "لینک دعوت کانال برای کاربر ارسال شد",
+                ]);
+                // ارسال لینک دعوت به کاربر
+                $this->telegram->sendMessage([
+                    'chat_id' => $user_con->id,
+                    'text' => "لطفا با استفاده از لینک دعوت[فقط یک ساعت معتبر می باشد] به کانال بپیوندید: " . $inviteLink,
+                ]);
+            }
         } elseif (str_contains($this->getData(), "confirm_")) {
             $data = str_replace('confirm_', '', $this->getData());
             $array = explode("_",$data);
@@ -810,9 +837,10 @@ class ActionAdminServices extends TextServices
                 $array[] =['text' => "\xF0\x9F\x86\x97", 'callback_data' => 'active_' . $key_i];
             else {
                 $array[] = ['text' => "\xF0\x9F\x9A\xAF", 'callback_data' => 'delete_' . $key_i];
-                if($user->status)
-                    $array[]= ['text' => "\xE2\x9D\x8C", 'callback_data' => 'reject_' . $key_i];
-                else
+                if($user->status) {
+                    $array[] = ['text' => "\xE2\x9D\x8C", 'callback_data' => 'reject_' . $key_i];
+                    $array[] = ['text' => "\xE2\x9E\x95	\xF0\x9F\x8C\xB3", 'callback_data' => 'add_chanel_' . $key_i];
+                }else
                     $array[]= ['text' => "\xE2\x9C\x85 ", 'callback_data' => 'confirm_' . $key_i];
 
             }
