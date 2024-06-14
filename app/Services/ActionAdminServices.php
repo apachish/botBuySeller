@@ -139,9 +139,9 @@ class ActionAdminServices extends TextServices
                 $customer->status = false;
                 $customer->update();
                 $user_con = $customer->parentCustomer;
-                cache()->get("sub_customer".$user_con->id);
+                $data_menu = cache()->get("sub_customer".$user_con->id);
 
-                $this->subcustomer($user_con);
+                $this->subcustomer($user_con,$data_menu);
             }
         }
         elseif (str_contains($this->getData(), "sub_customer_")) {
