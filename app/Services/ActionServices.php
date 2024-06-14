@@ -30,7 +30,7 @@ class ActionServices extends TextServices
         if($bot_customer)
         {
             logger("bot customer",[$bot_customer]);
-            $this->service_customer = new ActionServices($bot_customer->token);
+            $this->service_customer = new TelegramServices($bot_customer->token);
         }
     }
 
@@ -323,7 +323,7 @@ class ActionServices extends TextServices
                             'text' => $message,
                         ]);
                         logger("telegram_customer",[$this->telegram_customer]);
-                        $this->service_customer->telegram_services->sendMessage(
+                        $this->service_customer->sendMessage(
                             data_get($this->getUser(), 'customer.user_id'),
                                $message,
                             );
@@ -351,7 +351,7 @@ class ActionServices extends TextServices
                     {
                         $message = str_replace($transaction_party,$transaction_party_s,$message);
                         logger("message4",[$message]);
-                        $this->service_customer->telegram_services->sendMessage(
+                        $this->service_customer->sendMessage(
                             data_get($transfer->user, 'customerUser.user_id'),
                             $message,
                         );
