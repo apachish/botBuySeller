@@ -26,12 +26,7 @@ class ActionServices extends TextServices
     public function __construct($token)
     {
         parent::__construct($token);
-        $bot_customer  = Bot::where("title","botCustomer")->first();
-        if($bot_customer)
-        {
-            logger("bot customer",[$bot_customer]);
-            $this->service_customer = new TelegramServices($bot_customer->token);
-        }
+
     }
 
     public function addCustomerLimit()
@@ -324,11 +319,7 @@ class ActionServices extends TextServices
                             'chat_id' => data_get($this->getUser(), 'customer.user_id'),
                             'text' => $message,
                         ]);
-                        logger("telegram_customer",[$this->service_customer]);
-                        $this->service_customer->sendMessage(
-                            data_get($this->getUser(), 'customer.user_id'),
-                               $message,
-                            );
+                        $this->sendBotCustomer(data_get($this->getUser(), 'customer.user_id'),$message);
 
                     }
 
@@ -353,10 +344,8 @@ class ActionServices extends TextServices
                     {
                         $message = str_replace($transaction_party,$transaction_party_s,$message);
                         logger("message4",[$message]);
-                        $this->service_customer->sendMessage(
-                            data_get($transfer->user, 'customerUser.user_id'),
-                            $message,
-                        );
+                        $this->sendBotCustomer(data_get($transfer->user, 'customerUser.user_id'),$message);
+
                     }
 
 
@@ -925,5 +914,25 @@ class ActionServices extends TextServices
 
         $price = $start_trade + ($suggest_price * 1000);
         return $price;
+    }
+
+    /**
+     * @param array|string $message
+     * @return void
+     * @throws \Telegram\Bot\Exceptions\TelegramSDKException
+     */
+    private function sendBotCustomer($chat_id,array|string $message): void
+    {
+        $bot_customer = Bot::where("title", "botCustomer")->first();
+        if ($bot_customer) {
+            logger("bot customer", [$bot_customer]);
+            $telegram_customer = new Api($bot_customer->token);
+            $telegram_customer->sendMessage(
+                [
+                    'chat_id' => $chat_id,
+                    'text' => $message,
+                ]
+            );
+        }
     }
 }
