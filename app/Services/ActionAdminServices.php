@@ -215,7 +215,8 @@ class ActionAdminServices extends TextServices
             logger("con", [$user_con, $id]);
             if ($user_con) {
                 logger("link",[
-                    'chat_id' => $this->bot->chanel_id,
+                    $this->bot_user,
+                    'chat_id' => $this->bot_user->chanel_id,
                     'expire_date' => time() + 3600, // لینک به مدت 24 ساعت معتبر است
                     'member_limit' => 1, // تعداد اعضای جدیدی که با این لینک می‌توانند بپیوندند
                 ]);
