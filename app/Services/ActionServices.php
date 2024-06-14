@@ -261,14 +261,13 @@ class ActionServices extends TextServices
                     $request_transfer["type"] = getTypeOrder(data_get($transfer,"type"))=="buy"?"sell":"buy";
 
                     RequestTransfer::create($request_transfer);
-                    if(cache()->get("transfer_accept_".$transfer_type)) {
 // گرفتن تاریخ و زمان فعلی
                         $now = Carbon::now();
 
 // تنظیم زمان به ۲۳:۵۹:۰۰ امروزی
                         $endOfDay = $now->copy()->setTime(23, 59, 0);
                         cache()->set("transfer_accept_" . $transfer_type, $transfer->price, $endOfDay);
-                    }
+
                     if ($transfer->user->role == "customer" && $this->getUser()->role =="customer") {
                         $transaction_party_req = "مشاهده فقط برای سرگروه";
                         $transaction_party_req_s = data_get($this->getUser(), 'customer.headCustomer.fullName') . "(" . data_get($this->getUser(), 'customer.fullName') . ")";
@@ -706,6 +705,7 @@ class ActionServices extends TextServices
         }
         if(data_get($parameter,"start_hours_of_operation.value"))
             $this->telegram_services->sendMessage($this->getUserId(), "تعطیل می باشد");
+        logger("old",[cache()->get("transfer_accept_".$this->getType())]);
         if(!cache()->get("transfer_accept_".$this->getType())) {
             $start_trade_s = cache()->remember("start_price_trade", now()->addDay(1), function () {
                 $value = 14000000;
