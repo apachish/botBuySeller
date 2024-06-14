@@ -894,7 +894,7 @@ class ActionAdminServices extends TextServices
         cache()->set("sub_customer".$user_con->id,$data);
         foreach ($user_con->customerUsers as $j => $cus) {
             $title = $cus->fullName;
-            $title .= $cus->user->fullName ? "(" . $cus->user->fullName . ")" : null;
+            $title .= $cus->user && $cus->user->fullName ? "(" . $cus->user->fullName . ")" : null;
             $act = $cus->status ? "\xE2\x9D\x8C" : "\xE2\x9C\x85 ";
             $keyboard[$i++] = [
                 [
