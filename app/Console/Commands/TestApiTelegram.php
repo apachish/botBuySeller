@@ -38,6 +38,8 @@ class TestApiTelegram extends Command
     public function handle()
     {
         $customer_id = (int)$this->ask('What is  customer_id?');
+        $user_con = UserTelegram::withTrashed()->where("id", $customer_id)->first();
+        dd($user_con);
         $customer = CustomerUser::with("user")->find($customer_id);
         $date = now();
         $date_p = toJalali($date, "Y_m_d");

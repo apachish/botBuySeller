@@ -185,7 +185,7 @@ class ActionAdminServices extends TextServices
                 $this->listUser($page,$message_id,$filter);
             }
         }elseif (str_contains($this->getData(), "active_")) {
-            $data = str_replace('confirm_', '', $this->getData());
+            $data = str_replace('active_', '', $this->getData());
             $array = explode("_",$data);
             $id = (int)data_get($array,0);
             $page = (int)data_get($array,1);
