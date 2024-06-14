@@ -10,6 +10,7 @@ use App\Models\Setting;
 use App\Models\Transfer;
 use App\Models\UserTelegram;
 use Carbon\Carbon;
+use Illuminate\Support\Str;
 
 class ActionAdminServices extends TextServices
 {
@@ -222,6 +223,7 @@ class ActionAdminServices extends TextServices
                 ]);
                 $response = $this->telegram->createChatInviteLink([
                     'chat_id' => $this->bot_user->chanel_id,
+                    'name' => Str::slug($user_con->fullName,"_"),
                     'expire_date' => time() + 3600, // لینک به مدت 24 ساعت معتبر است
                     'member_limit' => 1, // تعداد اعضای جدیدی که با این لینک می‌توانند بپیوندند
                 ]);
@@ -234,10 +236,7 @@ class ActionAdminServices extends TextServices
                     'text' => "لینک دعوت کانال برای کاربر ارسال شد",
                 ]);
                 // ارسال لینک دعوت به کاربر
-                $this->service_user->sendMessage([
-                    'chat_id' => $user_con->id,
-                    'text' => "لطفا با استفاده از لینک دعوت[فقط یک ساعت معتبر می باشد] به کانال بپیوندید: " . $inviteLink,
-                ]);
+                $this->service_user->sendMessage($user_con->id,"لطفا با استفاده از لینک دعوت[فقط یک ساعت معتبر می باشد] به کانال بپیوندید: " . $inviteLink);
             }
         } elseif (str_contains($this->getData(), "confirm_")) {
             $data = str_replace('confirm_', '', $this->getData());
