@@ -238,7 +238,9 @@ class ActionAdminServices extends TextServices
                     'text' => "لینک دعوت کانال برای کاربر ارسال شد",
                 ]);
                 // ارسال لینک دعوت به کاربر
-                $this->service_user->telegram_services->sendMessage($user_con->id,"لطفا با استفاده از لینک دعوت[فقط یک ساعت معتبر می باشد] به کانال بپیوندید: " . $inviteLink);
+                $message_link  = "لطفا با استفاده از لینک دعوت[فقط یک ساعت معتبر می باشد] به کانال مسافران طبیعت گردی بپیوندید: " . $inviteLink;
+                $message_link  = "\n\n " . $inviteLink;
+                $this->service_user->telegram_services->sendMessage($user_con->id,$message_link);
             }
         } elseif (str_contains($this->getData(), "confirm_")) {
             $data = str_replace('confirm_', '', $this->getData());
