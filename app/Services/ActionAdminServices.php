@@ -229,6 +229,7 @@ class ActionAdminServices extends TextServices
                     'member_limit' => 1, // تعداد اعضای جدیدی که با این لینک می‌توانند بپیوندند
                 ]);
 
+                logger("r",[$response]);
                 $inviteLink = $response->getResult()['invite_link'];
 
                 logger("link",[$inviteLink]);
