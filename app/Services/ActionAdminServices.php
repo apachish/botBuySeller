@@ -121,12 +121,13 @@ class ActionAdminServices extends TextServices
         elseif (str_contains($this->getData(), "active_sub_customer_")) {
             $data = str_replace('active_sub_customer_', '', $this->getData());
             $array = explode("_",$data);
-            $customer = CustomerUser::with("parentCustomer")->find(data_get($array,0));
+            $customer = CustomerUser::with("headCustomer")->find(data_get($array,0));
+            logger("customer",[$customer]);
             if($customer){
                 $customer->status = true;
                 $customer->update();
-                $user_con = $customer->parentCustomer;
-                cache()->get("sub_customer".$user_con->id);
+                $user_con = $customer->headCustomer;
+                cache()->get("sub_customer".$customer->user_id);
 
                 $this->subcustomer($user_con);
             }

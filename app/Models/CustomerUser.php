@@ -34,10 +34,6 @@ class CustomerUser extends Model
         return $this->belongsTo(UserTelegram::class,"user_id","id");
     }
 
-    public function parentCustomer()
-    {
-        return $this->belongsTo(UserTelegram::class,"id","user_id");
-    }
 
 
 
