@@ -134,12 +134,12 @@ class ActionAdminServices extends TextServices
         }elseif (str_contains($this->getData(), "reject_sub_customer_")) {
             $data = str_replace('reject_sub_customer_', '', $this->getData());
             $array = explode("_",$data);
-            $customer = CustomerUser::with("parentCustomer")->find(data_get($array,0));
+            $customer = CustomerUser::with("headCustomer")->find(data_get($array,0));
             if($customer){
                 $customer->status = false;
                 $customer->update();
-                $user_con = $customer->parentCustomer;
-                $data_menu = cache()->get("sub_customer".$user_con->id);
+                $user_con = $customer->headCustomer;
+                $data_menu = cache()->get("sub_customer".$customer->user_id);
 
                 $this->subcustomer($user_con,$data_menu);
             }
