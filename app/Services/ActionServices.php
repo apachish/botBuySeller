@@ -322,7 +322,7 @@ class ActionServices extends TextServices
                             'chat_id' => data_get($this->getUser(), 'customer.user_id'),
                             'text' => $message,
                         ]);
-                        logger("telegram_customer",[$this->telegram_customer]);
+                        logger("telegram_customer",[$this->service_customer]);
                         $this->service_customer->sendMessage(
                             data_get($this->getUser(), 'customer.user_id'),
                                $message,
