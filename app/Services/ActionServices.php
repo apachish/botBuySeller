@@ -698,7 +698,7 @@ class ActionServices extends TextServices
         }
         if(data_get($parameter,"start_hours_of_operation.value"))
             $this->telegram_services->sendMessage($this->getUserId(), "تعطیل می باشد");
-        if(cache()->get("transfer_accept_".$this->getType())) {
+        if(!cache()->get("transfer_accept_".$this->getType())) {
             $start_trade_s = cache()->remember("start_price_trade", now()->addDay(1), function () {
                 $value = 14000000;
                 $setting = Setting::where("key", "start_price_trade")->first();
@@ -730,6 +730,8 @@ class ActionServices extends TextServices
                 return  false;
             }
 
+        }else{
+            $start_trade_s =  (int) cache()->get("transfer_accept_".$this->getType());
         }
 
 
