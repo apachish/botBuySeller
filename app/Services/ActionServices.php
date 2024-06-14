@@ -344,7 +344,7 @@ class ActionServices extends TextServices
                     {
                         $message = str_replace($transaction_party,$transaction_party_s,$message);
                         logger("message4",[$message]);
-                        $this->sendBotCustomer(data_get($transfer->user, 'customerUser.user_id'),$message);
+                        $this->sendBotCustomer(data_get($transfer, 'user.customer.headCustomer.id'),$message);
 
                     }
 
