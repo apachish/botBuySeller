@@ -217,6 +217,7 @@ class ActionAdminServices extends TextServices
                 $fullName = $user_con->fullName ?: $user_con->first_name . " " . $user_con->last_name;
                 $user_con->status = true;
                 $user_con->change_menu = true;
+                $user_con->role = $user_con->role?:"customer";
                 $user_con->update();
                 cache()->forget("keyword_menu" . $this->key_cache_user . $user_con->id);
                 $response_text = "$fullName اکانت کاربریش فعال شد\n\n ";
@@ -241,6 +242,7 @@ class ActionAdminServices extends TextServices
                 $fullName = $user_con->fullName ?: $user_con->first_name . " " . $user_con->last_name;
                 $user_con->status = true;
                 $user_con->change_menu = true;
+                $user_con->role = $user_con->role?:"customer";
                 $user_con->deleted_at = null;
                 $user_con->update();
                 cache()->forget("keyword_menu" . $this->key_cache_user . $user_con->id);
