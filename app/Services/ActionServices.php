@@ -720,7 +720,6 @@ class ActionServices extends TextServices
             });
             logger("start", [$start_trade_s]);
             logger("end", [$end_trade_s]);
-            logger("end", [$end_trade_s]);
             // بررسی کنید که آیا طول عدد 3 یا 5 است
             if ($length === 3) {
                 $start_price = (int)data_get($start_trade_s, "start");
@@ -731,6 +730,8 @@ class ActionServices extends TextServices
                 $suggest_price = $suggest_price % 1000;
 
             }
+            logger("end", [$suggest_price]);
+
             if($suggest_price <= $start_trade_s || $suggest_price <= $end_trade_s)
             {
                 $message ="مبلغ وارد شده باید در بازه";
