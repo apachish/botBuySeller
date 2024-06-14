@@ -136,7 +136,7 @@ class TelegramServices
     }
 
 
-    public function deleteKeyboard($chatId)
+    public function deleteKeyboard($chatId,$text='منو کاربری شما تغییر  یافت')
     {
         $keyboard = [
             'remove_keyboard' => true
@@ -144,7 +144,7 @@ class TelegramServices
 
         $data = [
             'chat_id' => $chatId,
-            'text' => 'منو کاربری شما تغییر  یافت',
+            'text' => $text,
             'reply_markup' => json_encode($keyboard)
         ];
 
