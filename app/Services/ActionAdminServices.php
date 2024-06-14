@@ -730,7 +730,7 @@ class ActionAdminServices extends TextServices
         $text .= "\n\n";
         $text .= "با کلیک بر\xE2\x9D\x8C کاربر غیر فعال شده و با کلیک بر \xE2\x9C\x85 کاربرفعال گردید در صورت کلیک بر روی اسم شخص نوع کاربر از مشتری به همکار و همکار به مشتری تغییر می کنند ";
 
-        $users = UserTelegram::query();
+        $users = UserTelegram::withTrashed();
         if($filter){
             $users->where(function ($query) use ($filter){
                $query->where("fullName","like","%".$filter."%");
