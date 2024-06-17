@@ -448,7 +448,8 @@ class TextServices
             str_contains($this->data, "trade_open_report_date_") ||
             str_contains($this->data, "trade_open_report_") ||
             str_contains($this->data, "trade_open_") ||
-            str_contains($this->data, "trade_limit_close_"))
+            str_contains($this->data, "trade_limit_close_") ||
+            str_contains($this->data, "rule_accept"))
             return true;
         return false;
     }
@@ -480,6 +481,18 @@ class TextServices
         } elseif (!$this->user->mobile) {
             $text = "لطفا شماره خود را به اشتراک بگذارید";
             $this->telegram_services->sendRequestContactButton($this->getUserId(), $text);
+            cache()->set($this->key_cache . $this->user_id, "rule_accept");
+            return true;
+
+        }elseif (!$this->user->accept_rule) {
+            $text = "لطفا قوانین را مطالعه فرمایید";
+            $rule = Setting::where("key", "rule")->first();
+
+            $text .=  $rule?$rule->value:"";
+            $keyboard[0][0] = ['text' => "قوانین را خواننده و آنها را پذیرفتم", "callback_data" => "rule_accept"];
+
+            $menu = $this->getTelegramServices()->MessageReplyMarkup($this->getTelegram(), $this->getUserId(), $text, $keyboard);
+            cache()->set("rule_accept". $this->user_id,$menu);
             return true;
 
         }
@@ -557,6 +570,8 @@ class TextServices
         }
         elseif (str_contains($this->data, "request_transfer_"))
             $this->requestTransfer();
+        elseif (str_contains($this->data, "rule_accept"))
+            $this->ruleAccept();
         elseif (str_contains($this->data, "transfer_buy_"))
             $this->transferBuy();
         elseif (str_contains($this->data, "trade_limit_close_"))

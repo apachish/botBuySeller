@@ -131,7 +131,7 @@ class ActionAdminServices extends TextServices
             $message_id = cache()->get("forbidden_".$this->getUserId());
             $text = $data=="active"?"فعال شد":"غیرفعال شد";
             $this->getTelegramServices()->editMessageTextAndInlineKeyboard($this->getUserId(), $message_id, $text, []);
-
+            cache()->forget("forbidden_".$this->getUserId());
         }
 
         elseif (str_contains($this->getData(), "active_sub_customer_")) {

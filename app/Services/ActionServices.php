@@ -159,6 +159,16 @@ class ActionServices extends TextServices
         $this->telegram->sendMessage(['chat_id' => $this->getUserId(), 'text' => $text]);
     }
 
+    public function ruleAccept()
+    {
+        $text = "اطلاعات شما برای مدیر سیستم ارسال شد پس از تایید شما در گروه اضافه می شوید";
+        cache()->set($this->getKeyCache() . $this->getUserId(), "pending_accept");
+        $message_id = cache()->get("rule_accept". $this->getUserId());
+        $this->getUser()->update(["accept_rule"=>now()]);
+        $this->getTelegramServices()->editMessageTextAndInlineKeyboard($this->getUserId(), $message_id, $text, []);
+        cache()->forget("rule_accept". $this->getUserId());
+    }
+
     public function requestTransfer()
     {
         $array = str_replace('request_transfer_', '', $this->getData());
