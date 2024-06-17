@@ -295,7 +295,7 @@ class ActionServices extends TextServices
                         $transaction_party_req_s = data_get($this->getUser(), 'customer.headCustomer.fullName') . "(" . data_get($this->getUser(), 'customer.fullName') . ")";
                         $transaction_party = data_get($transfer, 'user.customerUser.headCustomer.fullName') . "(" . data_get($transfer, 'user.customerUser.fullName') . ")";
                     } elseif ($transfer->user->role == "customer" && $this->getUser()->role == "colleague") {
-                        $transaction_party_req = data_get($transfer, 'user.customerUser.headCustomer.fullName') . "(" . data_get($transfer, 'user.customerUser.fullName') . ")";
+                        $transaction_party_req = data_get($transfer, 'user.customer.headCustomer.fullName') . "(" . data_get($transfer, 'user.customer.fullName') . ")";
                         $transaction_party = "مشاهده فقط برای سرگروه";
                         $transaction_party_s = data_get($transfer, 'user.customer.headCustomer.fullName') . "(" . data_get($transfer, 'user.customer.fullName') . ")";
                     } elseif ($transfer->user->role == "colleague" && $this->getUser()->role == "colleague") {
@@ -356,8 +356,8 @@ class ActionServices extends TextServices
                     $this->telegram_services->sendMessage($transfer->user_id, $message);
                     if ($transfer->user->role == "customer") {
                         $message = str_replace($transaction_party, $transaction_party_s, $message);
-                        logger("message4", [$message]);
-                        $this->sendBotCustomer(data_get($transfer, 'user.customer.headCustomer.id'), $message);
+                        logger("message4", [data_get($transfer, 'user.customer.user_id'),$message]);
+                        $this->sendBotCustomer(data_get($transfer, 'user.customer.user_id'), $message);
 
                     }
 
