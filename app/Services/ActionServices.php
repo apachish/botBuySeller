@@ -327,7 +327,7 @@ class ActionServices extends TextServices
                     $message .= "       شماره حواله:" . data_get($request_transfer, 'remittance_number');
                     logger("message1", [$message]);
                     $this->telegram_services->sendMessage($this->getUserId(), $message);
-                    if ($this->getUser()->role == "customer") {
+                    if ($this->getUser()->role == "customer" && data_get($this->getUser(), 'customer')) {
                         $message = str_replace($transaction_party_req, $transaction_party_req_s, $message);
                         logger("message2", [
                             'chat_id' => data_get($this->getUser(), 'customer.user_id'),
@@ -354,7 +354,7 @@ class ActionServices extends TextServices
 
                     logger("message3", [$message]);
                     $this->telegram_services->sendMessage($transfer->user_id, $message);
-                    if ($transfer->user->role == "customer") {
+                    if ($transfer->user->role == "customer" && data_get($transfer, 'user.customer')) {
                         $message = str_replace($transaction_party, $transaction_party_s, $message);
                         logger("message4", [data_get($transfer, 'user.customer.user_id'),$message]);
                         $this->sendBotCustomer(data_get($transfer, 'user.customer.user_id'), $message);
