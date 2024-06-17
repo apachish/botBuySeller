@@ -22,7 +22,8 @@ use Telegram\Bot\FileUpload\InputFile;
 class ActionServices extends TextServices
 {
 
-    protected  $service_customer;
+    protected $service_customer;
+
     public function __construct($token)
     {
         parent::__construct($token);
@@ -174,7 +175,7 @@ class ActionServices extends TextServices
         logger("Transfer", [$transfer]);
         $transfer_type = getTypeOrder($transfer->type);
         if ($transfer) {
-            $forbidden = Setting::where("key", "forbidden")->where("value",true)->first();
+            $forbidden = Setting::where("key", "forbidden")->where("value", true)->first();
 
             try {
 
@@ -188,7 +189,7 @@ class ActionServices extends TextServices
 
 
                 if ($this->getUser()->role == "customer") {
-                    if($forbidden) {
+                    if ($forbidden && data_get($transfer, "user.role") == "colleague") {
                         $head = data_get($this->getUser(), "customer.user_id");
                         if ($head == $transfer->user_id) {
                             $this->telegram_services->sendMessage($this->getUserId(), "متأسفانه امکان دریافت حواله برای شما در این معامله نمی باشد");
@@ -202,7 +203,7 @@ class ActionServices extends TextServices
                         $limit_day = $customer->limit;
 
                 } elseif ($this->getUser()->role == "colleague") {
-                    if($forbidden && data_get($transfer,"user.role")=="customer") {
+                    if ($forbidden && data_get($transfer, "user.role") == "customer") {
                         $customer = data_get($transfer, "user.customer.user_id");
                         if ($this->getUserId() == $customer) {
                             $this->telegram_services->sendMessage($this->getUserId(), "متأسفانه امکان دریافت حواله برای شما در این معامله نمی باشد");
@@ -275,30 +276,30 @@ class ActionServices extends TextServices
                     $request_transfer["request_id"] = $this->getUserId();
                     $request_transfer["transfer_id"] = $transfer->id;
                     $request_transfer["price"] = $transfer->price;
-                    $request_transfer["type"] = getTypeOrder(data_get($transfer,"type"))=="buy"?"sell":"buy";
+                    $request_transfer["type"] = getTypeOrder(data_get($transfer, "type")) == "buy" ? "sell" : "buy";
 
                     RequestTransfer::create($request_transfer);
 
-                    if ($transfer->user->role == "customer" && $this->getUser()->role =="customer") {
+                    if ($transfer->user->role == "customer" && $this->getUser()->role == "customer") {
                         $transaction_party_req = "مشاهده فقط برای سرگروه";
                         $transaction_party_req_s = data_get($this->getUser(), 'customer.headCustomer.fullName') . "(" . data_get($this->getUser(), 'customer.fullName') . ")";
                         $transaction_party = "مشاهده فقط برای سرگروه";
                         $transaction_party_s = data_get($transfer, 'user.customer.headCustomer.fullName') . "(" . data_get($transfer, 'user.customer.fullName') . ")";
 
-                    }elseif($transfer->user->role == "colleague" && $this->getUser()->role =="customer"){
+                    } elseif ($transfer->user->role == "colleague" && $this->getUser()->role == "customer") {
                         $transaction_party_req = "مشاهده فقط برای سرگروه";
                         $transaction_party_req_s = data_get($this->getUser(), 'customer.headCustomer.fullName') . "(" . data_get($this->getUser(), 'customer.fullName') . ")";
                         $transaction_party = data_get($transfer, 'user.customerUser.headCustomer.fullName') . "(" . data_get($transfer, 'user.customerUser.fullName') . ")";
-                    }elseif ($transfer->user->role == "customer" && $this->getUser()->role =="colleague"){
+                    } elseif ($transfer->user->role == "customer" && $this->getUser()->role == "colleague") {
                         $transaction_party_req = data_get($transfer, 'user.customerUser.headCustomer.fullName') . "(" . data_get($transfer, 'user.customerUser.fullName') . ")";
                         $transaction_party = "مشاهده فقط برای سرگروه";
                         $transaction_party_s = data_get($transfer, 'user.customer.headCustomer.fullName') . "(" . data_get($transfer, 'user.customer.fullName') . ")";
-                    }elseif ($transfer->user->role == "colleague" && $this->getUser()->role =="colleague"){
+                    } elseif ($transfer->user->role == "colleague" && $this->getUser()->role == "colleague") {
                         $transaction_party_req = data_get($transfer, 'user.fullName');
                         $transaction_party = $this->getUser()->fullName;
                     }
 
-                    logger("tr",[
+                    logger("tr", [
                         $transaction_party,
                         $transaction_party_req,
                         $transaction_party_s,
@@ -320,16 +321,15 @@ class ActionServices extends TextServices
                     $message .= "برای:" . toJalali($transfer->date, "Y/m/d");
                     $message .= "\n\n";
                     $message .= "       شماره حواله:" . data_get($request_transfer, 'remittance_number');
-                    logger("message1",[$message]);
+                    logger("message1", [$message]);
                     $this->telegram_services->sendMessage($this->getUserId(), $message);
-                    if($this->getUser()->role =="customer")
-                    {
-                        $message = str_replace($transaction_party_req,$transaction_party_req_s,$message);
-                        logger("message2",[
+                    if ($this->getUser()->role == "customer") {
+                        $message = str_replace($transaction_party_req, $transaction_party_req_s, $message);
+                        logger("message2", [
                             'chat_id' => data_get($this->getUser(), 'customer.user_id'),
                             'text' => $message,
                         ]);
-                        $this->sendBotCustomer(data_get($this->getUser(), 'customer.user_id'),$message);
+                        $this->sendBotCustomer(data_get($this->getUser(), 'customer.user_id'), $message);
 
                     }
 
@@ -348,13 +348,12 @@ class ActionServices extends TextServices
                     $message .= "\n\n";
                     $message .= "       شماره حواله:" . data_get($request_transfer, 'remittance_number');
 
-                    logger("message3",[$message]);
+                    logger("message3", [$message]);
                     $this->telegram_services->sendMessage($transfer->user_id, $message);
-                    if($transfer->user->role =="customer")
-                    {
-                        $message = str_replace($transaction_party,$transaction_party_s,$message);
-                        logger("message4",[$message]);
-                        $this->sendBotCustomer(data_get($transfer, 'user.customer.headCustomer.id'),$message);
+                    if ($transfer->user->role == "customer") {
+                        $message = str_replace($transaction_party, $transaction_party_s, $message);
+                        logger("message4", [$message]);
+                        $this->sendBotCustomer(data_get($transfer, 'user.customer.headCustomer.id'), $message);
 
                     }
 
@@ -536,7 +535,7 @@ class ActionServices extends TextServices
 
             $message = "یکی از گزینه های زیر برای مشتری ";
             $message .= "\n\n ";
-            $message .= $customer?$customer->fullName:$this->getUser()->fullName;
+            $message .= $customer ? $customer->fullName : $this->getUser()->fullName;
             $this->telegram_services->editMessageTextAndInlineKeyboard($this->getUserId(), $message_id, $message, $keyboard);
         }
 
@@ -574,7 +573,7 @@ class ActionServices extends TextServices
                 ['text' => toJalali(now()->addDay(1), "Y/m/d"), 'callback_data' => "trade_open_report_date_" . $customer_id . "_" . $tomorrow],
             ];
             $message = ' گزارش ';
-            $message .= $customer?$customer->fullName:$this->getUser()->fullName;
+            $message .= $customer ? $customer->fullName : $this->getUser()->fullName;
             $message .= "\n\n ";
             $message .= "تاریخ های زیر را انتخاب کنید";
             $message .= "\n\n ";
@@ -595,16 +594,16 @@ class ActionServices extends TextServices
 
             $date_p = toJalali($date, "Y_m_d");
             $message = ' گزارش ';
-            $message .= $customer?$customer->fullName:$this->getUser()->fullName;
+            $message .= $customer ? $customer->fullName : $this->getUser()->fullName;
             $message .= "  تاریخ   " . toJalali($date, "Y/m/d");
             $message .= "\n\n ";
             $this->telegram_services->editMessageTextAndInlineKeyboard($this->getUserId(), $message_id, $message);
             $request_transfer = RequestTransfer::with("transfer.user")
-                ->whereDate("created_at",$date)
+                ->whereDate("created_at", $date)
                 ->where("request_id", $customer_id)->get();
-            logger("request_transfer",[$request_transfer,$customer_id,$request_transfer->count()]);
+            logger("request_transfer", [$request_transfer, $customer_id, $request_transfer->count()]);
             if ($request_transfer->count()) {
-                $customer = $customer?:$this->getUser();
+                $customer = $customer ?: $this->getUser();
 //                $pdf = Pdf::loadView('users.report_pdf', compact('date_p', 'request_transfer', 'customer'));
 //                $name_file = $customer_id . "_" . $date_p . ".pdf";
 //                $path = "app/public/report/" . $this->getUserId() . "/" ;
@@ -613,19 +612,19 @@ class ActionServices extends TextServices
 //                logger("path_re",[$path_report]);
 //                $pdf->save($path_report);
                 $mpdf = new \Mpdf\Mpdf(['tempDir' => public_path("tmp")]);
-                $html = view('users.report_pdf',compact('date_p', 'request_transfer', 'customer'))->render();
+                $html = view('users.report_pdf', compact('date_p', 'request_transfer', 'customer'))->render();
                 $mpdf->WriteHTML($html);
                 $name_file = $customer_id . "_" . $date_p . ".pdf";
-                $path = "app/public/report/" . $this->getUserId() . "/" ;
+                $path = "app/public/report/" . $this->getUserId() . "/";
                 makeDirectoryStorage($path);
-                $path_report = storage_path($path. $name_file);
-                logger("path_re",[$path_report]);
+                $path_report = storage_path($path . $name_file);
+                logger("path_re", [$path_report]);
                 $document = $mpdf->Output($path_report, 'F');
                 $response = $this->telegram->sendDocument([
                     'chat_id' => $this->getUserId(),
-                    'document' =>InputFile::create($path_report, "$date_p.pdf")
+                    'document' => InputFile::create($path_report, "$date_p.pdf")
                 ]);
-                logger("sendDocument",[$response]);
+                logger("sendDocument", [$response]);
 
             } else {
                 $this->telegram->sendMessage(['chat_id' => $this->getUserId(), 'text' => 'معاله ای در این تاریخ انجام نشده']);
@@ -686,41 +685,40 @@ class ActionServices extends TextServices
     {
         $suggest_price = $this->getPrice();
 
-        $parameter = cache()->remember("parameter_need",now()->setTime(23,59),function (){
-           return Setting::whereIn("key",["start_hours_of_operation","end_hours_of_operation","vacation"])->get()->keyBy("key");
+        $parameter = cache()->remember("parameter_need", now()->setTime(23, 59), function () {
+            return Setting::whereIn("key", ["start_hours_of_operation", "end_hours_of_operation", "vacation"])->get()->keyBy("key");
         });
-        if(data_get($parameter,"vacation.value"))
-        {
+        if (data_get($parameter, "vacation.value")) {
             $this->telegram_services->sendMessage($this->getUserId(), "تعطیل می باشد");
-            return  false;
+            return false;
         }
         // گرفتن زمان فعلی
         $now = Carbon::now();
 
 // تعریف زمان 09:00 امروز
-        $array_time_s  = explode(":",data_get($parameter,"start_hours_of_operation.value","09:00"));
-        $array_time_e  = explode(":",data_get($parameter,"end_hours_of_operation.value","22:00"));
-        $start_time = Carbon::createFromTime(data_get($array_time_s,0), data_get($array_time_s,1), 0);
-        $end_time = Carbon::createFromTime(data_get($array_time_e,0), data_get($array_time_e,1), 0);
+        $array_time_s = explode(":", data_get($parameter, "start_hours_of_operation.value", "09:00"));
+        $array_time_e = explode(":", data_get($parameter, "end_hours_of_operation.value", "22:00"));
+        $start_time = Carbon::createFromTime(data_get($array_time_s, 0), data_get($array_time_s, 1), 0);
+        $end_time = Carbon::createFromTime(data_get($array_time_e, 0), data_get($array_time_e, 1), 0);
 
 // چک کردن اینکه آیا زمان فعلی قبل یا بعد از 09:00 است
-        logger("start time",[$start_time,$end_time,$now->lessThan($start_time),$now->greaterThan($end_time)]);
+        logger("start time", [$start_time, $end_time, $now->lessThan($start_time), $now->greaterThan($end_time)]);
         if ($now->lessThan($start_time)) {
             $message_s = " زمان شروع بازار ";
-            $message_s .= data_get($parameter,"start_hours_of_operation.value","09:00");
+            $message_s .= data_get($parameter, "start_hours_of_operation.value", "09:00");
             $message_s .= "می باشد";
             $this->telegram_services->sendMessage($this->getUserId(), $message_s);
-            return  false;
+            return false;
         } elseif ($now->greaterThan($end_time)) {
             $this->telegram_services->sendMessage($this->getUserId(), "تعطیل می باشد");
-            return  false;
+            return false;
         }
 
-        $last_transfer = Transfer::where("type",$this->getType())
-            ->whereIn("status",[Transfer::STATUS_ACTIVE_DO,Transfer::STATUS_ACTIVE_DONE])
-            ->orderBy("update_at","DESC")->first();
-        logger("old",[$last_transfer]);
-        if(!$last_transfer) {
+        $last_transfer = Transfer::where("type", $this->getType())
+            ->whereIn("status", [Transfer::STATUS_ACTIVE_DO, Transfer::STATUS_ACTIVE_DONE])
+            ->orderBy("update_at", "DESC")->first();
+        logger("old", [$last_transfer]);
+        if (!$last_transfer) {
             $start_trade_s = cache()->remember("start_price_trade", now()->addDay(1), function () {
                 $value = 14000000;
                 $setting = Setting::where("key", "start_price_trade")->first();
@@ -738,11 +736,10 @@ class ActionServices extends TextServices
             logger("start", [$start_trade_s]);
             logger("end", [$end_trade_s]);
             $price = $this->getPriceTrade($suggest_price, $start_trade_s);
-            logger("end", [$price,$price < $start_trade_s , $price > $end_trade_s]);
+            logger("end", [$price, $price < $start_trade_s, $price > $end_trade_s]);
 
-            if($price < $start_trade_s || $price > $end_trade_s)
-            {
-                $message ="مبلغ وارد شده باید در بازه";
+            if ($price < $start_trade_s || $price > $end_trade_s) {
+                $message = "مبلغ وارد شده باید در بازه";
                 $message .= "\n\n";
                 $message .= $start_trade_s;
                 $message .= "\n\n";
@@ -751,11 +748,11 @@ class ActionServices extends TextServices
                 $message .= $end_trade_s;
 
                 $this->telegram_services->sendMessage($this->getUserId(), $message);
-                return  false;
+                return false;
             }
 
-        }else{
-            $start_trade_s =  (int) $last_transfer->price;
+        } else {
+            $start_trade_s = (int)$last_transfer->price;
             $price = $this->getPriceTrade($suggest_price, $start_trade_s);
 
         }
@@ -935,7 +932,7 @@ class ActionServices extends TextServices
      * @return void
      * @throws \Telegram\Bot\Exceptions\TelegramSDKException
      */
-    private function sendBotCustomer($chat_id,array|string $message): void
+    private function sendBotCustomer($chat_id, array|string $message): void
     {
         $bot_customer = Bot::where("title", "botCustomer")->first();
         if ($bot_customer) {
