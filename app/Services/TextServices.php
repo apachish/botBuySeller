@@ -473,6 +473,10 @@ class TextServices
 
     public function actionByMessage()
     {
+        if($this->getMessage() == "قوانین را خواننده و آنها را پذیرفتم") {
+            $this->ruleAccept();
+            return true;
+        }
         if (!$this->user->fullName) {
             $text = " لطفا نام و نام خانوادگی وارد کنید";
             cache()->set($this->key_cache . $this->user_id, "add_fullName");
@@ -497,10 +501,7 @@ class TextServices
             return true;
 
         }
-        if($this->getMessage() == "قوانین را خواننده و آنها را پذیرفتم") {
-            $this->ruleAccept();
-            return true;
-        }
+
 
         /*
        * check message
