@@ -124,7 +124,16 @@ class ActionServices extends TextServices
                 $text = "نام و نام خانوادگی خود را وارد کنید";
                 cache()->set($this->getKeyCache() . $this->getUserId(), "add_fullName");
                 $this->telegram->sendMessage(['chat_id' => $this->getUserId(), 'text' => $text]);
-            } elseif (!$this->getUser()->status) {
+            } elseif (!$this->getUser()->accept_rule) {
+                $text = "لطفا قوانین را مطالعه فرمایید";
+                $rule = Setting::where("key", "rule")->first();
+
+                $text .=  $rule?$rule->value:"";
+                $keyboard[0][0] = ['text' => "قوانین را خواننده و آنها را پذیرفتم", "callback_data" => "rule_accept"];
+
+                $menu = $this->getTelegramServices()->MessageReplyMarkup($this->getTelegram(), $this->getUserId(), $text, $keyboard);
+                cache()->set("rule_accept". $this->getUserId(),$menu);
+            }elseif (!$this->getUser()->status) {
                 cache()->set($this->getKeyCache() . $this->getUserId(), "pending_accept");
                 $text = "منتظر تایید مدیر سیستم باشید تا دسترسی به شما ارائه گردد";
                 $this->telegram->sendMessage(['chat_id' => $this->getUserId(), 'text' => $text]);
