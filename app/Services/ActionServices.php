@@ -129,7 +129,7 @@ class ActionServices extends TextServices
                 $rule = Setting::where("key", "rule")->first();
 
                 $text .=  $rule?$rule->value:"";
-                $keyboard[0][0] = ['text' => "قوانین را خواننده و آنها را پذیرفتم", "callback_data" => "rule_accept"];
+                $keyboard[0][0] = ['text' => "قوانین را خواننده و آنها را پذیرفتم"];
                 TelegramServices::menu($this->telegram, $keyboard, $this->getUser(), $text);
                 cache()->forget($this->getKeyCache() . $this->getUserId());
 //                $menu = $this->getTelegramServices()->MessageReplyMarkup($this->getTelegram(), $this->getUserId(), $text, $keyboard);
@@ -171,6 +171,7 @@ class ActionServices extends TextServices
 
     public function ruleAccept()
     {
+        logger("accept rule");
         $text = "اطلاعات شما برای مدیر سیستم ارسال شد پس از تایید شما در گروه اضافه می شوید";
         cache()->set($this->getKeyCache() . $this->getUserId(), "pending_accept");
 //        $message_id = cache()->get("rule_accept". $this->getUserId());
