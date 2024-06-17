@@ -177,6 +177,7 @@ class ActionServices extends TextServices
         if ($transfer) {
             $forbidden = Setting::where("key", "forbidden")->where("value", true)->first();
 
+            logger("forbidden",[$forbidden]);
             try {
 
                 $limit_day = null;
@@ -191,6 +192,7 @@ class ActionServices extends TextServices
                 if ($this->getUser()->role == "customer") {
                     if ($forbidden && data_get($transfer, "user.role") == "colleague") {
                         $head = data_get($this->getUser(), "customer.user_id");
+                        logger("head",[$head,data_get($this->getUser(), "customer")]);
                         if ($head == $transfer->user_id) {
                             $this->telegram_services->sendMessage($this->getUserId(), "متأسفانه امکان دریافت حواله برای شما در این معامله نمی باشد");
                             return true;
@@ -205,6 +207,8 @@ class ActionServices extends TextServices
                 } elseif ($this->getUser()->role == "colleague") {
                     if ($forbidden && data_get($transfer, "user.role") == "customer") {
                         $customer = data_get($transfer, "user.customer.user_id");
+                        logger("head",[$customer,data_get($transfer, "user.customer")]);
+
                         if ($this->getUserId() == $customer) {
                             $this->telegram_services->sendMessage($this->getUserId(), "متأسفانه امکان دریافت حواله برای شما در این معامله نمی باشد");
                             return true;
