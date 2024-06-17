@@ -529,7 +529,7 @@ class ActionAdminServices extends TextServices
                     $response_text = "ساعت شروع تنظیم شد:";
                     $response_text .= "\n\n";
                     $response_text .= "\n\n";
-                    $response_text .= number_format(data_get($hours_of_operation, "value"), 0);
+                    $response_text .= data_get($hours_of_operation, "value")
                     $response_text .= "\n\n";
                 } else {
                     $response_text = " شروع  وارد شده باید به صورت \n\n";
@@ -546,7 +546,7 @@ class ActionAdminServices extends TextServices
                     $response_text = "ساعت پایان تنظیم شد:";
                     $response_text .= "\n\n";
                     $response_text .= "\n\n";
-                    $response_text .= number_format(data_get($hours_of_operation, "value"), 0);
+                    $response_text .= data_get($hours_of_operation, "value");
                     $response_text .= "\n\n";
                 } else {
                     $response_text = " پایان  وارد شده باید به صورت \n\n";
