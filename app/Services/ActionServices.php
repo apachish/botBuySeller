@@ -697,8 +697,6 @@ class ActionServices extends TextServices
             $this->telegram_services->sendMessage($this->getUserId(), "تعطیل می باشد");
             return  false;
         }
-        if(data_get($parameter,"start_hours_of_operation.value"))
-            $this->telegram_services->sendMessage($this->getUserId(), "تعطیل می باشد");
 
         $last_transfer = Transfer::where("type",$this->getType())
             ->whereIn("status",[Transfer::STATUS_ACTIVE_DO,Transfer::STATUS_ACTIVE_DONE])
