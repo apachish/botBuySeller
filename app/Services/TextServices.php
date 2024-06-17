@@ -496,6 +496,10 @@ class TextServices
             return true;
 
         }
+        if($this->getMessage() == "قوانین را خواننده و آنها را پذیرفتم") {
+            $this->ruleAccept();
+            return true;
+        }
 
         /*
        * check message
