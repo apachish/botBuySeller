@@ -175,7 +175,7 @@ class ActionServices extends TextServices
         $text = "اطلاعات شما برای مدیر سیستم ارسال شد پس از تایید شما در گروه اضافه می شوید";
         cache()->set($this->getKeyCache() . $this->getUserId(), "pending_accept");
 //        $message_id = cache()->get("rule_accept". $this->getUserId());
-        $this->getUser()->update(["accept_rule"=>now()]);
+        $this->getUser()->update(["accept_rule"=>now()->format("Y-m-d H:i")]);
         $this->telegram_services->deleteKeyboard($this->getUserId(),$text);
 //        $this->getTelegramServices()->editMessageTextAndInlineKeyboard($this->getUserId(), $message_id, $text, []);
 //        cache()->forget("rule_accept". $this->getUserId());
