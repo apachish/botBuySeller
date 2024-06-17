@@ -286,18 +286,37 @@ class ActionServices extends TextServices
 
                     if ($transfer->user->role == "customer" && $this->getUser()->role == "customer") {
                         $transaction_party_req = "مشاهده فقط برای سرگروه";
-                        $transaction_party_req_s = data_get($this->getUser(), 'customer.headCustomer.fullName') . "(" . data_get($this->getUser(), 'customer.fullName') . ")";
+                        if(data_get($transfer, 'user.customer')) {
+                            $transaction_party_req_s = data_get($transfer, 'user.customer.headCustomer.fullName');
+                            $transaction_party_req_s .= "(" . data_get($transfer, 'user.customer.fullName') . ")";
+                        }else
+                            $transaction_party_req_s = data_get($transfer, 'user.fullName');
+
                         $transaction_party = "مشاهده فقط برای سرگروه";
-                        $transaction_party_s = data_get($transfer, 'user.customer.headCustomer.fullName') . "(" . data_get($transfer, 'user.customer.fullName') . ")";
+                        if(data_get($this->getUser(), 'customer')) {
+                            $transaction_party_s = data_get($this->getUser(), 'customer.headCustomer.fullName');
+                            $transaction_party_s .= "(" . data_get($this->getUser(), 'customer.fullName') . ")";
+                        }else
+                            $transaction_party_s = data_get($transfer, 'user.fullName');
 
                     } elseif ($transfer->user->role == "colleague" && $this->getUser()->role == "customer") {
                         $transaction_party_req = "مشاهده فقط برای سرگروه";
-                        $transaction_party_req_s = data_get($this->getUser(), 'customer.headCustomer.fullName') . "(" . data_get($this->getUser(), 'customer.fullName') . ")";
-                        $transaction_party = data_get($transfer, 'user.customerUser.headCustomer.fullName') . "(" . data_get($transfer, 'user.customerUser.fullName') . ")";
+                        if(data_get($transfer, 'customer.headCustomer'))
+                            $transaction_party_req_s = data_get($transfer, 'user.fullName');
+                        if(data_get($this->getUser(), 'customer')) {
+                            $transaction_party = data_get($this->getUser(), 'user.customer.headCustomer.fullName');
+                            $transaction_party .= "(" . data_get($this->getUser(), 'user.customerUser.fullName') . ")";
+                        }else
+                            $transaction_party = data_get($this->getUser(),'fullName');
                     } elseif ($transfer->user->role == "customer" && $this->getUser()->role == "colleague") {
-                        $transaction_party_req = data_get($transfer, 'user.customer.headCustomer.fullName') . "(" . data_get($transfer, 'user.customer.fullName') . ")";
+                        if( data_get($transfer, 'user.customer')) {
+                            $transaction_party_req = data_get($transfer, 'user.customer.headCustomer.fullName') ;
+                            $transaction_party_req .= "(" . data_get($transfer, 'user.customer.fullName') . ")";
+                        }else
+                            $transaction_party_req = data_get($transfer, 'user.fullName') ;
+
                         $transaction_party = "مشاهده فقط برای سرگروه";
-                        $transaction_party_s = data_get($transfer, 'user.customer.headCustomer.fullName') . "(" . data_get($transfer, 'user.customer.fullName') . ")";
+                        $transaction_party_s = data_get($this->getUser(), 'fullName');
                     } elseif ($transfer->user->role == "colleague" && $this->getUser()->role == "colleague") {
                         $transaction_party_req = data_get($transfer, 'user.fullName');
                         $transaction_party = $this->getUser()->fullName;
