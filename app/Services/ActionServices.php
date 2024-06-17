@@ -687,6 +687,7 @@ class ActionServices extends TextServices
         $end_time = Carbon::createFromTime(data_get($array_time_e,0), data_get($array_time_e,1), 0);
 
 // چک کردن اینکه آیا زمان فعلی قبل یا بعد از 09:00 است
+        logger("start time",[$start_time,$end_time,$now->lessThan($start_time),$now->greaterThan($end_time)]);
         if ($now->lessThan($start_time)) {
             $message_s = " زمان شروع بازار ";
             $message_s .= data_get($parameter,"start_hours_of_operation.value","09:00");

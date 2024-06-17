@@ -116,6 +116,22 @@ class ActionAdminServices extends TextServices
             logger("aa", [$data_old, $message_id, $page]);
             if ($message_id)
                 $this->listUser($page, $message_id,$filter);
+        } elseif (str_contains($this->getData(), "forbidden_")) {
+            $data = str_replace('forbidden_', '', $this->getData());
+            $value = $data=="active"?true:false;
+            $forbidden = Setting::where("key", "forbidden")->first();
+            if($forbidden)
+                $forbidden->update(["value"=>$value]);
+            else{
+                Setting::create([
+                    "key"=>"forbidden",
+                    "value"=>$value,
+                ]);
+            }
+            $message_id = cache()->get("forbidden_".$this->getUserId());
+            $text = $data=="active"?"فعال شد":"غیرفعال شد";
+            $this->getTelegramServices()->editMessageTextAndInlineKeyboard($this->getUserId(), $message_id, $text, []);
+
         }
 
         elseif (str_contains($this->getData(), "active_sub_customer_")) {
@@ -454,6 +470,25 @@ class ActionAdminServices extends TextServices
                 cache()->set($this->getKeyCache() . $this->getUserId(), "help");
 
                 $this->getTelegramServices()->sendMessage($this->getUserId(), $response_text);
+                break;
+                case  "\xF0\x9F\x9A\xAB\xF0\x9F\x9A\xBBممنوع معامله":
+                $forbidden = Setting::where("key", "forbidden")->first();
+
+                if ($forbidden) {
+                    $response_text = $forbidden->value?"فعال":"غیرفعال";
+
+                    $response_text .= "\n\n";
+                    $response_text .= "معامله همکار و مشتری";
+                } else
+                    $response_text = "مشخص کنید معامله مشتری و همکار چگونه می باشد";
+
+                    $keyboard[0][0] = ['text' => "فعال", "callback_data" => "forbidden_active"];
+                    $keyboard[0][1] = ['text' => "غیرفعال", "callback_data" => "forbidden_deactivate"];
+
+                    $menu = $this->getTelegramServices()->MessageReplyMarkup($this->getTelegram(), $this->getUserId(), $response_text, $keyboard);
+                    cache()->set("forbidden_".$this->getUserId(), $menu);
+
+                    $this->getTelegramServices()->sendMessage($this->getUserId(), $response_text);
                 break;
             case  "\xF0\x9F\x92\xB3\xF0\x9F\x8C\xB3ویرایش حق اشتراک":
                 $rule = Setting::where("key", "membership")->first();
