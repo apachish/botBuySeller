@@ -166,7 +166,7 @@ class ActionServices extends TextServices
         $id = data_get($info, 0);
         $num = (int)data_get($info, 1);
         logger("request", [$num, $id]);
-        $transfer = Transfer::with("user")->find($id);
+        $transfer = Transfer::with("user.customer")->find($id);
 
         if ($transfer->user_id == $this->getUserId()) {
             $this->telegram_services->sendMessage($this->getUserId(), "متأسفانه امکان دریافت حواله برای شما در این معامله نمی باشد");
