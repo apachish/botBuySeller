@@ -166,6 +166,7 @@ class ActionServices extends TextServices
         $num = (int)data_get($info, 1);
         logger("request", [$num, $id]);
         $transfer = Transfer::find($id);
+
         if ($transfer->user_id == $this->getUserId()) {
             $this->telegram_services->sendMessage($this->getUserId(), "متأسفانه امکان دریافت حواله برای شما در این معامله نمی باشد");
             return true;
@@ -173,6 +174,8 @@ class ActionServices extends TextServices
         logger("Transfer", [$transfer]);
         $transfer_type = getTypeOrder($transfer->type);
         if ($transfer) {
+            $forbidden = Setting::where("key", "forbidden")->where("value",true)->first();
+
             try {
 
                 $limit_day = null;
@@ -185,6 +188,13 @@ class ActionServices extends TextServices
 
 
                 if ($this->getUser()->role == "customer") {
+                    if($forbidden) {
+                        $head = data_get($this->getUser(), "customer.user_id");
+                        if ($head == $transfer->user_id) {
+                            $this->telegram_services->sendMessage($this->getUserId(), "متأسفانه امکان دریافت حواله برای شما در این معامله نمی باشد");
+                            return true;
+                        }
+                    }
                     logger("customer", [$this->getUser()->role]);
                     $customer = CustomerUser::where("mobile", $this->getUser()->mobile)->first();
                     logger("limit customer", [$customer]);
@@ -192,6 +202,13 @@ class ActionServices extends TextServices
                         $limit_day = $customer->limit;
 
                 } elseif ($this->getUser()->role == "colleague") {
+                    if($forbidden && data_get($transfer,"user.role")=="customer") {
+                        $customer = data_get($transfer, "user.customer.user_id");
+                        if ($this->getUserId() == $customer) {
+                            $this->telegram_services->sendMessage($this->getUserId(), "متأسفانه امکان دریافت حواله برای شما در این معامله نمی باشد");
+                            return true;
+                        }
+                    }
                     $user_request = UserTradeAccess::where("user_id", $this->getUserId())
                         ->where("user_trade_id", $transfer->user_id)->first();
                     $user_transfer = UserTradeAccess::where("user_id", $transfer->user_id)
