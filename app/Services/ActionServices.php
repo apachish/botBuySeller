@@ -130,9 +130,9 @@ class ActionServices extends TextServices
 
                 $text .=  $rule?$rule->value:"";
                 $keyboard[0][0] = ['text' => "قوانین را خواننده و آنها را پذیرفتم", "callback_data" => "rule_accept"];
-
-                $menu = $this->getTelegramServices()->MessageReplyMarkup($this->getTelegram(), $this->getUserId(), $text, $keyboard);
-                cache()->set("rule_accept". $this->getUserId(),$menu);
+                TelegramServices::menu($this->telegram, $keyboard, $this->getUser(), $text);
+//                $menu = $this->getTelegramServices()->MessageReplyMarkup($this->getTelegram(), $this->getUserId(), $text, $keyboard);
+//                cache()->set("rule_accept". $this->getUserId(),$menu);
             }elseif (!$this->getUser()->status) {
                 cache()->set($this->getKeyCache() . $this->getUserId(), "pending_accept");
                 $text = "منتظر تایید مدیر سیستم باشید تا دسترسی به شما ارائه گردد";
@@ -172,10 +172,11 @@ class ActionServices extends TextServices
     {
         $text = "اطلاعات شما برای مدیر سیستم ارسال شد پس از تایید شما در گروه اضافه می شوید";
         cache()->set($this->getKeyCache() . $this->getUserId(), "pending_accept");
-        $message_id = cache()->get("rule_accept". $this->getUserId());
+//        $message_id = cache()->get("rule_accept". $this->getUserId());
         $this->getUser()->update(["accept_rule"=>now()]);
-        $this->getTelegramServices()->editMessageTextAndInlineKeyboard($this->getUserId(), $message_id, $text, []);
-        cache()->forget("rule_accept". $this->getUserId());
+        $this->telegram_services->deleteKeyboard($this->getUserId(),$text);
+//        $this->getTelegramServices()->editMessageTextAndInlineKeyboard($this->getUserId(), $message_id, $text, []);
+//        cache()->forget("rule_accept". $this->getUserId());
     }
 
     public function requestTransfer()
