@@ -401,7 +401,7 @@ class TextServices
             "\xE2\x9A\xA0\xE2\x9D\x8Cغیرفعال سازی تایید دو مرحله ای",
             "\xE2\x9C\x8Cفعال سازی دو مرحله ای",
             "\xE2\x9D\x8Cغیر فعال فوری",
-            "قوانین را خواننده و آنها را پذیرفتم",
+            "قوانین را خوانده و آنها را پذیرفتم",
         ];
         if (in_array($this->message, $accept))
             return true;
@@ -474,8 +474,8 @@ class TextServices
 
     public function actionByMessage()
     {
-        logger("as",[$this->getMessage() == "قوانین را خواننده و آنها را پذیرفتم"]);
-        if($this->getMessage() == "قوانین را خواننده و آنها را پذیرفتم") {
+        logger("as",[$this->getMessage() == "قوانین را خوانده و آنها را پذیرفتم"]);
+        if($this->getMessage() == "قوانین را خوانده و آنها را پذیرفتم") {
             logger("aaa");
             $this->ruleAccept();
             return true;
@@ -496,7 +496,7 @@ class TextServices
             $rule = Setting::where("key", "rule")->first();
 
             $text .=  $rule?$rule->value:"";
-            $keyboard[0][0] = ['text' => "قوانین را خواننده و آنها را پذیرفتم"];
+            $keyboard[0][0] = ['text' => "قوانین را خوانده و آنها را پذیرفتم"];
             TelegramServices::menu($this->telegram, $keyboard, $this->getUser(), $text);
             cache()->forget($this->getKeyCache() . $this->getUserId());
 //            $menu = $this->getTelegramServices()->MessageReplyMarkup($this->getTelegram(), $this->getUserId(), $text, $keyboard);
