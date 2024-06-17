@@ -166,7 +166,7 @@ class ActionServices extends TextServices
         $id = data_get($info, 0);
         $num = (int)data_get($info, 1);
         logger("request", [$num, $id]);
-        $transfer = Transfer::find($id);
+        $transfer = Transfer::with("user")->find($id);
 
         if ($transfer->user_id == $this->getUserId()) {
             $this->telegram_services->sendMessage($this->getUserId(), "متأسفانه امکان دریافت حواله برای شما در این معامله نمی باشد");
@@ -192,7 +192,7 @@ class ActionServices extends TextServices
                 if ($this->getUser()->role == "customer") {
                     if ($forbidden && data_get($transfer, "user.role") == "colleague") {
                         $head = data_get($this->getUser(), "customer.user_id");
-                        logger("head",[$head,data_get($this->getUser(), "customer")]);
+                        logger("head cus",[$head,data_get($this->getUser(), "customer")]);
                         if ($head == $transfer->user_id) {
                             $this->telegram_services->sendMessage($this->getUserId(), "متأسفانه امکان دریافت حواله برای شما در این معامله نمی باشد");
                             return true;
