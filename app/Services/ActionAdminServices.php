@@ -487,9 +487,7 @@ class ActionAdminServices extends TextServices
 
                     $menu = $this->getTelegramServices()->MessageReplyMarkup($this->getTelegram(), $this->getUserId(), $response_text, $keyboard);
                     cache()->set("forbidden_".$this->getUserId(), $menu);
-
-                    $this->getTelegramServices()->sendMessage($this->getUserId(), $response_text);
-                break;
+                    break;
             case  "\xF0\x9F\x92\xB3\xF0\x9F\x8C\xB3ویرایش حق اشتراک":
                 $rule = Setting::where("key", "membership")->first();
 
