@@ -401,6 +401,7 @@ class TextServices
             "\xE2\x9A\xA0\xE2\x9D\x8Cغیرفعال سازی تایید دو مرحله ای",
             "\xE2\x9C\x8Cفعال سازی دو مرحله ای",
             "\xE2\x9D\x8Cغیر فعال فوری",
+            "قوانین را خواننده و آنها را پذیرفتم",
         ];
         if (in_array($this->message, $accept))
             return true;
