@@ -261,7 +261,7 @@ class ActionAdminServices extends TextServices
                     'text' => "لینک دعوت کانال برای کاربر ارسال شد",
                 ]);
                 // ارسال لینک دعوت به کاربر
-                $message_link  = "لطفا با استفاده از لینک دعوت[فقط یک ساعت معتبر می باشد] به کانال مسافران طبیعت گردی بپیوندید: " . $inviteLink;
+                $message_link  = "لطفا با استفاده از لینک دعوت[فقط یک ساعت معتبر می باشد] به کانال  ".env("APP_NAME")." بپیوندید: " . $inviteLink;
                 $message_link  = "\n\n " . $inviteLink;
                 $this->service_user->telegram_services->sendMessage($user_con->id,$message_link);
             }

@@ -733,7 +733,7 @@ class TextServices
     {
             $this->telegram->sendMessage([
                 'chat_id' => $this->user_id,
-                'text' => 'خوش آمدید! به طبیعت گردی.'
+                'text' => 'خوش آمدید! به '.env("APP_NAME").'.'
             ]);
 
     }
