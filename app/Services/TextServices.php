@@ -24,6 +24,7 @@ class TextServices
     protected $list_type_normal= ["فف","خف","خ","ف"];
     protected $list_type_floating = ["خفش","ففش","خش","فش"];
     protected $list_type_cash = ["خفن","ففن","خن","فن"];
+    protected $list_type_cash_n = ["خن","فن"];
     protected $list_type_reverse = ["خفپ","ففپ","ففم","خفم","فم","خم","خپ","فپ"];
 
     private $type;
