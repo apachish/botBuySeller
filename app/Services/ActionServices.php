@@ -868,7 +868,7 @@ class ActionServices extends TextServices
                 $message_request .= " \xE2\x98\x80	";
                 $message_request_me .= " \xE2\x98\x80	";
                 $date = now()->format("Y-m-d");
-            }if ($time->between($morning, $none_16, true) && !in_array($this->getType(), $this->list_type_tommarow) && in_array($this->list_type_cash_n)) {
+            }if ($time->between($morning, $none_16, true) && !in_array($this->getType(), $this->list_type_tommarow) && in_array($this->getType(),$this->list_type_cash_n)) {
                 $message .= " \xE2\x98\x80	";
                 $message_request .= " \xE2\x98\x80	";
                 $message_request_me .= " \xE2\x98\x80	";
@@ -888,7 +888,7 @@ class ActionServices extends TextServices
             $message_request_me .= "فی:";
             $message_request_me .= number_format($price, 0);
             if (in_array($this->getType(), $this->list_type_cash)) {
-                if ($time->between($morning, $none_16, true) && in_array($this->list_type_cash_n))
+                if ($time->between($morning, $none_16, true) && in_array($this->getType(),$this->list_type_cash_n))
                     $message .= " نقدی حاضر ";
                 else
                     $message .= " بی حواله فردا";
