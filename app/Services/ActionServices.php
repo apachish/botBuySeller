@@ -471,9 +471,14 @@ class ActionServices extends TextServices
         if ($word == null) return false;
 
         if ($check == "true") {
-            Transfer::where("user_id", $this->getUserId())
+            $transfer_olds = Transfer::where("user_id", $this->getUserId())
                 ->where("type", data_get($word, "type"))
-                ->delete();
+                ->get();
+            foreach ($transfer_olds as $row_delet) {
+                $message = $row_delet->message . "\xF0\x9F\x95\x9B	";
+                $this->telegram_services->editMessageTextAndInlineKeyboard($this->bot->chanel_id, $row_delet->message_id, $message);
+                $row_delet->delete();
+            }
             $word->status = WordTelegram::STATUS_ACCEPT;
             $word->update();
             $order = [
@@ -850,6 +855,7 @@ class ActionServices extends TextServices
             $time = Carbon::now();
             $morning = Carbon::create($time->year, $time->month, $time->day, 9, 0, 0); //set time to 08:00
             $none = Carbon::create($time->year, $time->month, $time->day, 15, 00, 0); //set time to 18:00
+            $none_16 = Carbon::create($time->year, $time->month, $time->day, 16, 00, 0); //set time to 18:00
             logger("check day", [
                 $time->between($morning, $none, true),
                 (
@@ -863,9 +869,9 @@ class ActionServices extends TextServices
                 $message_request_me .= " \xE2\x98\x80	";
                 $date = now()->format("Y-m-d");
             } else {
-                $message .= " \xE2\x8F\xB3	";
-                $message_request .= " \xE2\x8F\xB3	";
-                $message_request_me .= " \xE2\x8F\xB3	";
+                $message .= " 🕰️	";
+                $message_request .= " 🕰️	";
+                $message_request_me .= " 🕰️	";
                 $date = now()->addDay(1)->format("Y-m-d");
             }
 
@@ -875,21 +881,22 @@ class ActionServices extends TextServices
             $message_request_me .= "\n\n";
             $message_request_me .= "فی:";
             $message_request_me .= number_format($price, 0);
-            if (str_contains($this->getType(), "ن")) {
-                $message .= " بی حواله ";
-                if (!$time->between($morning, $none, true) ||
-                    in_array($this->getType(), $this->list_type_sell_n_buy_tom))
-                    $message .= " فردا ";
-                $message .= "\xF0\x9F\x92\xB0	\xF0\x9F\x92\xB5	";
+            if (in_array($this->getType(), $this->list_type_cash)) {
+                if ($time->between($morning, $none_16, true))
+                    $message .= " نقدی حاضر ";
+                else
+                    $message .= " بی حواله فردا";
+
+                $message .= "\xF0\x9F\x92\xB0	";
 
             } else
                 $message .= "با حواله";
             $message .= $number;
             $message .= " تا ";
             if (in_array($this->getType(), $this->list_type_floating))
-                $message .= " شنا ";
+                $message .= "\xE2\xAC\x86	 شنا ";
             elseif (in_array($this->getType(), $this->list_type_reverse))
-                $message .= " معکوس ";
+                $message .= "\xE2\xAC\x87	 معکوس ";
 
 
             if ($this->getDescription()) {
