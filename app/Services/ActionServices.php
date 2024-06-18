@@ -195,7 +195,7 @@ class ActionServices extends TextServices
             return true;
         }
         elseif($this->getUser()->verify_two && cache()->get("double_click_".$id."_".$this->getUserId()))
-            {cache()->forget("double_click_".$id."_".$this->getUserId());
+            cache()->forget("double_click_".$id."_".$this->getUserId());
         $transfer = Transfer::with("user.customer")->find($id);
 
         if ($transfer->user_id == $this->getUserId()) {
