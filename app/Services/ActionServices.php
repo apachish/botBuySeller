@@ -183,11 +183,19 @@ class ActionServices extends TextServices
 
     public function requestTransfer()
     {
+
         $array = str_replace('request_transfer_', '', $this->getData());
         $info = explode("_", $array);
         $id = data_get($info, 0);
         $num = (int)data_get($info, 1);
         logger("request", [$num, $id]);
+        if($this->getUser()->verify_two && !cache()->get("double_click_".$id."_".$this->getUserId()))
+        {
+            cache()->set("double_click_".$id."_".$this->getUserId(),1,now()->addSecond(5));
+            return true;
+        }
+        elseif($this->getUser()->verify_two && cache()->get("double_click_".$id."_".$this->getUserId()))
+            {cache()->forget("double_click_".$id."_".$this->getUserId());
         $transfer = Transfer::with("user.customer")->find($id);
 
         if ($transfer->user_id == $this->getUserId()) {
