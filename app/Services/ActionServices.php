@@ -475,7 +475,7 @@ class ActionServices extends TextServices
                 ->where("type", data_get($word, "type"))
                 ->get();
             foreach ($transfer_olds as $row_delet) {
-                $message = $row_delet->message . "\xF0\x9F\x95\x9B	";
+                $message = $row_delet->message . "\xE2\x9D\x8C	";
                 $this->telegram_services->editMessageTextAndInlineKeyboard($this->bot->chanel_id, $row_delet->message_id, $message);
                 $row_delet->delete();
             }
