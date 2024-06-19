@@ -610,8 +610,8 @@ class ActionServices extends TextServices
         $message_id = cache()->get("trade_open_" . $this->getUserId());
         if ($customer_id && $message_id) {
             $customer = CustomerUser::find($customer_id);
-            if ($customer_id != $this->getUserId() && $this->getUser()->role == "colleague")
-                $keyboard[0][] = ['text' => "\xF0\x9F\x94\x90	حد مجاز", 'callback_data' => "trade_open_limit_$customer_id"];
+//            if ($customer_id != $this->getUserId() && $this->getUser()->role == "colleague")
+//                $keyboard[0][] = ['text' => "\xF0\x9F\x94\x90	حد مجاز", 'callback_data' => "trade_open_limit_$customer_id"];
             $keyboard[0][] = ['text' => "\xF0\x9F\x93\x9C	گزارش", 'callback_data' => "trade_open_report_$customer_id"];
 
             $message = "یکی از گزینه های زیر برای مشتری ";
