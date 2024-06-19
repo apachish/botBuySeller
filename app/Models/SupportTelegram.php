@@ -18,6 +18,12 @@ class SupportTelegram extends EloquentModel
         "message_id",
         "user_telegram_id",
         "text",
-        "data"
+        "data",
+        "replay"
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(UserTelegram::class,"user_telegram_id","id");
+    }
 }

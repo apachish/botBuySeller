@@ -7,6 +7,7 @@ use App\Models\Bot;
 use App\Models\BotMenuUser;
 use App\Models\CustomerUser;
 use App\Models\Setting;
+use App\Models\SupportTelegram;
 use App\Models\Transfer;
 use App\Models\UserTelegram;
 use Carbon\Carbon;
@@ -407,6 +408,31 @@ class ActionAdminServices extends TextServices
                 $this->getTelegramServices()->sendMessage($this->getUserId(), $message);
                 cache()->set($this->getKeyCache() . $this->getUserId(), "edit_name_done_".$data);
             }
+        }elseif (str_contains($this->getData(), "answer_message_")) {
+
+            $data = str_replace('answer_message_', '', $this->getData());
+            $array = explode("_",$data);
+            $id = data_get($array,0);
+            $page = (int)data_get($array,1);
+
+            $message = SupportTelegram::with("user")->where("id", $id)->first();
+            if($message) {
+                $user = $message->user;
+                if ($user) {
+                    $fullName = $user->fullName ?: $user->first_name . " " . $user->last_name;
+                    $message = "می توانید با ارسال متن پاسخ سوال کاربر ";
+                    $message .= "\n\n";
+                    $message .= $fullName;
+                    $message .= "\n\n";
+                    $message .= ":پیام";
+                    $message .= "\n\n";
+                    $message .= $message->text;
+                    $message .= "\n\n";
+                    $message .= "وارد کنید";
+                    $this->getTelegramServices()->sendMessage($this->getUserId(), $message);
+                    cache()->set($this->getKeyCache() . $this->getUserId(), "answer_message_" . $id."_".$page);
+                }
+            }
         }elseif (str_contains($this->getData(), "edit_mobile_")) {
 
             $data = str_replace('edit_mobile_', '', $this->getData());
@@ -435,6 +461,9 @@ class ActionAdminServices extends TextServices
         switch ($this->getMessage()) {
             case "\xF0\x9F\x9A\xBBلیست کاربران":
                 $this->listUser();
+                break;
+                case "\xF0\x9F\x92\xACلیست پیام ها کاربران":
+                $this->listMessageSupport();
                 break;
             case "جستجو کاربر\xF0\x9F\x94\x8D":
                 cache()->set($this->getKeyCache() . $this->getUserId(), "find_user");
@@ -623,6 +652,8 @@ class ActionAdminServices extends TextServices
             $key_case = "edit_name_done_";
         elseif(str_contains($this->getMessageCache(), "edit_mobile_done_"))
             $key_case = "edit_mobile_done_";
+        elseif(str_contains($this->getMessageCache(), "answer_message_"))
+            $key_case = "answer_message_";
         logger($key_case);
         switch ($key_case) {
 
@@ -686,6 +717,25 @@ class ActionAdminServices extends TextServices
                 break;
             case "find_user":
                 $this->listUser(1,null,$this->getMessage());
+
+                cache()->forget($this->getKeyCache() . $this->getUserId());
+                break;
+            case "answer_message_":
+                $data = str_replace('answer_message_', '', $this->getMessageCache());
+                $array = explode("_",$data);
+                logger("array",[$array]);
+                $id = (int)data_get($array,0);
+                $page = (int)data_get($array,1);
+                $message = SupportTelegram::with("user")->where("id", $id)->first();
+
+                if($message)
+                {
+                    $message->replay = $this->getMessage();
+                    $message->update();
+                }
+                $data_old = cache()->get("menu_List_message_" . $this->getUserId());
+                $message_id = data_get($data_old, "id", null);
+                $this->listMessageSupport($page,$message_id);
 
                 cache()->forget($this->getKeyCache() . $this->getUserId());
                 break;
@@ -906,6 +956,48 @@ class ActionAdminServices extends TextServices
             $this->getTelegramServices()->editMessageTextAndInlineKeyboard($this->getUserId(), $message_id, $text, $keyboard);
         else {
             $this->getTelegramServices()->menu_key = "menu_List_user_";
+            $menu = $this->getTelegramServices()->MessageReplyMarkup($this->getTelegram(), $this->getUserId(), $text, $keyboard);
+        }
+    }
+    public function listMessageSupport($page = 1, $message_id = null)
+    {
+        $text = "\n\nلیست  پیام های کاربران";
+        $text .= "\n\n";
+        $text .= "با کلیک بر پیام امکان پاسخ پیام می باشد ";
+
+        $messages = SupportTelegram::orderBy("created_at","DESC")->orderBy("replay");
+        $messages = $messages->simplePaginate(5, ['*'], 'page', $page);
+        $page = $messages->currentPage();
+        $next = $messages->nextPageUrl() ? (int)str_replace("?page=", "", strstr($messages->nextPageUrl(), "?page=")) : null;
+        $pre = $messages->previousPageUrl() ? (int)str_replace("?page=", "", strstr($messages->previousPageUrl(), "?page=")) : null;
+        $keyboard = [];
+        $i = 0;
+
+        logger("messages", [$messages]);
+        $messages->each(function ($message) use (&$keyboard, &$i,$page){
+            $user = $message->user;
+            $text = $user->fullName ?: $user->first_name . " " . $user->last_name;
+            $text .= $user->role == "colleague" ? "(همکار)" : "(مشتری)";
+            $text .=":\n\n";
+            $text .= $message->text;
+            $text .="\n\n";
+            $text .= toJalali($message->created_at);
+            if($message->replay)
+                $text.=" \n\n \xE2\x9C\x85	";
+
+            $keyboard[$i++] = [
+                ['text' => "  $text  ", 'callback_data' =>  "answer_message_".$message->id."_".$page],
+            ];
+        });
+        if ($pre)
+            $keyboard[$i][] = ['text' => "قبلی", "callback_data" => "pre_" . $pre];
+        if ($next)
+            $keyboard[$i][] = ['text' => "بعدی", "callback_data" => "next_" . $next];
+
+        if ($message_id)
+            $this->getTelegramServices()->editMessageTextAndInlineKeyboard($this->getUserId(), $message_id, $text, $keyboard);
+        else {
+            $this->getTelegramServices()->menu_key = "menu_List_message_";
             $menu = $this->getTelegramServices()->MessageReplyMarkup($this->getTelegram(), $this->getUserId(), $text, $keyboard);
         }
     }
