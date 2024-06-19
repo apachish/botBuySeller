@@ -427,7 +427,7 @@ class ActionAdminServices extends TextServices
                     $message .= "\n\n";
                     $message .= ":پیام";
                     $message .= "\n\n";
-                    $message .= $message->text;
+                    $message .= data_get($message,'text');
                     $message .= "\n\n";
                     $message .= "وارد کنید";
                     $this->getTelegramServices()->sendMessage($this->getUserId(), $message);
