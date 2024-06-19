@@ -728,7 +728,7 @@ class ActionAdminServices extends TextServices
                 logger("array",[$array]);
                 $id = (int)data_get($array,0);
                 $page = (int)data_get($array,1);
-                $message = SupportTelegram::with("user")->where("id", $id)->first();
+                $message = SupportTelegram::with("user")->find($id);
 
                 if($message)
                 {
@@ -738,12 +738,14 @@ class ActionAdminServices extends TextServices
                     $message_id = data_get($data_old, "id", null);
                     $this->listMessageSupport($page,$message_id);
                     $bot = Bot::where("title","botSupport")-first();
+                    logger("bot support",[$bot]);
                     if($bot) {
                         $telegram = new Api($bot->token);
-                        $telegram->sendMessage([
+                        $m = $telegram->sendMessage([
                             'chat_id' => $message->user_telegram_id,
                             'text' => $this->getMessage(),
                         ]);
+                        logger("ss",[$m]);
                     }
                 }
 
