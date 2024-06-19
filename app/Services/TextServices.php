@@ -413,6 +413,7 @@ class TextServices
             "/start",
             "start",
             "/help",
+            "کنسل",
             "نشد",
             "ن",
             "\xF0\x9F\x91\xA5معرفی مشتری",
@@ -551,6 +552,7 @@ class TextServices
         switch ($this->message) {
             case 'ن':
             case 'نشد':
+            case 'کنسل':
                 if($this->rejectAll())
                     $this->telegram->sendMessage(['chat_id' => $this->user_id, 'text' => 'لفظ های شما کنسل شد']);
             break;
