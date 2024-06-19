@@ -243,8 +243,8 @@ class ActionServices extends TextServices
                     logger("customer", [$this->getUser()->role]);
                     $customer = CustomerUser::where("mobile", $this->getUser()->mobile)->first();
                     logger("limit customer", [$customer]);
-                    if ($customer && $customer->limit)
-                        $limit_day = $customer->limit;
+//                    if ($customer && $customer->limit)
+//                        $limit_day = $customer->limit;
 
                 } elseif ($this->getUser()->role == "colleague") {
                     if ($forbidden && data_get($transfer, "user.role") == "customer") {
