@@ -415,10 +415,10 @@ class ActionAdminServices extends TextServices
             $id = data_get($array,0);
             $page = (int)data_get($array,1);
 
-            $message = SupportTelegram::with("user")->find($id);
-            logger("answer_message_",[$id,$page,$message]);
-            if($message) {
-                $user = $message->user;
+            $support = SupportTelegram::with("user")->find($id);
+            logger("answer_message_",[$id,$page,$support]);
+            if($support) {
+                $user = $support->user;
                 if ($user) {
                     $fullName = $user->fullName ?: $user->first_name . " " . $user->last_name;
                     $message = "می توانید با ارسال متن پاسخ سوال کاربر ";
@@ -427,7 +427,7 @@ class ActionAdminServices extends TextServices
                     $message .= "\n\n";
                     $message .= ":پیام";
                     $message .= "\n\n";
-                    $message .= data_get($message,'text');
+                    $message .= data_get($support,'text');
                     $message .= "\n\n";
                     $message .= "وارد کنید";
                     $this->getTelegramServices()->sendMessage($this->getUserId(), $message);
