@@ -101,7 +101,7 @@ class ActionAdminServices extends TextServices
             $response_text = "برای تماس با شماره زیر کلیک کنید:\n\n$tel";
             $this->getTelegramServices()->sendMessage($this->getUserId(), $response_text);
         }if (str_contains($this->getData(), "ok_user_")) {
-        $id = str_replace('ok_user_', '', $this->getData());
+        $id = (int)str_replace('ok_user_', '', $this->getData());
             $user = UserTelegram::where("id",$id)->first();
             if($user)
             {
