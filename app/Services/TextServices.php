@@ -155,6 +155,8 @@ class TextServices
      */
     public function setUserId(): void
     {
+        logger("user_id set", [$this->type_message . '.from.id']);
+
         $this->user_id = data_get($this->update, $this->type_message . '.from.id');;
         logger("user_id", [$this->user_id]);
     }
