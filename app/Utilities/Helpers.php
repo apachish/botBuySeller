@@ -46,18 +46,23 @@ if (!function_exists('cleanInput')) {
             "خ ف پ","ف ف پ","خ ف م","ف ف م","خ ف ن","خ ف ش","ف ف ش","ف ف ن","ف ف","خ ف","خ ش","ف ش","خ ن","ف ن","خ م","ف م","خ پ","ف پ"
 
         ];
-        $im = implode("|",$list_type);
-        $pattern = "/^([0-9]{3}|[0-9]{5})($im)([4-9]?)(\s:\s.*)?$/u";
 
+        $im = implode("|",$list_type);
+        $pattern = "/^([0-9]{3}|[0-9]{5})($im)([1-3]?)(.*:.*)?$/u";
 
         if (preg_match($pattern, $input, $matches)) {
-            $input = explode(":",$input);
-            $word = str_replace(" ","",data_get($input,0));
-            $cleanedInput = $word.data_get($input,1);
-            return $cleanedInput;
+
+            $message = explode(":",$input);
+            $word = str_ireplace(" ","",rtrim($message[0]));
+
+            if(isset($message[1]))
+                $cleanedInput = $word.$message[1];
+            else
+                $cleanedInput = $word;
+            return  $cleanedInput;
+        }else{
+            return $input;
         }
-        return $input;
-//        return $input; // اگر الگو تطابق نداشت، همان ورودی را برگردانید
     }
 }
 if (!function_exists('getPriceFormat')) {
