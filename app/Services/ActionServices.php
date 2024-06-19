@@ -193,7 +193,6 @@ class ActionServices extends TextServices
         $text .=  $help?$help->value:"";
         $keyboard[0][0] = ['text' => "راهنما را خواندم و یاد گرفتم"];
         TelegramServices::menu($this->telegram, $keyboard, $this->getUser(), $text);
-        cache()->set($this->getKeyCache() . $this->getUserId(), "pending_accept");
 //        $message_id = cache()->get("rule_accept". $this->getUserId());
 //        $this->telegram_services->deleteKeyboard($this->getUserId(), $text);
 //        $this->getTelegramServices()->editMessageTextAndInlineKeyboard($this->getUserId(), $message_id, $text, []);
