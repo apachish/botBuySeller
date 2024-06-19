@@ -73,7 +73,7 @@ class TelegramAdminController extends Controller
                     ['text' => "\xF0\x9F\x92\xB1کیف پول"]
                 ],
                 [
-                    ['text' => "\xF0\x9F\x92\xACلیست پیام ها کاربران"],
+//                    ['text' => "\xF0\x9F\x92\xACلیست پیام ها کاربران"],
                     ['text' => "\xF0\x9F\x93\x81ارسال فایل"],
                     ['text' => "\xF0\x9F\x9A\xA9حذف پیام ها"],
                 ],

@@ -147,7 +147,7 @@ class ActionServices extends TextServices
                 );
             }
             if (!$this->getUser()->fullName) {
-                $text = "نام و نام خانوادگی خود را وارد کنید";
+                $text = "طفا نام و نام خانوادگی خود را وارد نمایید";
                 cache()->set($this->getKeyCache() . $this->getUserId(), "add_fullName");
                 $this->telegram->sendMessage(['chat_id' => $this->getUserId(), 'text' => $text]);
 

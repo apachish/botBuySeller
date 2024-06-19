@@ -499,7 +499,7 @@ class TextServices
             return true;
         }
         if (!$this->user->fullName) {
-            $text = " لطفا نام و نام خانوادگی وارد کنید";
+            $text = " لطفا نام و نام خانوادگی خود را وارد نمایید";
             cache()->set($this->key_cache . $this->user_id, "add_fullName");
             $this->telegram->sendMessage(['chat_id' => $this->user_id, 'text' => $text]);
             return true;
