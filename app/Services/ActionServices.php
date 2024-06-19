@@ -939,12 +939,12 @@ class ActionServices extends TextServices
                 if ($time->between($morning, $none, true) && in_array($this->getType(), $this->list_type_cash_n))
                     $message .= " نقدی حاضر ";
                 else
-                    $message .= " بی حواله فردا";
+                    $message .= "   بی حواله فردا ";
 
                 $message .= "\xF0\x9F\x92\xB0	";
 
             } else
-                $message .= "با حواله";
+                $message .= "  با حواله  ";
             $message .= $number;
             $message .= " تا ";
             if (in_array($this->getType(), $this->list_type_floating))
