@@ -199,7 +199,7 @@ class ActionServices extends TextServices
         $transfer = Transfer::with("user.customer")->find($id);
 
         if ($transfer->user_id == $this->getUserId()) {
-            $this->telegram_services->sendMessage($this->getUserId(), "متأسفانه امکان دریافت حواله برای شما در این معامله نمی باشد");
+            $this->telegram_services->sendMessage($this->getUserId(), "شما نمی توانید لفظ خود را دریافت کنید");
             return true;
         }
         logger("Transfer", [$transfer]);
@@ -317,15 +317,15 @@ class ActionServices extends TextServices
                     if ($transfer->user->role == "customer" && $this->getUser()->role == "customer") {
                         $transaction_party_req = "مشاهده فقط برای سرگروه";
                         if(data_get($transfer, 'user.customer')) {
-                            $transaction_party_req_s = data_get($transfer, 'user.customer.headCustomer.fullName');
-                            $transaction_party_req_s .= "(" . data_get($transfer, 'user.customer.fullName') . ")";
+                            $transaction_party_req_s = data_get($transfer, 'user.customer.fullName');
+                            $transaction_party_req_s .= "(" . data_get($transfer, 'user.customer.headCustomer.fullName') . ")";
                         }else
                             $transaction_party_req_s = data_get($transfer, 'user.fullName');
 
                         $transaction_party = "مشاهده فقط برای سرگروه";
                         if(data_get($this->getUser(), 'customer')) {
-                            $transaction_party_s = data_get($this->getUser(), 'customer.headCustomer.fullName');
-                            $transaction_party_s .= "(" . data_get($this->getUser(), 'customer.fullName') . ")";
+                            $transaction_party_s =  data_get($this->getUser(), 'customer.fullName');
+                            $transaction_party_s .= "(" . data_get($this->getUser(), 'customer.headCustomer.fullName') . ")";
                         }else
                             $transaction_party_s = data_get($transfer, 'user.fullName');
 
@@ -334,14 +334,14 @@ class ActionServices extends TextServices
                         if(data_get($transfer, 'customer.headCustomer'))
                             $transaction_party_req_s = data_get($transfer, 'user.fullName');
                         if(data_get($this->getUser(), 'customer')) {
-                            $transaction_party = data_get($this->getUser(), 'user.customer.headCustomer.fullName');
-                            $transaction_party .= "(" . data_get($this->getUser(), 'user.customerUser.fullName') . ")";
+                            $transaction_party = data_get($this->getUser(), 'user.customerUser.fullName');
+                            $transaction_party .= "(" . data_get($this->getUser(), 'user.customer.headCustomer.fullName') . ")";
                         }else
                             $transaction_party = data_get($this->getUser(),'fullName');
                     } elseif ($transfer->user->role == "customer" && $this->getUser()->role == "colleague") {
                         if( data_get($transfer, 'user.customer')) {
-                            $transaction_party_req = data_get($transfer, 'user.customer.headCustomer.fullName') ;
-                            $transaction_party_req .= "(" . data_get($transfer, 'user.customer.fullName') . ")";
+                            $transaction_party_req =  data_get($transfer, 'user.customer.fullName') ;
+                            $transaction_party_req .= "(" . data_get($transfer, 'user.customer.headCustomer.fullName') . ")";
                         }else
                             $transaction_party_req = data_get($transfer, 'user.fullName') ;
 
@@ -352,14 +352,6 @@ class ActionServices extends TextServices
                         $transaction_party = $this->getUser()->fullName;
                     }
 
-                    logger("tr", [
-                        $transaction_party,
-                        $transaction_party_req,
-                        $transaction_party_s,
-                        $transaction_party_req_s,
-                        $transfer->user,
-                        $this->getUser()
-                    ]);
                     /*
                      * send for request
                      */
@@ -368,6 +360,11 @@ class ActionServices extends TextServices
                     $message .= "مقدار:" . data_get($request_transfer, "number") . "کیلو";
                     $message .= "\n\n";
                     $message .= "نوع:" . getTypeTransfer($transfer->type);
+                    if($transfer->description) {
+                        $message .= "\n\n";
+                        $message .= "توضیحات" ;
+                        $message .= "\xE2\x9D\x97 : \n\n" . $transfer->description;
+                    }
                     $message .= "\n\n";
                     $message .= "طرف معامله:" . $transaction_party_req;
                     $message .= "\n\n";
@@ -394,6 +391,11 @@ class ActionServices extends TextServices
                     $message .= "مقدار:" . data_get($request_transfer, "number") . "کیلو";
                     $message .= "\n\n";
                     $message .= "نوع:" . getTypeTransfer($transfer->type);
+                    if($transfer->description) {
+                        $message .= "\n\n";
+                        $message .= "توضیحات" ;
+                        $message .= "\xE2\x9D\x97 : \n\n" . $transfer->description;
+                    }
                     $message .= "\n\n";
                     $message .= "طرف معامله:" . $transaction_party;
                     $message .= "\n\n";
