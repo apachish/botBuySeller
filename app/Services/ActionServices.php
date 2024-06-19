@@ -124,8 +124,8 @@ class ActionServices extends TextServices
             $this->getUser()->update();
             $this->setBotAdmin();
             $keyboard[] = [
-                ["text" => "تایید", "callback_data" => "ok_user_".$this->setUserId()],
-                ["text" => "رد", "callback_data" => "reject_user_".$this->setUserId()]
+                ["text" => "تایید", "callback_data" => "ok_user_".$this->getUserId()],
+                ["text" => "رد", "callback_data" => "reject_user_".$this->getUserId()]
             ];
             $reply_markup = Keyboard::make([
                 'inline_keyboard' => $keyboard,
