@@ -43,22 +43,25 @@ if (!function_exists('isValidTime')) {
 if (!function_exists('cleanInput')) {
     function cleanInput($input) {
         // استفاده از یک الگو برای جدا کردن بخش‌ها
-        $pattern = '/^(\d+)\s*( خفن|خفش|ففش|ففن|خفپ|ففپ|خفم|ففم|فف|خف|فپ|خپ|فم|خم|خش|فش|خن|فن|خ|ف)\s*(\d?)(:\s*(.*))?$/u';
-
-        if (preg_match($pattern, $input, $matches)) {
-            // حذف فضای خالی از بخش‌های مورد نیاز
-            $number = preg_replace('/\s+/', '', $matches[1]);
-            $letters = preg_replace('/\s+/', '', $matches[2]);
-            $optional_number = preg_replace('/\s+/', '', $matches[3]);
-            $comment = isset($matches[5]) ? $matches[5] : '';
-
-            // ساختن رشته نهایی
-            $cleanedInput = $number . $letters . $optional_number;
-            if (!empty($comment)) {
-                $cleanedInput .= ':' . $comment;
-            }
-            return $cleanedInput;
-        }
+//        $pattern = '/^(\d+)\s*( خفن|خفش|ففش|ففن|خفپ|ففپ|خفم|ففم|فف|خف|فپ|خپ|فم|خم|خش|فش|خن|فن|خ|ف)\s*(\d?)(:\s*(.*))?$/u';
+//
+//        if (preg_match($pattern, $input, $matches)) {
+//            // حذف فضای خالی از بخش‌های مورد نیاز
+//            $number = preg_replace('/\s+/', '', $matches[1]);
+//            $letters = preg_replace('/\s+/', '', $matches[2]);
+//            $optional_number = preg_replace('/\s+/', '', $matches[3]);
+//            $comment = isset($matches[5]) ? $matches[5] : '';
+//
+//            // ساختن رشته نهایی
+//            $cleanedInput = $number . $letters . $optional_number;
+//            if (!empty($comment)) {
+//                $cleanedInput .= ':' . $comment;
+//            }
+//            return $cleanedInput;
+//        }
+        $input = explode(":",$input);
+        $word = str_replace(" ","",data_get($input,0));
+        $input = $word.data_get($input,1);
         return $input; // اگر الگو تطابق نداشت، همان ورودی را برگردانید
     }
 }

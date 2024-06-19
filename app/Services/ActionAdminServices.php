@@ -454,9 +454,9 @@ class ActionAdminServices extends TextServices
                     cache()->set($this->getKeyCache() . $this->getUserId(), "answer_message_" . $id . "_" . $page);
                 }
             }
-        } elseif (str_contains($this->getData(), "edit_mobile_")) {
+        } elseif (str_contains($this->getData(), "sync_mobile_")) {
 
-            $data = str_replace('edit_mobile_', '', $this->getData());
+            $data = str_replace('sync_mobile_', '', $this->getData());
             $array = explode("_", $data);
             $id = (int)data_get($array, 0);
             $page = (int)data_get($array, 1);
@@ -1014,7 +1014,7 @@ class ActionAdminServices extends TextServices
                 $key_i .= "_" . $filter;
             $array = [
                 ['text' => "\xE2\x9C\x8F\xF0\x9F\x91\xA8", 'callback_data' => 'edit_name_' . $key_i],
-                ['text' => "\xE2\x9C\x8F\xF0\x9F\x93\xB1", 'callback_data' => 'edit_mobile_' . $key_i],
+                ['text' => "\xE2\x86\x94", 'callback_data' => 'sync_mobile_' . $key_i],
                 ['text' => "\xF0\x9F\x91\xA4", 'callback_data' => 'sub_customer_' . $key_i],
             ];
             if ($user->deleted_at)

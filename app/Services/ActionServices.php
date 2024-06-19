@@ -878,7 +878,7 @@ class ActionServices extends TextServices
             $time = Carbon::now();
             $morning = Carbon::create($time->year, $time->month, $time->day, 9, 0, 0); //set time to 08:00
             $none = Carbon::create($time->year, $time->month, $time->day, 15, 00, 0); //set time to 18:00
-            $none_16 = Carbon::create($time->year, $time->month, $time->day, 16, 00, 0); //set time to 18:00
+            $none_13_30 = Carbon::create($time->year, $time->month, $time->day, 13, 30, 0); //set time to 18:00
             logger("check day", [
                 $time->between($morning, $none, true),
                 (
@@ -886,18 +886,28 @@ class ActionServices extends TextServices
                     !in_array($this->getType(), $this->list_type_sell_tommarow)
                 )
             ]);
-            if ($time->between($morning, $none, true) && !in_array($this->getType(), $this->list_type_tommarow)) {
+            if (!$time->between($morning, $none_13_30, true) && in_array($this->getType(), $this->list_type_today_r_f)) {
+                $this->telegram_services->sendMessage($this->getUserId(), "\xE2\x9D\x8C	فرصت معامله شرایطی برای امروز به پایان رسیده است\xE2\x9D\x8C	");
+                return true;
+            }elseif (!$time->between($morning, $none, true) && in_array($this->getType(), $this->list_type_today_normal)) {
+                $this->telegram_services->sendMessage($this->getUserId(), "\xE2\x9D\x8C	فرصت معامله روز به پایان رسیده است\xE2\x9D\x8C		");
+                return true;
+            }elseif (!$time->between($morning, $none, true) && in_array($this->getType(), $this->list_type_today_cache)) {
+                $this->telegram_services->sendMessage($this->getUserId(), "\xE2\x9D\x8C	فرصت معامله نقدی حاضر به پایان رسیده است\xE2\x9D\x8C		");
+                return true;
+            }else if ($time->between($morning, $none_13_30, true) && in_array($this->getType(), $this->list_type_today_r_f)) {
+                $message .= " \xE2\x98\x80	";
+                $message_request .= " \xE2\x98\x80	";
+                $message_request_me .= " \xE2\x98\x80	";
+                $date = now()->format("Y-m-d");
+            }else if ($time->between($morning, $none, true) && (in_array($this->getType(), $this->list_type_today_normal)||
+                    in_array($this->getType(), $this->list_type_today_cache))) {
                 $message .= " \xE2\x98\x80	";
                 $message_request .= " \xE2\x98\x80	";
                 $message_request_me .= " \xE2\x98\x80	";
                 $date = now()->format("Y-m-d");
             }
-            if ($time->between($morning, $none_16, true) && !in_array($this->getType(), $this->list_type_tommarow) && in_array($this->getType(), $this->list_type_cash_n)) {
-                $message .= " \xE2\x98\x80	";
-                $message_request .= " \xE2\x98\x80	";
-                $message_request_me .= " \xE2\x98\x80	";
-                $date = now()->format("Y-m-d");
-            } else {
+             else {
                 $message .= " 🕰️	";
                 $message_request .= " 🕰️	";
                 $message_request_me .= " 🕰️	";
