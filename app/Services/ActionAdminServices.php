@@ -12,6 +12,7 @@ use App\Models\Transfer;
 use App\Models\UserTelegram;
 use Carbon\Carbon;
 use Illuminate\Support\Str;
+use Telegram\Bot\Api;
 
 class ActionAdminServices extends TextServices
 {
@@ -429,7 +430,7 @@ class ActionAdminServices extends TextServices
                     $message .= "\n\n";
                     $message .= data_get($support,'text');
                     $message .= "\n\n";
-                    $message .= "وارد کنید";
+                    $message .= "!!پاسخ دهید!!";
                     $this->getTelegramServices()->sendMessage($this->getUserId(), $message);
                     cache()->set($this->getKeyCache() . $this->getUserId(), "answer_message_" . $id."_".$page);
                 }
@@ -733,10 +734,19 @@ class ActionAdminServices extends TextServices
                 {
                     $message->replay = $this->getMessage();
                     $message->update();
+                    $data_old = cache()->get("menu_List_message_" . $this->getUserId());
+                    $message_id = data_get($data_old, "id", null);
+                    $this->listMessageSupport($page,$message_id);
+                    $bot = Bot::where("title","botSupport")-first();
+                    if($bot) {
+                        $telegram = new Api($bot->token);
+                        $telegram->sendMessage([
+                            'chat_id' => $message->user_telegram_id,
+                            'text' => $this->getMessage(),
+                        ]);
+                    }
                 }
-                $data_old = cache()->get("menu_List_message_" . $this->getUserId());
-                $message_id = data_get($data_old, "id", null);
-                $this->listMessageSupport($page,$message_id);
+
 
                 cache()->forget($this->getKeyCache() . $this->getUserId());
                 break;
