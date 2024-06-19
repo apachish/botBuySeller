@@ -53,6 +53,7 @@ if (!function_exists('cleanInput')) {
 
         if (preg_match($pattern, $input, $matches)) {
 
+            logger("match",[$matches]);
             $message = explode(":",$input);
             $word = str_ireplace(" ","",$message[0]);
 
