@@ -737,7 +737,7 @@ class ActionAdminServices extends TextServices
                     $data_old = cache()->get("menu_List_message_" . $this->getUserId());
                     $message_id = data_get($data_old, "id", null);
                     $this->listMessageSupport($page,$message_id);
-                    $bot = Bot::where("title","botSupport")-first();
+                    $bot = Bot::where("title","botSupport")->first();
                     logger("bot support",[$bot]);
                     if($bot) {
                         $telegram = new Api($bot->token);
