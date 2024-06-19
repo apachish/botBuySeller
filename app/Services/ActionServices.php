@@ -212,7 +212,11 @@ class ActionServices extends TextServices
 
     public function requestTransfer()
     {
-
+        if(!$this->getUser()->status)
+        {
+            $this->telegram_services->sendMessage($this->getUserId(), "اکانت کاربری شما غیر فعال می باشد");
+            return true;
+        }
         $array = str_replace('request_transfer_', '', $this->getData());
         $info = explode("_", $array);
         $id = data_get($info, 0);
@@ -779,6 +783,12 @@ class ActionServices extends TextServices
 
     public function checkWord()
     {
+        if(!$this->getUser()->status)
+        {
+            $this->telegram_services->sendMessage($this->getUserId(), "اکانت کاربری شما غیر فعال می باشد");
+            return true;
+        }
+
         $suggest_price = $this->getPrice();
 
         $parameter = cache()->remember("parameter_need", now()->setTime(23, 59), function () {
