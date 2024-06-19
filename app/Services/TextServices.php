@@ -732,10 +732,9 @@ class TextServices
 
     private function sendMessageNewUser(): void
     {
-            $this->telegram->sendMessage([
-                'chat_id' => $this->user_id,
-                'text' => 'خوش آمدید! به '.env("APP_NAME").'.'
-            ]);
+            $text = 'خوش آمدید! به '.env("APP_NAME").'.';
+        $this->telegram_services->sendMessage($this->getUserId(), $text);
+
 
     }
 
