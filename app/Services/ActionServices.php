@@ -395,7 +395,7 @@ class ActionServices extends TextServices
                             'chat_id' => data_get($this->getUser(), 'customer.user_id'),
                             'text' => $message_head,
                         ]);
-                        $this->sendBotCustomer(data_get($this->getUser(), 'customer.user_id'), $message);
+                        $this->sendBotCustomer(data_get($this->getUser(), 'customer.user_id'), $message_head);
 
                     }
 
@@ -427,7 +427,7 @@ class ActionServices extends TextServices
                         $message_head .= "\n\n";
                         $message = str_replace($transaction_party, $transaction_party_s, $message);
                         $message_head .= $message;
-                        logger("message4", [data_get($transfer, 'user.customer.user_id'), $message]);
+                        logger("message4", [data_get($transfer, 'user.customer.user_id'), $message_head]);
                         $this->sendBotCustomer(data_get($transfer, 'user.customer.user_id'), $message_head);
 
                     }
