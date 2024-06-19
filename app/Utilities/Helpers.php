@@ -47,7 +47,7 @@ if (!function_exists('cleanInput')) {
 
         ];
         $im = implode("|",$list_type);
-        $pattern = "/^([0-9]{3}|[0-9]{5})($im)([4-9]?)(%s:%s.*)?$/u";
+        $pattern = "/^([0-9]{3}|[0-9]{5})($im)([4-9]?)(\s:\s.*)?$/u";
 
 
         if (preg_match($pattern, $input, $matches)) {
