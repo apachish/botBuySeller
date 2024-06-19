@@ -386,10 +386,14 @@ class ActionServices extends TextServices
                     logger("message1", [$message]);
                     $this->telegram_services->sendMessage($this->getUserId(), $message);
                     if ($this->getUser()->role == "customer" && data_get($this->getUser(), 'customer')) {
+                        $message_head = "نام مشتری:";
+                        $message_head .= data_get($this->getUser(), 'user.fullName');
+                        $message_head .= "\n\n";
                         $message = str_replace($transaction_party_req, $transaction_party_req_s, $message);
+                        $message_head .= $message;
                         logger("message2", [
                             'chat_id' => data_get($this->getUser(), 'customer.user_id'),
-                            'text' => $message,
+                            'text' => $message_head,
                         ]);
                         $this->sendBotCustomer(data_get($this->getUser(), 'customer.user_id'), $message);
 
@@ -418,9 +422,13 @@ class ActionServices extends TextServices
                     logger("message3", [$message]);
                     $this->telegram_services->sendMessage($transfer->user_id, $message);
                     if ($transfer->user->role == "customer" && data_get($transfer, 'user.customer')) {
+                        $message_head = "نام مشتری:";
+                        $message_head .= data_get($transfer, 'user.fullName');
+                        $message_head .= "\n\n";
                         $message = str_replace($transaction_party, $transaction_party_s, $message);
+                        $message_head .= $message;
                         logger("message4", [data_get($transfer, 'user.customer.user_id'), $message]);
-                        $this->sendBotCustomer(data_get($transfer, 'user.customer.user_id'), $message);
+                        $this->sendBotCustomer(data_get($transfer, 'user.customer.user_id'), $message_head);
 
                     }
 
@@ -503,6 +511,7 @@ class ActionServices extends TextServices
                 "price" => data_get($word, "price"),
                 "message" => data_get($word, "message"),
                 "date" => data_get($word, "date"),
+                "description" => data_get($word, "description"),
                 "message_request" => data_get($word, "message_request"),
                 "message_request_me" => data_get($word, "message_request_me"),
             ];
@@ -934,7 +943,8 @@ class ActionServices extends TextServices
                 "price" => $price,
                 "date" => $date,
                 "message_request" => $message_request,
-                "message_request_me" => $message_request_me
+                "message_request_me" => $message_request_me,
+                "description"=>$this->getDescription()
             ]);
             logger("word", [$word_telegram]);
             $keyboard[0] = [
