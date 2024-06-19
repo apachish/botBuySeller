@@ -105,6 +105,8 @@ class ActionAdminServices extends TextServices
             $user = UserTelegram::where("id",$id)->first();
             if($user)
             {
+                $user->status = true;
+                $user->update();
                 $text = "لطفا قوانین را مطالعه فرمایید";
                 $rule = Setting::where("key", "rule")->first();
 

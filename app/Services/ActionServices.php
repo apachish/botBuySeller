@@ -387,7 +387,7 @@ class ActionServices extends TextServices
                     $this->telegram_services->sendMessage($this->getUserId(), $message);
                     if ($this->getUser()->role == "customer" && data_get($this->getUser(), 'customer')) {
                         $message_head = "نام مشتری:";
-                        $message_head .= data_get($this->getUser(), 'user.fullName');
+                        $message_head .= data_get($this->getUser(), 'fullName');
                         $message_head .= "\n\n";
                         $message = str_replace($transaction_party_req, $transaction_party_req_s, $message);
                         $message_head .= $message;
