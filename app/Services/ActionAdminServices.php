@@ -778,6 +778,7 @@ class ActionAdminServices extends TextServices
                 cache()->forget($this->getKeyCache() . $this->getUserId());
                 break;
             case "file":
+                logger("file",[$this->update[$this->getTypeMessage()]['document']]);
                 if (isset($this->update[$this->getTypeMessage()]['document'])) {
                     $fileId = $this->update[$this->getTypeMessage()]['document']['file_id'];
 
