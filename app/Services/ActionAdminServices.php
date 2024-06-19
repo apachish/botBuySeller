@@ -112,7 +112,7 @@ class ActionAdminServices extends TextServices
 
                 $text .=  $rule?$rule->value:"";
                 $keyboard[0][0] = ['text' => "قوانین را خوانده و آنها را پذیرفتم"];
-                $this->service_user->telegram_services::menu($this->telegram, $keyboard, $user, $text);
+                $this->service_user->telegram_services::menu($this->service_user->telegram, $keyboard, $user, $text);
             }
         }
         if (str_contains($this->getData(), "reject_user_")) {
