@@ -921,7 +921,7 @@ class ActionServices extends TextServices
             $message_request_me .= "فی:";
             $message_request_me .= number_format($price, 0);
             if (in_array($this->getType(), $this->list_type_cash)) {
-                if ($time->between($morning, $none_16, true) && in_array($this->getType(), $this->list_type_cash_n))
+                if ($time->between($morning, $none, true) && in_array($this->getType(), $this->list_type_cash_n))
                     $message .= " نقدی حاضر ";
                 else
                     $message .= " بی حواله فردا";
