@@ -818,6 +818,8 @@ class ActionAdminServices extends TextServices
                     $type ="video";
                 elseif(data_get($this->update,$this->getTypeMessage().'audio'))
                     $type ="audio";
+                elseif(data_get($this->update,$this->getTypeMessage().'voice'))
+                                    $type ="voice";
 
 
 
@@ -826,12 +828,30 @@ class ActionAdminServices extends TextServices
 
                     // ارسال فایل به کانال
                     try {
-                        $response = $this->telegram->sendDocument([
-                            'chat_id' => $this->bot->chanel_id,
-                            'document' => $fileId,
-                            'caption' => 'فایل ارسالی از طرف ادمین',
-                        ]);
-
+                        if($type == "video")
+                            $response = $this->telegram->sendVideo([
+                                'chat_id' => $this->bot->chanel_id,
+                                'video' => $fileId,
+                                'caption' => 'فایل ارسالی از طرف ادمین',
+                            ]);
+                        elseif ($type == "photo")
+                            $response = $this->telegram->sendPhoto([
+                                'chat_id' => $this->bot->chanel_id,
+                                'photo' => $fileId,
+                                'caption' => 'فایل ارسالی از طرف ادمین',
+                            ]);
+                        elseif ($type == "audio")
+                            $response = $this->telegram->sendAudio([
+                                'chat_id' => $this->bot->chanel_id,
+                                'audio' => $fileId,
+                                'caption' => 'فایل ارسالی از طرف ادمین',
+                            ]);
+                        elseif ($type == "audio")
+                            $response = $this->telegram->sendVoice([
+                                'chat_id' => $this->bot->chanel_id,
+                                'voice' => $fileId,
+                                'caption' => 'فایل ارسالی از طرف ادمین',
+                            ]);
                         // ارسال پیام به کاربر در صورت موفقیت آمیز بودن
                         $this->telegram->sendMessage([
                             'chat_id' => $this->getUserId(),
