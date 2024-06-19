@@ -251,7 +251,7 @@ class ActionServices extends TextServices
                         $head = data_get($this->getUser(), "customer.user_id");
                         logger("head cus", [$head, data_get($this->getUser(), "customer")]);
                         if ($head == $transfer->user_id) {
-                            $this->telegram_services->sendMessage($this->getUserId(), "متأسفانه امکان دریافت حواله برای شما در این معامله نمی باشد");
+                            $this->telegram_services->sendMessage($this->getUserId(), "\xE2\x9D\x8C	استثنائا در این دقایق خاص بصورت موقت امکان گرفتن لفظ سرگروه و زیر مجموعه خودش امکان پذیر نمی باشد\xE2\x9D\x8C	");
                             return true;
                         }
                     }
@@ -267,7 +267,7 @@ class ActionServices extends TextServices
                         logger("head", [$customer, data_get($transfer, "user.customer")]);
 
                         if ($this->getUserId() == $customer) {
-                            $this->telegram_services->sendMessage($this->getUserId(), "متأسفانه امکان دریافت حواله برای شما در این معامله نمی باشد");
+                            $this->telegram_services->sendMessage($this->getUserId(), "\xE2\x9D\x8C	استثنائا در این دقایق خاص بصورت موقت امکان گرفتن لفظ سرگروه و زیر مجموعه خودش امکان پذیر نمی باشد\xE2\x9D\x8C	");
                             return true;
                         }
                     }
@@ -449,8 +449,8 @@ class ActionServices extends TextServices
 
 
                 } else {
-                    $this->telegram_services->sendMessage($this->getUserId(), "متأسفانه امکان دریافت حواله برای شما در این معامله نمی باشد");
-
+//                    $this->telegram_services->sendMessage($this->getUserId(), "متأسفانه امکان دریافت حواله برای شما در این معامله نمی باشد");
+                    return true;
                 }
             } catch (\Exception $exception) {
 
