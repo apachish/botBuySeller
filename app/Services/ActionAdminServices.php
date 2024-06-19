@@ -778,9 +778,27 @@ class ActionAdminServices extends TextServices
                 cache()->forget($this->getKeyCache() . $this->getUserId());
                 break;
             case "file":
-                logger("file",[$this->update[$this->getTypeMessage()]['document']]);
-                if (isset($this->update[$this->getTypeMessage()]['document'])) {
-                    $fileId = $this->update[$this->getTypeMessage()]['document']['file_id'];
+                logger("file",[
+                    data_get($this->update,$this->getTypeMessage().'document'),
+                    data_get($this->update,$this->getTypeMessage().'photo').
+                    data_get($this->update,$this->getTypeMessage().'video'),
+                    data_get($this->update,$this->getTypeMessage().'sound'),
+
+
+                ]);
+                $type ="document";
+                if(data_get($this->update,$this->getTypeMessage().'document'))
+                    $type ="document";
+                elseif(data_get($this->update,$this->getTypeMessage().'photo'))
+                    $type ="photo";
+                elseif(data_get($this->update,$this->getTypeMessage().'video'))
+                    $type ="video";
+                elseif(data_get($this->update,$this->getTypeMessage().'audio'))
+                    $type ="audio";
+                else
+
+                if (isset($this->update[$this->getTypeMessage()][$type])) {
+                    $fileId = $this->update[$this->getTypeMessage()][$type]['file_id'];
 
                     // ارسال فایل به کانال
                     try {
