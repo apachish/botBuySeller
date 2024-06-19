@@ -4,6 +4,7 @@ namespace App\Services;
 
 
 use App\Jobs\DeactivateTransfer;
+use App\Models\AccessBot;
 use App\Models\Bot;
 use App\Models\CustomerUser;
 use App\Models\DailyRequestTransfer;
@@ -18,6 +19,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Telegram\Bot\Api;
 use Telegram\Bot\FileUpload\InputFile;
+use Telegram\Bot\Keyboard\Keyboard;
 
 class ActionServices extends TextServices
 {
@@ -120,27 +122,39 @@ class ActionServices extends TextServices
         if ($mobile) {
             $this->getUser()->mobile = $mobile;
             $this->getUser()->update();
+            $this->setBotAdmin();
+            $keyboard[] = [
+                ["text" => "تایید", "callback_data" => "ok_user_".$this->setUserId()],
+                ["text" => "رد", "callback_data" => "reject_user_".$this->setUserId()]
+            ];
+            $reply_markup = Keyboard::make([
+                'inline_keyboard' => $keyboard,
+                'resize_keyboard' => true,
+                'one_time_keyboard' => true
+            ]);
+            $text = " کاربر  ";
+            $text .= $this->getUser()->fullName;
+            $text .= "می خواهد وارد سیستم شود";
+            $admins = AccessBot::all();
+            foreach ($admins as $admin) {
+                $this->getBotAdmin()->sendMessage(
+                    [
+                        'chat_id' => $admin->user_id,
+                        'text' => $text,
+                        'reply_markup' => $reply_markup,
+
+                    ]
+                );
+            }
             if (!$this->getUser()->fullName) {
                 $text = "نام و نام خانوادگی خود را وارد کنید";
                 cache()->set($this->getKeyCache() . $this->getUserId(), "add_fullName");
                 $this->telegram->sendMessage(['chat_id' => $this->getUserId(), 'text' => $text]);
-            } elseif (!$this->getUser()->accept_rule) {
-                $text = "لطفا قوانین را مطالعه فرمایید";
-                $rule = Setting::where("key", "rule")->first();
 
-                $text .=  $rule?$rule->value:"";
-                $keyboard[0][0] = ['text' => "قوانین را خوانده و آنها را پذیرفتم"];
-                TelegramServices::menu($this->telegram, $keyboard, $this->getUser(), $text);
-                cache()->forget($this->getKeyCache() . $this->getUserId());
-//                $menu = $this->getTelegramServices()->MessageReplyMarkup($this->getTelegram(), $this->getUserId(), $text, $keyboard);
-//                cache()->set("rule_accept". $this->getUserId(),$menu);
-            }elseif (!$this->getUser()->status) {
-                cache()->set($this->getKeyCache() . $this->getUserId(), "pending_accept");
-                $text = "منتظر تایید مدیر سیستم باشید تا دسترسی به شما ارائه گردد";
-                $this->telegram->sendMessage(['chat_id' => $this->getUserId(), 'text' => $text]);
-            } else {
-                cache()->forget($this->getKeyCache() . $this->getUserId());
             }
+            $text = "منتظر تایید مدیر سیستم باشید تا دسترسی به شما ارائه گردد";
+            $this->telegram->sendMessage(['chat_id' => $this->getUserId(), 'text' => $text]);
+            cache()->forget($this->getKeyCache() . $this->getUserId());
         } else
             $this->telegram->sendMessage(['chat_id' => $this->getUserId(), 'text' => "شماره همراه وارد شده نامعتبر می باشد دوباره وارد کنید"]);
     }
@@ -175,8 +189,8 @@ class ActionServices extends TextServices
         $text = "اطلاعات شما برای مدیر سیستم ارسال شد پس از تایید شما در گروه اضافه می شوید";
         cache()->set($this->getKeyCache() . $this->getUserId(), "pending_accept");
 //        $message_id = cache()->get("rule_accept". $this->getUserId());
-        $this->getUser()->update(["accept_rule"=>now()->format("Y-m-d H:i")]);
-        $this->telegram_services->deleteKeyboard($this->getUserId(),$text);
+        $this->getUser()->update(["accept_rule" => now()->format("Y-m-d H:i")]);
+        $this->telegram_services->deleteKeyboard($this->getUserId(), $text);
 //        $this->getTelegramServices()->editMessageTextAndInlineKeyboard($this->getUserId(), $message_id, $text, []);
 //        cache()->forget("rule_accept". $this->getUserId());
     }
@@ -189,13 +203,11 @@ class ActionServices extends TextServices
         $id = data_get($info, 0);
         $num = (int)data_get($info, 1);
         logger("request", [$num, $id]);
-        if($this->getUser()->verify_two && !cache()->get("double_click_".$id."_".$this->getUserId()))
-        {
-            cache()->set("double_click_".$id."_".$this->getUserId(),1,now()->addSecond(5));
+        if ($this->getUser()->verify_two && !cache()->get("double_click_" . $id . "_" . $this->getUserId())) {
+            cache()->set("double_click_" . $id . "_" . $this->getUserId(), 1, now()->addSecond(5));
             return true;
-        }
-        elseif($this->getUser()->verify_two && cache()->get("double_click_".$id."_".$this->getUserId()))
-            cache()->forget("double_click_".$id."_".$this->getUserId());
+        } elseif ($this->getUser()->verify_two && cache()->get("double_click_" . $id . "_" . $this->getUserId()))
+            cache()->forget("double_click_" . $id . "_" . $this->getUserId());
         $transfer = Transfer::with("user.customer")->find($id);
 
         if ($transfer->user_id == $this->getUserId()) {
@@ -207,7 +219,7 @@ class ActionServices extends TextServices
         if ($transfer) {
             $forbidden = Setting::where("key", "forbidden")->where("value", true)->first();
 
-            logger("forbidden",[$forbidden]);
+            logger("forbidden", [$forbidden]);
             try {
 
                 $limit_day = null;
@@ -222,7 +234,7 @@ class ActionServices extends TextServices
                 if ($this->getUser()->role == "customer") {
                     if ($forbidden && data_get($transfer, "user.role") == "colleague") {
                         $head = data_get($this->getUser(), "customer.user_id");
-                        logger("head cus",[$head,data_get($this->getUser(), "customer")]);
+                        logger("head cus", [$head, data_get($this->getUser(), "customer")]);
                         if ($head == $transfer->user_id) {
                             $this->telegram_services->sendMessage($this->getUserId(), "متأسفانه امکان دریافت حواله برای شما در این معامله نمی باشد");
                             return true;
@@ -237,7 +249,7 @@ class ActionServices extends TextServices
                 } elseif ($this->getUser()->role == "colleague") {
                     if ($forbidden && data_get($transfer, "user.role") == "customer") {
                         $customer = data_get($transfer, "user.customer.user_id");
-                        logger("head",[$customer,data_get($transfer, "user.customer")]);
+                        logger("head", [$customer, data_get($transfer, "user.customer")]);
 
                         if ($this->getUserId() == $customer) {
                             $this->telegram_services->sendMessage($this->getUserId(), "متأسفانه امکان دریافت حواله برای شما در این معامله نمی باشد");
@@ -316,34 +328,34 @@ class ActionServices extends TextServices
 
                     if ($transfer->user->role == "customer" && $this->getUser()->role == "customer") {
                         $transaction_party_req = "مشاهده فقط برای سرگروه";
-                        if(data_get($transfer, 'user.customer')) {
+                        if (data_get($transfer, 'user.customer')) {
                             $transaction_party_req_s = data_get($transfer, 'user.customer.fullName');
                             $transaction_party_req_s .= "(" . data_get($transfer, 'user.customer.headCustomer.fullName') . ")";
-                        }else
+                        } else
                             $transaction_party_req_s = data_get($transfer, 'user.fullName');
 
                         $transaction_party = "مشاهده فقط برای سرگروه";
-                        if(data_get($this->getUser(), 'customer')) {
-                            $transaction_party_s =  data_get($this->getUser(), 'customer.fullName');
+                        if (data_get($this->getUser(), 'customer')) {
+                            $transaction_party_s = data_get($this->getUser(), 'customer.fullName');
                             $transaction_party_s .= "(" . data_get($this->getUser(), 'customer.headCustomer.fullName') . ")";
-                        }else
+                        } else
                             $transaction_party_s = data_get($transfer, 'user.fullName');
 
                     } elseif ($transfer->user->role == "colleague" && $this->getUser()->role == "customer") {
                         $transaction_party_req = "مشاهده فقط برای سرگروه";
-                        if(data_get($transfer, 'customer.headCustomer'))
+                        if (data_get($transfer, 'customer.headCustomer'))
                             $transaction_party_req_s = data_get($transfer, 'user.fullName');
-                        if(data_get($this->getUser(), 'customer')) {
+                        if (data_get($this->getUser(), 'customer')) {
                             $transaction_party = data_get($this->getUser(), 'user.customerUser.fullName');
                             $transaction_party .= "(" . data_get($this->getUser(), 'user.customer.headCustomer.fullName') . ")";
-                        }else
-                            $transaction_party = data_get($this->getUser(),'fullName');
+                        } else
+                            $transaction_party = data_get($this->getUser(), 'fullName');
                     } elseif ($transfer->user->role == "customer" && $this->getUser()->role == "colleague") {
-                        if( data_get($transfer, 'user.customer')) {
-                            $transaction_party_req =  data_get($transfer, 'user.customer.fullName') ;
+                        if (data_get($transfer, 'user.customer')) {
+                            $transaction_party_req = data_get($transfer, 'user.customer.fullName');
                             $transaction_party_req .= "(" . data_get($transfer, 'user.customer.headCustomer.fullName') . ")";
-                        }else
-                            $transaction_party_req = data_get($transfer, 'user.fullName') ;
+                        } else
+                            $transaction_party_req = data_get($transfer, 'user.fullName');
 
                         $transaction_party = "مشاهده فقط برای سرگروه";
                         $transaction_party_s = data_get($this->getUser(), 'fullName');
@@ -360,9 +372,9 @@ class ActionServices extends TextServices
                     $message .= "مقدار:" . data_get($request_transfer, "number") . "کیلو";
                     $message .= "\n\n";
                     $message .= "نوع:" . getTypeTransfer($transfer->type);
-                    if($transfer->description) {
+                    if ($transfer->description) {
                         $message .= "\n\n";
-                        $message .= "توضیحات" ;
+                        $message .= "توضیحات";
                         $message .= "\xE2\x9D\x97 : \n\n" . $transfer->description;
                     }
                     $message .= "\n\n";
@@ -391,9 +403,9 @@ class ActionServices extends TextServices
                     $message .= "مقدار:" . data_get($request_transfer, "number") . "کیلو";
                     $message .= "\n\n";
                     $message .= "نوع:" . getTypeTransfer($transfer->type);
-                    if($transfer->description) {
+                    if ($transfer->description) {
                         $message .= "\n\n";
-                        $message .= "توضیحات" ;
+                        $message .= "توضیحات";
                         $message .= "\xE2\x9D\x97 : \n\n" . $transfer->description;
                     }
                     $message .= "\n\n";
@@ -407,7 +419,7 @@ class ActionServices extends TextServices
                     $this->telegram_services->sendMessage($transfer->user_id, $message);
                     if ($transfer->user->role == "customer" && data_get($transfer, 'user.customer')) {
                         $message = str_replace($transaction_party, $transaction_party_s, $message);
-                        logger("message4", [data_get($transfer, 'user.customer.user_id'),$message]);
+                        logger("message4", [data_get($transfer, 'user.customer.user_id'), $message]);
                         $this->sendBotCustomer(data_get($transfer, 'user.customer.user_id'), $message);
 
                     }
@@ -870,13 +882,13 @@ class ActionServices extends TextServices
                 $message_request .= " \xE2\x98\x80	";
                 $message_request_me .= " \xE2\x98\x80	";
                 $date = now()->format("Y-m-d");
-            }if ($time->between($morning, $none_16, true) && !in_array($this->getType(), $this->list_type_tommarow) && in_array($this->getType(),$this->list_type_cash_n)) {
+            }
+            if ($time->between($morning, $none_16, true) && !in_array($this->getType(), $this->list_type_tommarow) && in_array($this->getType(), $this->list_type_cash_n)) {
                 $message .= " \xE2\x98\x80	";
                 $message_request .= " \xE2\x98\x80	";
                 $message_request_me .= " \xE2\x98\x80	";
                 $date = now()->format("Y-m-d");
-            }
-            else {
+            } else {
                 $message .= " 🕰️	";
                 $message_request .= " 🕰️	";
                 $message_request_me .= " 🕰️	";
@@ -890,7 +902,7 @@ class ActionServices extends TextServices
             $message_request_me .= "فی:";
             $message_request_me .= number_format($price, 0);
             if (in_array($this->getType(), $this->list_type_cash)) {
-                if ($time->between($morning, $none_16, true) && in_array($this->getType(),$this->list_type_cash_n))
+                if ($time->between($morning, $none_16, true) && in_array($this->getType(), $this->list_type_cash_n))
                     $message .= " نقدی حاضر ";
                 else
                     $message .= " بی حواله فردا";

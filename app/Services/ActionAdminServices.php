@@ -100,7 +100,28 @@ class ActionAdminServices extends TextServices
             $tel = "[$tel]";//(tel:$tel)
             $response_text = "برای تماس با شماره زیر کلیک کنید:\n\n$tel";
             $this->getTelegramServices()->sendMessage($this->getUserId(), $response_text);
-        } elseif (str_contains($this->getData(), "pre_")) {
+        }if (str_contains($this->getData(), "ok_user_")) {
+        $id = str_replace('ok_user_', '', $this->getData());
+            $user = UserTelegram::where("id",$id)->first();
+            if($user)
+            {
+                $text = "لطفا قوانین را مطالعه فرمایید";
+                $rule = Setting::where("key", "rule")->first();
+
+                $text .=  $rule?$rule->value:"";
+                $keyboard[0][0] = ['text' => "قوانین را خوانده و آنها را پذیرفتم"];
+                $this->service_user->telegram_services::menu($this->telegram, $keyboard, $user, $text);
+            }
+        }
+        if (str_contains($this->getData(), "reject_user_")) {
+            $id = str_replace('reject_user_', '', $this->getData());
+            $user = UserTelegram::where("id",$id)->first();
+            if($user)
+            {
+                $user->deleted();
+            }
+        }
+        elseif (str_contains($this->getData(), "pre_")) {
             $data = str_replace('pre_', '', $this->getData());
             $array = explode("_", $data);
             $page = (int)data_get($array, 0);

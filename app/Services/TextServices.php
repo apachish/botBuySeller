@@ -43,6 +43,8 @@ class TextServices
 
     protected $bot;
 
+    protected $bot_admin;
+
     protected $telegram;
 
     protected $message_menu = "خوش آمدید";
@@ -80,7 +82,22 @@ class TextServices
         $this->update = $this->telegram->getWebhookUpdate();
         logger("bot user", [$this->update]);
     }
+    /**
+     * @return mixed
+     */
+    public function getBotAdmin()
+    {
+        return new Api($this->bot_admin->token);;
+    }
 
+    /**
+     * @param mixed $bot_admin
+     */
+    public function setBotAdmin(): void
+    {
+        $bot = Bot::where("title","botManage")->first();
+        $this->bot_admin = $bot?:null;
+    }
     /**
      * @return Api
      */
@@ -477,9 +494,7 @@ class TextServices
 
     public function actionByMessage()
     {
-        logger("as",[$this->getMessage() == "قوانین را خوانده و آنها را پذیرفتم"]);
         if($this->getMessage() == "قوانین را خوانده و آنها را پذیرفتم") {
-            logger("aaa");
             $this->ruleAccept();
             return true;
         }
