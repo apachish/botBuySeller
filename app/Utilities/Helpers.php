@@ -110,7 +110,7 @@ if (!function_exists('getTypeTransfer')) {
         if(in_array($type,[ "فف","خف","خ","ف"]))
             return "عادی";
         elseif(in_array($type,["خفش","ففش","خش","فش"]))
-            return "شناوری";
+            return "شنا";
         elseif(in_array($type,["خفن","ففن","خن","فن"]))
             return "نقدی";
         elseif(in_array($type,["ففم","خفم","فم","خم"]))
