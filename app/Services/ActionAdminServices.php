@@ -824,47 +824,19 @@ class ActionAdminServices extends TextServices
 
 
                 if (isset($this->update[$this->getTypeMessage()][$type])) {
-                    $fileId = $this->update[$this->getTypeMessage()][$type]['file_id'];
-
-                    // ارسال فایل به کانال
-                    try {
-                        if($type == "video")
-                            $response = $this->telegram->sendVideo([
-                                'chat_id' => $this->bot->chanel_id,
-                                'video' => $fileId,
-                                'caption' => 'فایل ارسالی از طرف ادمین',
-                            ]);
-                        elseif ($type == "photo")
-                            $response = $this->telegram->sendPhoto([
-                                'chat_id' => $this->bot->chanel_id,
-                                'photo' => $fileId,
-                                'caption' => 'فایل ارسالی از طرف ادمین',
-                            ]);
-                        elseif ($type == "audio")
-                            $response = $this->telegram->sendAudio([
-                                'chat_id' => $this->bot->chanel_id,
-                                'audio' => $fileId,
-                                'caption' => 'فایل ارسالی از طرف ادمین',
-                            ]);
-                        elseif ($type == "audio")
-                            $response = $this->telegram->sendVoice([
-                                'chat_id' => $this->bot->chanel_id,
-                                'voice' => $fileId,
-                                'caption' => 'فایل ارسالی از طرف ادمین',
-                            ]);
-                        // ارسال پیام به کاربر در صورت موفقیت آمیز بودن
-                        $this->telegram->sendMessage([
-                            'chat_id' => $this->getUserId(),
-                            'text' => "File has been successfully uploaded to the channel.",
-                        ]);
-
-                    } catch (Exception $e) {
-                        // ارسال پیام به کاربر در صورت عدم موفقیت
-                        $this->telegram->sendMessage([
-                            'chat_id' => $this->getUserId(),
-                            'text' => "Failed to upload file to the channel. Error: " . $e->getMessage(),
-                        ]);
+                    $files = $this->update[$this->getTypeMessage()][$type];
+                    if(is_array($files))
+                        foreach ($files as $file) {
+                            $fileId = data_get($file, "file_id");
+                            // ارسال فایل به کانال
+                            $this->sendFile($type, $fileId);
+                        }
+                    else {
+                        $fileId = data_get($files, "file_id");
+                        $this->sendFile($type, $fileId);
                     }
+
+
                 }
 
                 cache()->forget($this->getKeyCache() . $this->getUserId());
@@ -1142,5 +1114,53 @@ class ActionAdminServices extends TextServices
             ],
         ];
         $this->getTelegramServices()->editMessageTextAndInlineKeyboard($this->getUserId(), $message_id, $text, $keyboard);
+    }
+
+    /**
+     * @param string $type
+     * @param mixed $fileId
+     * @return void
+     * @throws \Telegram\Bot\Exceptions\TelegramSDKException
+     */
+    private function sendFile(string $type, mixed $fileId): void
+    {
+        try {
+            if ($type == "video")
+                $response = $this->telegram->sendVideo([
+                    'chat_id' => $this->bot->chanel_id,
+                    'video' => $fileId,
+                    'caption' => 'فایل ارسالی از طرف ادمین',
+                ]);
+            elseif ($type == "photo")
+                $response = $this->telegram->sendPhoto([
+                    'chat_id' => $this->bot->chanel_id,
+                    'photo' => $fileId,
+                    'caption' => 'فایل ارسالی از طرف ادمین',
+                ]);
+            elseif ($type == "audio")
+                $response = $this->telegram->sendAudio([
+                    'chat_id' => $this->bot->chanel_id,
+                    'audio' => $fileId,
+                    'caption' => 'فایل ارسالی از طرف ادمین',
+                ]);
+            elseif ($type == "audio")
+                $response = $this->telegram->sendVoice([
+                    'chat_id' => $this->bot->chanel_id,
+                    'voice' => $fileId,
+                    'caption' => 'فایل ارسالی از طرف ادمین',
+                ]);
+            // ارسال پیام به کاربر در صورت موفقیت آمیز بودن
+            $this->telegram->sendMessage([
+                'chat_id' => $this->getUserId(),
+                'text' => "File has been successfully uploaded to the channel.",
+            ]);
+
+        } catch (Exception $e) {
+            // ارسال پیام به کاربر در صورت عدم موفقیت
+            $this->telegram->sendMessage([
+                'chat_id' => $this->getUserId(),
+                'text' => "Failed to upload file to the channel. Error: " . $e->getMessage(),
+            ]);
+        }
     }
 }
