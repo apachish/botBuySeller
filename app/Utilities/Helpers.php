@@ -42,25 +42,22 @@ if (!function_exists('isValidTime')) {
 }
 if (!function_exists('cleanInput')) {
     function cleanInput($input) {
-        // استفاده از یک الگو برای جدا کردن بخش‌ها
-        $pattern = '/^(\d+)\s*( خفن|خفش|ففش|ففن|خفپ|ففپ|خفم|ففم|فف|خف|فپ|خپ|فم|خم|خش|فش|خن|فن|خ|ف)\s*(\d?)(:\s*(.*))?$/u';
+        $list_type = [  "خفپ","ففپ","خفم","ففم","خفن","خفش","ففش","ففن","فف","خف","خش","فش","خن","فن","خم","فم","خپ","فپ","خ","ف",
+            "خ ف پ","ف ف پ","خ ف م","ف ف م","خ ف ن","خ ف ش","ف ف ش","ف ف ن","ف ف","خ ف","خ ش","ف ش","خ ن","ف ن","خ م","ف م","خ پ","ف پ"
+
+        ];
+        $im = implode("|",$list_type);
+        $pattern = "/^([0-9]{3}|[0-9]{5})($im)([4-9]?)(:.*)?$/u";
 
 
         if (preg_match($pattern, $input, $matches)) {
-            // حذف فضای خالی از بخش‌های مورد نیاز
-            $number = preg_replace('/\s+/', '', $matches[1]);
-            $letters = preg_replace('/\s+/', '', $matches[2]);
-            $optional_number = preg_replace('/\s+/', '', $matches[3]);
-            $comment = isset($matches[5]) ? $matches[5] : '';
-
-            // ساختن رشته نهایی
-            $cleanedInput = $number . $letters . $optional_number;
-            if (!empty($comment)) {
-                $cleanedInput .= ':' . $comment;
-            }
+            $input = explode(":",$input);
+            $word = str_replace(" ","",data_get($input,0));
+            $cleanedInput = $word.data_get($input,1);
             return $cleanedInput;
         }
-        return $input; // اگر الگو تطابق نداشت، همان ورودی را برگردانید
+        return $input;
+//        return $input; // اگر الگو تطابق نداشت، همان ورودی را برگردانید
     }
 }
 if (!function_exists('getPriceFormat')) {
