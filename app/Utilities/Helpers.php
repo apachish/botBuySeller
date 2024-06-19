@@ -46,6 +46,7 @@ if (!function_exists('cleanInput')) {
             "خ ف پ","ف ف پ","خ ف م","ف ف م","خ ف ن","خ ف ش","ف ف ش","ف ف ن","ف ف","خ ف","خ ش","ف ش","خ ن","ف ن","خ م","ف م","خ پ","ف پ"
 
         ];
+        $input =  rtrim($input);
 
         $im = implode("|",$list_type);
         $pattern = "/^([0-9]{3}|[0-9]{5})($im)([1-3]?)(.*:.*)?$/u";
@@ -53,10 +54,10 @@ if (!function_exists('cleanInput')) {
         if (preg_match($pattern, $input, $matches)) {
 
             $message = explode(":",$input);
-            $word = str_ireplace(" ","",rtrim($message[0]));
+            $word = str_ireplace(" ","",$message[0]);
 
             if(isset($message[1]))
-                $cleanedInput = $word.$message[1];
+                $cleanedInput = $word.":".$message[1];
             else
                 $cleanedInput = $word;
             return  $cleanedInput;
