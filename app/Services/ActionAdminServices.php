@@ -726,7 +726,7 @@ class ActionAdminServices extends TextServices
                 $data = str_replace('answer_message_', '', $this->getMessageCache());
                 $array = explode("_",$data);
                 logger("array",[$array]);
-                $id = (int)data_get($array,0);
+                $id = data_get($array,0);
                 $page = (int)data_get($array,1);
                 $message = SupportTelegram::with("user")->find($id);
 
