@@ -109,7 +109,7 @@ class ActionAdminServices extends TextServices
                 $rule = Setting::where("key", "rule")->first();
 
                 $text .=  $rule?$rule->value:"";
-                $keyboard[0][0] = ['text' => "قوانین را خوانده و آنها را پذیرفتم"];
+                $keyboard[0][0] = ['text' => "قوانین را خواندم و آنها را پذیرفتم"];
                 $this->service_user->telegram_services::menu($this->service_user->telegram, $keyboard, $user, $text);
             }
         }
