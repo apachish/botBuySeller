@@ -186,10 +186,26 @@ class ActionServices extends TextServices
     public function ruleAccept()
     {
         logger("accept rule");
-        $text = "اطلاعات شما برای مدیر سیستم ارسال شد پس از تایید شما در گروه اضافه می شوید";
+        $this->getUser()->update(["accept_rule" => now()->format("Y-m-d H:i")]);
+        $text = "لطفا راهنما را مطالعه فرمایید";
+        $help = Setting::where("key", "help")->first();
+
+        $text .=  $help?$help->value:"";
+        $keyboard[0][0] = ['text' => "راهنما را خواندم و یاد گرفتم"];
+        TelegramServices::menu($this->telegram, $keyboard, $this->getUser(), $text);
         cache()->set($this->getKeyCache() . $this->getUserId(), "pending_accept");
 //        $message_id = cache()->get("rule_accept". $this->getUserId());
-        $this->getUser()->update(["accept_rule" => now()->format("Y-m-d H:i")]);
+//        $this->telegram_services->deleteKeyboard($this->getUserId(), $text);
+//        $this->getTelegramServices()->editMessageTextAndInlineKeyboard($this->getUserId(), $message_id, $text, []);
+//        cache()->forget("rule_accept". $this->getUserId());
+    }
+    public function helpAccept()
+    {
+        logger("accept help");
+        $text = "اطلاعات شما برای مدیر سیستم ارسال شد پس از تایید شما در گروه اضافه می شوید";
+        $this->getUser()->update(["accept_help" => now()->format("Y-m-d H:i")]);
+        cache()->set($this->getKeyCache() . $this->getUserId(), "pending_accept");
+//        $message_id = cache()->get("rule_accept". $this->getUserId());
         $this->telegram_services->deleteKeyboard($this->getUserId(), $text);
 //        $this->getTelegramServices()->editMessageTextAndInlineKeyboard($this->getUserId(), $message_id, $text, []);
 //        cache()->forget("rule_accept". $this->getUserId());

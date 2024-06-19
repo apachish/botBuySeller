@@ -426,6 +426,7 @@ class TextServices
             "\xE2\x9C\x8Cفعال سازی دو مرحله ای",
             "\xE2\x9D\x8Cغیر فعال فوری",
             "قوانین را خوانده و آنها را پذیرفتم",
+            "راهنما را خواندم و یاد گرفتم",
         ];
         if (in_array($this->message, $accept))
             return true;
@@ -500,6 +501,10 @@ class TextServices
     {
         if($this->getMessage() == "قوانین را خوانده و آنها را پذیرفتم") {
             $this->ruleAccept();
+            return true;
+        }
+        if($this->getMessage() == "راهنما را خواندم و یاد گرفتم") {
+            $this->helpAccept();
             return true;
         }
         if (!$this->user->fullName) {
