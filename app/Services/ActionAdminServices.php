@@ -100,8 +100,10 @@ class ActionAdminServices extends TextServices
 
     public function actionText()
     {
+        logger("Message Admin:".$this->getMessage());
         switch ($this->getMessage()) {
             case "\xF0\x9F\x93\x88معامله":
+                logger("inja");
                 new TransactionServices();
                 break;
             case "\xE2\x8C\x9Aزمان":
