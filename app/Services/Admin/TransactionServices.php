@@ -3,6 +3,8 @@
 namespace App\Services\Admin;
 
 
+use App\Models\Setting;
+
 class TransactionServices
 {
     public $keyword = [
@@ -19,6 +21,26 @@ class TransactionServices
             ['text' => "\xE2\x86\xA9منو"]
         ],
     ];
+
+
+    public function setForbidden($object)
+    {
+        $forbidden = Setting::where("key", "forbidden")->first();
+
+        if ($forbidden) {
+            $response_text = $forbidden->value ? "فعال" : "غیرفعال";
+
+            $response_text .= "\n\n";
+            $response_text .= "معامله همکار و مشتری";
+        } else
+            $response_text = "مشخص کنید معامله مشتری و همکار چگونه می باشد";
+
+        $keyboard[0][0] = ['text' => "فعال", "callback_data" => "forbidden_active"];
+        $keyboard[0][1] = ['text' => "غیرفعال", "callback_data" => "forbidden_deactivate"];
+
+        $menu = $object->getTelegramServices()->MessageReplyMarkup($object->getTelegram(), $object->getUserId(), $response_text, $keyboard);
+        cache()->set("forbidden_" . $object->getUserId(), $menu);
+    }
 
 
 }

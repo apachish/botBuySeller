@@ -527,21 +527,8 @@ class ActionAdminServices extends TextServices
                 $this->getTelegramServices()->sendMessage($this->getUserId(), $response_text);
                 break;
             case  "\xF0\x9F\x9A\xAB\xF0\x9F\x9A\xBBممنوع معامله":
-                $forbidden = Setting::where("key", "forbidden")->first();
-
-                if ($forbidden) {
-                    $response_text = $forbidden->value ? "فعال" : "غیرفعال";
-
-                    $response_text .= "\n\n";
-                    $response_text .= "معامله همکار و مشتری";
-                } else
-                    $response_text = "مشخص کنید معامله مشتری و همکار چگونه می باشد";
-
-                $keyboard[0][0] = ['text' => "فعال", "callback_data" => "forbidden_active"];
-                $keyboard[0][1] = ['text' => "غیرفعال", "callback_data" => "forbidden_deactivate"];
-
-                $menu = $this->getTelegramServices()->MessageReplyMarkup($this->getTelegram(), $this->getUserId(), $response_text, $keyboard);
-                cache()->set("forbidden_" . $this->getUserId(), $menu);
+                $transaction = new TransactionServices();
+                $transaction->setForbidden($this);
                 break;
             case  "\xF0\x9F\x92\xB3\xF0\x9F\x8C\xB3ویرایش حق اشتراک":
                 $rule = Setting::where("key", "membership")->first();
