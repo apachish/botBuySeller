@@ -48,7 +48,10 @@ class TransactionServices extends TextServices
         $keyboard[0][0] = ['text' => "فعال", "callback_data" => "forbidden_active"];
         $keyboard[0][1] = ['text' => "غیرفعال", "callback_data" => "forbidden_deactivate"];
 
-        $menu = $this->getTelegramServices()->MessageReplyMarkup($this->getTelegram(), $this->getUserId(), $response_text, $keyboard);
-        cache()->set("forbidden_" . $this->getUserId(), $menu);
+
+        logger("forbiden",[$this->getUserId()]);
+
+        //$menu = $this->getTelegramServices()->MessageReplyMarkup($this->getTelegram(), $this->getUserId(), $response_text, $keyboard);
+        //cache()->set("forbidden_" . $this->getUserId(), $menu);
     }
 }
