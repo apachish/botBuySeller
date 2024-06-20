@@ -4,13 +4,14 @@ namespace App\Services;
 
 
 use App\Models\Bot;
+use App\Services\Admin\AdminAction;
 use App\Services\Admin\CustomerServices;
 use App\Services\Admin\SettingServices;
 use App\Services\Admin\TimeServices;
 use App\Services\Admin\TransactionServices;
 
 
-class ActionAdminServices extends TextServices
+class ActionAdminServices extends AdminAction
 {
     public $service_user;
     public $bot_title;
@@ -107,6 +108,10 @@ class ActionAdminServices extends TextServices
                 $transaction = new TransactionServices();
                 $text = "تغییر در معاملات انجام دهید";
                 $this->getTelegramServices()->menu($this->telegram, $transaction->keyword, $this->getUser(), $text);
+                break;
+            case  "\xF0\x9F\x9A\xAB\xF0\x9F\x9A\xBBممنوع معامله":
+                $transaction = new TransactionServices();
+                $transaction->setForbidden();
                 break;
         }
     }
