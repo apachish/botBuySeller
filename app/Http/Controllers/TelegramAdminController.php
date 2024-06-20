@@ -34,21 +34,7 @@ class TelegramAdminController extends Controller
                 $text_services->actionText();
 
 
-            $keyboard_menu = [
-                [
-                    ["text"=>"\xF0\x9F\x93\x88معامله"],
-//                    ['text' => "\xE2\x8C\x9Aزمان"]
-                ],
-//                [
-//                    ["text"=>"\xF0\x9F\x9A\xBBکاربران"], ['text' => "\xF0\x9F\x94\xA7تنظیمات"]
-//                ],
-//                [
-//                    ["text"=>"کانال"],
-//                    ['text' =>"حسابداری"],
-//                    ['text' =>"لفظ"],
-//                    ['text' =>"دفترچه"],
-//                ],
-            ];
+
 //            $keyboard_menu = [
 //                [
 //                    ['text' => "\xF0\x9F\x93\x88شروع مبلغ معامله"],
@@ -73,7 +59,7 @@ class TelegramAdminController extends Controller
 //                    ['text' => "\xF0\x9F\x92\xB1کیف پول"]
 //                ],
 //            ];
-            $text_services->menu($keyboard_menu, $access);
+            $text_services->menu($text_services->keyboard_menu, $access);
         } catch (\Exception $exception) {
             logger("get error", [
                 $exception->getMessage(),
