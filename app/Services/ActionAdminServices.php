@@ -10,6 +10,7 @@ use App\Models\Setting;
 use App\Models\SupportTelegram;
 use App\Models\Transfer;
 use App\Models\UserTelegram;
+use App\Services\Admin\TransactionServices;
 use Carbon\Carbon;
 use Illuminate\Support\Str;
 use Telegram\Bot\Api;
@@ -109,7 +110,7 @@ class ActionAdminServices extends TextServices
                 $rule = Setting::where("key", "rule")->first();
 
                 $text .=  $rule?$rule->value:"";
-                $keyboard[0][0] = ['text' => "قوانین را خواندم و آنها را پذیرفتم"];
+                $keyboard[0][0] = ['text' => "قوانین را خوانده و آنها را پذیرفتم"];
                 $this->service_user->telegram_services::menu($this->service_user->telegram, $keyboard, $user, $text);
             }
         }
@@ -478,6 +479,12 @@ class ActionAdminServices extends TextServices
         cache()->forget($this->getKeyCache() . $this->getUserId());
         logger("actionText", [$this->getMessage()]);
         switch ($this->getMessage()) {
+            case "\xF0\x9F\x93\x88معامله":
+                $transaction = new TransactionServices();
+                $text = "تغییر در معاملات انجام دهید";
+                TelegramServices::menu($this->telegram, $transaction->keyword, $this->getUser(),$text );
+                $this->menu($transaction->keyword,$this->getUser()->status,);
+                break;
             case "\xF0\x9F\x9A\xBBلیست کاربران":
                 $this->listUser();
                 break;

@@ -12,7 +12,7 @@ class TelegramAdminController extends Controller
     {
 
         try {
-            $text_services = new AdminAction($token);
+            $text_services = new ActionAdminServices($token);
 
             $access = $text_services->accessAdmin();
             if ($access == null) return false;
