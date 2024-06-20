@@ -27,7 +27,7 @@ class SettingServices extends TextServices
         $text = "تغییر در تنظیمات انجام دهید";
         logger($text);
 
-        TelegramServices::menu($this->telegram, $this->keyword, $this->getUser(), $text);
+//        TelegramServices::menu($this->telegram, $this->keyword, $this->getUser(), $text);
 
     }
 }
