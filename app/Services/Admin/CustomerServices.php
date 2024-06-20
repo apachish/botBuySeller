@@ -32,6 +32,8 @@ class CustomerServices extends TextServices
     public function __construct()
     {
         $text = "کاربران سیستم";
+        logger($text);
+
         TelegramServices::menu($this->telegram, $this->keyword, $this->getUser(), $text);
     }
 }

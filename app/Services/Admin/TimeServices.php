@@ -29,6 +29,8 @@ class TimeServices extends TextServices
     public function __construct()
     {
         $text = "تغییر در زمان معاملات انجام دهید";
+        logger($text);
+
         TelegramServices::menu($this->telegram, $this->keyword, $this->getUser(), $text);
     }
 }
