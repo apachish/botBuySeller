@@ -3,10 +3,9 @@
 namespace App\Services\Admin;
 
 
-use App\Services\TelegramServices;
-use App\Services\TextServices;
+use App\Services\ActionAdminServices;
 
-class TransactionServices extends TextServices
+class TransactionServices extends ActionAdminServices
 {
 
     private $keyword = [
