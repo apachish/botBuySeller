@@ -24,7 +24,7 @@ namespace App\Services\Admin;
      public function actionText(){
         switch ($this->getMessage()){
             case "\xF0\x9F\x93\x88معامله":
-                $this->transaction_services->menu($this->transaction_services->keyword,$this->getUser()->status,$this->getUser());
+                $this->menu($this->transaction_services->keyword,$this->getUser()->status,$this->getUser());
                 break;
             case "\xF0\x9F\x9A\xAB\xF0\x9F\x9A\xBBممنوع معامله":
                 $this->transaction_services->setForbidden();
