@@ -104,7 +104,9 @@ class ActionAdminServices extends TextServices
         switch ($this->getMessage()) {
             case "\xF0\x9F\x93\x88معامله":
                 logger("inja");
-                new TransactionServices($this->telegram,$this->getUser());
+                $transaction = new TransactionServices();
+                $text = "تغییر در معاملات انجام دهید";
+                $this->getTelegramServices()->menu($this->telegram, $transaction->keyword, $this->getUser(), $text);
                 break;
         }
     }
