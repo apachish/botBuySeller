@@ -4,9 +4,8 @@ namespace App\Services\Admin;
 
 
 
-use App\Services\TextServices;
 
-class TransactionServices extends TextServices
+class TransactionServices
 {
 
     private $telegram;
@@ -29,7 +28,7 @@ class TransactionServices extends TextServices
     {
         $this->telegram = $telegram;
         $text = "تغییر در معاملات انجام دهید";
-        logger($text,[$this->getTelegram()]);
+        logger($text,[$this->telegram]);
         $this->getTelegramServices()->menu($this->telegram, $this->keyword, $this->getUser(), $text);
 
     }
