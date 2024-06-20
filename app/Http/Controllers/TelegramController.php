@@ -51,28 +51,8 @@ class TelegramController extends Controller
 
             if(!$text_services->getUser()->fullName || !$text_services->getUser()->mobile )
                 return false;
-            $i = 0;
-            if ($text_services->getUser()->role == "colleague") {
-                $keyboard_menu[$i++] = [
-                    ['text' => "\xF0\x9F\x91\xA5معرفی مشتری"],
-                    ['text' => "\xF0\x9F\x93\x8Bلیست همکاران"],
-                ];
 
-            }
-            $keyboard_menu[$i++] = [
-                ['text' => "\xF0\x9F\x93\x88معاملات باز"]
-            ];
-            $keyboard_menu[$i++] = [
-                ['text' => "\xF0\x9F\x93\x9Aقوانین"],
-                ['text' => "راهنما\xE2\x81\x89"],
-                ['text' => "\xF0\x9F\x92\xB3\xF0\x9F\x8C\xB3حق اشتراک"]
-
-            ];
-            $keyboard_menu[$i++] = [
-                ['text' => $text_services->getUser()->verify_two ? "\xE2\x9A\xA0\xE2\x9D\x8Cغیرفعال سازی تایید دو مرحله ای" : "\xE2\x9C\x8Cفعال سازی دو مرحله ای"],
-                ['text' => "\xE2\x9D\x8Cغیر فعال فوری"],
-
-            ];
+            $keyboard_menu = $text_services->setMenu();
 
             $text_services->menu($keyboard_menu, $text_services->getUser()->status);
         }catch (\Exception $exception){
