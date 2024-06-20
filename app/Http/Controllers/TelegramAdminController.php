@@ -51,7 +51,7 @@ class TelegramAdminController extends Controller
                     ["text"=>"\xF0\x9F\x93\x88معامله"], ['text' => "\xE2\x8C\x9Aزمان"]
                 ],
                 [
-                    ["text"=>"\xF0\x9F\x9A\xBBکاربران"], ['text' => "\xE2\x8C\x9Aتنظیمات"]
+                    ["text"=>"\xF0\x9F\x9A\xBBکاربران"], ['text' => "\xF0\x9F\x94\xA7تنظیمات"]
                 ],
                 [
                     ["text"=>"کانال"],

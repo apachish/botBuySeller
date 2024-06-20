@@ -118,7 +118,7 @@ class ActionAdminServices extends TextServices
             case "\xF0\x9F\x9A\xBBکاربران":
                 new CustomerServices();
                 break;
-            case "\xE2\x8C\x9Aتنظیمات":
+            case "\xF0\x9F\x94\xA7تنظیمات":
                 new SettingServices();
                 break;
             case "کانال":
