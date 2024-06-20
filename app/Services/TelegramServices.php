@@ -29,6 +29,7 @@ class TelegramServices
 
     public static function menu($telegram, $keyboard, $user, $text)
     {
+        logger("w",[$telegram, $keyboard, $user, $text]);
         $reply_markup = Keyboard::make([
             'keyboard' => $keyboard,
             'resize_keyboard' => true,

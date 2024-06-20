@@ -28,7 +28,7 @@ class TransactionServices extends TextServices
     {
         $text = "تغییر در معاملات انجام دهید";
         logger($text);
-        $this->getTelegramServices()->menu($this->telegram, $this->keyword, $this->getUser(), $text);
+        $this->getTelegramServices()->menu($this->getTelegram(), $this->keyword, $this->getUser(), $text);
 
     }
 }
