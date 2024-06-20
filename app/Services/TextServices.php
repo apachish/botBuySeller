@@ -732,8 +732,11 @@ class TextServices
                 break;
 
             case  "\xE2\x9D\x8Cغیر فعال فوری":
-
-
+                if(!cache()->get("disable_immediately_".$this->getUserId())) {
+                    cache()->set("disable_immediately_" . $this->getUserId(), 1,now()->addSecond(5));
+                    return true;
+                }
+                cache()->forget("disable_immediately_".$this->getUserId());
                 try {
                     // خارج کردن کاربر از کانال
                     $response =  $this->telegram->kickChatMember(
@@ -751,8 +754,9 @@ class TextServices
                     logger( "Error: " . $e->getMessage());
                 }
                 $this->user->status = false;
+                $this->user->change_menu = true;
                 $this->user->update();
-                $this->telegram_services->deleteKeyboard($this->user->id);
+                $this->telegram_services->deleteKeyboard($this->user->id,"مواظب خودت باش");
                 $this->user->delete();
                 cache()->forget("keyword_menu" . $this->getKeyCache() . $this->user->id);
                 $this->menu([], false);
