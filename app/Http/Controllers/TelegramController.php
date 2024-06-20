@@ -45,6 +45,8 @@ class TelegramController extends Controller
                 $text_services->actionByCache();
             elseif ($text_services->getMessage() && $text_services->checkText())
                 $text_services->actionByMessage();
+            else
+                $text_services->getTelegramServices()->sendMessage($text_services->getUserId(),"متن شما نامعتبر می باشد");
 
 
             if(!$text_services->getUser()->fullName || !$text_services->getUser()->mobile )

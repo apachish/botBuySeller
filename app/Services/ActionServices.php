@@ -789,6 +789,12 @@ class ActionServices extends TextServices
             return true;
         }
 
+        if($this->getDescription() && !(in_array($this->getType(), $this->list_type_today_normal)||
+                in_array($this->getType(), $this->list_type_today_cache)))
+        {
+            $this->telegram_services->sendMessage($this->getUserId(), "توضیحات برای معاملات نقدی می باشد");
+            return true;
+        }
         $suggest_price = $this->getPrice();
 
         $parameter = cache()->remember("parameter_need", now()->setTime(23, 59), function () {
