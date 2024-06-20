@@ -77,16 +77,16 @@ class ActionAdminServices extends AdminAction
     public function __construct($token)
     {
         parent::__construct($token);
-
-        $this->bot_user = cache()->remember("telegram_user", now()->addDay(), function () {
-            return Bot::where('title', "botUser")
-                ->first();
-        });
-        if ($this->bot_user) {
-//            $this->service_telgram_user = new TelegramServices($this->bot_user->token);
-            $this->service_user = new ActionServices($this->bot_user->token);
-            $this->bot_title = $this->bot_user->title;
-        }
+//
+//        $this->bot_user = cache()->remember("telegram_user", now()->addDay(), function () {
+//            return Bot::where('title', "botUser")
+//                ->first();
+//        });
+//        if ($this->bot_user) {
+////            $this->service_telgram_user = new TelegramServices($this->bot_user->token);
+//            $this->service_user = new ActionServices($this->bot_user->token);
+//            $this->bot_title = $this->bot_user->title;
+//        }
     }
 
     public function actionData()
