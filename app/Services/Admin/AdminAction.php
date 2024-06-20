@@ -14,7 +14,7 @@ namespace App\Services\Admin;
     {
         parent::__construct($token);
         $this->transaction_services = new TransactionServices($token);
-
+        logger("pra",[$this->transaction_services]);
     }
 
      public function actionData(){
