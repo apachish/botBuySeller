@@ -714,6 +714,7 @@ class TextServices
 
             case "\xE2\x9A\xA0\xE2\x9D\x8Cغیرفعال سازی تایید دو مرحله ای":
                 $this->user->verify_two = false;
+                $this->user->change_menu = true;
                 $this->user->update();
                 $keyboard_menu = $this->setMenu();
                 $this->message_menu = "تایید دو مرحله ای غیر فعال شد";
@@ -722,6 +723,8 @@ class TextServices
 
             case "\xE2\x9C\x8Cفعال سازی دو مرحله ای":
                 $this->user->verify_two = true;
+                $this->user->change_menu = true;
+
                 $this->user->update();
                 $keyboard_menu = $this->setMenu();
                 $this->message_menu = "تایید دو مرحله ای  فعال شد";
