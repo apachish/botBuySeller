@@ -28,5 +28,6 @@ class SettingServices extends TextServices
         logger($text);
 
         TelegramServices::menu($this->telegram, $this->keyword, $this->getUser(), $text);
+
     }
 }
