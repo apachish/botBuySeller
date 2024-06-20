@@ -104,7 +104,7 @@ class ActionAdminServices extends TextServices
         switch ($this->getMessage()) {
             case "\xF0\x9F\x93\x88معامله":
                 logger("inja");
-                new TransactionServices();
+                new TransactionServices($this->telegram);
                 break;
             case "\xE2\x8C\x9Aزمان":
                 new TimeServices();

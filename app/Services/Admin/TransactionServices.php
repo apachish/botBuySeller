@@ -3,11 +3,13 @@
 namespace App\Services\Admin;
 
 
-use App\Services\ActionAdminServices;
 
-class TransactionServices extends ActionAdminServices
+use App\Services\TextServices;
+
+class TransactionServices extends TextServices
 {
 
+    private $telegram;
     private $keyword = [
         [
             ['text' => "\xF0\x9F\x9A\xAB\xE2\x98\x80ممنوع معامله روز"],
@@ -23,11 +25,12 @@ class TransactionServices extends ActionAdminServices
         ],
     ];
 
-    public function __construct()
+    public function __construct($telegram)
     {
+        $this->telegram = $telegram;
         $text = "تغییر در معاملات انجام دهید";
-        logger($text);
-        $this->getTelegramServices()->menu($this->getTelegram(), $this->keyword, $this->getUser(), $text);
+        logger($text,[$this->getTelegram()]);
+        $this->getTelegramServices()->menu($this->telegram, $this->keyword, $this->getUser(), $text);
 
     }
 }
