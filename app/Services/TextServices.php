@@ -810,7 +810,7 @@ class TextServices
         if ($show ) {
             if($user && $user->change_menu) {
                 {
-                    $this->telegram_services->deleteKeyboard($user->id);
+//                    $this->telegram_services->deleteKeyboard($user->id);
                     $user->change_menu = false;
                     $user->update();
                 }
