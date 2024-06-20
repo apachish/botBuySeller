@@ -9,7 +9,7 @@ use App\Services\TelegramServices;
 use App\Services\TextServices;
 use Illuminate\Support\Str;
 
-class CustomerServices extends TextServices
+class CustomerServices
 {
 
     public $keyword = [
@@ -51,6 +51,7 @@ class CustomerServices extends TextServices
             ['text' => "\xE2\x9D\x8Cغیر فعال فوری"],
 
         ]];
+
     protected $keyword_customer = [
         [
             ['text' => "\xF0\x9F\x93\x9Aقوانین"],

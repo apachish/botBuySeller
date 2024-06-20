@@ -4,10 +4,8 @@ namespace App\Services\Admin;
 
 
 use App\Models\Setting;
-use App\Services\TelegramServices;
-use App\Services\TextServices;
 
-class SettingServices extends TextServices
+class SettingServices
 {
 
     public $keyword = [
