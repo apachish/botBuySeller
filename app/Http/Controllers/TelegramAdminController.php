@@ -46,38 +46,44 @@ class TelegramAdminController extends Controller
                 $text_services->actionText();
 
 
-
-            $text = "سلام! به منوی اصلی خوش آمدید.";
-
             $keyboard_menu = [
                 [
-                    ['text' => "\xF0\x9F\x93\x88شروع مبلغ معامله"],
-                    ['text' => "\xF0\x9F\x93\x88سقف مبلغ معامله"],
-                    ['text' => "\xF0\x9F\x9A\xAB\xF0\x9F\x9A\xBBممنوع معامله"],
+                    ["text"=>"\xF0\x9F\x93\x88معامله"], ['text' => "\xE2\x8C\x9Aزمان"]
                 ],
                 [
-                    ['text' => "\xF0\x9F\x9A\xBBلیست کاربران"],
-                    ['text' => "جستجو کاربر\xF0\x9F\x94\x8D"],
+                    ["text"=>"\xF0\x9F\x9A\xBBکاربران"], ['text' => "\xE2\x8C\x9Aتنظیمات"]
                 ],
                 [
-                    ['text' => "\xE2\x8C\x9Aساعت شروع"],
-                    ['text' => "\xE2\x8F\xB0ساعت پایان"],
-                    ['text' => "\xE2\x98\x81تعطیل/باز"],
-                ],
-                [
-                    ['text' => "\xF0\x9F\x93\x9Aویرایش قوانین"],
-                    ['text' => "\xE2\x81\x89ویرایش راهنما"],
-                ],
-                [
-                    ['text' => "\xF0\x9F\x92\xB3\xF0\x9F\x8C\xB3ویرایش حق اشتراک"],
-                    ['text' => "\xF0\x9F\x92\xB1کیف پول"]
-                ],
-                [
-//                    ['text' => "\xF0\x9F\x92\xACلیست پیام ها کاربران"],
-                    ['text' => "\xF0\x9F\x93\x81ارسال فایل"],
-                    ['text' => "\xF0\x9F\x9A\xA9حذف پیام ها"],
+                    ["text"=>"کانال"],
+                    ['text' =>"حسابداری"],
+                    ['text' =>"لفظ"],
+                    ['text' =>"دفترچه"],
                 ],
             ];
+//            $keyboard_menu = [
+//                [
+//                    ['text' => "\xF0\x9F\x93\x88شروع مبلغ معامله"],
+//                    ['text' => "\xF0\x9F\x93\x88سقف مبلغ معامله"],
+//                    ['text' => "\xF0\x9F\x9A\xAB\xF0\x9F\x9A\xBBممنوع معامله"],
+//                ],
+//                [
+//                    ['text' => "\xF0\x9F\x9A\xBBلیست کاربران"],
+//                    ['text' => "جستجو کاربر\xF0\x9F\x94\x8D"],
+//                ],
+//                [
+//                    ['text' => "\xE2\x8C\x9Aساعت شروع"],
+//                    ['text' => "\xE2\x8F\xB0ساعت پایان"],
+//                    ['text' => "\xE2\x98\x81تعطیل/باز"],
+//                ],
+//                [
+//                    ['text' => "\xF0\x9F\x93\x9Aویرایش قوانین"],
+//                    ['text' => "\xE2\x81\x89ویرایش راهنما"],
+//                ],
+//                [
+//                    ['text' => "\xF0\x9F\x92\xB3\xF0\x9F\x8C\xB3ویرایش حق اشتراک"],
+//                    ['text' => "\xF0\x9F\x92\xB1کیف پول"]
+//                ],
+//            ];
             $text_services->menu($keyboard_menu, $access);
         } catch (\Exception $exception) {
             logger("get error", [
