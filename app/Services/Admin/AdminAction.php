@@ -12,6 +12,7 @@ namespace App\Services\Admin;
 
     public function __construct($token)
     {
+        parent::__construct($token);
         $this->transaction_services = new TransactionServices($token);
 
     }
