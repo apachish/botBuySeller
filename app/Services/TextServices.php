@@ -717,7 +717,7 @@ class TextServices
                 $this->user->update();
                 $keyboard_menu = $this->setMenu();
                 $this->message_menu = "تایید دو مرحله ای غیر فعال شد";
-                $this->menu($keyboard_menu, $this->getUser()->status,$this->getUser());
+                $this->menu($keyboard_menu,$this->user->status,$this->user);
                 break;
 
             case "\xE2\x9C\x8Cفعال سازی دو مرحله ای":
@@ -725,7 +725,7 @@ class TextServices
                 $this->user->update();
                 $keyboard_menu = $this->setMenu();
                 $this->message_menu = "تایید دو مرحله ای  فعال شد";
-                $this->menu($keyboard_menu, $this->getUser()->status,$this->getUser());
+                $this->menu($keyboard_menu,$this->user->status,$this->user);
                 break;
 
             case  "\xE2\x9D\x8Cغیر فعال فوری":
