@@ -2,22 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\ContactResourceCollection;
-use App\Models\Setting;
 use App\Services\ActionAdminServices;
-use App\Services\TelegramServices;
-use App\Services\TextServices;
-use Illuminate\Http\Request;
-use Telegram\Bot\Api;
-use App\Models\Bot;
-use App\Models\TextTelegram;
-use App\Models\UserTelegram;
-use Telegram\Bot\Keyboard\Keyboard;
+
 
 class TelegramAdminController extends Controller
 {
-    private $access_token;
-
     public function setWebhook($token)
     {
 
@@ -48,17 +37,18 @@ class TelegramAdminController extends Controller
 
             $keyboard_menu = [
                 [
-                    ["text"=>"\xF0\x9F\x93\x88معامله"], ['text' => "\xE2\x8C\x9Aزمان"]
+                    ["text"=>"\xF0\x9F\x93\x88معامله"],
+//                    ['text' => "\xE2\x8C\x9Aزمان"]
                 ],
-                [
-                    ["text"=>"\xF0\x9F\x9A\xBBکاربران"], ['text' => "\xF0\x9F\x94\xA7تنظیمات"]
-                ],
-                [
-                    ["text"=>"کانال"],
-                    ['text' =>"حسابداری"],
-                    ['text' =>"لفظ"],
-                    ['text' =>"دفترچه"],
-                ],
+//                [
+//                    ["text"=>"\xF0\x9F\x9A\xBBکاربران"], ['text' => "\xF0\x9F\x94\xA7تنظیمات"]
+//                ],
+//                [
+//                    ["text"=>"کانال"],
+//                    ['text' =>"حسابداری"],
+//                    ['text' =>"لفظ"],
+//                    ['text' =>"دفترچه"],
+//                ],
             ];
 //            $keyboard_menu = [
 //                [

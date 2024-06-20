@@ -2,20 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Jobs\DeactivateTransfer;
-use App\Models\Setting;
-use App\Models\Transfer;
-use App\Models\UserTradeAccess;
 use App\Services\ActionServices;
-use App\Services\TelegramServices;
-use App\Services\TextServices;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Telegram\Bot\Api;
-use App\Models\Bot;
-use App\Models\TextTelegram;
-use App\Models\UserTelegram;
-use Telegram\Bot\Keyboard\Keyboard;
+
 
 class TelegramController extends Controller
 {

@@ -9,6 +9,7 @@ class TransactionServices
 {
 
     private $telegram;
+    private $user;
     private $keyword = [
         [
             ['text' => "\xF0\x9F\x9A\xAB\xE2\x98\x80ممنوع معامله روز"],
@@ -24,12 +25,13 @@ class TransactionServices
         ],
     ];
 
-    public function __construct($telegram)
+    public function __construct($telegram,$user)
     {
         $this->telegram = $telegram;
+        $this->user = $user;
         $text = "تغییر در معاملات انجام دهید";
         logger($text,[$this->telegram]);
-        $this->getTelegramServices()->menu($this->telegram, $this->keyword, $this->getUser(), $text);
+        $this->getTelegramServices()->menu($this->telegram, $this->keyword, $this->user, $text);
 
     }
 }

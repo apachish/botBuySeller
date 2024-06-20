@@ -4,11 +4,11 @@ namespace App\Services\Admin;
 
 
 use App\Services\TelegramServices;
-use App\Services\TextServices;
 
-class TimeServices extends TextServices
+class TimeServices
 {
-
+private $telegram;
+private $user;
     private $keyword = [
         [
             ['text' => "\xE2\x8C\x9Aساعت شروع"],
@@ -27,11 +27,12 @@ class TimeServices extends TextServices
         ],
     ];
 
-    public function __construct()
+    public function __construct($telegram,$user)
     {
+        $this->telegram = $telegram;
         $text = "تغییر در زمان معاملات انجام دهید";
         logger($text);
 
-        TelegramServices::menu($this->telegram, $this->keyword, $this->getUser(), $text);
+        TelegramServices::menu($this->telegram, $this->keyword, $user, $text);
     }
 }
