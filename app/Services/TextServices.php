@@ -310,7 +310,7 @@ class TextServices
      */
     public function setMessage(): void
     {
-        $this->message = isset($this->update['message']['text']) ? $this->convertNumber(cleanInput($this->update['message']['text'])) : null;
+        $this->message = isset($this->update['message']['text']) ? cleanInput($this->convertNumber($this->update['message']['text'])) : null;
         logger("message", [$this->message]);
     }
 
