@@ -6,8 +6,9 @@ namespace App\Services\Admin;
 
 
 use App\Models\Setting;
+use App\Services\TextServices;
 
-class TransactionServices extends AdminAction
+class TransactionServices extends TextServices
 {
     public $keyword = [
         [
@@ -24,8 +25,9 @@ class TransactionServices extends AdminAction
         ],
     ];
 
-    public function __construct()
+    public function __construct($token)
     {
+        parent::__construct($token);
     }
 
     /*

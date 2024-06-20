@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Services\ActionAdminServices;
+use App\Services\Admin\AdminAction;
 
 
 class TelegramAdminController extends Controller
@@ -11,7 +12,7 @@ class TelegramAdminController extends Controller
     {
 
         try {
-            $text_services = new ActionAdminServices($token);
+            $text_services = new AdminAction($token);
 
             $access = $text_services->accessAdmin();
             if ($access == null) return false;
