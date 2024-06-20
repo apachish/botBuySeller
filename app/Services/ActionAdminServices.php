@@ -134,7 +134,8 @@ class ActionAdminServices extends TextServices
         switch ($this->getMessage()) {
             case "\xE2\x86\xA9منو":
 
-                TelegramServices::menu($this->telegram, $this->keyboard_menu, $this->getUser(), " ");
+                logger("bargashti");
+                TelegramServices::menu($this->telegram, $this->keyboard_menu, $this->getUser(), "بازگشت");
                 break;
             case "\xF0\x9F\x93\x88معامله":
                 $text = "تغییر در معاملات انجام دهید";
