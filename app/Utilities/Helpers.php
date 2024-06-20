@@ -34,30 +34,38 @@ if (!function_exists('getPriceFormat')) {
 }
 
 if (!function_exists('isValidTime')) {
-    function isValidTime($time) {
+    function isValidTime($time)
+    {
         $pattern = '/^([01]\d|2[0-3]):([0-5]\d)$/';
         return preg_match($pattern, $time);
     }
 
 }
 if (!function_exists('cleanInput')) {
-    function cleanInput($input) {
+    function cleanInput($input)
+    {
         // استفاده از یک الگو برای جدا کردن بخش‌ها
-        $pattern = '/^(\d+)\s*(خفن|خفش|ففش|ففن|خفپ|ففپ|خفم|ففم|فف|خف|فپ|خپ|فم|خم|خش|فش|خن|فن|خ|ف)\s*(\d?)(:\s*(.*))?$/u';
-
+// 1       $pattern = '/^(\d+)\s*(خفن|خفش|ففش|ففن|خفپ|ففپ|خفم|ففم|فف|خف|فپ|خپ|فم|خم|خش|فش|خن|فن|خ|ف)\s*(\d?)(:\s*(.*))?$/u';
+        $pattern = "/^(\d{3}|\d{5})\s*((?:خف|فف|فپ|خم|خش|فش|خن|فن|خ|ف)\s*){1,3}([1-3]?)\s*(:.*)?$/u";
         if (preg_match($pattern, $input, $matches)) {
-            // حذف فضای خالی از بخش‌های مورد نیاز
-            $number = preg_replace('/\s+/', '', $matches[1]);
-            $letters = preg_replace('/\s+/', '', $matches[2]);
-            $optional_number = preg_replace('/\s+/', '', $matches[3]);
-            $comment = isset($matches[5]) ? $matches[5] : '';
+            $e = explode(":", $input);
+            $a = str_replace(" ", "", data_get($e, 0));
+            return $input = $a . (data_get($e, 1) ? ":" . data_get($e, 1) : null);
 
-            // ساختن رشته نهایی
-            $cleanedInput = $number . $letters . $optional_number;
-            if (!empty($comment)) {
-                $cleanedInput .= ':' . $comment;
-            }
-            return $cleanedInput;
+//            if (preg_match($pattern, $input, $matches)) {
+//                // حذف فضای خالی از بخش‌های مورد نیاز
+//                $number = preg_replace('/\s+/', '', $matches[1]);
+//                $letters = preg_replace('/\s+/', '', $matches[2]);
+//                $optional_number = preg_replace('/\s+/', '', $matches[3]);
+//                $comment = isset($matches[5]) ? $matches[5] : '';
+//
+//                // ساختن رشته نهایی
+//                $cleanedInput = $number . $letters . $optional_number;
+//                if (!empty($comment)) {
+//                    $cleanedInput .= ':' . $comment;
+//                }
+//            }
+//            return $cleanedInput;
         }
         return $input; // اگر الگو تطابق نداشت، همان ورودی را برگردانید
     }
@@ -73,24 +81,25 @@ if (!function_exists('getPriceFormat')) {
 if (!function_exists('getTypeTitleOrder')) {
     function getTypeTitleOrder($type)
     {
-        if(in_array($type, ["خفپ","خفم","خفش","خفن","خش","خن","خم","خف","خپ","خ"]))
+        if (in_array($type, ["خفپ", "خفم", "خفش", "خفن", "خش", "خن", "خم", "خف", "خپ", "خ"]))
             return "خرید";
-        elseif(in_array($type,["ففپ","ففم","ففش","ففن","فش","فن","فم","فف","فپ","ف"]))
+        elseif (in_array($type, ["ففپ", "ففم", "ففش", "ففن", "فش", "فن", "فم", "فف", "فپ", "ف"]))
             return "فروش";
     }
 }
 if (!function_exists('getTypeOrder')) {
     function getTypeOrder($type)
     {
-        if(in_array($type,["خفپ","خفم","خفش","خفن","خش","خن","خم","خف","خپ","خ"]))
+        if (in_array($type, ["خفپ", "خفم", "خفش", "خفن", "خش", "خن", "خم", "خف", "خپ", "خ"]))
             return "buy";
-        elseif(in_array($type,["ففپ","ففم","ففش","ففن","فش","فن","فم","فف","فپ","ف"]))
+        elseif (in_array($type, ["ففپ", "ففم", "ففش", "ففن", "فش", "فن", "فم", "فف", "فپ", "ف"]))
             return "sell";
     }
 }
 
 if (!function_exists('generateUniqueSixDigitCode')) {
-    function generateUniqueSixDigitCode() {
+    function generateUniqueSixDigitCode()
+    {
         // دریافت زمان فعلی بر حسب میلی‌ثانیه
         $microtime = microtime(true);
 
@@ -107,13 +116,13 @@ if (!function_exists('generateUniqueSixDigitCode')) {
 if (!function_exists('getTypeTransfer')) {
     function getTypeTransfer($type)
     {
-        if(in_array($type,[ "فف","خف","خ","ف"]))
+        if (in_array($type, ["فف", "خف", "خ", "ف"]))
             return "عادی";
-        elseif(in_array($type,["خفش","ففش","خش","فش"]))
+        elseif (in_array($type, ["خفش", "ففش", "خش", "فش"]))
             return "شنا";
-        elseif(in_array($type,["خفن","ففن","خن","فن"]))
+        elseif (in_array($type, ["خفن", "ففن", "خن", "فن"]))
             return "نقدی";
-        elseif(in_array($type,["ففم","خفم","فم","خم"]))
+        elseif (in_array($type, ["ففم", "خفم", "فم", "خم"]))
             return "معکوس";
 
     }
@@ -121,9 +130,9 @@ if (!function_exists('getTypeTransfer')) {
 
 
 if (!function_exists('dataNow')) {
-    function dataNow($time=null)
+    function dataNow($time = null)
     {
-        return \Carbon\Carbon::parse($time?:now())
+        return \Carbon\Carbon::parse($time ?: now())
             ->timezone(config('app.timezone'))
             ->toDateTimeString();
 
@@ -133,14 +142,14 @@ if (!function_exists('dataNow')) {
 if (!function_exists('getBetweenMonth')) {
     function getBetweenMonth($month): array
     {
-        if($month==12)
+        if ($month == 12)
             $year = convertNumber(toJalali(now()->subYear(1), "Y"));
         else
             $year = convertNumber(toJalali(now(), "Y"));
         $days = (new Jalalian($year, $month, 15))->getMonthDays();
         $date_between[] = (new Jalalian($year, $month, 1))->toCarbon()->format("Y-m-d"); // [2016, 5, 7]
         $date_between[] = (new Jalalian($year, $month, $days))->toCarbon()->format("Y-m-d"); // [2016, 5, 7]
-        return  $date_between;
+        return $date_between;
         switch ($month) {
             case 1;
                 return ["2021-03-21", "2021-04-20"];
@@ -254,12 +263,12 @@ if (!function_exists('getUnitPrice')) {
         if ($number >= 99999999999)
             $base = 1000000000000;
         elseif ($number >= 999999999)
-            $base = 1000000000 ;
+            $base = 1000000000;
         elseif ($number >= 99999)
             $base = 1000000;
         elseif ($number >= 999)
             $base = 1000;
-        return  $base;
+        return $base;
 
     }
 }
@@ -836,15 +845,15 @@ if (!function_exists('fagd')) {
     if (!function_exists('createPassword')) {
         function createPassword()
         {
-            $digits    = array_flip(range('2', '9'));
+            $digits = array_flip(range('2', '9'));
             $lowercase = array_flip(range('a', 'z'));
-            $lowercase = array_diff($lowercase,['i',"l","o"]);
+            $lowercase = array_diff($lowercase, ['i', "l", "o"]);
             $uppercase = array_flip(range('A', 'Z'));
-            $uppercase = array_diff($uppercase,["I","L","O"]);
-            $special   = array_flip(str_split('@#$'));
-            $combined  = array_merge($digits, $lowercase, $uppercase, $special);
+            $uppercase = array_diff($uppercase, ["I", "L", "O"]);
+            $special = array_flip(str_split('@#$'));
+            $combined = array_merge($digits, $lowercase, $uppercase, $special);
 
-            $password  = str_shuffle(array_rand($digits) .
+            $password = str_shuffle(array_rand($digits) .
                 array_rand($lowercase) .
                 array_rand($uppercase) .
                 array_rand($special) .

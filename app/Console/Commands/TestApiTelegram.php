@@ -39,6 +39,7 @@ class TestApiTelegram extends Command
      */
     public function handle()
     {
+        echo cleanInput("430خف1:توضیحات");exit;
 //        $customer_id = (int)$this->ask('What is  customer_id?');
 //        $customer = CustomerUser::with("user")->find($customer_id);
 //        $date = now();
