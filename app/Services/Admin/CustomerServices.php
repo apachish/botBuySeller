@@ -209,7 +209,7 @@ class CustomerServices
             // ارسال لینک دعوت به کاربر
             $message_link = "لطفا با استفاده از لینک دعوت[فقط یک ساعت معتبر می باشد] به کانال  " . env("APP_NAME") . " بپیوندید: " . $inviteLink;
             $message_link .= "\n\n " . $inviteLink;
-            $object->service_user->telegram_services->sendMessage($user_con->id, $message_link);
+            $object->service_user->telegram_services->sendMessage($user_con->telegram_id, $message_link);
             $data_old = cache()->get("menu_List_user_" . $object->getUserId());
             $message_id = data_get($data_old, "id", null);
             $this->listUser($role,$object,$page, $message_id, $filter);
