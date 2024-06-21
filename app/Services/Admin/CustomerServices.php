@@ -521,7 +521,7 @@ class CustomerServices
 
         if ($user_con) {
             $message = "شماره تلفن فعلی شما";
-            $message = $user_con->mobile;
+            $message .= $user_con->mobile;
             $message .= "\n\n";
             $message .= "می باشد لطفا موبایل  جدید وارد کنید ";
             $object->getTelegramServices()->sendMessage($object->getUserId(), $message);
