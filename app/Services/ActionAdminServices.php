@@ -73,7 +73,14 @@ class ActionAdminServices extends TextServices
             "\xF0\x9F\x92\xB3\xF0\x9F\x8C\xB3ویرایش حق اشتراک",
             "\xF0\x9F\x92\xB1کیف پول",
             "\xF0\x9F\x92\xACلیست پیام ها کاربران",
-            "\xF0\x9F\x93\x81ارسال فایل"
+            "\xF0\x9F\x93\x81ارسال فایل",
+            "جستجو کاربر\xF0\x9F\x94\x8D",
+            "\xF0\x9F\x9A\xBBلیست همکاران",
+            "\xF0\x9F\x9A\xBBلیست مشتریان",
+            "🕰تاریخ فردا️",
+            "\xE2\x98\x81تعطیل",
+            "\xF0\x9F\x9A\xAB\xE2\x98\x80ممنوع معامله روز",
+            "\xE2\x86\xA9منو",
         ];
         if (in_array($this->message, $access_text))
             return true;
