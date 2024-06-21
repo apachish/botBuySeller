@@ -173,7 +173,8 @@ class CustomerServices
                 $object->service_user->message_menu = "$fullName همکار گرامی به سیستم ما خوش آمدید\n\n ";
                 $object->service_user->message_menu .= "\n\n";
                 $object->service_user->message_menu .= "برای دریافت حساب مشتربان خود بات مشتریان را شروع کنید";
-                $object->service_user->message_menu .= "@".$object->bot->contact;
+                $object->service_user->message_menu .= "\n\n";
+                $object->service_user->message_menu .= "  @".$object->bot->contact;
                 $object->service_user->menu($this->keyword_colleague, $user_con->status, $user_con);
 
             }else
