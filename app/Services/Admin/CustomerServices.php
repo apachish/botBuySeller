@@ -185,9 +185,10 @@ class CustomerServices
     {
         $data = str_replace('add_chanel_', '', $object->getData());
         $array = explode("_", $data);
-        $id = (int)data_get($array, 0);
-        $page = (int)data_get($array, 1);
-        $filter = data_get($array, 2, null);
+        $role = (int)data_get($array, 0);
+        $id = (int)data_get($array, 1);
+        $page = (int)data_get($array, 2);
+        $filter = data_get($array, 3, null);
         $user_con = UserTelegram::with("customerUsers")->find($id);
         if ($user_con) {
             $response = $object->telegram->createChatInviteLink([
@@ -210,7 +211,7 @@ class CustomerServices
             $object->service_user->telegram_services->sendMessage($user_con->id, $message_link);
             $data_old = cache()->get("menu_List_user_" . $object->getUserId());
             $message_id = data_get($data_old, "id", null);
-            $this->listUser($object,$page, $message_id, $filter);
+            $this->listUser($role,$object,$page, $message_id, $filter);
         }
     }
 
@@ -239,7 +240,7 @@ class CustomerServices
             $object->service_user->menu($this->keyword_customer, $user_con->status, $user_con);
             $data_old = cache()->get("menu_List_user_" . $object->getUserId());
             $message_id = data_get($data_old, "id", null);
-            $this->listUser($object,$page, $message_id, $filter);
+            $this->listUser($role,$object,$page, $message_id, $filter);
         }
     }
 
