@@ -42,12 +42,12 @@ class UserTelegram extends Model
 
     public function customerUser()
     {
-        return $this->hasOne(UserTelegram::class,"user_id","id");
+        return $this->hasOne(UserTelegram::class,"agent_id","id");
     }
 
     public function customer()
     {
-        return $this->hasOne(CustomerUser::class,"mobile","mobile");
+        return $this->hasOne(UserTelegram::class,"id","agent_id");
     }
 
     public function customerUsers()
