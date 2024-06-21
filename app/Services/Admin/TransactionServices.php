@@ -25,14 +25,15 @@ class TransactionServices
     public function getForbidden($object)
     {
         $forbidden = Setting::where("key", "forbidden")->first();
-
+        $response_text = "\n\n";
         if ($forbidden) {
-            $response_text = $forbidden->value ? "فعال" : "غیرفعال";
+            $response_text = "معامله همکار با مشتری ";
+
+            $response_text .= $forbidden->value ? "فعال" : "غیرفعال";
 
             $response_text .= "\n\n";
-            $response_text .= "معامله همکار و مشتری";
-        } else
-            $response_text = "مشخص کنید معامله مشتری و همکار چگونه می باشد";
+        }
+            $response_text .= "مشخص کنید معامله مشتری و همکار چگونه می باشد";
 
         $keyboard[0][0] = ['text' => "فعال", "callback_data" => "forbidden_active"];
         $keyboard[0][1] = ['text' => "غیرفعال", "callback_data" => "forbidden_deactivate"];
@@ -45,14 +46,17 @@ class TransactionServices
     {
         $forbidden_day = Setting::where("key", "forbidden_day")->first();
 
+        $response_text = "\n\n";
+
         if ($forbidden_day) {
             $response_text = "معامله روز ";
             $response_text .= "\n\n";
             $response_text .= $forbidden_day->value ? "فعال" : "غیرفعال";
             $response_text .= "\n\n";
             $response_text .= "می باشد";
-        } else
-            $response_text = "مشخص کنید معامله در چه وضعیتی باشد";
+
+        }
+            $response_text .= "مشخص کنید معامله در چه وضعیتی باشد";
 
         $keyboard[0][0] = ['text' => "فعال", "callback_data" => "forbidden_day_active"];
         $keyboard[0][1] = ['text' => "غیرفعال", "callback_data" => "forbidden_day_deactivate"];
