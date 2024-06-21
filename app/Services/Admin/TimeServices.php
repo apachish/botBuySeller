@@ -221,6 +221,7 @@ class TimeServices
             $response_text .= "تنظیم شد";
             $object->getTelegramServices()->sendMessage($object->getUserId(), $response_text);
             cache()->forget($object->getKeyCache() . $object->getUserId());
+            cache()->forget("set_tomorrow_date");
         }else{
             $response_text = "فرمت تاریخ وارد شده درست نمی باشد";
             $object->getTelegramServices()->sendMessage($object->getUserId(), $response_text);

@@ -941,7 +941,13 @@ class ActionServices extends TextServices
                 $message .= " 🕰️	";
                 $message_request .= " 🕰️	";
                 $message_request_me .= " 🕰️	";
-                $date = now()->addDay(1)->format("Y-m-d");
+                $date = cache()->remember("set_tomorrow_date",now()->setTime(22, 59),function (){
+                    $tomorrow = Setting::where("key","tomorrow")->first();
+                    if($tomorrow)
+                        return $tomorrow->value;
+                });
+                if(!$date)
+                    $date = now()->addDay(1)->format("Y-m-d");
             }
 
             $message_request .= "\n\n";
