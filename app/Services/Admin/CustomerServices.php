@@ -469,7 +469,7 @@ class CustomerServices
     }
     public function setMemberShip($object)
     {
-        $data = str_replace('set_membership_', '', $object->getData());
+        $data = str_replace('set_membership_', '', $this->getMessageCache());
 
         $array = explode("_", $data);
         logger("data",[$array]);
