@@ -490,10 +490,13 @@ class CustomerServices
             $message = "تاریخ اشتراک";
             $message .= " ".$user_con->fullName;
             $message .= "\n\n";
-            $message .=toJalali($date,"Y\m\d");
+            $message .= convertNumber(toJalali($date,"Y\m\d"));
+            $message .= "\n\n";
             $message .= "تنظیم شد";
 
             $object->getTelegramServices()->sendMessage($object->getUserId(), $message);
+            cache()->forget($object->getKeyCache() . $object->getUserId());
+
         }else{
             $message = "فرمت تاریخ اشتراک 1403/04/01";
             $object->getTelegramServices()->sendMessage($object->getUserId(), $message);
