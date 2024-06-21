@@ -50,6 +50,11 @@ class UserTelegram extends Model
         return $this->hasOne(UserTelegram::class,"id","agent_id");
     }
 
+    public function memberShip()
+    {
+        return $this->hasOne(Membership::class,"user_id");
+    }
+
     public function customerUsers()
     {
         return $this->hasMany(CustomerUser::class,"user_id","id");
