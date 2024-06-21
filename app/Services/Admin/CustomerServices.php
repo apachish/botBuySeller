@@ -420,6 +420,8 @@ class CustomerServices
 
             $menu = $object->getTelegramServices()->MessageReplyMarkup($object->getTelegram(), $object->getUserId(), $text, $keyboard);
             cache()->set("set_head_done_" . $object->getUserId(), $menu);
+            cache()->forget($object->getKeyCache() . $object->getUserId());
+
         }else{
             $object->getTelegramServices()->sendMessage($object->getUserId(), "کاربری یافت نشد ");
 
