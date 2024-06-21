@@ -260,7 +260,7 @@ class TextServices
                 "mobile" => data_get($update, $type . '.mobile'),
                 "username" => data_get($update, $type . '.from.username'),
                 "language_code" => data_get($update, $type . '.from.language_code'),
-                "role"=>null,
+                "role"=>"customer",
                 "status"=>false,
             ]);
             if ($update && $data) {
