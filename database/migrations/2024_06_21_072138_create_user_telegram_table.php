@@ -13,11 +13,11 @@ return new class extends Migration
     {
         Schema::create('user_telegram', function (Blueprint $table) {
             $table->id();
-            $table->string("telegram_id");
+            $table->string("telegram_id")->unique()->index();
             $table->string("first_name");
             $table->string("last_name");
-            $table->string("fullName");
-            $table->string("mobile");
+            $table->string("fullName")->nullable();
+            $table->string("mobile")->nullable();
             $table->string("username");
             $table->string("language_code");
             $table->boolean("status");
