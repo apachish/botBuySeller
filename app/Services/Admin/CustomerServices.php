@@ -71,6 +71,8 @@ class CustomerServices
             $object->service_user->telegram_services::menu($object->service_user->telegram, $keyboard, $user, $text);
             $message_admin = cache()->get("message_admin_".$object->getUserId());
             logger("message_admin",[$message_admin]);
+            if($message_admin)
+                $object->telegram_services->deleteMessage($object->getUserId(),data_get($message_admin,"message_id"));
 
         }
     }
