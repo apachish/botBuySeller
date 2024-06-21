@@ -231,18 +231,25 @@ class ActionAdminServices extends TextServices
 
                 break;
             case "کانال":
+                logger($this->bot->chanel_link);
+
                 $this->getTelegramServices()->sendMessage($this->getUserId(), $this->bot->chanel_link);
 
                 break;
             case "حسابداری":
+                logger("@".$this->bot->accounting);
+
                 $this->getTelegramServices()->sendMessage($this->getUserId(), "@".$this->bot->accounting);
 
                 break;
             case "لفظ":
+                logger("@".$this->bot->word);
                 $this->getTelegramServices()->sendMessage($this->getUserId(), "@".$this->bot->word);
 
                 break;
             case "دفترچه":
+                logger("@".$this->bot->contact);
+
                 $this->getTelegramServices()->sendMessage($this->getUserId(), "@".$this->bot->contact);
 
                 break;
