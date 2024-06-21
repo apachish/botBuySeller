@@ -525,7 +525,7 @@ class ActionServices extends TextServices
             $word->update();
             $order = [
                 "status" => Transfer::STATUS_ACTIVE,
-                "user_id" => $this->getUserId(),
+                "user_id" => $this->getUser()->id,
                 "type" => data_get($word, "type"),
                 "number" => (int)data_get($word, "number"),
                 "price" => data_get($word, "price"),
@@ -538,7 +538,7 @@ class ActionServices extends TextServices
 
             logger("order", [
                 "status" => Transfer::STATUS_ACTIVE,
-                "user_id" => $this->getUserId(),
+                "user_id" => $this->getUser()->id,
                 "type" => data_get($word, "type"),
                 "number" => (int)data_get($word, "number"),
                 "price" => data_get($word, "price"),
