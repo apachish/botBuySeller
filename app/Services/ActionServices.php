@@ -265,6 +265,7 @@ class ActionServices extends TextServices
                     }
                     if ($head && $head->userTradeAccess) {
                         $access_limit = $head->userTradeAccess->where("user_trade_id", $transfer->user_id)->first();
+                        logger("access_limit",[$access_limit]);
                         if ($access_limit)
                             $limit_day = $access_limit->limit_access;
                     }
