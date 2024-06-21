@@ -89,12 +89,14 @@ class ActionAdminServices extends TextServices
         $this->time = new TimeServices();
         $this->custromer = new CustomerServices();
         $this->setting = new SettingServices();
-
-        $this->bot_user = cache()->remember("telegram_user", now()->addDay(), function () {
-            return Bot::where('title', "botUser")
-                ->first();
-        });
+        $this->bot_user = Bot::where('title', "botUser")
+            ->first();
+//        $this->bot_user = cache()->remember("telegram_user", now()->addDay(), function () {
+//            return Bot::where('title', "botUser")
+//                ->first();
+//        });
         if ($this->bot_user) {
+            logger("bot user active",[$this->bot_user]);
 //            $this->service_telgram_user = new TelegramServices($this->bot_user->token);
             $this->service_user = new ActionServices($this->bot_user->token);
             $this->bot_title = $this->bot_user->title;
