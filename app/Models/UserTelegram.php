@@ -30,6 +30,7 @@ class UserTelegram extends Model
         "agent_id",
         "role",
         "change_menu",
+        "link_invite",
         "accept_rule"
     ];
 

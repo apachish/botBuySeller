@@ -127,7 +127,7 @@ class CustomerServices
         $id = (int)data_get($array, 0);
         $page = (int)data_get($array, 1);
         $filter = data_get($array, 2, null);
-        $user_con = UserTelegram::where("id", $id)->first();
+        $user_con = UserTelegram::find($id);
         logger("con", [$user_con, $id]);
         if ($user_con) {
             $fullName = $user_con->fullName ?: $user_con->first_name . " " . $user_con->last_name;
@@ -154,7 +154,7 @@ class CustomerServices
         $id = (int)data_get($array, 1);
         $page = (int)data_get($array, 2);
         $filter = data_get($array, 3, null);
-        $user_con = UserTelegram::where("id", $id)->first();
+        $user_con = UserTelegram::find($id);
         logger("con", [$user_con, $id]);
         if ($user_con) {
             $fullName = $user_con->fullName ?: $user_con->first_name . " " . $user_con->last_name;
@@ -188,7 +188,7 @@ class CustomerServices
         $id = (int)data_get($array, 0);
         $page = (int)data_get($array, 1);
         $filter = data_get($array, 2, null);
-        $user_con = UserTelegram::where("id", $id)->with("customerUsers")->first();
+        $user_con = UserTelegram::with("customerUsers")->find($id);
         if ($user_con) {
             $response = $object->telegram->createChatInviteLink([
                 'chat_id' => $object->bot->chanel_id,
@@ -198,6 +198,7 @@ class CustomerServices
             ]);
 
             $inviteLink = data_get($response, "invite_link");
+
 
             $object->telegram->sendMessage([
                 'chat_id' => $object->getUserId(),
@@ -220,7 +221,7 @@ class CustomerServices
         $id = (int)data_get($array, 0);
         $page = (int)data_get($array, 1);
         $filter = data_get($array, 2, null);
-        $user_con = UserTelegram::where("id", $id)->first();
+        $user_con = UserTelegram::find($id);
         logger("con", [$user_con, $id]);
         if ($user_con) {
             $fullName = $user_con->fullName ?: $user_con->first_name . " " . $user_con->last_name;
@@ -249,7 +250,7 @@ class CustomerServices
         $id = (int)data_get($array, 1);
         $page = (int)data_get($array, 2);
         $filter = data_get($array, 3, null);
-        $user_con = UserTelegram::withTrashed()->where("id", $id)->first();
+        $user_con = UserTelegram::withTrashed()->find($id);
         logger("con", [$user_con, $id, UserTelegram::withTrashed()->where("id", $id)->getQuery()]);
         if ($user_con) {
             $fullName = $user_con->fullName ?: $user_con->first_name . " " . $user_con->last_name;
@@ -280,7 +281,7 @@ class CustomerServices
         $page = (int)data_get($array, 2);
         $filter = data_get($array, 3, null);
 
-        $user_con = UserTelegram::where("id", $id)->first();
+        $user_con = UserTelegram::find($id);
         logger("rej", [$user_con, $id]);
 
         if ($user_con) {
@@ -311,7 +312,7 @@ class CustomerServices
         $page = (int)data_get($array, 2);
         $filter = data_get($array, 3, null);
 
-        $user_con = UserTelegram::where("id", $id)->first();
+        $user_con = UserTelegram::find($id);
         logger("rej", [$user_con, $id]);
 
         if ($user_con) {
@@ -358,7 +359,7 @@ class CustomerServices
         $page = (int)data_get($array, 2);
         $filter = data_get($array, 3, null);
 
-        $user_con = UserTelegram::where("id", $id)->first();
+        $user_con = UserTelegram::find($id);
         logger("rej", [$user_con, $id]);
 
         if ($user_con) {
@@ -378,7 +379,7 @@ class CustomerServices
         $array = explode("_", $data);
         $id = (int)data_get($array, 1);
 
-        $user_con = UserTelegram::where("id", $id)->first();
+        $user_con = UserTelegram::find($id);
         logger("edit_mobile_done_", [$user_con, $id]);
 
         if ($user_con) {
@@ -423,7 +424,7 @@ class CustomerServices
         $id = (int)data_get($array, 2);
         $page = (int)data_get($array, 3);
         $filter = data_get($array, 4, null);
-        $user_con = UserTelegram::where("id", $id)->first();
+        $user_con = UserTelegram::find($id);
         if($user_con)
         {
             $user_con["agent_id"] = $parent;
@@ -511,7 +512,7 @@ class CustomerServices
         $page = (int)data_get($array, 1);
         $filter = data_get($array, 2, null);
 
-        $user_con = UserTelegram::where("id", $id)->first();
+        $user_con = UserTelegram::find($id);
         logger("edit_mobile_done_", [$user_con, $id]);
 
         if ($user_con) {
@@ -533,7 +534,7 @@ class CustomerServices
         $page = (int)data_get($array, 2);
         $filter = data_get($array, 3, null);
 
-        $user_con = UserTelegram::where("id", $id)->first();
+        $user_con = UserTelegram::find($id);
         logger("rej", [$user_con, $id]);
 
         if ($user_con) {
