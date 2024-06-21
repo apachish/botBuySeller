@@ -54,7 +54,7 @@ class TextServices
 
     private $pattern;
 
-    protected $telegram_services;
+    public $telegram_services;
 
     private $token;
 
