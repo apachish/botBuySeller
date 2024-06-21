@@ -172,7 +172,7 @@ class ActionAdminServices extends TextServices
                 $text = "مدیریت کاربران سیستم";
                 TelegramServices::menu($this->telegram, $this->custromer->keyword, $this->getUser(), $text);
                 break;
-            case "\xF0\x9F\x9A\xBBلیست کاربران":
+            case "\xF0\x9F\x9A\xBBلیست مشتریان":
                 $this->listUser();
                 break;
             case "\xF0\x9F\x9A\xBBلیست همکاران":
