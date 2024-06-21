@@ -134,10 +134,10 @@ class ActionServices extends TextServices
             ]);
             $text = " کاربر  ";
             $text .= $this->getUser()->fullName;
-            $text .= "می خواهد وارد سیستم شود";
+            $text .= " می خواهد وارد سیستم شود ";
             $admins = AccessBot::all();
             foreach ($admins as $admin) {
-                $this->getBotAdmin()->sendMessage(
+                $message_admin =$this->getBotAdmin()->sendMessage(
                     [
                         'chat_id' => $admin->user_id,
                         'text' => $text,
@@ -145,9 +145,10 @@ class ActionServices extends TextServices
 
                     ]
                 );
+                cache()->set("message_admin_".$admin->user_id,$message_admin);
             }
             if (!$this->getUser()->fullName) {
-                $text = "طفا نام و نام خانوادگی خود را وارد نمایید";
+                $text = "لطفا نام و نام خانوادگی خود را وارد نمایید";
                 cache()->set($this->getKeyCache() . $this->getUserId(), "add_fullName");
                 $this->telegram->sendMessage(['chat_id' => $this->getUserId(), 'text' => $text]);
 
