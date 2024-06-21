@@ -72,7 +72,14 @@ class CustomerServices
             $message_admin = cache()->get("message_admin_".$object->getUserId());
             logger("message_admin",[$message_admin]);
             if($message_admin)
+            {
                 $object->telegram_services->deleteMessage($object->getUserId(),data_get($message_admin,"message_id"));
+                $text_a = "کاربر";
+                $text_a .= $user->fullName;
+                $text_a .= "تایید شد";
+                $object->getTelegramServices()->sendMessage($object->getUserId(), $text_a);
+
+            }
 
         }
     }
