@@ -44,11 +44,11 @@ class TextServices
 
     public $data;
 
-    protected $bot;
+    public $bot;
 
-    protected $bot_admin;
+    public $bot_admin;
 
-    protected $telegram;
+    public $telegram;
 
     protected $message_menu = "خوش آمدید";
 
