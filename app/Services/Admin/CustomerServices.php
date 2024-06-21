@@ -605,7 +605,7 @@ class CustomerServices
                 $key_i .= "_" . $filter;
             if($user->role == "customer" && $user->customerUser)
                 $text .= " مشتری )".$user->customerUser->FullName." )";
-            else
+            elseif($user->role == "colleague")
                 $text .= "(همکار)";
             $keyboard[$i++] = [
                 ['text' => "  $text  ", 'callback_data' => "set_worker_".$key_i],
