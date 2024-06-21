@@ -60,7 +60,7 @@ class CustomerServices
     public function AcceptUser($object)
     {
         $id = (int)str_replace('ok_user_', '', $object->getData());
-        $user = UserTelegram::where("id",$id)->first();
+        $user = UserTelegram::where("telegram_id",$id)->first();
         if($user)
         {
             $text = "لطفا قوانین را مطالعه فرمایید";
