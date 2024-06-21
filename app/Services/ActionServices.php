@@ -124,8 +124,8 @@ class ActionServices extends TextServices
             $this->getUser()->update();
             $this->setBotAdmin();
             $keyboard[] = [
-                ["text" => "تایید", "callback_data" => "ok_user_".$this->getUserId()],
-                ["text" => "رد", "callback_data" => "reject_user_".$this->getUserId()]
+                ["text" => "تایید", "callback_data" => "ok_user_" . $this->getUserId()],
+                ["text" => "رد", "callback_data" => "reject_user_" . $this->getUserId()]
             ];
             $reply_markup = Keyboard::make([
                 'inline_keyboard' => $keyboard,
@@ -137,7 +137,7 @@ class ActionServices extends TextServices
             $text .= " می خواهد وارد سیستم شود ";
             $admins = AccessBot::all();
             foreach ($admins as $admin) {
-                $message_admin =$this->getBotAdmin()->sendMessage(
+                $message_admin = $this->getBotAdmin()->sendMessage(
                     [
                         'chat_id' => $admin->user_id,
                         'text' => $text,
@@ -145,7 +145,7 @@ class ActionServices extends TextServices
 
                     ]
                 );
-                cache()->set("message_admin_".$admin->user_id,$message_admin);
+                cache()->set("message_admin_" . $admin->user_id, $message_admin);
             }
             if (!$this->getUser()->fullName) {
                 $text = "لطفا نام و نام خانوادگی خود را وارد نمایید";
@@ -191,7 +191,7 @@ class ActionServices extends TextServices
         $text = "لطفا راهنما را مطالعه فرمایید";
         $help = Setting::where("key", "help")->first();
 
-        $text .=  $help?$help->value:"";
+        $text .= $help ? $help->value : "";
         $keyboard[0][0] = ['text' => "راهنما را خواندم و یاد گرفتم"];
         TelegramServices::menu($this->telegram, $keyboard, $this->getUser(), $text);
 //        $message_id = cache()->get("rule_accept". $this->getUserId());
@@ -199,6 +199,7 @@ class ActionServices extends TextServices
 //        $this->getTelegramServices()->editMessageTextAndInlineKeyboard($this->getUserId(), $message_id, $text, []);
 //        cache()->forget("rule_accept". $this->getUserId());
     }
+
     public function helpAccept()
     {
         logger("accept help");
@@ -213,8 +214,7 @@ class ActionServices extends TextServices
 
     public function requestTransfer()
     {
-        if(!$this->getUser()->status)
-        {
+        if (!$this->getUser()->status) {
             $this->telegram_services->sendMessage($this->getUserId(), "اکانت کاربری شما غیر فعال می باشد");
             return true;
         }
@@ -256,19 +256,22 @@ class ActionServices extends TextServices
 
                     if ($forbidden && data_get($transfer, "user.role") == "colleague") {
                         $list_worker = $head->customerUsers->pluck("id")->toArray();
-                        $list_worker[] = data_get($head,"id");
+                        $list_worker[] = data_get($head, "id");
                         logger("head cus", [$head, data_get($this->getUser(), "customer")]);
-                        if (in_array($this->getUser()->id,$list_worker)) {
+                        if (in_array($this->getUser()->id, $list_worker)) {
                             $this->telegram_services->sendMessage($this->getUserId(), "\xE2\x9D\x8C	استثنائا در این دقایق خاص بصورت موقت امکان گرفتن لفظ سرگروه و زیر مجموعه خودش امکان پذیر نمی باشد\xE2\x9D\x8C	");
                             return true;
                         }
                     }
-                    if ($head && $head->userTradeAccess)
-                        $limit_day = $head->userTradeAccess->limit_access;
+                    if ($head && $head->userTradeAccess) {
+                        $access_limit = $head->userTradeAccess->where("user_trade_id", $transfer->user_id);
+                        if ($access_limit)
+                            $limit_day = $access_limit->limit_access;
+                    }
 
                 } elseif ($this->getUser()->role == "colleague") {
                     if ($forbidden && data_get($transfer, "user.role") == "customer") {
-                        if (in_array($this->getUserId(),$this->getUser()->customerUsers)) {
+                        if (in_array($this->getUserId(), $this->getUser()->customerUsers)) {
                             $this->telegram_services->sendMessage($this->getUserId(), "\xE2\x9D\x8C	استثنائا در این دقایق خاص بصورت موقت امکان گرفتن لفظ سرگروه و زیر مجموعه خودش امکان پذیر نمی باشد\xE2\x9D\x8C	");
                             return true;
                         }
@@ -341,7 +344,7 @@ class ActionServices extends TextServices
                     $request_transfer["price"] = $transfer->price;
                     $request_transfer["type"] = getTypeOrder(data_get($transfer, "type")) == "buy" ? "sell" : "buy";
 
-                    $order_buy =  RequestTransfer::create($request_transfer);
+                    $order_buy = RequestTransfer::create($request_transfer);
 
                     if ($transfer->user->role == "customer" && $this->getUser()->role == "customer") {
                         $transaction_party_req = "مشاهده فقط برای سرگروه";
@@ -434,7 +437,7 @@ class ActionServices extends TextServices
                     $message .= "\n\n";
                     $message .= "برای:" . toJalali($transfer->date, "Y/m/d");
                     $message .= "\n\n";
-                    $message .= "       شماره حواله:" .  data_get($order_buy, 'id');
+                    $message .= "       شماره حواله:" . data_get($order_buy, 'id');
 
                     logger("message3", [$message]);
                     $this->telegram_services->sendMessage($transfer->user_id, $message);
@@ -781,15 +784,13 @@ class ActionServices extends TextServices
 
     public function checkWord()
     {
-        if(!$this->getUser()->status)
-        {
+        if (!$this->getUser()->status) {
             $this->telegram_services->sendMessage($this->getUserId(), "اکانت کاربری شما غیر فعال می باشد");
             return true;
         }
 
-        if($this->getDescription() && !(in_array($this->getType(), $this->list_type_today_normal)||
-                in_array($this->getType(), $this->list_type_today_cache)))
-        {
+        if ($this->getDescription() && !(in_array($this->getType(), $this->list_type_today_normal) ||
+                in_array($this->getType(), $this->list_type_today_cache))) {
             $this->telegram_services->sendMessage($this->getUserId(), "توضیحات برای معاملات نقدی می باشد");
             return true;
         }
@@ -918,25 +919,24 @@ class ActionServices extends TextServices
             if (!$time->between($morning, $none_13_30, true) && in_array($this->getType(), $this->list_type_today_r_f)) {
                 $this->telegram_services->sendMessage($this->getUserId(), "\xE2\x9D\x8C	زمان معامله شرایطی برای امروز به پایان رسیده است\xE2\x9D\x8C	");
                 return true;
-            }elseif (!$time->between($morning, $none, true) && in_array($this->getType(), $this->list_type_today_normal)) {
+            } elseif (!$time->between($morning, $none, true) && in_array($this->getType(), $this->list_type_today_normal)) {
                 $this->telegram_services->sendMessage($this->getUserId(), "\xE2\x9D\x8C	زمان معامله روز به پایان رسیده است\xE2\x9D\x8C		");
                 return true;
-            }elseif (!$time->between($morning, $none, true) && in_array($this->getType(), $this->list_type_today_cache)) {
+            } elseif (!$time->between($morning, $none, true) && in_array($this->getType(), $this->list_type_today_cache)) {
                 $this->telegram_services->sendMessage($this->getUserId(), "\xE2\x9D\x8C	زمان معامله نقدی حاضر به پایان رسیده است\xE2\x9D\x8C		");
                 return true;
-            }else if ($time->between($morning, $none_13_30, true) && in_array($this->getType(), $this->list_type_today_r_f)) {
+            } else if ($time->between($morning, $none_13_30, true) && in_array($this->getType(), $this->list_type_today_r_f)) {
                 $message .= " \xE2\x98\x80	";
                 $message_request .= " \xE2\x98\x80	";
                 $message_request_me .= " \xE2\x98\x80	";
                 $date = now()->format("Y-m-d");
-            }else if ($time->between($morning, $none, true) && (in_array($this->getType(), $this->list_type_today_normal)||
+            } else if ($time->between($morning, $none, true) && (in_array($this->getType(), $this->list_type_today_normal) ||
                     in_array($this->getType(), $this->list_type_today_cache))) {
                 $message .= " \xE2\x98\x80	";
                 $message_request .= " \xE2\x98\x80	";
                 $message_request_me .= " \xE2\x98\x80	";
                 $date = now()->format("Y-m-d");
-            }
-             else {
+            } else {
                 $message .= " 🕰️	";
                 $message_request .= " 🕰️	";
                 $message_request_me .= " 🕰️	";
@@ -983,7 +983,7 @@ class ActionServices extends TextServices
                 "date" => $date,
                 "message_request" => $message_request,
                 "message_request_me" => $message_request_me,
-                "description"=>$this->getDescription()
+                "description" => $this->getDescription()
             ]);
             logger("word", [$word_telegram]);
             $keyboard[0] = [
