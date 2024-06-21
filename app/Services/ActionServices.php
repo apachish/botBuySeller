@@ -350,31 +350,31 @@ class ActionServices extends TextServices
                     if ($transfer->user->role == "customer" && $this->getUser()->role == "customer") {
                         $transaction_party_req = "مشاهده فقط برای سرگروه";
                         if (data_get($transfer, 'user.customer')) {
-                            $transaction_party_req_s = data_get($transfer, 'user.customer.fullName');
-                            $transaction_party_req_s .= "(" . data_get($transfer, 'user.customer.headCustomer.fullName') . ")";
+                            $transaction_party_req_s = data_get($transfer, 'user.fullName');
+                            $transaction_party_req_s .= "(" . data_get($transfer, 'user.customer.fullName') . ")";
                         } else
                             $transaction_party_req_s = data_get($transfer, 'user.fullName');
 
                         $transaction_party = "مشاهده فقط برای سرگروه";
                         if (data_get($this->getUser(), 'customer')) {
-                            $transaction_party_s = data_get($this->getUser(), 'customer.fullName');
-                            $transaction_party_s .= "(" . data_get($this->getUser(), 'customer.headCustomer.fullName') . ")";
+                            $transaction_party_s = data_get($this->getUser(), 'fullName');
+                            $transaction_party_s .= "(" . data_get($this->getUser(), 'customer.fullName') . ")";
                         } else
                             $transaction_party_s = data_get($transfer, 'user.fullName');
 
                     } elseif ($transfer->user->role == "colleague" && $this->getUser()->role == "customer") {
                         $transaction_party_req = "مشاهده فقط برای سرگروه";
-                        if (data_get($transfer, 'customer.headCustomer'))
+                        if (data_get($transfer, 'user'))
                             $transaction_party_req_s = data_get($transfer, 'user.fullName');
                         if (data_get($this->getUser(), 'customer')) {
-                            $transaction_party = data_get($this->getUser(), 'user.customerUser.fullName');
-                            $transaction_party .= "(" . data_get($this->getUser(), 'user.customer.headCustomer.fullName') . ")";
+                            $transaction_party = data_get($this->getUser(), 'fullName');
+                            $transaction_party .= "(" . data_get($this->getUser(), 'customer.fullName') . ")";
                         } else
                             $transaction_party = data_get($this->getUser(), 'fullName');
                     } elseif ($transfer->user->role == "customer" && $this->getUser()->role == "colleague") {
                         if (data_get($transfer, 'user.customer')) {
-                            $transaction_party_req = data_get($transfer, 'user.customer.fullName');
-                            $transaction_party_req .= "(" . data_get($transfer, 'user.customer.headCustomer.fullName') . ")";
+                            $transaction_party_req = data_get($transfer, 'user.fullName');
+                            $transaction_party_req .= "(" . data_get($transfer, 'user.customer.fullName') . ")";
                         } else
                             $transaction_party_req = data_get($transfer, 'user.fullName');
 
@@ -441,7 +441,7 @@ class ActionServices extends TextServices
                     $message .= "       شماره حواله:" . data_get($order_buy, 'id');
 
                     logger("message3", [$message]);
-                    $this->telegram_services->sendMessage($transfer->user_id, $message);
+                    $this->telegram_services->sendMessage($transfer->user->telegram_id, $message);
                     if ($transfer->user->role == "customer" && data_get($transfer, 'user.customer')) {
                         $message_head = "نام مشتری:";
                         $message_head .= data_get($transfer, 'user.fullName');
