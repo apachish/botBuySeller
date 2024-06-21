@@ -218,11 +218,12 @@ class CustomerServices
     {
         $data = str_replace('confirm_', '', $object->getData());
         $array = explode("_", $data);
-        $id = (int)data_get($array, 0);
-        $page = (int)data_get($array, 1);
-        $filter = data_get($array, 2, null);
+        $role = (int)data_get($array, 0);
+        $id = (int)data_get($array, 1);
+        $page = (int)data_get($array, 2);
+        $filter = data_get($array, 3, null);
         $user_con = UserTelegram::find($id);
-        logger("con", [$user_con, $id]);
+        logger("con", [$user_con, $id,$data]);
         if ($user_con) {
             $fullName = $user_con->fullName ?: $user_con->first_name . " " . $user_con->last_name;
             $user_con->status = true;
