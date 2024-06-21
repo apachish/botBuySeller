@@ -235,15 +235,15 @@ class ActionAdminServices extends TextServices
 
                 break;
             case "حسابداری":
-                $this->getTelegramServices()->sendMessage($this->getUserId(), $this->bot->accounting);
+                $this->getTelegramServices()->sendMessage($this->getUserId(), "@".$this->bot->accounting);
 
                 break;
             case "لفظ":
-                $this->getTelegramServices()->sendMessage($this->getUserId(), $this->bot->word);
+                $this->getTelegramServices()->sendMessage($this->getUserId(), "@".$this->bot->word);
 
                 break;
             case "دفترچه":
-                $this->getTelegramServices()->sendMessage($this->getUserId(), $this->bot->contact);
+                $this->getTelegramServices()->sendMessage($this->getUserId(), "@".$this->bot->contact);
 
                 break;
 
