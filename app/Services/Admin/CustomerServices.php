@@ -69,7 +69,7 @@ class CustomerServices
             $text .=  $rule?$rule->value:"";
             $keyboard[0][0] = ['text' => "قوانین را خوانده و آنها را پذیرفتم"];
             $object->service_user->telegram_services::menu($object->service_user->telegram, $keyboard, $user, $text);
-            $message_admin = cache()->set("message_admin_".$object->getUserId());
+            $message_admin = cache()->get("message_admin_".$object->getUserId());
             logger("message_admin",[$message_admin]);
 
         }
