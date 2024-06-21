@@ -58,7 +58,7 @@ class UserTelegram extends Model
 
     public function customerUsers()
     {
-        return $this->hasMany(CustomerUser::class,"user_id","id");
+        return $this->hasMany(UserTelegram::class,"user_id","id");
     }
 
 
