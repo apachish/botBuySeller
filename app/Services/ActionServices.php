@@ -413,10 +413,10 @@ class ActionServices extends TextServices
                         $message = str_replace($transaction_party_req, $transaction_party_req_s, $message);
                         $message_head .= $message;
                         logger("message2", [
-                            'chat_id' => data_get($this->getUser(), 'customer.user_id'),
+                            'chat_id' => data_get($this->getUser(), 'customer.telegram_id'),
                             'text' => $message_head,
                         ]);
-                        $this->sendBotCustomer(data_get($this->getUser(), 'customer.user_id'), $message_head);
+                        $this->sendBotCustomer(data_get($this->getUser(), 'customer.telegram_id'), $message_head);
 
                     }
 
@@ -448,8 +448,8 @@ class ActionServices extends TextServices
                         $message_head .= "\n\n";
                         $message = str_replace($transaction_party, $transaction_party_s, $message);
                         $message_head .= $message;
-                        logger("message4", [data_get($transfer, 'user.customer.user_id'), $message_head]);
-                        $this->sendBotCustomer(data_get($transfer, 'user.customer.user_id'), $message_head);
+                        logger("message4", [data_get($transfer, 'user.customer.telegram_id'), $message_head]);
+                        $this->sendBotCustomer(data_get($transfer, 'user.customer.telegram_id'), $message_head);
 
                     }
 
