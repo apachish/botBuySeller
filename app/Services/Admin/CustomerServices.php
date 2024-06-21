@@ -572,6 +572,8 @@ class CustomerServices
         $action_id = cache()->get("say_mobile_new_".$object->getUserId());
         if($status == "reject"){
             $object->getTelegramServices()->deleteMessage($object->getUserId(),$action_id);
+            cache()->forget("say_mobile_new_".$object->getUserId());
+            cache()->forget($object->getKeyCache() . $object->getUserId());
             return true;
         }
         $user_new = UserTelegram::find($new_user);
@@ -599,7 +601,8 @@ class CustomerServices
             $data_old = cache()->get("menu_List_user_" . $object->getUserId());
             $message_id = data_get($data_old, "id", null);
             $object->getTelegramServices()->deleteMessage($object->getUserId(),$message_id);
-
+            cache()->forget("say_mobile_new_".$object->getUserId());
+            cache()->forget($object->getKeyCache() . $object->getUserId());
         }
     }
 
