@@ -23,6 +23,9 @@ class CustomerServices
             ['text' => "\xF0\x9F\x9A\xBBلیست مشتریان"],
         ],
         [
+            ['text' => "\xF0\x9F\x93\xA9ارسال پیام گروه"],
+        ],
+        [
             ['text' => "\xE2\x86\xA9منو"]
         ],
     ];
@@ -662,6 +665,25 @@ class CustomerServices
     public function listCustomer($object)
     {
         $this->listUser("customer",$object,1,);
+
+    }
+
+    public function getMessageGroup($object)
+    {
+        $message ="پیامی که می خواهید برای کاربان سیستم ارسال کنید وارد کنید";
+            $object->getTelegramServices()->sendMessage($object->getUserId(), $message);
+            cache()->set($object->getKeyCache() . $object->getUserId(), "send_message_group");
+
+    }
+
+    public function setMessageGroup($object)
+    {
+        $users = UserTelegram::get();
+        foreach ($users as $user) {
+            $object->service_user->telegram_services->sendMessage($user->telegram_id, $object->getMessage());
+
+        }
+        cache()->forget($object->getKeyCache() . $object->getUserId());
 
     }
 

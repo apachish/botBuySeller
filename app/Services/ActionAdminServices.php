@@ -77,6 +77,7 @@ class ActionAdminServices extends TextServices
             "جستجو کاربر\xF0\x9F\x94\x8D",
             "\xF0\x9F\x9A\xBBلیست همکاران",
             "\xF0\x9F\x9A\xBBلیست مشتریان",
+            "\xF0\x9F\x93\xA9ارسال پیام گروه",
             "🕰تاریخ فردا️",
             "\xE2\x98\x81تعطیل",
             "\xF0\x9F\x9A\xAB\xE2\x98\x80ممنوع معامله روز",
@@ -157,8 +158,6 @@ class ActionAdminServices extends TextServices
         logger("actionText", [$this->getMessage()]);
         switch ($this->getMessage()) {
             case "\xE2\x86\xA9منو":
-
-                logger("bargashti");
                 TelegramServices::menu($this->telegram, $this->keyboard_menu, $this->getUser(), "بازگشت");
                 break;
             case "\xF0\x9F\x93\x88معامله":
@@ -187,8 +186,8 @@ class ActionAdminServices extends TextServices
             case "\xF0\x9F\x9A\xBBلیست همکاران":
                 $this->custromer->listColleague($this);
                 break;
-            case "\xF0\x9F\x92\xACلیست پیام ها کاربران":
-                $this->listMessageSupport();
+            case "\xF0\x9F\x93\xA9ارسال پیام گروه":
+                $this->custromer->getMessageGroup();
                 break;
             case "جستجو کاربر\xF0\x9F\x94\x8D":
                 cache()->set($this->getKeyCache() . $this->getUserId(), "find_user");
@@ -279,7 +278,10 @@ class ActionAdminServices extends TextServices
         logger($key_case);
         switch ($key_case) {
 
-            case "say_mobile_new_":
+            case "send_message_group":
+                $this->custromer->setMessageGroup($this);
+                break;
+                case "say_mobile_new_":
                 $this->custromer->getMobile($this);
                 break;
             case "set_date_tomorrow":
