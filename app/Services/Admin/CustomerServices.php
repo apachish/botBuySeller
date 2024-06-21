@@ -192,6 +192,12 @@ class CustomerServices
         logger("data",[$data]);
         $user_con = UserTelegram::with("customerUsers")->find($id);
         if ($user_con) {
+            logger("link",[
+                'chat_id' => $object->bot,
+                'name' => Str::slug($user_con->fullName, "_"),
+                'expire_date' => time() + 3600, // لینک به مدت 24 ساعت معتبر است
+                'member_limit' => 1, // تعداد اعضای جدیدی که با این لینک می‌توانند بپیوندند
+            ]);
             $response = $object->telegram->createChatInviteLink([
                 'chat_id' => $object->bot->chanel_id,
                 'name' => Str::slug($user_con->fullName, "_"),
