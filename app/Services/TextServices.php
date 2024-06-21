@@ -75,7 +75,7 @@ class TextServices
                 ->first();
         });
         logger("bot check ",[$this->bot]);
-        $this->telegram = new Api($this->bot);
+        $this->telegram = new Api($this->bot->token);
         logger("trl check ",[$this->telegram]);
 
         $this->telegram_services = new TelegramServices($this->token);
