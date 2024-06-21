@@ -485,7 +485,7 @@ class CustomerServices
 
             $user_con->memberShip()->create([
                 "user_id"=>$user_con->id,
-                "date"=>$date,
+                "expiration_date"=>$date,
             ]);
             $message = "تاریخ اشتراک";
             $message .= " ".$user_con->fullName;
