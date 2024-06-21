@@ -3,13 +3,11 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use MongoDB\Laravel\Eloquent\Model;
-use MongoDB\Laravel\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Model;
 
 class UserTradeAccess extends Model
 {
-    protected $connection = "mongodb";
-    protected $collection = 'user_trade_access_collection';
+    protected $table = 'user_trade_access';
 
     protected $fillable = [
         "user_id",

@@ -230,7 +230,7 @@ class ActionServices extends TextServices
             cache()->forget("double_click_" . $id . "_" . $this->getUserId());
         $transfer = Transfer::with("user.customer")->find($id);
 
-        if ($transfer->user_id == $this->getUserId()) {
+        if ($transfer->user_id == $this->getUser()->id) {
             $this->telegram_services->sendMessage($this->getUserId(), "شما نمی توانید لفظ خود را دریافت کنید");
             return true;
         }
@@ -252,34 +252,31 @@ class ActionServices extends TextServices
 
 
                 if ($this->getUser()->role == "customer") {
+                    $head = data_get($this->getUser(), "customer");
+
                     if ($forbidden && data_get($transfer, "user.role") == "colleague") {
-                        $head = data_get($this->getUser(), "customer.user_id");
+                        $list_worker = $head->customerUsers->pluck("id")->toArray();
+                        $list_worker[] = data_get($head,"id");
                         logger("head cus", [$head, data_get($this->getUser(), "customer")]);
-                        if ($head == $transfer->user_id) {
+                        if (in_array($this->getUser()->id,$list_worker)) {
                             $this->telegram_services->sendMessage($this->getUserId(), "\xE2\x9D\x8C	استثنائا در این دقایق خاص بصورت موقت امکان گرفتن لفظ سرگروه و زیر مجموعه خودش امکان پذیر نمی باشد\xE2\x9D\x8C	");
                             return true;
                         }
                     }
-                    logger("customer", [$this->getUser()->role]);
-                    $customer = CustomerUser::where("mobile", $this->getUser()->mobile)->first();
-                    logger("limit customer", [$customer]);
-//                    if ($customer && $customer->limit)
-//                        $limit_day = $customer->limit;
+                    if ($head && $head->userTradeAccess)
+                        $limit_day = $head->userTradeAccess->limit_access;
 
                 } elseif ($this->getUser()->role == "colleague") {
                     if ($forbidden && data_get($transfer, "user.role") == "customer") {
-                        $customer = data_get($transfer, "user.customer.user_id");
-                        logger("head", [$customer, data_get($transfer, "user.customer")]);
-
-                        if ($this->getUserId() == $customer) {
+                        if (in_array($this->getUserId(),$this->getUser()->customerUsers)) {
                             $this->telegram_services->sendMessage($this->getUserId(), "\xE2\x9D\x8C	استثنائا در این دقایق خاص بصورت موقت امکان گرفتن لفظ سرگروه و زیر مجموعه خودش امکان پذیر نمی باشد\xE2\x9D\x8C	");
                             return true;
                         }
                     }
-                    $user_request = UserTradeAccess::where("user_id", $this->getUserId())
+                    $user_request = UserTradeAccess::where("user_id", $this->getUser()->id)
                         ->where("user_trade_id", $transfer->user_id)->first();
                     $user_transfer = UserTradeAccess::where("user_id", $transfer->user_id)
-                        ->where("user_trade_id", $this->getUserId())->first();
+                        ->where("user_trade_id", $this->getUser()->id)->first();
 
                     logger("www", [$user_request, $user_transfer]);
                     if (($user_request && $user_request->limit_access) && ($user_transfer && $user_transfer->limit_access))
@@ -290,9 +287,9 @@ class ActionServices extends TextServices
                         $limit_day = $user_request->limit_access;
 
                 }
-                logger("type_t" . $transfer_type, [$transfer->user_id, $this->getUserId()]);
-                $buyer_id = $transfer_type == "buy" ? $transfer->user_id : $this->getUserId();
-                $seller_id = $transfer_type == "sell" ? $transfer->user_id : $this->getUserId();
+                logger("type_t" . $transfer_type, [$transfer->user_id, $this->getUser()->id]);
+                $buyer_id = $transfer_type == "buy" ? $transfer->user_id : $this->getUser()->id;
+                $seller_id = $transfer_type == "sell" ? $transfer->user_id : $this->getUser()->id;
 
                 logger("limit_day", [$limit_day]);
                 logger("limit_day", [$buyer_id, $seller_id]);
@@ -338,13 +335,13 @@ class ActionServices extends TextServices
                     $this->telegram_services->editMessageTextAndInlineKeyboard($this->bot->chanel_id, $transfer->message_id, $trade_message, $keyboard);
                     $transfer->update();
 
-                    $request_transfer["remittance_number"] = generateUniqueSixDigitCode();
-                    $request_transfer["request_id"] = $this->getUserId();
+//                    $request_transfer["remittance_number"] = generateUniqueSixDigitCode();
+                    $request_transfer["request_id"] = $this->getUser()->id;
                     $request_transfer["transfer_id"] = $transfer->id;
                     $request_transfer["price"] = $transfer->price;
                     $request_transfer["type"] = getTypeOrder(data_get($transfer, "type")) == "buy" ? "sell" : "buy";
 
-                    RequestTransfer::create($request_transfer);
+                    $order_buy =  RequestTransfer::create($request_transfer);
 
                     if ($transfer->user->role == "customer" && $this->getUser()->role == "customer") {
                         $transaction_party_req = "مشاهده فقط برای سرگروه";
@@ -402,7 +399,7 @@ class ActionServices extends TextServices
                     $message .= "\n\n";
                     $message .= "برای:" . toJalali($transfer->date, "Y/m/d");
                     $message .= "\n\n";
-                    $message .= "       شماره حواله:" . data_get($request_transfer, 'remittance_number');
+                    $message .= "       شماره حواله:" . data_get($order_buy, 'id');
                     logger("message1", [$message]);
                     $this->telegram_services->sendMessage($this->getUserId(), $message);
                     if ($this->getUser()->role == "customer" && data_get($this->getUser(), 'customer')) {
@@ -437,7 +434,7 @@ class ActionServices extends TextServices
                     $message .= "\n\n";
                     $message .= "برای:" . toJalali($transfer->date, "Y/m/d");
                     $message .= "\n\n";
-                    $message .= "       شماره حواله:" . data_get($request_transfer, 'remittance_number');
+                    $message .= "       شماره حواله:" .  data_get($order_buy, 'id');
 
                     logger("message3", [$message]);
                     $this->telegram_services->sendMessage($transfer->user_id, $message);
@@ -573,7 +570,7 @@ class ActionServices extends TextServices
         $worker_id = (int)data_get($array, 0);
         $page = (int)data_get($array, 1);
 
-        $worker = UserTelegram::where("id", $worker_id)->first();
+        $worker = UserTelegram::find($worker_id);
         logger("worker", [$worker_id, $worker, $page]);
         if ($worker) {
             $limit_access = UserTradeAccess::where("user_id", $this->getUserId())
@@ -611,7 +608,7 @@ class ActionServices extends TextServices
         $data = explode("_", $data);
         $worker_id = (int)data_get($data, 0);
         $page = (int)data_get($data, 1);
-        $worker = UserTelegram::where("id", $worker_id)->first();
+        $worker = UserTelegram::find($worker_id);
         logger("worker", [$worker]);
         if ($worker) {
             $name_worker = $worker->fullName ?: $worker->first_name . " " . $worker->last_name;
@@ -744,7 +741,7 @@ class ActionServices extends TextServices
             $worker_id = (int)data_get($data_cache, "value");
             $page = (int)data_get($data_cache, "page");
             UserTradeAccess::updateOrCreate([
-                "user_id" => $this->getUserId(),
+                "user_id" => $this->getUser()->id,
                 "user_trade_id" => $worker_id,],
                 [
                     "limit_access" => $number
