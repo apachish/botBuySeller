@@ -187,7 +187,7 @@ class ActionAdminServices extends TextServices
                 $this->custromer->listColleague($this);
                 break;
             case "\xF0\x9F\x93\xA9ارسال پیام گروه":
-                $this->custromer->getMessageGroup();
+                $this->custromer->getMessageGroup($this);
                 break;
             case "جستجو کاربر\xF0\x9F\x94\x8D":
                 cache()->set($this->getKeyCache() . $this->getUserId(), "find_user");
