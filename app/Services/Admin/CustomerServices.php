@@ -603,7 +603,7 @@ class CustomerServices
             $key_i = $user->role ."_".$user->id . "_" . $page;
             if ($filter)
                 $key_i .= "_" . $filter;
-            if($user->role == "customer")
+            if($user->role == "customer" && $user->customerUser)
                 $text .= " مشتری )".$user->customerUser->FullName." )";
             else
                 $text .= "(همکار)";
