@@ -472,6 +472,7 @@ class CustomerServices
         $data = str_replace('set_membership_', '', $object->getData());
 
         $array = explode("_", $data);
+        logger("data",[$array]);
         $role = data_get($array, 0);
         $id = (int)data_get($array, 1);
         $page = (int)data_get($array, 2);
