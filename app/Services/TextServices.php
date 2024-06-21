@@ -270,11 +270,11 @@ class TextServices
             $this->user = $user_telegram;
         }elseif(data_get($user_telegram,"deleted_at"))
         {
-            cache()->forget("keyword_menu" . $this->getKeyCache() . $user_telegram->id);
+            cache()->forget("keyword_menu" . $this->getKeyCache() . $user_telegram->telegram_id);
             $message = 'منو کاربری شما تغییر  یافت';
             if($this->getMessage())
                 $message = "متن شما نامعتبر می باشد";
-            $this->telegram_services->deleteKeyboard($user_telegram->id,$message);
+            $this->telegram_services->deleteKeyboard($user_telegram->telegram_id,$message);
         }else
             $this->user = $user_telegram;
     }
