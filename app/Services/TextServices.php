@@ -74,7 +74,9 @@ class TextServices
             return Bot::where('token', $this->token)
                 ->first();
         });
-        $this->telegram = new Api($this->token);
+        logger("bot check ",[$this->bot]);
+        $this->telegram = new Api($this->telegram);
+        logger("trl check ",[$this->bot]);
 
         $this->telegram_services = new TelegramServices($this->token);
         /*
