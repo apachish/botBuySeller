@@ -18,11 +18,11 @@ return new class extends Migration
             $table->string("last_name");
             $table->string("fullName")->nullable();
             $table->string("mobile")->nullable();
-            $table->string("username");
-            $table->string("language_code");
-            $table->boolean("status");
-            $table->dateTime("verify_two");
-            $table->unsignedBigInteger('agent_id');
+            $table->string("username")->nullable();
+            $table->string("language_code")->nullable();
+            $table->boolean("status")->nullable();
+            $table->dateTime("verify_two")->nullable();
+            $table->unsignedBigInteger('agent_id')->nullable();
             $table->foreign('agent_id')->references('id')->on('user_telegram');
             $table->enum("role",["customer","colleague"])->nullable();
             $table->boolean("change_menu");
