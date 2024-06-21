@@ -226,7 +226,7 @@ class CustomerServices
     {
         $data = str_replace('confirm_', '', $object->getData());
         $array = explode("_", $data);
-        $role = (int)data_get($array, 0);
+        $role = data_get($array, 0);
         $id = (int)data_get($array, 1);
         $page = (int)data_get($array, 2);
         $filter = data_get($array, 3, null);
@@ -413,12 +413,17 @@ class CustomerServices
         });
         $users = $users->get();
         $i =0;
-        $text = "از میان همکاران زیر سرگروه مشتری را انتخاب کنید";
-        foreach ($users as $user)
-            $keyboard[$i++][] = ['text' => $user->fullName, "callback_data" => "set_head_done_" .$user->id."_".$data];
+        if($users->count()) {
+            $text = "از میان همکاران زیر سرگروه مشتری را انتخاب کنید";
+            foreach ($users as $user)
+                $keyboard[$i++][] = ['text' => $user->fullName, "callback_data" => "set_head_done_" . $user->id . "_" . $data];
 
-        $menu = $object->getTelegramServices()->MessageReplyMarkup($object->getTelegram(), $object->getUserId(), $text, $keyboard);
-        cache()->set("set_head_done_".$object->getUserId(),$menu);
+            $menu = $object->getTelegramServices()->MessageReplyMarkup($object->getTelegram(), $object->getUserId(), $text, $keyboard);
+            cache()->set("set_head_done_" . $object->getUserId(), $menu);
+        }else{
+            $object->getTelegramServices()->sendMessage($object->getUserId(), "کاربری یافت نشد ");
+
+        }
     }
 
     public function setHeadCustomer($object)
