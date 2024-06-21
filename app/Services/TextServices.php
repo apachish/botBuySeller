@@ -826,7 +826,7 @@ class TextServices
 
         }elseif ($user->change_menu)
         {
-            $this->telegram_services->deleteKeyboard($user->id);
+            $this->telegram_services->deleteKeyboard($user->telegram_id);
             $user->change_menu = false;
             $user->update();
         }
