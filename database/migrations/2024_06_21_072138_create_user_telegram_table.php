@@ -25,7 +25,7 @@ return new class extends Migration
             $table->unsignedBigInteger('agent_id')->nullable();
             $table->foreign('agent_id')->references('id')->on('user_telegram');
             $table->enum("role",["customer","colleague"])->nullable();
-            $table->boolean("change_menu");
+            $table->boolean("change_menu")->nullable();
             $table->dateTime("accept_rule");
             $table->boolean("is_bot")->nullable();
             $table->boolean("is_premium")->nullable();
