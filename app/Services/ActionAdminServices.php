@@ -138,6 +138,8 @@ class ActionAdminServices extends TextServices
             $this->custromer->delete($this);
         elseif (str_contains($this->getData(), "edit_name_"))
             $this->custromer->getEditName($this);
+        elseif (str_contains($this->getData(), "say_mobile_action_"))
+            $this->custromer->setMobileNew($this);
         elseif (str_contains($this->getData(), "sync_mobile_"))
             $this->custromer->syncMobile($this);
     }
@@ -253,11 +255,16 @@ class ActionAdminServices extends TextServices
             $key_case = "set_head_select_";
         elseif (str_contains($this->getMessageCache(), "set_membership_"))
             $key_case = "set_membership_";
+        elseif (str_contains($this->getMessageCache(), "say_mobile_new_"))
+            $key_case = "say_mobile_new_";
 
         logger($key_case);
         switch ($key_case) {
 
-            case "set_head_select_":
+            case "say_mobile_new_":
+                $this->custromer->getMobile($this);
+                break;
+                case "set_head_select_":
                 $this->custromer->selectHeadCustomer($this);
                 break;
             case "set_membership_":

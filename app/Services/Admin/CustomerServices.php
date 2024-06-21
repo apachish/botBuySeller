@@ -514,22 +514,95 @@ class CustomerServices
     {
         $data = str_replace('sync_mobile_', '', $object->getData());
         $array = explode("_", $data);
-        $role = (int)data_get($array, 0);
-        $id = (int)data_get($array, 0);
-        $page = (int)data_get($array, 1);
-        $filter = data_get($array, 2, null);
+        $id = (int)data_get($array, 1);
 
         $user_con = UserTelegram::find($id);
         logger("edit_mobile_done_", [$user_con, $id]);
 
         if ($user_con) {
+            $message = "شماره تلفن فعلی شما";
             $message = $user_con->mobile;
             $message .= "\n\n";
-            $message .= "می باشد لطفا موبایل وارد کنید ";
+            $message .= "می باشد لطفا موبایل  جدید وارد کنید ";
             $object->getTelegramServices()->sendMessage($object->getUserId(), $message);
-            cache()->set($object->getKeyCache() . $object->getUserId(), "edit_mobile_done_" . $data);
+            cache()->set($object->getKeyCache() . $object->getUserId(), "say_mobile_new_" . $data);
         }
     }
+    public function getMobile($object)
+    {
+        $data = str_replace('say_mobile_new_', '', $object->getMessageCache());
+        $array = explode("_", $data);
+        $id = (int)data_get($array, 1);
+        $user_con = UserTelegram::find($id);
+        $user_search = UserTelegram::where("mobile","like","%".$object->getMessage()."%")->first();
+        logger("edit_mobile_done_", [$user_search, $id]);
+
+        if ($user_search && $user_con) {
+            $message = "می خواهید شما شماره تلفن";
+            $message .= "\n\n";
+            $message .= $user_con->mobile;
+            $message .= "\n\n";
+            $message .= " با شماره تلفن  ";
+            $message .= $user_search->mobile;
+            $message .= "\n\n";
+            $message .= " جایگزین کنید؟  ";
+
+            $keyboard[0] = [
+                ['text' => "  تایید  ", 'callback_data' => "say_mobile_action_accept_".$user_search->id."_".$user_con->id],
+                ['text' => "  رد  ", 'callback_data' => "say_mobile_action_reject_".$user_search->id."_".$user_con->id],
+            ];
+            $menu = $object->getTelegramServices()->MessageReplyMarkup($object->getTelegram(), $object->getUserId(), $message, $keyboard);
+
+            cache()->set("say_mobile_new_".$object->getUserId(),$menu);
+            cache()->set($object->getKeyCache() . $object->getUserId(), "say_mobile_new_" . $data);
+        }else{
+            $object->getTelegramServices()->sendMessage($object->getUserId(), "شماره تلفن ارسال شده در لیست کاربران ما نیست");
+
+        }
+    }
+
+    public function setMobileNew($object)
+    {
+        $data = str_replace('say_mobile_action_', '', $object->getData());
+
+        $array = explode("_", $data);
+        $status = data_get($array, 0);
+        $new_user = (int)data_get($array, 1);
+        $old_user = (int)data_get($array, 2);
+        $action_id = cache()->get("say_mobile_new_".$object->getUserId());
+        if($status == "reject"){
+            $object->getTelegramServices()->deleteMessage($object->getUserId(),$action_id);
+            return true;
+        }
+        $user_new = UserTelegram::find($new_user);
+        $user_old = UserTelegram::find($old_user);
+        if($user_new && $user_old)
+        {
+            $message = "کاربر";
+            $message .= "\n\n";
+            $message .= $user_new->mobile;
+            $message .= "جایگزین ";
+            $message .= "\n\n";
+
+            $message .= $user_old->mobile;
+            $message .= "\n\n";
+
+            $message .= "  شد ";
+            $user_old->telegram_id = $user_new->telgram_id;
+            $user_old->mobile = $user_new->mobile;
+
+
+            $user_new->forceDelete();
+            $user_old->update();
+            $object->getTelegramServices()->sendMessage($object->getUserId(), $message);
+            $object->getTelegramServices()->deleteMessage($object->getUserId(),$action_id);
+            $data_old = cache()->get("menu_List_user_" . $object->getUserId());
+            $message_id = data_get($data_old, "id", null);
+            $object->getTelegramServices()->deleteMessage($object->getUserId(),$message_id);
+
+        }
+    }
+
 
     public function setName($object)
     {
