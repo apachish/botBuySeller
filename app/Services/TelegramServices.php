@@ -37,7 +37,7 @@ class TelegramServices
         ]);
 
         $response = $telegram->sendMessage([
-            'chat_id' => $user->id,
+            'chat_id' => $user->telegram_id,
             'text' => $text,
             'reply_markup' => $reply_markup
         ]);
