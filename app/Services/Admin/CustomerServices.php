@@ -79,7 +79,7 @@ class CustomerServices
                 $object->telegram_services->deleteMessage($object->getUserId(),data_get($message_admin,"message_id"));
                 $text_a = "کاربر";
                 $text_a .= $user->fullName;
-                $text_a .= "تایید شد";
+                $text_a .= " تایید شد ";
                 $object->getTelegramServices()->sendMessage($object->getUserId(), $text_a);
 
             }
@@ -168,19 +168,22 @@ class CustomerServices
             $user_con->change_menu = true;
             $user_con->update();
 
-            if($role ==  "colleague") {
+            if($role ==  "customer") {
                 $response_text = "$fullName نقش همکار فعال شد \n\n ";
                 $object->service_user->message_menu = "$fullName همکار گرامی به سیستم ما خوش آمدید\n\n ";
                 $object->service_user->message_menu .= "\n\n";
                 $object->service_user->message_menu .= "برای دریافت حساب مشتربان خود بات مشتریان را شروع کنید";
                 $object->service_user->message_menu .= "@".$object->bot->contact;
+                $object->service_user->menu($this->keyword_colleague, $user_con->status, $user_con);
+
             }else
             {
                 $response_text = "$fullName نقش همکاری این شخص به مشتری تغییر یافت \n\n ";
                 $object->service_user->message_menu = "$fullName همکاری شما در سیستم به سطح مشتری انتقال یافت\n\n ";
+                $object->service_user->menu($this->keyword_customer, $user_con->status, $user_con);
+
             }
             $object->getTelegramServices()->sendMessage($object->getUserId(), $response_text);
-            $object->service_user->menu($this->keyword_customer, $user_con->status, $user_con);
             $data_old = cache()->get("menu_List_user_" . $object->getUserId());
             $message_id = data_get($data_old, "id", null);
             $this->listUser($role,$object,$page, $message_id, $filter);
