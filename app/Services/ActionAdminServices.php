@@ -103,7 +103,7 @@ class ActionAdminServices extends TextServices
 //                ->first();
 //        });
         if ($this->bot_user) {
-            logger("bot user active",[$this->bot_user]);
+            logger("bot user active", [$this->bot_user]);
 //            $this->service_telgram_user = new TelegramServices($this->bot_user->token);
             $this->service_user = new ActionServices($this->bot_user->token);
             $this->bot_title = $this->bot_user->title;
@@ -230,6 +230,10 @@ class ActionAdminServices extends TextServices
                 $this->time->open($this);
 
                 break;
+            case "🕰تاریخ فردا️":
+                $this->time->getDataTomorrow($this);
+
+                break;
             case "کانال":
                 logger($this->bot->chanel_link);
 
@@ -237,20 +241,20 @@ class ActionAdminServices extends TextServices
 
                 break;
             case "حسابداری":
-                logger("@".$this->bot->accounting);
+                logger("@" . $this->bot->accounting);
 
-                $this->getTelegramServices()->sendMessage($this->getUserId(), "@".$this->bot->accounting);
+                $this->getTelegramServices()->sendMessage($this->getUserId(), "@" . $this->bot->accounting);
 
                 break;
             case "لفظ":
-                logger("@".$this->bot->word);
-                $this->getTelegramServices()->sendMessage($this->getUserId(), "@".$this->bot->word);
+                logger("@" . $this->bot->word);
+                $this->getTelegramServices()->sendMessage($this->getUserId(), "@" . $this->bot->word);
 
                 break;
             case "دفترچه":
-                logger("@".$this->bot->contact);
+                logger("@" . $this->bot->contact);
 
-                $this->getTelegramServices()->sendMessage($this->getUserId(), "@".$this->bot->contact);
+                $this->getTelegramServices()->sendMessage($this->getUserId(), "@" . $this->bot->contact);
 
                 break;
 
@@ -278,7 +282,10 @@ class ActionAdminServices extends TextServices
             case "say_mobile_new_":
                 $this->custromer->getMobile($this);
                 break;
-                case "set_head_select_":
+            case "set_date_tomorrow":
+                $this->time->setDataTomorrow($this);
+                break;
+            case "set_head_select_":
                 $this->custromer->selectHeadCustomer($this);
                 break;
             case "set_membership_":

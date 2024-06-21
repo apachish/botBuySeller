@@ -190,4 +190,43 @@ class TimeServices
         } else
             $object->getTelegramServices()->sendMessage($object->getUserId(), "ساختار وارد شده ساعت باید باشد 22:00");
     }
+
+    public function getDataTomorrow($object)
+    {
+        $tomorrow = Setting::where("key", "tomorrow")->first();
+        $response_text = "تاریخ فردا معاملات:";
+        $response_text .= "\n\n";
+        if($tomorrow)
+            $response_text .= toJalali($tomorrow, "Y/m/d");
+        else
+            $response_text .= toJalali(now()->addDay(), "Y/m/d");
+        $response_text .= "\n\n";
+        $response_text .= "در صورت تاریخ دیگر به صورت ۱۴۰۳/۰۴/۰۱ وارد کنید";
+        $object->getTelegramServices()->sendMessage($object->getUserId(), $response_text);
+        cache()->set($object->getKeyCache() . $object->getUserId(), "set_date_tomorrow");
+
+    }
+    public function setDataTomorrow($object)
+    {
+        if(isValidShamsiDate($object->getMessage()))
+        {
+            $date = toGregorian($object->getMessage(), "Y/m/d");
+            Setting::updateOrCreate(["key"=>"tomorrow"],[
+                "value"=>$date
+            ]);
+            $response_text = "تاریخ فردا معاملات:";
+            $response_text .= "\n\n";
+            $response_text .= toJalali($date, "Y/m/d");
+            $response_text .= "\n\n";
+            $response_text .= "تنظیم شد";
+            $object->getTelegramServices()->sendMessage($object->getUserId(), $response_text);
+            cache()->forget($object->getKeyCache() . $object->getUserId());
+        }else{
+            $response_text = "فرمت تاریخ وارد شده درست نمی باشد";
+            $object->getTelegramServices()->sendMessage($object->getUserId(), $response_text);
+
+        }
+
+
+    }
 }

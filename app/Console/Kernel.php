@@ -14,6 +14,7 @@ class Kernel extends ConsoleKernel
     {
         // $schedule->command('inspire')->hourly();
          $schedule->command('app:delete-message-chanel')->everyFifteenMinutes();
+         $schedule->command('app:set-date-tomorrow')->dailyAt('23:00');;
     }
 
     /**
