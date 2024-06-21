@@ -67,7 +67,7 @@ class CustomerServices
             $rule = Setting::where("key", "rule")->first();
 
             $text .=  $rule?$rule->value:"";
-            $keyboard[0][0] = ['text' => "قوانین را خوانده و آنها را پذیرفتم"];
+            $keyboard[0][0] = ['text' => "قوانین را خواندم و آنها را پذیرفتم"];
             $object->service_user->telegram_services::menu($object->service_user->telegram, $keyboard, $user, $text);
             $message_admin = cache()->get("message_admin_".$object->getUserId());
             logger("message_admin",[$message_admin]);
@@ -704,7 +704,7 @@ class CustomerServices
                 ['text' => "\xE2\x86\x94", 'callback_data' => 'sync_mobile_' . $key_i],
                 ['text' => "\xF0\x9F\x93\x9D", 'callback_data' => 'get_membership_' . $key_i],
             ];
-            if($user->role == "colleague")
+            if($user->role == "customer")
                 $array[] =  ['text' => "\xF0\x9F\x91\xA4", 'callback_data' => 'head_customer_' . $key_i];
 
             if ($user->deleted_at)
