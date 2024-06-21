@@ -436,7 +436,10 @@ class CustomerServices
         $id = (int)data_get($array, 2);
         $page = (int)data_get($array, 3);
         $filter = data_get($array, 4, null);
+        logger("data",[$array]);
         $user_con = UserTelegram::find($id);
+        logger("data",[$user_con]);
+
         if($user_con)
         {
             $user_con["agent_id"] = $parent;
