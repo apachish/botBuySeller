@@ -12,7 +12,7 @@ class RequestTransfer extends Model
     use SoftDeletes;
     use HasFactory;
 
-    protected $collection = 'request_transfer';
+    protected $table = 'request_transfer';
 
     protected $fillable = [
         "request_id",
@@ -27,6 +27,10 @@ class RequestTransfer extends Model
     public function transfer()
     {
         return $this->belongsTo(Transfer::class);
+    }
+    public function userRequest()
+    {
+        return $this->belongsTo(UserTelegram::class,"request_id");
     }
 
 }
