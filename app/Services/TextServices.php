@@ -709,8 +709,15 @@ class TextServices
 
                 break;
                 case "\xF0\x9F\x92\xB3\xF0\x9F\x8C\xB3حق اشتراک":
-                $help = Setting::where("key", "membership")->first();
-                $this->telegram_services->sendMessage($this->user_id, $help->value);
+//                $help = Setting::where("key", "membership")->first();
+                    if($this->getUser()->memberShip) {
+                        $message = "تاریخ پایان اشتراک شما:";
+                        $message .= "\n\n";
+                        $message .= toJalali($this->getUser()->memberShip->date);
+                    }else{
+                        $message = " اشتراک ندارید";
+                    }
+                $this->telegram_services->sendMessage($this->user_id, $message);
 
                 break;
 
