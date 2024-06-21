@@ -832,14 +832,14 @@ class ActionServices extends TextServices
             ->orderBy("updated_at", "DESC")->first();
         logger("old", [$last_transfer]);
         if (!$last_transfer) {
-            $start_trade_s = cache()->remember("start_price_trade", now()->addDay(1), function () {
+            $start_trade_s = (int)cache()->remember("start_price_trade", now()->addDay(1), function () {
                 $value = 14000000;
                 $setting = Setting::where("key", "start_price_trade")->first();
                 if ($setting)
                     $value = data_get($setting, "value");
-                return (int)$value;
+                return $value;
             });
-            $end_trade_s = cache()->remember("end_price_trade", now()->addDay(1), function () {
+            $end_trade_s = (int)cache()->remember("end_price_trade", now()->addDay(1), function () {
                 $value = 14200000;
                 $setting = Setting::where("key", "end_price_trade")->first();
                 if ($setting)
