@@ -404,7 +404,7 @@ class CustomerServices
 
     public function selectHeadCustomer($object)
     {
-        $data = str_replace('set_head_select_', '', $object->getData());
+        $data = str_replace('set_head_select_', '', $object->getMessageCache());
 
         $users = UserTelegram::query();
         $users->where(function ($query) use ($object) {
