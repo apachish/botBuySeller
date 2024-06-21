@@ -289,7 +289,6 @@ class CustomerServices
         if ($user_con) {
             $fullName = $user_con->fullName ?: $user_con->first_name . " " . $user_con->last_name;
             $user_con->status = false;
-            $user_con->role = null;
             $user_con->change_menu = true;
 
             $user_con->update();
@@ -320,7 +319,6 @@ class CustomerServices
         if ($user_con) {
             $fullName = $user_con->fullName ?: $user_con->first_name . " " . $user_con->last_name;
             $user_con->status = false;
-            $user_con->role = null;
             $user_con->change_menu = true;
             $user_con->update();
             $user_con->delete();
