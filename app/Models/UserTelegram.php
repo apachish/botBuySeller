@@ -3,20 +3,18 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use MongoDB\Laravel\Eloquent\HybridRelations;
-use MongoDB\Laravel\Eloquent\Model;
-use MongoDB\Laravel\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class UserTelegram extends Model
 {
     use SoftDeletes;
-    use HybridRelations;
-    protected $connection = "mongodb";
-    protected $collection = 'user_telegram_collection';
+    use HasFactory;
 
+    protected $table = 'user_telegram';
     protected $fillable = [
         "is_bot",
-        "id",
+        "telegram_id",
         "first_name",
         "last_name",
         "fullName",
@@ -35,7 +33,6 @@ class UserTelegram extends Model
         "accept_rule"
     ];
 
-    use HasFactory;
 
 
     public function userTradeAccess()
@@ -45,7 +42,7 @@ class UserTelegram extends Model
 
     public function customerUser()
     {
-        return $this->hasOne(CustomerUser::class,"user_id","id");
+        return $this->hasOne(UserTelegram::class,"user_id","id");
     }
 
     public function customer()

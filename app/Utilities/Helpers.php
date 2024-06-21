@@ -10,6 +10,63 @@ use Propaganistas\LaravelPhone\PhoneNumber;
 use Armanbroker\Structure\Score\Models\Cost;
 use Armanbroker\Structure\Setting\Models\Definition;
 
+if (!function_exists('isValidShamsiDate')) {
+
+    function isValidShamsiDate($date)
+    {
+        // الگوی regex برای اعتبارسنجی فرمت تاریخ به صورت yyyy/mm/dd
+        $pattern = '/^(13|14)\d{2}\/(0[1-9]|1[0-2])\/(0[1-9]|[12][0-9]|3[01])$/';
+
+        // بررسی مطابقت تاریخ با الگو
+        if (!preg_match($pattern, $date)) {
+            return false;
+        }
+
+        // جداسازی سال، ماه و روز از تاریخ
+        list($year, $month, $day) = explode('/', $date);
+
+        // تبدیل رشته به عدد صحیح
+        $year = (int)$year;
+        $month = (int)$month;
+        $day = (int)$day;
+
+        // بررسی منطقی بودن تاریخ شمسی
+        return checkShamsiDate($year, $month, $day);
+    }
+}
+if (!function_exists('checkShamsiDate')) {
+
+    function checkShamsiDate($year, $month, $day)
+    {
+        // تعداد روزهای هر ماه در تقویم شمسی
+        $daysInMonth = array(
+            1 => 31, 2 => 31, 3 => 31, 4 => 31, 5 => 31, 6 => 31,
+            7 => 30, 8 => 30, 9 => 30, 10 => 30, 11 => 30, 12 => 29
+        );
+
+        // بررسی سال کبیسه در تقویم شمسی
+        if ($month == 12 && isLeapYear($year)) {
+            $daysInMonth[12] = 30;
+        }
+
+        // بررسی منطقی بودن روز در ماه
+        if ($day > 0 && $day <= $daysInMonth[$month]) {
+            return true;
+        }
+
+        return false;
+    }
+}
+if (!function_exists('isLeapYear')) {
+
+    function isLeapYear($year)
+    {
+        // بررسی سال کبیسه در تقویم شمسی
+        $mod = $year % 33;
+        return ($mod == 1 || $mod == 5 || $mod == 9 || $mod == 13 || $mod == 17 || $mod == 22 || $mod == 26 || $mod == 30);
+    }
+}
+
 if (!function_exists('makeDirectoryStorage')) {
     function makeDirectoryStorage($path)
     {
@@ -48,7 +105,7 @@ if (!function_exists('cleanInput')) {
 // 1       $pattern = '/^(\d+)\s*(خفن|خفش|ففش|ففن|خفپ|ففپ|خفم|ففم|فف|خف|فپ|خپ|فم|خم|خش|فش|خن|فن|خ|ف)\s*(\d?)(:\s*(.*))?$/u';
         $pattern = "/^(\d{3}|\d{5})\s*((?:خف|فف|فپ|خم|خش|فش|خن|فن|خ|ف)\s*){1,3}([1-3]?)\s*(:.*)?$/u";
         if (preg_match($pattern, $input, $matches)) {
-            logger("check",$matches);
+            logger("check", $matches);
             $e = explode(":", $input);
             $a = str_replace(" ", "", data_get($e, 0));
             return $input = $a . (data_get($e, 1) ? ":" . data_get($e, 1) : null);

@@ -23,12 +23,6 @@ class CustomerServices
             ['text' => "\xF0\x9F\x9A\xBBلیست مشتریان"],
         ],
         [
-            ['text' => "\xF0\x9F\x9A\xBBلیست کاربران غیر فعال"],
-        ],
-        [
-            ['text' => "\xF0\x9F\x9A\xBBلیست کاربران مسدود شده"],
-        ],
-        [
             ['text' => "\xE2\x86\xA9منو"]
         ],
     ];
@@ -92,11 +86,12 @@ class CustomerServices
         $data = str_replace('pre_', '', $object->getData());
         $array = explode("_", $data);
         $page = (int)data_get($array, 0);
-        $filter = data_get($array, 1, null);
+        $role = data_get($array, 1, null);
+        $filter = data_get($array, 2, null);
         $data_old = cache()->get("menu_List_user_" . $object->getUserId());
         $message_id = data_get($data_old, "id", null);
         if ($message_id)
-            $this->listUser($object,$page, $message_id, $filter);
+            $this->listUser($role,$object,$page, $message_id, $filter);
     }
 
     public function next($object)
@@ -104,12 +99,13 @@ class CustomerServices
         $data = str_replace('next_', '', $object->getData());
         $array = explode("_", $data);
         $page = (int)data_get($array, 0);
-        $filter = data_get($array, 1, null);
+        $role = data_get($array, 1, null);
+        $filter = data_get($array, 2, null);
         $data_old = cache()->get("menu_List_user_" . $object->getUserId());
         $message_id = data_get($data_old, "id", null);
         logger("aa", [$data_old, $message_id, $page]);
         if ($message_id)
-            $this->listUser($object,$page, $message_id, $filter);
+            $this->listUser($role,$object,$page, $message_id, $filter);
     }
 
     public function setCustomer($object)
@@ -138,29 +134,38 @@ class CustomerServices
         }
     }
 
-    public function setColleague($object)
+    public function setRole($object)
     {
-        $data = str_replace('colleague_', '', $object->getData());
+        $data = str_replace('set_worker_', '', $object->getData());
         $array = explode("_", $data);
-        $id = (int)data_get($array, 0);
-        $page = (int)data_get($array, 1);
-        $filter = data_get($array, 2, null);
+        $role = data_get($array, 0);
+        $id = (int)data_get($array, 1);
+        $page = (int)data_get($array, 2);
+        $filter = data_get($array, 3, null);
         $user_con = UserTelegram::where("id", $id)->first();
         logger("con", [$user_con, $id]);
         if ($user_con) {
             $fullName = $user_con->fullName ?: $user_con->first_name . " " . $user_con->last_name;
-            $user_con->role = "customer";
+            if($role ==  "colleague")
+                $user_con->role = "customer";
+            else
+                $user_con->role = "colleague";
             $user_con->change_menu = true;
             $user_con->update();
-            $response_text = "$fullName نقش همکاری این شخص به مشتری تغییر یافت \n\n ";
+
+            if($role ==  "colleague") {
+                $response_text = "$fullName نقش همکار فعال شد \n\n ";
+                $object->service_user->message_menu = "$fullName همکار گرامی به سیستم ما خوش آمدید\n\n ";
+            }else
+            {
+                $response_text = "$fullName نقش همکاری این شخص به مشتری تغییر یافت \n\n ";
+                $object->service_user->message_menu = "$fullName همکاری شما در سیستم به سطح مشتری انتقال یافت\n\n ";
+            }
             $object->getTelegramServices()->sendMessage($object->getUserId(), $response_text);
-//                $response_text = "$fullName همکاری شما در سیستم به سطح مشتری انتقال یافت\n\n ";
-//                $object->service_user->telegram_services->sendMessage($user_con->id, $response_text);
-            $object->service_user->message_menu = "$fullName همکاری شما در سیستم به سطح مشتری انتقال یافت\n\n ";
             $object->service_user->menu($this->keyword_customer, $user_con->status, $user_con);
             $data_old = cache()->get("menu_List_user_" . $object->getUserId());
             $message_id = data_get($data_old, "id", null);
-            $this->listUser($object,$page, $message_id, $filter);
+            $this->listUser($role,$object,$page, $message_id, $filter);
         }
     }
 
@@ -228,9 +233,10 @@ class CustomerServices
     {
         $data = str_replace('active_', '', $object->getData());
         $array = explode("_", $data);
-        $id = (int)data_get($array, 0);
-        $page = (int)data_get($array, 1);
-        $filter = data_get($array, 2, null);
+        $role = data_get($array, 0);
+        $id = (int)data_get($array, 1);
+        $page = (int)data_get($array, 2);
+        $filter = data_get($array, 3, null);
         $user_con = UserTelegram::withTrashed()->where("id", $id)->first();
         logger("con", [$user_con, $id, UserTelegram::withTrashed()->where("id", $id)->getQuery()]);
         if ($user_con) {
@@ -249,7 +255,7 @@ class CustomerServices
             $object->service_user->menu($this->keyword_customer, $user_con->status, $user_con);
             $data_old = cache()->get("menu_List_user_" . $object->getUserId());
             $message_id = data_get($data_old, "id", null);
-            $this->listUser($object,$page, $message_id, $filter);
+            $this->listUser($role,$object,$page, $message_id, $filter);
         }
     }
 
@@ -257,9 +263,10 @@ class CustomerServices
     {
         $data = str_replace('reject_', '', $object->getData());
         $array = explode("_", $data);
-        $id = (int)data_get($array, 0);
-        $page = (int)data_get($array, 1);
-        $filter = data_get($array, 2, null);
+        $role = data_get($array, 0);
+        $id = (int)data_get($array, 1);
+        $page = (int)data_get($array, 2);
+        $filter = data_get($array, 3, null);
 
         $user_con = UserTelegram::where("id", $id)->first();
         logger("rej", [$user_con, $id]);
@@ -279,7 +286,7 @@ class CustomerServices
             $object->service_user->menu([], $user_con->status, $user_con);
             $data_old = cache()->get("menu_List_user_" . $object->getUserId());
             $message_id = data_get($data_old, "id", null);
-            $this->listUser($object,$page, $message_id, $filter);
+            $this->listUser($role,$object,$page, $message_id, $filter);
         }
     }
 
@@ -287,9 +294,10 @@ class CustomerServices
     {
         $data = str_replace('delete_', '', $object->getData());
         $array = explode("_", $data);
-        $id = (int)data_get($array, 0);
-        $page = (int)data_get($array, 1);
-        $filter = data_get($array, 2, null);
+        $role = data_get($array, 0);
+        $id = (int)data_get($array, 1);
+        $page = (int)data_get($array, 2);
+        $filter = data_get($array, 3, null);
 
         $user_con = UserTelegram::where("id", $id)->first();
         logger("rej", [$user_con, $id]);
@@ -324,7 +332,7 @@ class CustomerServices
             $object->service_user->menu([], $user_con->status, $user_con);
             $data_old = cache()->get("menu_List_user_" . $object->getUserId());
             $message_id = data_get($data_old, "id", null);
-            $this->listUser($object,$page, $message_id, $filter);
+            $this->listUser($role,$object,$page, $message_id, $filter);
 
         }
     }
@@ -333,27 +341,156 @@ class CustomerServices
     {
         $data = str_replace('edit_name_', '', $object->getData());
         $array = explode("_", $data);
-        $id = (int)data_get($array, 0);
-        $page = (int)data_get($array, 1);
-        $filter = data_get($array, 2, null);
+        $role = data_get($array, 0);
+        $id = (int)data_get($array, 1);
+        $page = (int)data_get($array, 2);
+        $filter = data_get($array, 3, null);
 
         $user_con = UserTelegram::where("id", $id)->first();
         logger("rej", [$user_con, $id]);
 
         if ($user_con) {
             $fullName = $user_con->fullName ?: $user_con->first_name . " " . $user_con->last_name;
-            $message = $fullName;
+            $message = " نام و نام خانوادگی :";
+            $message .= $fullName;
             $message .= "\n\n";
-            $message .= "می باشد لطفا نام و نام خانوادگی وارد کنید ";
+            $message .= " نام و نام خانوادگی جدید وارد کنید ";
             $object->getTelegramServices()->sendMessage($object->getUserId(), $message);
             cache()->set($object->getKeyCache() . $object->getUserId(), "edit_name_done_" . $data);
         }
     }
 
+    public function headCustomer($object)
+    {
+        $data = str_replace('head_customer_', '', $object->getData());
+        $array = explode("_", $data);
+        $id = (int)data_get($array, 1);
+
+        $user_con = UserTelegram::where("id", $id)->first();
+        logger("edit_mobile_done_", [$user_con, $id]);
+
+        if ($user_con) {
+            $message = "";
+            if($user_con->customerUser) {
+                $message .= "سرگروه فعلی:";
+                $message .= $user_con->customerUser->fullName;
+            }
+            $message .= "\n\n";
+            $message .= "شماره یا نام سرگروه را وارد کنید";
+            $object->getTelegramServices()->sendMessage($object->getUserId(), $message);
+            cache()->set($object->getKeyCache() . $object->getUserId(), "set_head_select_" . $data);
+        }
+    }
+
+    public function selectHeadCustomer($object)
+    {
+        $data = str_replace('set_head_select_', '', $object->getData());
+
+        $users = UserTelegram::query();
+        $users->where(function ($query) use ($object) {
+            $query->where("fullName", "like", "%" . $object->getMessage() . "%");
+            $query->orWhere("mobile", "like", "%" . $object->getMessage() . "%");
+        });
+        $users = $users->get();
+        $i =0;
+        $text = "از میان همکاران زیر سرگروه مشتری را انتخاب کنید";
+        foreach ($users as $user)
+            $keyboard[$i++][] = ['text' => $user->fullName, "callback_data" => "set_head_done_" .$user->id."_".$data];
+
+        $menu = $object->getTelegramServices()->MessageReplyMarkup($object->getTelegram(), $object->getUserId(), $text, $keyboard);
+        cache()->set("set_head_done_".$object->getUserId(),$menu);
+    }
+
+    public function setHeadCustomer($object)
+    {
+        $data = str_replace('set_head_done_', '', $object->getData());
+
+        $array = explode("_", $data);
+        $parent = (int)data_get($array, 0);
+        $role = data_get($array, 1);
+        $id = (int)data_get($array, 2);
+        $page = (int)data_get($array, 3);
+        $filter = data_get($array, 4, null);
+        $user_con = UserTelegram::where("id", $id)->first();
+        if($user_con)
+        {
+            $user_con["agent_id"] = $parent;
+            $user_con->update();
+            $data_old = cache()->get("menu_List_user_" . $object->getUserId());
+            $message_id = data_get($data_old, "id", null);
+            $this->listUser($role,$object,$page, $message_id, $filter);
+            $action_id = cache()->get("set_head_done_".$object->getUserId());
+            $object->getTelegramServices()->deleteMessage($object->getUserId(),$action_id);
+            $message = "همکار";
+            $message .= "\n\n";
+            $user_parent = UserTelegram::find($parent);
+            $message .= $user_parent->fullName;
+            $message .= " برای مشتری ";
+            $message .= $user_con->fullName;
+            $message .= " انتخاب شد ";
+            $object->getTelegramServices()->sendMessage($object->getUserId(), $message);
+
+        }
+    }
+    public function getMemberShip($object)
+    {
+        $data = str_replace('get_membership_', '', $object->getData());
+
+        $array = explode("_", $data);
+        $id = (int)data_get($array, 1);
+        $user_con = UserTelegram::find($id);
+        if($user_con)
+        {
+            $message = "\n\n";
+            if($user_con->memberShip) {
+                $message .= "تاریخ اشتراک";
+                $message .= "\n\n";
+                $message .= toJalali($user_con->memberShip->date);
+                $message .= " می باشد ";
+                $message .= "\n\n";
+            }
+            $message .= "تاریخ اشتراک کاربر را وارد کنید";
+            $object->getTelegramServices()->sendMessage($object->getUserId(), $message);
+            cache()->set($object->getKeyCache() . $object->getUserId(), "set_membership_" . $data);
+
+        }
+    }
+    public function setMemberShip($object)
+    {
+        $data = str_replace('set_membership_', '', $object->getData());
+
+        $array = explode("_", $data);
+        $role = data_get($array, 0);
+        $id = (int)data_get($array, 1);
+        $page = (int)data_get($array, 2);
+        $filter = data_get($array, 3, null);
+        $user_con = UserTelegram::find($id);
+        if($user_con && isValidShamsiDate($object->getMessage()))
+        {
+            $user_con->memberShip()->delete();
+            $date = toGregorian($object->getMessage(), "Y/m/d");
+
+            $user_con->memberShip()->create([
+                "user_id"=>$user_con->id,
+                "date"=>$date,
+            ]);
+            $message = "تاریخ اشتراک";
+            $message .= " ".$user_con->fullName;
+            $message .= "\n\n";
+            $message .=toJalali($date,"Y\m\d");
+            $message .= "تنظیم شد";
+
+            $object->getTelegramServices()->sendMessage($object->getUserId(), $message);
+        }else{
+            $message = "فرمت تاریخ اشتراک 1403/04/01";
+            $object->getTelegramServices()->sendMessage($object->getUserId(), $message);
+        }
+    }
     public function syncMobile($object)
     {
         $data = str_replace('sync_mobile_', '', $object->getData());
         $array = explode("_", $data);
+        $role = (int)data_get($array, 0);
         $id = (int)data_get($array, 0);
         $page = (int)data_get($array, 1);
         $filter = data_get($array, 2, null);
@@ -375,9 +512,10 @@ class CustomerServices
         $data = str_replace('edit_name_done_', '', $object->getMessageCache());
         $array = explode("_", $data);
         logger("array", [$array]);
-        $id = (int)data_get($array, 0);
-        $page = (int)data_get($array, 1);
-        $filter = data_get($array, 2, null);
+        $role = data_get($array, 0);
+        $id = (int)data_get($array, 1);
+        $page = (int)data_get($array, 2);
+        $filter = data_get($array, 3, null);
 
         $user_con = UserTelegram::where("id", $id)->first();
         logger("rej", [$user_con, $id]);
@@ -392,26 +530,47 @@ class CustomerServices
         }
         $data_old = cache()->get("menu_List_user_" . $object->getUserId());
         $message_id = data_get($data_old, "id", null);
-        $this->listUser($object,$page, $message_id, $filter);
+        $this->listUser($role,$object,$page, $message_id, $filter);
         cache()->forget($object->getKeyCache() . $object->getUserId());
     }
 
     public function findUser($object)
     {
-        $this->listUser($object,1, null, $object->getMessage());
+        $this->listUser(null,$object,1, null, $object->getMessage());
 
         cache()->forget($object->getKeyCache() . $object->getUserId());
     }
+
+    public function listColleague($object)
+    {
+        $text = "\n\nلیست  همکاران";
+        $text .= "\n\n";
+        $text .= "با کلیک بر\xE2\x9D\x8C کاربر غیر فعال شده و با کلیک بر \xE2\x9C\x85 کاربرفعال گردید در صورت کلیک بر روی اسم شخص نوع کاربر از مشتری به همکار و به لیست مشتری انتقال می یابد ";
+        $this->listUser("colleague",$object,1,);
+
+    }
+
     /**
      * @return void
      */
-    private function listUser($object,$page = 1, $message_id = null, $filter = null)
+    private function listUser($type=null,$object,$page = 1, $message_id = null, $filter = null)
     {
-        $text = "\n\nلیست  کاربران";
-        $text .= "\n\n";
-        $text .= "با کلیک بر\xE2\x9D\x8C کاربر غیر فعال شده و با کلیک بر \xE2\x9C\x85 کاربرفعال گردید در صورت کلیک بر روی اسم شخص نوع کاربر از مشتری به همکار و همکار به مشتری تغییر می کنند ";
-
-        $users = UserTelegram::withTrashed();
+        if($type == "colleague") {
+            $text = "\n\nلیست  همکاران";
+            $text .= "\n\n";
+            $text .= "با کلیک بر\xE2\x9D\x8C کاربر غیر فعال شده و با کلیک بر \xE2\x9C\x85 کاربرفعال گردید در صورت کلیک بر روی اسم شخص نوع کاربر از مشتری به همکار و به لیست مشتری انتقال می یابد ";
+            $users = UserTelegram::withTrashed()->where("role", "colleague");
+        }elseif($type == "customer") {
+            $text = "\n\nلیست  مشتریان";
+            $text .= "\n\n";
+            $text .= "با کلیک بر\xE2\x9D\x8C کاربر غیر فعال شده و با کلیک بر \xE2\x9C\x85 کاربرفعال گردید در صورت کلیک بر روی اسم شخص نوع کاربر از همکار به مشتری و به لیست همکار انتقال می یابد ";
+            $users = UserTelegram::withTrashed()->where("role", "customer");
+        }else{
+            $text = "\n\nلیست  کاربران";
+            $text .= "\n\n";
+            $text .= "با کلیک بر\xE2\x9D\x8C کاربر غیر فعال شده و با کلیک بر \xE2\x9C\x85 کاربرفعال گردید در صورت کلیک بر روی اسم شخص نوع کاربر از همکار به مشتری و  از مشتری به همکار انتقال می یابد ";
+            $users = UserTelegram::withTrashed();
+        }
         if ($filter) {
             $users->where(function ($query) use ($filter) {
                 $query->where("fullName", "like", "%" . $filter . "%");
@@ -425,21 +584,27 @@ class CustomerServices
         $keyboard = [];
         $i = 0;
 
-        logger("users", [$users]);
         $users->each(function ($user) use (&$keyboard, &$i, $page, $filter) {
             $text = $user->fullName ?: $user->first_name . " " . $user->last_name;
-            $text .= $user->role == "colleague" ? "(همکار)" : "(مشتری)";
-            $keyboard[$i++] = [
-                ['text' => "  $text  ", 'callback_data' => ($user->role == "colleague" ? "colleague_" : "customer_") . $user->id . "_" . $page],
-            ];
-            $key_i = $user->id . "_" . $page;
+            $key_i = $user->role ."_".$user->id . "_" . $page;
             if ($filter)
                 $key_i .= "_" . $filter;
-            $array = [
+            if($user->role == "customer")
+                $text .= " مشتری )".$user->customerUser->FullName." )";
+            else
+                $text .= "(همکار)";
+            $keyboard[$i++] = [
+                ['text' => "  $text  ", 'callback_data' => "set_worker_".$key_i],
                 ['text' => "\xE2\x9C\x8F\xF0\x9F\x91\xA8", 'callback_data' => 'edit_name_' . $key_i],
-                ['text' => "\xE2\x86\x94", 'callback_data' => 'sync_mobile_' . $key_i],
-                ['text' => "\xF0\x9F\x91\xA4", 'callback_data' => 'sub_customer_' . $key_i],
             ];
+
+            $array = [
+                ['text' => "\xE2\x86\x94", 'callback_data' => 'sync_mobile_' . $key_i],
+                ['text' => "\xF0\x9F\x93\x9D", 'callback_data' => 'get_membership_' . $key_i],
+            ];
+            if($user->role == "colleague")
+                $array[] =  ['text' => "\xF0\x9F\x91\xA4", 'callback_data' => 'head_customer_' . $key_i];
+
             if ($user->deleted_at)
                 $array[] = ['text' => "\xF0\x9F\x86\x97", 'callback_data' => 'active_' . $key_i];
             else {
@@ -455,9 +620,9 @@ class CustomerServices
             $keyboard[$i++] = $array;
         });
         if ($pre)
-            $keyboard[$i][] = ['text' => "قبلی", "callback_data" => "pre_" . $pre . ($filter ? "_" . $filter : null)];
+            $keyboard[$i][] = ['text' => "قبلی", "callback_data" => "pre_" . $pre . ($type ? "_" . $type :  "_" ). ($filter ? "_" . $filter : null)];
         if ($next)
-            $keyboard[$i][] = ['text' => "بعدی", "callback_data" => "next_" . $next . ($filter ? "_" . $filter : null)];
+            $keyboard[$i][] = ['text' => "بعدی", "callback_data" => "next_" . $next . ($type ? "_" . $type :  "_" ). ($filter ? "_" . $filter : null)];
 
         if ($message_id)
             $object->getTelegramServices()->editMessageTextAndInlineKeyboard($object->getUserId(), $message_id, $text, $keyboard);

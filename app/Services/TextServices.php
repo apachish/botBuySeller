@@ -251,7 +251,7 @@ class TextServices
             $update = $this->update;
             $type = $this->type_message;
             $data =  array_filter([
-                "id" => $this->user_id,
+                "telegram_id" => $this->user_id,
                 "is_bot" => data_get($update, $type . '.from.is_bot'),
                 "first_name" => data_get($update, $type . '.from.first_name'),
                 "last_name" => data_get($update, $type . '.from.last_name'),

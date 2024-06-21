@@ -3,20 +3,30 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use MongoDB\Laravel\Eloquent\Model;
+use Illuminate\Database\Eloquent\Model;
 use MongoDB\Laravel\Eloquent\SoftDeletes;
 
 class Transfer extends Model
 {
     use SoftDeletes;
-    protected $connection = "mongodb";
-    protected $collection = 'transfer_collection';
+    protected $table = 'transfer';
 
     const STATUS_PENDING = "pending";
     const STATUS_ACTIVE = "active";
     const STATUS_ACTIVE_DO = "active_do";
     const STATUS_ACTIVE_DONE = "active_done";
     const STATUS_DEACTIVATE = "deactivate";
+
+    public static function getStatus(): array
+    {
+        return [
+            self::STATUS_PENDING,
+            self::STATUS_ACTIVE,
+            self::STATUS_ACTIVE_DO,
+            self::STATUS_ACTIVE_DONE,
+            self::STATUS_DEACTIVATE,
+        ];
+    }
 
     protected $fillable = [
         "user_id",

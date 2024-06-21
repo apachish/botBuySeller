@@ -3,14 +3,16 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use MongoDB\Laravel\Eloquent\Model;
-use MongoDB\Laravel\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+
 
 class RequestTransfer extends Model
 {
     use SoftDeletes;
-    protected $connection = "mongodb";
-    protected $collection = 'request_transfer_collection';
+    use HasFactory;
+
+    protected $collection = 'request_transfer';
 
     protected $fillable = [
         "request_id",
@@ -18,11 +20,9 @@ class RequestTransfer extends Model
         "number",
         "price",
         "status",
-        "remittance_number",
         "type"
     ];
 
-    use HasFactory;
 
     public function transfer()
     {

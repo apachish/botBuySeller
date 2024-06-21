@@ -116,10 +116,14 @@ class ActionAdminServices extends TextServices
             $this->transaction->setForbiddenDay($this);
         elseif (str_contains($this->getData(), "forbidden_"))
             $this->transaction->setForbidden($this);
-        elseif (str_contains($this->getData(), "customer_"))
-            $this->custromer->setCustomer($this);
-        elseif (str_contains($this->getData(), "colleague_"))
-            $this->custromer->setColleague($this);
+        elseif (str_contains($this->getData(), "set_worker_"))
+            $this->custromer->setRole($this);
+        elseif (str_contains($this->getData(), "set_head_done_"))
+            $this->custromer->setHeadCustomer($this);
+        elseif (str_contains($this->getData(), "get_membership_"))
+            $this->custromer->getMemberShip($this);
+        elseif (str_contains($this->getData(), "head_customer_"))
+            $this->custromer->headCustomer($this);
         elseif (str_contains($this->getData(), "add_chanel_"))
             $this->custromer->addChanel($this);
         elseif (str_contains($this->getData(), "confirm_"))
@@ -168,6 +172,9 @@ class ActionAdminServices extends TextServices
                 break;
             case "\xF0\x9F\x9A\xBBلیست کاربران":
                 $this->listUser();
+                break;
+            case "\xF0\x9F\x9A\xBBلیست همکاران":
+                $this->custromer->listColleague();
                 break;
             case "\xF0\x9F\x92\xACلیست پیام ها کاربران":
                 $this->listMessageSupport();
@@ -240,10 +247,20 @@ class ActionAdminServices extends TextServices
             $key_case = "edit_name_done_";
         elseif (str_contains($this->getMessageCache(), "edit_mobile_done_"))
             $key_case = "edit_mobile_done_";
+        elseif (str_contains($this->getMessageCache(), "set_head_select_"))
+            $key_case = "set_head_select_";
+        elseif (str_contains($this->getMessageCache(), "set_membership_"))
+            $key_case = "set_membership_";
 
         logger($key_case);
         switch ($key_case) {
 
+            case "set_head_select_":
+                $this->custromer->selectHeadCustomer($this);
+                break;
+            case "set_membership_":
+                $this->custromer->setMemberShip($this);
+                break;
             case "edit_name_done_":
                 $this->custromer->setName($this);
                 break;
