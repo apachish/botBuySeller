@@ -15,7 +15,6 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('request_id');
             $table->foreign('request_id')->references('id')->on('user_telegram');
-            $table->string("transfer_id");
             $table->unsignedBigInteger('transfer_id');
             $table->foreign('transfer_id')->references('id')->on('transfer');
             $table->integer("number");
