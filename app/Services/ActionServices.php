@@ -837,14 +837,14 @@ class ActionServices extends TextServices
                 $setting = Setting::where("key", "start_price_trade")->first();
                 if ($setting)
                     $value = data_get($setting, "value");
-                return $value;
+                return (int)$value;
             });
             $end_trade_s = cache()->remember("end_price_trade", now()->addDay(1), function () {
                 $value = 14200000;
                 $setting = Setting::where("key", "end_price_trade")->first();
                 if ($setting)
                     $value = data_get($setting, "value");
-                return $value;
+                return (int)$value;
             });
             logger("start", [$start_trade_s]);
             logger("end", [$end_trade_s]);
