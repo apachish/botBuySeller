@@ -713,7 +713,7 @@ class TextServices
                     if($this->getUser()->memberShip) {
                         $message = "تاریخ پایان اشتراک شما:";
                         $message .= "\n\n";
-                        $message .= toJalali($this->getUser()->memberShip->date);
+                        $message .= toJalali($this->getUser()->memberShip->date,"y/d/m");
                     }else{
                         $message = " اشتراک ندارید";
                     }
