@@ -50,7 +50,7 @@ class TextServices
 
     public $telegram;
 
-    protected $message_menu = "خوش آمدید";
+    public $message_menu = "خوش آمدید";
 
     private $pattern;
 
