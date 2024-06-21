@@ -176,7 +176,7 @@ class ActionAdminServices extends TextServices
                 $this->listUser();
                 break;
             case "\xF0\x9F\x9A\xBBلیست همکاران":
-                $this->custromer->listColleague();
+                $this->custromer->listColleague($this);
                 break;
             case "\xF0\x9F\x92\xACلیست پیام ها کاربران":
                 $this->listMessageSupport();
