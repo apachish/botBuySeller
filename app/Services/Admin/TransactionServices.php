@@ -43,7 +43,7 @@ class TransactionServices
 
     public function getForbiddenDay($object)
     {
-        $forbidden_day = Setting::where("key", "forbiddenDay")->first();
+        $forbidden_day = Setting::where("key", "forbidden_day")->first();
 
         if ($forbidden_day) {
             $response_text = "معامله روز ";
