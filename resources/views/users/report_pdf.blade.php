@@ -122,7 +122,7 @@
     <table>
         <thead>
         <tr>
-            <th class="hide"></th>
+            <th class="bg-purple">شماره حواله</th>
             <th class="bg-blue">نوع</th>
             <th class="bg-blue">طرف معامله</th>
             <th class="bg-blue default">موعد معامله</th>
@@ -142,7 +142,7 @@
                     if($type == "sell")
                         $color = "#ef4444";
                 @endphp
-                <td>{{$i+1}}</td>
+                <td>{{$item->id}}</td>
                 <td style="color: {{$color}}">{{getTypeTitleOrder(data_get($item,"transfer.type"))}}</td>
                 <td>{{data_get($item,"transfer.user.fullName")}}</td>
                 <td>{{toJalali(data_get($item,"transfer.date"),"Y/m/d")}}</td>

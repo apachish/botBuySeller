@@ -168,6 +168,9 @@ class CustomerServices
             if($role ==  "colleague") {
                 $response_text = "$fullName نقش همکار فعال شد \n\n ";
                 $object->service_user->message_menu = "$fullName همکار گرامی به سیستم ما خوش آمدید\n\n ";
+                $object->service_user->message_menu .= "\n\n";
+                $object->service_user->message_menu .= "برای دریافت حساب مشتربان خود بات مشتریان را شروع کنید";
+                $object->service_user->message_menu .= "@".$object->bot->contact;
             }else
             {
                 $response_text = "$fullName نقش همکاری این شخص به مشتری تغییر یافت \n\n ";
