@@ -829,7 +829,7 @@ class ActionServices extends TextServices
 
         $last_transfer = Transfer::where("type", $this->getType())
             ->whereIn("status", [Transfer::STATUS_ACTIVE_DO, Transfer::STATUS_ACTIVE_DONE])
-            ->orderBy("update_at", "DESC")->first();
+            ->orderBy("updated_at", "DESC")->first();
         logger("old", [$last_transfer]);
         if (!$last_transfer) {
             $start_trade_s = cache()->remember("start_price_trade", now()->addDay(1), function () {
