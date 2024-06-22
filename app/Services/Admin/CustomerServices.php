@@ -41,7 +41,8 @@ class CustomerServices
         [
             ['text' => "\xF0\x9F\x93\x9Aقوانین"],
             ['text' => "راهنما\xE2\x81\x89"],
-            ['text' => "\xF0\x9F\x92\xB3\xF0\x9F\x8C\xB3حق اشتراک"]
+            ['text' => "\xE2\x8F\xB3مدت اشتراک"],
+            ['text' => "\xF0\x9F\x92\xB3حق اشتراک"]
 
         ], [
             ['text' => "\xE2\x9C\x8Cفعال سازی دو مرحله ای"],
@@ -53,7 +54,8 @@ class CustomerServices
         [
             ['text' => "\xF0\x9F\x93\x9Aقوانین"],
             ['text' => "راهنما\xE2\x81\x89"],
-            ['text' => "\xF0\x9F\x92\xB3\xF0\x9F\x8C\xB3حق اشتراک"]
+            ['text' => "\xE2\x8F\xB3مدت اشتراک"],
+            ['text' => "\xF0\x9F\x92\xB3حق اشتراک"]
         ], [
             ['text' => "\xE2\x9C\x8Cفعال سازی دو مرحله ای"],
             ['text' => "\xE2\x9D\x8Cغیر فعال فوری"],
@@ -485,7 +487,7 @@ class CustomerServices
             if($user_con->memberShip) {
                 $message .= "تاریخ اشتراک";
                 $message .= "\n\n";
-                $message .= toJalali($user_con->memberShip->expiration_date);
+                $message .= toJalali($user_con->memberShip->expiration_date,"Y/m/d");
                 $message .= " می باشد ";
                 $message .= "\n\n";
             }

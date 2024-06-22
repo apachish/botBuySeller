@@ -386,7 +386,7 @@ class TestApiTelegram2 extends Command
             "\xF0\x9F\x93\x8Bلیست همکاران",
             "\xF0\x9F\x93\x9Aقوانین",
             "راهنما\xE2\x81\x89",
-            "\xF0\x9F\x92\xB3\xF0\x9F\x8C\xB3حق اشتراک",
+            "\xF0\x9F\x92\xB3حق اشتراک",
             "\xE2\x9A\xA0\xE2\x9D\x8Cغیرفعال سازی تایید دو مرحله ای",
             "\xE2\x9C\x8Cفعال سازی دو مرحله ای",
             "\xE2\x9D\x8Cغیر فعال فوری",
