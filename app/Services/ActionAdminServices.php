@@ -202,7 +202,7 @@ class ActionAdminServices extends TextServices
                 foreach ($updates as $update) {
 
                     // حذف پیام
-                    $result = $this->deleteMessage($this->bot->token, $this->bot->chanel_id, $update->message_id);
+                    $result = $this->telegram_services->deleteMessage($this->bot->chanel_id, $update->message_id);
                     logger("result delete message",[$result]);
                     if ($result['ok']) {
                         logger( "پیام با شناسه $update->message_id حذف شد.\n");
