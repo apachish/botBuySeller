@@ -224,7 +224,10 @@ class ActionServices extends TextServices
         $id = data_get($info, 0);
         $num = (int)data_get($info, 1);
         logger("request", [$num, $id]);
+        logger("verify_two", [$this->getUser()->verify_two]);
+        logger("double", ["double_click_" . $id . "_" . $this->getUserId(),cache()->get("double_click_" . $id . "_" . $this->getUserId())]);
         if ($this->getUser()->verify_two && !cache()->get("double_click_" . $id . "_" . $this->getUserId())) {
+            logger("injto mondam");
             cache()->set("double_click_" . $id . "_" . $this->getUserId(), 1, now()->addSecond(5));
             return true;
         } elseif ($this->getUser()->verify_two && cache()->get("double_click_" . $id . "_" . $this->getUserId()))
