@@ -731,7 +731,7 @@ class TextServices
                 break;
 
             case "\xE2\x9C\x8Cفعال سازی دو مرحله ای":
-                $this->user->verify_two = true;
+                $this->user->verify_two = now();
                 $this->user->change_menu = true;
 
                 $this->user->update();
