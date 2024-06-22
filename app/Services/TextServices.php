@@ -722,7 +722,7 @@ class TextServices
                 break;
 
             case "\xE2\x9A\xA0\xE2\x9D\x8Cغیرفعال سازی تایید دو مرحله ای":
-                $this->user->verify_two = false;
+                $this->user->verify_two = null;
                 $this->user->change_menu = true;
                 $this->user->update();
                 $keyboard_menu = $this->setMenu();
