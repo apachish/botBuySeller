@@ -839,6 +839,7 @@ class ActionServices extends TextServices
             $this->telegram_services->sendMessage($this->getUserId(), "توضیحات برای معاملات نقدی می باشد");
             return true;
         }
+
         $suggest_price = $this->getPrice();
 
         $parameter = cache()->remember("parameter_need", now()->setTime(23, 59), function () {
@@ -961,6 +962,13 @@ class ActionServices extends TextServices
                     !in_array($this->getType(), $this->list_type_sell_tommarow)
                 )
             ]);
+            $forbidden_day = cache()->remember("forbidden_day", now()->setTime(23, 59), function () {
+                return Setting::where("key", "forbidden_day")->get()->keyBy("key");
+            });
+            if ($forbidden_day && in_array($this->getType(), $this->list_type_today) ) {
+                $this->telegram_services->sendMessage($this->getUserId(), "معامله روز تعطیل می باشد");
+                return true;
+            }
             if (!$time->between($morning, $none_13_30, true) && in_array($this->getType(), $this->list_type_today_r_f)) {
                 $this->telegram_services->sendMessage($this->getUserId(), "\xE2\x9D\x8C	زمان معامله شرایطی برای امروز به پایان رسیده است\xE2\x9D\x8C	");
                 return true;
