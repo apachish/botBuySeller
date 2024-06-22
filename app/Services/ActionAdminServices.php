@@ -194,11 +194,12 @@ class ActionAdminServices extends TextServices
                 $this->custromer->getMessageGroup($this);
                 break;
             case "\xE2\x9D\x8C\xE2\x9D\x97حذف پیام های کانال":
-                $targetDate = now(); // تاریخ مورد نظر برای حذف پیام‌ها (فرمت YYYY-MM-DD)
+                $targetDate = cache()->get("date_delete_message_chanel")?:now();
+                cache()->forget("date_delete_message_chanel");
                 logger($targetDate->format("Y-m-d H:i"));
                 $updates = Transfer::withTrashed()->
                 whereNotNull("message_id")
-                    ->where("created_at","<=",$targetDate)->get();
+                    ->where("created_at", "<=", $targetDate)->get();
                 try {
                     foreach ($updates as $update) {
 
@@ -212,10 +213,13 @@ class ActionAdminServices extends TextServices
                         }
                     }
                     $this->getTelegramServices()->sendMessage($this->getUserId(), "حذف پیام انجام شد");
-                }catch (\Exception $exception){
+                    cache()->rememberForever("date_delete_message_chanel", function () {
+                        return now();
+                    });
+                } catch (\Exception $exception) {
                     $this->getTelegramServices()->sendMessage($this->getUserId(), "حذف پیام با مشکل روبرو شد");
 
-                    logger("get error",[
+                    logger("get error", [
                         $exception->getMessage(),
                         $exception->getLine(),
                         $exception->getCode(),
@@ -317,7 +321,7 @@ class ActionAdminServices extends TextServices
             case "send_message_group":
                 $this->custromer->setMessageGroup($this);
                 break;
-                case "say_mobile_new_":
+            case "say_mobile_new_":
                 $this->custromer->getMobile($this);
                 break;
             case "set_date_tomorrow":
