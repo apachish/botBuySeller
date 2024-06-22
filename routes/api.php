@@ -30,3 +30,5 @@ Route::post('support/set/webhook/{token}',
 
 Route::post('customer/set/webhook/{token}',
     [\App\Http\Controllers\TelegramCustomerController::class,'setWebhook'])->name('set.webhook.customer');
+Route::post('accounting/set/webhook/{token}',
+    [\App\Http\Controllers\TelegramAccountingController::class,'setWebhook'])->name('set.webhook.accounting');
