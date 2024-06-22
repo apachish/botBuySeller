@@ -26,6 +26,7 @@ class ActionServices extends TextServices
 
     protected $service_customer;
 
+
     public function __construct($token)
     {
         parent::__construct($token);
@@ -451,6 +452,36 @@ class ActionServices extends TextServices
                         logger("message4", [data_get($transfer, 'user.customer.telegram_id'), $message_head]);
                         $this->sendBotCustomer(data_get($transfer, 'user.customer.telegram_id'), $message_head);
 
+                    }
+                    $bot_accounting = Bot::where('title', "botAccounting")
+                        ->first();
+                    if($bot_accounting){
+                        $telegram_accounting = new Api($bot_accounting->token);
+                        $telegram_accounting_services = new TelegramServices($bot_accounting->token);
+                        $admins = $bot_accounting->accessBot;
+                        $message = "شماره حواله:".data_get($order_buy, 'id');
+                        $message .= "\n\n";
+                        $message .= $transfer->message_request;
+                        $message .= "\n\n";
+
+                        if($this->getUser()->role == "customer")
+                            $message .="  درخواست دهنده: ".$transaction_party_req_s;
+                        else
+                            $message .="  درخواست دهنده: ".$transaction_party_req;
+                        $message .= "\n\n";
+                        if ($transfer->user->role == "customer")
+                            $message .="  دریافت کننده: ". $transaction_party_s;
+                        else
+                            $message .="  دریافت کننده: ".$transaction_party;
+                        $message .= "\n\n";
+                        $message .= "برای:" . toJalali($transfer->date, "Y/m/d");
+                        $message .= "\n\n";
+                        $message .= "مقدار:" . data_get($request_transfer, "number") . "کیلو";
+                        $message .= "\n\n";
+                        $message .= "نوع:" . getTypeTransfer($transfer->type);
+                        foreach ($admins as $admin){
+                            $telegram_accounting_services->sendMessage($admin->user_id,$message);
+                        }
                     }
 
 
