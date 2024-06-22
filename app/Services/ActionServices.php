@@ -488,7 +488,7 @@ class ActionServices extends TextServices
                         $message .= "\n\n";
                         $message .= "برای:" . toJalali($transfer->date, "Y/m/d");
                         $message .= "\n\n";
-                        $message .= "ساعت:" . toJalali($transfer->date, "H:i:s");
+                        $message .= "ساعت:" . toJalali($order_buy->created_at, "H:i:s");
                         $message .= "\n\n";
                         $message .= "مقدار:" . data_get($request_transfer, "number") . "کیلو";
                         $message .= "\n\n";
