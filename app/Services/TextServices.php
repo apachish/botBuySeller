@@ -674,15 +674,12 @@ class TextServices
                 break;
             case "\xF0\x9F\x93\x88معاملات باز":
                 cache()->forget("trade_open_" . $this->user_id);
-                $worker = CustomerUser::where("user_id", $this->user_id)
-                    ->with("user")
-                    ->whereHas("user")
-                    ->get();
+                $worker = UserTelegram::where("agent_id", $this->getUser()->id)->get();
                 $keyboard = [];
                 $i = 0;
                 logger("woker", [$worker]);
                 $keyboard[$i++] = [
-                    ['text' => "خودم", 'callback_data' => "trade_open_" . $this->getUserId()],
+                    ['text' => "خودم", 'callback_data' => "trade_open_" . $this->getUser()->id],
                 ];
                 $worker->each(function ($row) use (&$i, &$keyboard) {
                     $keyboard[$i++] = [

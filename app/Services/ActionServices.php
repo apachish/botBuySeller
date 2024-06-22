@@ -630,14 +630,14 @@ class ActionServices extends TextServices
         $customer_id = str_replace('trade_open_', '', $this->getData());
         $message_id = cache()->get("trade_open_" . $this->getUserId());
         if ($customer_id && $message_id) {
-            $customer = CustomerUser::find($customer_id);
+            $customer = UserTelegram::find($customer_id);
 //            if ($customer_id != $this->getUserId() && $this->getUser()->role == "colleague")
 //                $keyboard[0][] = ['text' => "\xF0\x9F\x94\x90	حد مجاز", 'callback_data' => "trade_open_limit_$customer_id"];
             $keyboard[0][] = ['text' => "\xF0\x9F\x93\x9C	گزارش", 'callback_data' => "trade_open_report_$customer_id"];
 
             $message = "یکی از گزینه های زیر برای مشتری ";
             $message .= "\n\n ";
-            $message .= $customer ? $customer->fullName : $this->getUser()->fullName;
+            $message .= $customer ? $customer->fullName : $customer->first_name." ".$customer->last_name;
             $this->telegram_services->editMessageTextAndInlineKeyboard($this->getUserId(), $message_id, $message, $keyboard);
         }
 
@@ -666,7 +666,7 @@ class ActionServices extends TextServices
         $customer_id = str_replace('trade_open_report_', '', $this->getData());
         $message_id = cache()->get("trade_open_" . $this->getUserId());
         if ($customer_id && $message_id) {
-            $customer = CustomerUser::find($customer_id);
+            $customer = UserTelegram::find($customer_id);
 
             $today = now()->format("Y-m-d");
             $tomorrow = now()->addDay(1)->format("Y-m-d");
@@ -675,7 +675,7 @@ class ActionServices extends TextServices
                 ['text' => toJalali(now()->addDay(1), "Y/m/d"), 'callback_data' => "trade_open_report_date_" . $customer_id . "_" . $tomorrow],
             ];
             $message = ' گزارش ';
-            $message .= $customer ? $customer->fullName : $this->getUser()->fullName;
+            $message .= $customer ? $customer->fullName : $customer->first_name." ".$customer->last_name;
             $message .= "\n\n ";
             $message .= "تاریخ های زیر را انتخاب کنید";
             $message .= "\n\n ";
@@ -692,11 +692,11 @@ class ActionServices extends TextServices
         $date = data_get($array, 1);
         $message_id = cache()->get("trade_open_" . $this->getUserId());
         if ($customer_id && $message_id) {
-            $customer = CustomerUser::with("user")->find($customer_id);
+            $customer = UserTelegram::find($customer_id);
 
             $date_p = toJalali($date, "Y_m_d");
             $message = ' گزارش ';
-            $message .= $customer ? $customer->fullName : $this->getUser()->fullName;
+            $message .= $customer ? $customer->fullName : $customer->first_name." ".$customer->last_name;
             $message .= "  تاریخ   " . toJalali($date, "Y/m/d");
             $message .= "\n\n ";
             $this->telegram_services->editMessageTextAndInlineKeyboard($this->getUserId(), $message_id, $message);
@@ -716,7 +716,7 @@ class ActionServices extends TextServices
                 $mpdf = new \Mpdf\Mpdf(['tempDir' => public_path("tmp")]);
                 $html = view('users.report_pdf', compact('date_p', 'request_transfer', 'customer'))->render();
                 $mpdf->WriteHTML($html);
-                $name_file = $customer_id . "_" . $date_p . ".pdf";
+                $name_file = $this->getUserId() . "_" . $date_p . ".pdf";
                 $path = "app/public/report/" . $this->getUserId() . "/";
                 makeDirectoryStorage($path);
                 $path_report = storage_path($path . $name_file);
