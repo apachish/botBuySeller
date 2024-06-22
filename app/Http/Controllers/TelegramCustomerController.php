@@ -20,7 +20,7 @@ class TelegramCustomerController extends Controller
             logger("user", [$text_services->getUser()]);
             if ($text_services->getUser() == null) return false;
 
-            if ($text_services->getMessage() == "/start") {
+            if ($text_services->getUser()->role == "colleague" && $text_services->getMessage() == "/start") {
                 $message = "با تشکر از ثبت نام در ربات مشتریان";
                 $message .= "\n\n";
                 $message .= "
