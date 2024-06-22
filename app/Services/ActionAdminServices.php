@@ -199,19 +199,31 @@ class ActionAdminServices extends TextServices
                 $updates = Transfer::withTrashed()->
                 whereNotNull("message_id")
                     ->where("created_at","<=",$targetDate)->get();
-                foreach ($updates as $update) {
+                try {
+                    foreach ($updates as $update) {
 
-                    // حذف پیام
-                    $result = $this->telegram_services->deleteMessage($this->bot->chanel_id, $update->message_id);
-                    logger("result delete message",[$result]);
-                    if ($result['ok']) {
-                        logger( "پیام با شناسه $update->message_id حذف شد.\n");
-                    } else {
-                        logger( "خطا در حذف پیام با شناسه $update->message_id: " . $result['description'] . "\n");
+                        // حذف پیام
+                        $result = $this->telegram_services->deleteMessage($this->bot->chanel_id, $update->message_id);
+                        logger("result delete message", [$result]);
+                        if ($result['ok']) {
+                            logger("پیام با شناسه $update->message_id حذف شد.\n");
+                        } else {
+                            logger("خطا در حذف پیام با شناسه $update->message_id: " . $result['description'] . "\n");
+                        }
                     }
                     $this->getTelegramServices()->sendMessage($this->getUserId(), "حذف پیام انجام شد");
+                }catch (\Exception $exception){
+                    $this->getTelegramServices()->sendMessage($this->getUserId(), "حذف پیام با مشکل روبرو شد");
 
+                    logger("get error",[
+                        $exception->getMessage(),
+                        $exception->getLine(),
+                        $exception->getCode(),
+                        $exception->getTrace(),
+                        $exception->getFile()
+                    ]);
                 }
+
                 break;
             case "جستجو کاربر\xF0\x9F\x94\x8D":
                 cache()->set($this->getKeyCache() . $this->getUserId(), "find_user");
