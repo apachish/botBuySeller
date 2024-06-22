@@ -199,7 +199,8 @@ class ActionAdminServices extends TextServices
                 logger($targetDate->format("Y-m-d H:i"));
                 $updates = Transfer::withTrashed()->
                 whereNotNull("message_id")
-                    ->where("created_at", "<=", $targetDate)->get();
+                    ->where("created_at", ">=", $targetDate)
+                    ->where("created_at", "<=", now()->format("Y-m-d H:i"))->get();
                 try {
                     foreach ($updates as $update) {
 
