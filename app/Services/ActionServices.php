@@ -464,7 +464,8 @@ class ActionServices extends TextServices
                         $admins = $bot_accounting->accessBot;
                         $message = "شماره حواله:".data_get($order_buy, 'id');
                         $message .= "\n\n";
-                        $message .= $transfer->message_request;
+                        $message .= "فی:";
+                        $message .= number_format(data_get($order_buy, 'price'), 0);
                         $message .= "\n\n";
                         $type =  data_get($order_buy,"type");
                         if($type  == "sell") {
@@ -486,6 +487,8 @@ class ActionServices extends TextServices
                             $message .="  $title_mal: ".$transaction_party;
                         $message .= "\n\n";
                         $message .= "برای:" . toJalali($transfer->date, "Y/m/d");
+                        $message .= "\n\n";
+                        $message .= "ساعت:" . toJalali($transfer->date, "H:i:s");
                         $message .= "\n\n";
                         $message .= "مقدار:" . data_get($request_transfer, "number") . "کیلو";
                         $message .= "\n\n";
