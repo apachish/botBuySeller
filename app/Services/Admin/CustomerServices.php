@@ -485,7 +485,7 @@ class CustomerServices
             if($user_con->memberShip) {
                 $message .= "تاریخ اشتراک";
                 $message .= "\n\n";
-                $message .= toJalali($user_con->memberShip->date);
+                $message .= toJalali($user_con->memberShip->expiration_date);
                 $message .= " می باشد ";
                 $message .= "\n\n";
             }
