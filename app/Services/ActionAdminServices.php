@@ -39,6 +39,9 @@ class ActionAdminServices extends TextServices
             ["text" => "\xF0\x9F\x9A\xBBکاربران"], ['text' => "\xF0\x9F\x94\xA7تنظیمات"]
         ],
         [
+            ["text" => "\xE2\x9D\x8C\xE2\x9D\x97حذف پیام های کانال"]
+        ],
+        [
             ["text" => "کانال"],
             ['text' => "حسابداری"],
             ['text' => "لفظ"],
@@ -78,6 +81,7 @@ class ActionAdminServices extends TextServices
             "\xF0\x9F\x9A\xBBلیست همکاران",
             "\xF0\x9F\x9A\xBBلیست مشتریان",
             "\xF0\x9F\x93\xA9ارسال پیام گروه",
+            "\xE2\x9D\x8C\xE2\x9D\x97حذف پیام های کانال",
             "🕰تاریخ فردا️",
             "\xE2\x98\x81تعطیل",
             "\xF0\x9F\x9A\xAB\xE2\x98\x80ممنوع معامله روز",
@@ -188,6 +192,26 @@ class ActionAdminServices extends TextServices
                 break;
             case "\xF0\x9F\x93\xA9ارسال پیام گروه":
                 $this->custromer->getMessageGroup($this);
+                break;
+            case "\xE2\x9D\x8C\xE2\x9D\x97حذف پیام های کانال":
+                $targetDate = now(); // تاریخ مورد نظر برای حذف پیام‌ها (فرمت YYYY-MM-DD)
+                logger($targetDate->format("Y-m-d H:i"));
+                $updates = Transfer::withTrashed()->
+                whereNotNull("message_id")
+                    ->where("created_at","<=",$targetDate)->get();
+                foreach ($updates as $update) {
+
+                    // حذف پیام
+                    $result = $this->deleteMessage($this->bot->token, $this->bot->chanel_id, $update->message_id);
+                    logger("result",[$result]);
+                    if ($result['ok']) {
+                        logger( "پیام با شناسه $update->message_id حذف شد.\n");
+                    } else {
+                        logger( "خطا در حذف پیام با شناسه $update->message_id: " . $result['description'] . "\n");
+                    }
+                    $this->getTelegramServices()->sendMessage($this->getUserId(), "حذف پیام انجام شد");
+
+                }
                 break;
             case "جستجو کاربر\xF0\x9F\x94\x8D":
                 cache()->set($this->getKeyCache() . $this->getUserId(), "find_user");
