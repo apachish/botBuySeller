@@ -433,10 +433,7 @@ class TextServices
             "راهنما را خواندم و یاد گرفتم",
         ];
         if (in_array($this->message, $accept))
-        {
-            logger("in menu");
             return true;
-        }
         $im = implode("|", $this->list_type);
         $pattern_un = "/^([0-9]{3}|[0-9]{5})($im)([4-9]?)(:.*)?$/u";
         if (preg_match($pattern_un, $this->message, $matches)) {
@@ -573,6 +570,7 @@ class TextServices
             case "\xF0\x9F\x93\x9Aقوانین":
             case "راهنما\xE2\x81\x89":
             case "\xF0\x9F\x92\xB3حق اشتراک":
+            case "\xE2\x8C\x9Bمدت اشتراک":
             case "\xE2\x9A\xA0\xE2\x9D\x8Cغیرفعال سازی تایید دو مرحله ای":
             case "\xE2\x9C\x8Cفعال سازی دو مرحله ای":
             case  "\xE2\x9D\x8Cغیر فعال فوری":
