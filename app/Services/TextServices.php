@@ -425,7 +425,7 @@ class TextServices
             "\xF0\x9F\x93\x9Aقوانین",
             "راهنما\xE2\x81\x89",
             "\xF0\x9F\x92\xB3حق اشتراک",
-            "\xE2\x8F\xB3مدت اشتراک",
+            "\xE2\x8C\x9Bمدت اشتراک",
             "\xE2\x9A\xA0\xE2\x9D\x8Cغیرفعال سازی تایید دو مرحله ای",
             "\xE2\x9C\x8Cفعال سازی دو مرحله ای",
             "\xE2\x9D\x8Cغیر فعال فوری",
@@ -433,7 +433,10 @@ class TextServices
             "راهنما را خواندم و یاد گرفتم",
         ];
         if (in_array($this->message, $accept))
+        {
+            logger("in menu");
             return true;
+        }
         $im = implode("|", $this->list_type);
         $pattern_un = "/^([0-9]{3}|[0-9]{5})($im)([4-9]?)(:.*)?$/u";
         if (preg_match($pattern_un, $this->message, $matches)) {
@@ -705,7 +708,7 @@ class TextServices
                 $this->telegram_services->sendMessage($this->user_id, $help->value);
 
                 break;
-            case "\xE2\x8F\xB3مدت اشتراک":
+            case "\xE2\x8C\x9Bمدت اشتراک":
 //                $help = Setting::where("key", "membership")->first();
                 if ($this->getUser()->memberShip) {
                     $message = "تاریخ پایان اشتراک شما:";
@@ -795,7 +798,7 @@ class TextServices
         $keyboard_menu[$i++] = [
             ['text' => "\xF0\x9F\x93\x9Aقوانین"],
             ['text' => "راهنما\xE2\x81\x89"],
-            ['text' => "\xE2\x8F\xB3مدت اشتراک"],
+            ['text' => "\xE2\x8C\x9Bمدت اشتراک"],
             ['text' => "\xF0\x9F\x92\xB3حق اشتراک"]
 
         ];
