@@ -463,16 +463,24 @@ class ActionServices extends TextServices
                         $message .= "\n\n";
                         $message .= $transfer->message_request;
                         $message .= "\n\n";
+                        $type =  data_get($order_buy,"type");
+                        if($type  == "sell") {
+                            $title_request = "خریدار";
+                            $title_mal = "فروشنده";
+                        }else {
+                            $title_request = "فروشنده";
+                            $title_mal = "خریدار";
 
+                        }
                         if($this->getUser()->role == "customer")
-                            $message .="  درخواست دهنده: ".$transaction_party_req_s;
+                            $message .="  $title_request: ".$transaction_party_req_s;
                         else
-                            $message .="  درخواست دهنده: ".$transaction_party_req;
+                            $message .="  $title_request: ".$transaction_party_req;
                         $message .= "\n\n";
                         if ($transfer->user->role == "customer")
-                            $message .="  دریافت کننده: ". $transaction_party_s;
+                            $message .="  $title_mal: ". $transaction_party_s;
                         else
-                            $message .="  دریافت کننده: ".$transaction_party;
+                            $message .="  $title_mal: ".$transaction_party;
                         $message .= "\n\n";
                         $message .= "برای:" . toJalali($transfer->date, "Y/m/d");
                         $message .= "\n\n";
