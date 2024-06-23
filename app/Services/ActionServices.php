@@ -757,10 +757,10 @@ class ActionServices extends TextServices
             });
             $request_transfer = Transfer::whereDate("date",$date)
                 ->with(["requestTransfer"=>function ($query) use ($customer_id){
-                    $query->where("customer_id", $customer_id);
+                    $query->where("request_id", $customer_id);
                 }])
                 ->whereHas("requestTransfer",function ($query) use ($customer_id){
-                $query->where("customer_id", $customer_id);
+                $query->where("request_id", $customer_id);
             })->union($trade_me)->orderBy("created_at")
                 ->get();
 //            $request_transfer = RequestTransfer::with(["transfer"=>function ($request) use ($date) {
