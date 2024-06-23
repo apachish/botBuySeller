@@ -32,7 +32,6 @@ class CustomerServices
 
     protected $keyword_colleague = [
         [
-            ['text' => "\xF0\x9F\x91\xA5معرفی مشتری"],
             ['text' => "\xF0\x9F\x93\x8Bلیست همکاران"]
         ],
         [
