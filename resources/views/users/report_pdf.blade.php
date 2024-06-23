@@ -138,16 +138,24 @@
             <tr>
                 @php
                     if(data_get($customer,'id') == data_get($item,'requestTransfer.request_id'))
-                        $type = data_get($item,"requestTransfer.type");
+                        {
+                            $type = data_get($item,"requestTransfer.type");
+                            $name_owner = data_get($item,"user.fullName");
+
+                        }
                     else
-                       $type =  getTypeOrder(data_get($item,"type"));
+                       {
+                           $type =  getTypeOrder(data_get($item,"type"))=="buy"?"sell":"buy";
+                           $name_owner = data_get($item,"requestTransfer.userRequest.fullName");
+
+                       }
     $color = "dodgerblue";
     if($type == "sell")
         $color = "#ef4444";
                 @endphp
                 <td>{{data_get($item,'requestTransfer.id')}}</td>
                  <td style="color: {{$color}}">{{$type . getTypeTitleOrder($type)}}</td>
-                <td>{{data_get($item,"user.fullName")}}</td>
+                <td>{{$name_owner}}</td>
                 <td>{{toJalali(data_get($item,"date"),"Y/m/d")}}</td>
                 <td>{{data_get($item,"requestTransfer.number")}}</td>
                 <td>{{getTypeTransfer(data_get($item,"type"))}}</td>
