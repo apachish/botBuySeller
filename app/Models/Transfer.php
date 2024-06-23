@@ -52,6 +52,6 @@ class Transfer extends Model
 
     public function requestTransfer()
     {
-        return $this->belongsTo(RequestTransfer::class,"transfer_id");
+        return $this->hasMany(RequestTransfer::class,"transfer_id");
     }
 }
