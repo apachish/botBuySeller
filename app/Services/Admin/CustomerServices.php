@@ -739,10 +739,10 @@ class CustomerServices
                 $text .= "(همکار)";
             $keyboard[$i++] = [
                 ['text' => "  $text  ", 'callback_data' => "set_worker_".$key_i],
-                ['text' => "\xE2\x9C\x8F\xF0\x9F\x91\xA8", 'callback_data' => 'edit_name_' . $key_i],
             ];
 
             $array = [
+                ['text' => "\xE2\x9C\x8F\xF0\x9F\x91\xA8", 'callback_data' => 'edit_name_' . $key_i],
                 ['text' => "\xE2\x86\x94", 'callback_data' => 'sync_mobile_' . $key_i],
                 ['text' => "\xF0\x9F\x93\x9D", 'callback_data' => 'get_membership_' . $key_i],
             ];
