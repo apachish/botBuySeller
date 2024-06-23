@@ -173,7 +173,7 @@ class ActionServices extends TextServices
             cache()->set($this->getKeyCache() . $this->getUserId(), "add_mobile");
 
         } elseif (!$this->getUser()->status) {
-            cache()->set($this->getKeyCache() . $this->getUserId(), "pending_accept");
+//            cache()->set($this->getKeyCache() . $this->getUserId(), "pending_accept");
             $text = "منتظر تایید مدیر سیستم باشید تا دسترسی به شما ارائه گردد";
             $this->telegram->sendMessage(['chat_id' => $this->getUserId(), 'text' => $text]);
         }
