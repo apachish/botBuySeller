@@ -210,9 +210,11 @@ class ActionServices extends TextServices
 //        cache()->set($this->getKeyCache() . $this->getUserId(), "pending_accept");
 //        $message_id = cache()->get("rule_accept". $this->getUserId());
 //        $this->telegram_services->deleteKeyboard($this->getUserId(), $text);
+        $this->getUser()->change_menu = true;
+        $this->getUser()->update();
         $keyboard_menu = $this->setMenu();
         $this->message_menu = "خوش آمدید، از این لحظه منو کاربری فعال شد";
-        $this->menu($keyboard_menu, $this->getUser()->status);
+        $this->menu($keyboard_menu, $this->getUser()->status,$this->getUser());
 
 //        $this->getTelegramServices()->editMessageTextAndInlineKeyboard($this->getUserId(), $message_id, $text, []);
 //        cache()->forget("rule_accept". $this->getUserId());
