@@ -774,7 +774,7 @@ class ActionServices extends TextServices
                 $request_transfer[] = $req;
                 if (data_get($customer, 'id') == data_get($req, 'user_id')) {
                     $req->type_label = getTypeOrder(data_get($req, "type")) == "buy" ? "sell" : "buy";
-                    $req->said = data_get($req, "requestTransfer.userRequest.fullName");
+                    $req->said = data_get($req, "request_transfer.user_request.fullName");
                     $req->color = $req->type_label == "sell" ? "#ef4444" : "dodgerblue";
                 } else {
 
