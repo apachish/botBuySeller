@@ -816,16 +816,16 @@ class ActionServices extends TextServices
                 $request_transfer[] = $req;
                 if (data_get($customer, 'id') == data_get($req, 'transfer.user_id')) {
                     $req->type_label = data_get($req, "type") ;
-                    $req->said = data_get($req, "user_request.fullName");
+                    $req->said = data_get($req, "userRequest.fullName");
                     $req->color = $req->type_label == "sell" ? "#ef4444" : "dodgerblue";
-                    logger("1",[$req,data_get($req, "user_request"),data_get($req, "user_request.fullName")]);
+                    logger("1",[$req,data_get($req, "userRequest"),data_get($req, "userRequest.fullName"),data_get($req, "transfer"),data_get($req, "transfer.user")]);
 
                 } else {
 
                     $req->type_label = data_get($req, "type")== "buy" ? "sell" : "buy";
                     $req->said = data_get($req, "transfer.user.fullName");
                     $req->color = $req->type_label == "sell" ? "#ef4444" : "dodgerblue";
-                    logger("2",[$req]);
+                    logger("2",[$req,data_get($req, "userRequest"),data_get($req, "userRequest.fullName"),data_get($req, "transfer"),data_get($req, "transfer.user")]);
 
                 }
             }
@@ -835,14 +835,14 @@ class ActionServices extends TextServices
                     $req->type_label = data_get($req, "type") ;
                     $req->said = data_get($req, "user_request.fullName");
                     $req->color = $req->type_label == "sell" ? "#ef4444" : "dodgerblue";
-                    logger("3",[$req]);
+                    logger("3",[$req,data_get($req, "userRequest"),data_get($req, "userRequest.fullName"),data_get($req, "transfer"),data_get($req, "transfer.user")]);
 
                 } else {
 
                     $req->type_label = data_get($req, "type")== "buy" ? "sell" : "buy";
                     $req->said = data_get($req, "transfer.user.fullName");
                     $req->color = $req->type_label == "sell" ? "#ef4444" : "dodgerblue";
-                    logger("4",[$req]);
+                    logger("3",[$req,data_get($req, "userRequest"),data_get($req, "userRequest.fullName"),data_get($req, "transfer"),data_get($req, "transfer.user")]);
                 }
             }
 
