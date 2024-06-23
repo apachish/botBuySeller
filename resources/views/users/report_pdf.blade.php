@@ -142,7 +142,7 @@
                 <td>{{data_get($item,"said")}}</td>
                 <td>{{toJalali(data_get($item,"transfer.date"),"Y/m/d")}}</td>
                 <td>{{data_get($item,"number")}}</td>
-                <td>{{getTypeTransfer(data_get($item,"type"))}}</td>
+                <td>{{getTypeTransfer(data_get($item,"transfer.type"))}}</td>
                 <td>{{data_get($item,"transfer.description")}}</td>
                 <td style="color:{{data_get($item,"color")}}">{{number_format(data_get($item,"price"))}}</td>
                 <td>{{toJalali(data_get($item,'created_at'),"Y/m/d H:i:s")}}</td>
