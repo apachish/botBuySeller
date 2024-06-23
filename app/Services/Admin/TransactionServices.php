@@ -139,6 +139,7 @@ class TransactionServices
         $text = $data == "active" ? "فعال شد" : "غیرفعال شد";
         $object->getTelegramServices()->editMessageTextAndInlineKeyboard($object->getUserId(), $message_id, $text, []);
         cache()->forget("forbidden_day_" . $object->getUserId());
+        cache()->forget("forbidden_day");
     }
 
 }
