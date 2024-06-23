@@ -71,6 +71,8 @@ class CustomerServices
             $text = "لطفا قوانین را مطالعه فرمایید";
             $rule = Setting::where("key", "rule")->first();
 
+            $user->status = true;
+            $user->update();
             $text .=  $rule?$rule->value:"";
             $keyboard[0][0] = ['text' => "قوانین را خواندم و آنها را پذیرفتم"];
             $object->service_user->telegram_services::menu($object->service_user->telegram, $keyboard, $user, $text);
