@@ -803,7 +803,7 @@ class ActionServices extends TextServices
             logger("request_transfer",[$request_transfer]);
 
             logger("request_transfer", [$request_transfer, $customer_id]);
-            if ($request_transfer->count()) {
+            if ($request_transfer) {
                 $customer = $customer ?: $this->getUser();
 //                $pdf = Pdf::loadView('users.report_pdf', compact('date_p', 'request_transfer', 'customer'));
 //                $name_file = $customer_id . "_" . $date_p . ".pdf";
