@@ -752,7 +752,7 @@ class ActionServices extends TextServices
             $message .= "  تاریخ   " . toJalali($date, "Y/m/d");
             $message .= "\n\n ";
             $this->telegram_services->editMessageTextAndInlineKeyboard($this->getUserId(), $message_id, $message);
-            $trade_me = Transfer::where("customer_id", $customer_id)->whereDate("date",$date)->with("requestTransfer")->whereHas("requestTransfer",function (){
+            $trade_me = Transfer::where("user_id", $customer_id)->whereDate("date",$date)->with("requestTransfer")->whereHas("requestTransfer",function (){
 
             });
             $request_transfer = Transfer::whereDate("date",$date)
