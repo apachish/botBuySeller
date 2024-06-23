@@ -146,6 +146,7 @@ class ActionServices extends TextServices
 
                     ]
                 );
+                logger("send admin ", [$admin->user_id,$message_admin]);
                 cache()->set("message_admin_" . $admin->user_id, $message_admin);
             }
             if (!$this->getUser()->fullName) {
