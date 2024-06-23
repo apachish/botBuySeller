@@ -804,7 +804,10 @@ class ActionServices extends TextServices
                         $query->whereDate("date",$date);
                         $query->with("user");
                     },"userRequest"])
-                ->get();
+                ->whereHas("transfer",function ($query) use($customer_id,$date){
+                    $query->where("user_id",$customer_id);
+                    $query->whereDate("date",$date);
+                })->get();
             $request = RequestTransfer::where("request_id",$customer_id)
                 ->with(["transfer"=>function ($query) use($customer_id,$date){
                     $query->with("user");
