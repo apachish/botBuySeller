@@ -818,11 +818,15 @@ class ActionServices extends TextServices
                     $req->type_label = data_get($req, "type") ;
                     $req->said = data_get($req, "user_request.fullName");
                     $req->color = $req->type_label == "sell" ? "#ef4444" : "dodgerblue";
+                    logger("1",[$req]);
+
                 } else {
 
                     $req->type_label = data_get($req, "type")== "buy" ? "sell" : "buy";
                     $req->said = data_get($req, "transfer.user.fullName");
                     $req->color = $req->type_label == "sell" ? "#ef4444" : "dodgerblue";
+                    logger("2",[$req]);
+
                 }
             }
             foreach ($request as $req) {
@@ -831,16 +835,17 @@ class ActionServices extends TextServices
                     $req->type_label = data_get($req, "type") ;
                     $req->said = data_get($req, "user_request.fullName");
                     $req->color = $req->type_label == "sell" ? "#ef4444" : "dodgerblue";
+                    logger("3",[$req]);
+
                 } else {
 
                     $req->type_label = data_get($req, "type")== "buy" ? "sell" : "buy";
                     $req->said = data_get($req, "transfer.user.fullName");
                     $req->color = $req->type_label == "sell" ? "#ef4444" : "dodgerblue";
+                    logger("4",[$req]);
                 }
             }
-            logger("request_transfer",[$request_transfer]);
 
-            logger("request_transfer", [$request_transfer, $customer_id]);
             if ($request_transfer) {
                 $customer = $customer ?: $this->getUser();
 //                $pdf = Pdf::loadView('users.report_pdf', compact('date_p', 'request_transfer', 'customer'));
@@ -857,13 +862,11 @@ class ActionServices extends TextServices
                 $path = "app/public/report/" . $this->getUserId() . "/";
                 makeDirectoryStorage($path);
                 $path_report = storage_path($path . $name_file);
-                logger("path_re", [$path_report]);
                 $document = $mpdf->Output($path_report, 'F');
                 $response = $this->telegram->sendDocument([
                     'chat_id' => $this->getUserId(),
                     'document' => InputFile::create($path_report, "$date_p.pdf")
                 ]);
-                logger("sendDocument", [$response]);
 
             } else {
                 $this->telegram->sendMessage(['chat_id' => $this->getUserId(), 'text' => 'معامله ای در این تاریخ انجام نشده']);
