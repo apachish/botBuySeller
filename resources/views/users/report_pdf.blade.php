@@ -143,7 +143,11 @@
                         $color = "#ef4444";
                 @endphp
                 <td>{{data_get($item,'requestTransfer.id')}}</td>
-                <td style="color: {{$color}}">{{getTypeTitleOrder(data_get($item,"type"))}}</td>
+                @if(data_get($customer,'id') == data_get($item,'requestTransfer.request_id'))
+                    <td style="color: {{$color}}">{{getTypeTitleOrder(data_get($item,"requestTransfer.type"))}}</td>
+                @else
+                    <td style="color: {{$color}}">{{getTypeTitleOrder(getTypeOrder(data_get($item,"type")))}}</td>
+                @endif
                 <td>{{data_get($item,"user.fullName")}}</td>
                 <td>{{toJalali(data_get($item,"date"),"Y/m/d")}}</td>
                 <td>{{data_get($item,"requestTransfer.number")}}</td>
