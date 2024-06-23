@@ -734,7 +734,7 @@ class CustomerServices
             if ($filter)
                 $key_i .= "_" . $filter;
             if($user->role == "customer" && $user->customer)
-                $text .= " مشتری -".$user->customer->fullName." ";
+                $text .= "  - مشتری".$user->customer->fullName." ";
             elseif($user->role == "colleague")
                 $text .= "(همکار)";
             $keyboard[$i++] = [
