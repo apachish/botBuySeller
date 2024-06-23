@@ -702,12 +702,12 @@ class CustomerServices
             $text = "\n\nلیست  همکاران";
             $text .= "\n\n";
             $text .= "با کلیک بر\xE2\x9D\x8C کاربر غیر فعال شده و با کلیک بر \xE2\x9C\x85 کاربرفعال گردید در صورت کلیک بر روی اسم شخص نوع کاربر از مشتری به همکار و به لیست مشتری انتقال می یابد ";
-            $users = UserTelegram::with("customer")->withTrashed()->where("role", "colleague");
+            $users = UserTelegram::with("customerUser")->withTrashed()->where("role", "colleague");
         }elseif($type == "customer") {
             $text = "\n\nلیست  مشتریان";
             $text .= "\n\n";
             $text .= "با کلیک بر\xE2\x9D\x8C کاربر غیر فعال شده و با کلیک بر \xE2\x9C\x85 کاربرفعال گردید در صورت کلیک بر روی اسم شخص نوع کاربر از همکار به مشتری و به لیست همکار انتقال می یابد ";
-            $users = UserTelegram::with("customerUser")->withTrashed()->where("role", "customer");
+            $users = UserTelegram::with("customer")->withTrashed()->where("role", "customer");
         }else{
             $text = "\n\nلیست  کاربران";
             $text .= "\n\n";
@@ -721,6 +721,7 @@ class CustomerServices
             });
         }
         $users = $users->simplePaginate(4, ['*'], 'page', $page);
+        logger("users",[$users]);
         $page = $users->currentPage();
         $next = $users->nextPageUrl() ? (int)str_replace("?page=", "", strstr($users->nextPageUrl(), "?page=")) : null;
         $pre = $users->previousPageUrl() ? (int)str_replace("?page=", "", strstr($users->previousPageUrl(), "?page=")) : null;
@@ -732,8 +733,8 @@ class CustomerServices
             $key_i = $user->role ."_".$user->id . "_" . $page;
             if ($filter)
                 $key_i .= "_" . $filter;
-            if($user->role == "customer" && $user->customerUser)
-                $text .= " مشتری )".$user->customerUser->FullName." )";
+            if($user->role == "customer" && $user->customer)
+                $text .= " مشتری )".$user->customer->FullName." )";
             elseif($user->role == "colleague")
                 $text .= "(همکار)";
             $keyboard[$i++] = [
