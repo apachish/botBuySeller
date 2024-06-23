@@ -138,7 +138,7 @@
             <tr>
 
                 <td>{{data_get($item,'requestTransfer.id')}}</td>
-                 <td style="color: {{data_get($item,"color")}}">{{$type . getTypeTitleOrder(data_get($item,"type_label"))}}</td>
+                 <td style="color: {{data_get($item,"color")}}">{{ getTypeTitleOrder(data_get($item,"type_label"))}}</td>
                 <td>{{data_get($item,"said")}}</td>
                 <td>{{toJalali(data_get($item,"date"),"Y/m/d")}}</td>
                 <td>{{data_get($item,"requestTransfer.number")}}</td>
