@@ -771,7 +771,7 @@ class ActionServices extends TextServices
                 ->get();
             $request_transfer = [];
             foreach ($me as $req) {
-                $request_transfer = $req;
+                $request_transfer[] = $req;
                 if (data_get($customer, 'id') == data_get($req, 'user_id')) {
                     $req->type_label = getTypeOrder(data_get($req, "type")) == "buy" ? "sell" : "buy";
                     $req->said = data_get($req, "requestTransfer.userRequest.fullName");
@@ -784,7 +784,7 @@ class ActionServices extends TextServices
                 }
             }
             foreach ($request as $req) {
-                $request_transfer = $req;
+                $request_transfer[] = $req;
                 if(data_get($customer,'id') == data_get($req,'user_id'))
                 {
                     $req->type_label =  getTypeOrder(data_get($req,"type"))=="buy"?"sell":"buy";
@@ -799,6 +799,7 @@ class ActionServices extends TextServices
                     $req->color = $req->type_label =="sell"?"#ef4444":"dodgerblue";
                 }
             }
+
             logger("request_transfer",[$request_transfer]);
 
             logger("request_transfer", [$request_transfer, $customer_id, $request_transfer->count()]);
