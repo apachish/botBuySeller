@@ -752,54 +752,91 @@ class ActionServices extends TextServices
             $message .= "  تاریخ   " . toJalali($date, "Y/m/d");
             $message .= "\n\n ";
             $this->telegram_services->editMessageTextAndInlineKeyboard($this->getUserId(), $message_id, $message);
-            $me = Transfer::where("user_id", $customer_id)
-                ->whereDate("date",$date)
-                ->with(["requestTransfer"=>function ($query) {
-                        $query->with("userRequest");
-                    },"user"])
-                ->whereHas("requestTransfer")->get();
-
-            $request = Transfer::whereDate("date",$date)
-                ->with(["user",
-                    "requestTransfer"=>function ($query) use ($customer_id){
-                    $query->where("request_id", $customer_id);
-                    $query->with("userRequest");
-                }])
-                ->whereHas("requestTransfer",function ($query) use ($customer_id){
-                    $query->where("request_id", $customer_id);
-                })->orderBy("created_at")
+//            $me = Transfer::where("user_id", $customer_id)
+//                ->whereDate("date",$date)
+//                ->with(["requestTransfer"=>function ($query) {
+//                        $query->with("userRequest");
+//                    },"user"])
+//                ->whereHas("requestTransfer")->get();
+//
+//            $request = Transfer::whereDate("date",$date)
+//                ->with(["user",
+//                    "requestTransfer"=>function ($query) use ($customer_id){
+//                    $query->where("request_id", $customer_id);
+//                    $query->with("userRequest");
+//                }])
+//                ->whereHas("requestTransfer",function ($query) use ($customer_id){
+//                    $query->where("request_id", $customer_id);
+//                })->orderBy("created_at")
+//                ->get();
+//            $request_transfer = [];
+//            foreach ($me as $req) {
+//                $request_transfer[] = $req;
+//                if (data_get($customer, 'id') == data_get($req, 'user_id')) {
+//                    $req->type_label = getTypeOrder(data_get($req, "type")) == "buy" ? "sell" : "buy";
+//                    $req->said = data_get($req, "request_transfer.user_request.fullName");
+//                    $req->color = $req->type_label == "sell" ? "#ef4444" : "dodgerblue";
+//                } else {
+//
+//                    $req->type_label = data_get($req, "requestTransfer.type");
+//                    $req->said = data_get($req, "user.fullName");
+//                    $req->color = $req->type_label == "sell" ? "#ef4444" : "dodgerblue";
+//                }
+//            }
+//            foreach ($request as $req) {
+//                $request_transfer[] = $req;
+//                if(data_get($customer,'id') == data_get($req,'user_id'))
+//                {
+//                    $req->type_label =  getTypeOrder(data_get($req,"type"))=="buy"?"sell":"buy";
+//                    $req->said = data_get($req,"requestTransfer.userRequest.fullName");
+//                    $req->color = $req->type_label =="sell"?"#ef4444":"dodgerblue";
+//                }
+//                else
+//                {
+//
+//                    $req->type_label = data_get($req,"requestTransfer.type");
+//                    $req->said = data_get($req,"user.fullName");
+//                    $req->color = $req->type_label =="sell"?"#ef4444":"dodgerblue";
+//                }
+//            }
+            $me = RequestTransfer::whereDate("date",$date)
+                ->with(["transfer"=>function ($query) use($customer_id){
+                        $query->where("user_id",$customer_id);
+                        $query->with("user");
+                    },"userRequest"])
                 ->get();
-            $request_transfer = [];
+            $request = RequestTransfer::whereDate("date",$date)->where("request_id",$customer_id)
+                ->with(["transfer"=>function ($query) use($customer_id){
+                    $query->with("user");
+                },"userRequest"])
+                ->get();
+                        $request_transfer = [];
             foreach ($me as $req) {
                 $request_transfer[] = $req;
-                if (data_get($customer, 'id') == data_get($req, 'user_id')) {
-                    $req->type_label = getTypeOrder(data_get($req, "type")) == "buy" ? "sell" : "buy";
-                    $req->said = data_get($req, "request_transfer.user_request.fullName");
+                if (data_get($customer, 'id') == data_get($req, 'transfer.user_id')) {
+                    $req->type_label = data_get($req, "type") == "buy" ? "sell" : "buy";
+                    $req->said = data_get($req, "user_request.fullName");
                     $req->color = $req->type_label == "sell" ? "#ef4444" : "dodgerblue";
                 } else {
 
-                    $req->type_label = data_get($req, "requestTransfer.type");
-                    $req->said = data_get($req, "user.fullName");
+                    $req->type_label = data_get($req, "type");
+                    $req->said = data_get($req, "transfer.user.fullName");
                     $req->color = $req->type_label == "sell" ? "#ef4444" : "dodgerblue";
                 }
             }
             foreach ($request as $req) {
                 $request_transfer[] = $req;
-                if(data_get($customer,'id') == data_get($req,'user_id'))
-                {
-                    $req->type_label =  getTypeOrder(data_get($req,"type"))=="buy"?"sell":"buy";
-                    $req->said = data_get($req,"requestTransfer.userRequest.fullName");
-                    $req->color = $req->type_label =="sell"?"#ef4444":"dodgerblue";
-                }
-                else
-                {
+                if (data_get($customer, 'id') == data_get($req, 'transfer.user_id')) {
+                    $req->type_label = data_get($req, "type") == "buy" ? "sell" : "buy";
+                    $req->said = data_get($req, "user_request.fullName");
+                    $req->color = $req->type_label == "sell" ? "#ef4444" : "dodgerblue";
+                } else {
 
-                    $req->type_label = data_get($req,"requestTransfer.type");
-                    $req->said = data_get($req,"user.fullName");
-                    $req->color = $req->type_label =="sell"?"#ef4444":"dodgerblue";
+                    $req->type_label = data_get($req, "type");
+                    $req->said = data_get($req, "transfer.user.fullName");
+                    $req->color = $req->type_label == "sell" ? "#ef4444" : "dodgerblue";
                 }
             }
-
             logger("request_transfer",[$request_transfer]);
 
             logger("request_transfer", [$request_transfer, $customer_id]);
