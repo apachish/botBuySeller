@@ -138,26 +138,16 @@
             <tr>
 
                 <td>{{data_get($item,'requestTransfer.id')}}</td>
-                 <td style="color: {{$color}}">{{$type . getTypeTitleOrder($type)}}</td>
-                <td>{{$name_owner}}</td>
+                 <td style="color: {{data_get($item,"color")}}">{{$type . getTypeTitleOrder(data_get($item,"type_label"))}}</td>
+                <td>{{data_get($item,"said")}}</td>
                 <td>{{toJalali(data_get($item,"date"),"Y/m/d")}}</td>
                 <td>{{data_get($item,"requestTransfer.number")}}</td>
                 <td>{{getTypeTransfer(data_get($item,"type"))}}</td>
                 <td>{{data_get($item,"description")}}</td>
-                <td style="color:{{$color}}">{{number_format(data_get($item,"price"))}}</td>
+                <td style="color:{{data_get($item,"color")}}">{{number_format(data_get($item,"price"))}}</td>
                 <td>{{toJalali(data_get($item,'requestTransfer.created_at'),"Y/m/d H:i:s")}}</td>
             </tr>
         @endforeach
-        {{--        <tr>--}}
-        {{--            <td>تعرفه ماهانه</td>--}}
-        {{--            <td><span class="txt-l">3000</span><span class="txt-top">تومان</span></td>--}}
-        {{--            <td><span class="txt-l">5000</span><span class="txt-top">تومان</span></td>--}}
-        {{--            <td class="default"><span class="txt-l">6000</span><span class="txt-top">تومان</span></td>--}}
-        {{--            <td><span class="txt-l">8000</span><span class="txt-top">تومان</span></td>--}}
-        {{--        </tr>--}}
-        {{--        <tr>--}}
-        {{--            <td colspan="5" class="sep">به سادگی شروع کنید</td>--}}
-        {{--        </tr>--}}
 
         </tbody>
     </table>
