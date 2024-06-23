@@ -49,4 +49,9 @@ class Transfer extends Model
     {
         return $this->belongsTo(UserTelegram::class,"user_id","id");
     }
+
+    public function requestTransfer()
+    {
+        return $this->belongsTo(RequestTransfer::class,"transfer_id");
+    }
 }

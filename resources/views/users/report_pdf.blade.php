@@ -142,15 +142,15 @@
                     if($type == "sell")
                         $color = "#ef4444";
                 @endphp
-                <td>{{$item->id}}</td>
-                <td style="color: {{$color}}">{{getTypeTitleOrder(data_get($item,"transfer.type"))}}</td>
-                <td>{{data_get($item,"transfer.user.fullName")}}</td>
-                <td>{{toJalali(data_get($item,"transfer.date"),"Y/m/d")}}</td>
-                <td>{{data_get($item,"number")}}</td>
-                <td>{{getTypeTransfer(data_get($item,"transfer.type"))}}</td>
-                <td>{{data_get($item,"transfer.description")}}</td>
-                <td style="color:{{$color}}">{{number_format(data_get($item,"transfer.price"))}}</td>
-                <td>{{toJalali(data_get($item,'created_at'),"Y/m/d H:i:s")}}</td>
+                <td>{{data_get($item,'requestTransfer.id')}}</td>
+                <td style="color: {{$color}}">{{getTypeTitleOrder(data_get($item,"type"))}}</td>
+                <td>{{data_get($item,"user.fullName")}}</td>
+                <td>{{toJalali(data_get($item,"date"),"Y/m/d")}}</td>
+                <td>{{data_get($item,"requestTransfer.number")}}</td>
+                <td>{{getTypeTransfer(data_get($item,"type"))}}</td>
+                <td>{{data_get($item,"description")}}</td>
+                <td style="color:{{$color}}">{{number_format(data_get($item,"price"))}}</td>
+                <td>{{toJalali(data_get($item,'requestTransfer.created_at'),"Y/m/d H:i:s")}}</td>
             </tr>
         @endforeach
         {{--        <tr>--}}

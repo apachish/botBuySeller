@@ -752,9 +752,23 @@ class ActionServices extends TextServices
             $message .= "  تاریخ   " . toJalali($date, "Y/m/d");
             $message .= "\n\n ";
             $this->telegram_services->editMessageTextAndInlineKeyboard($this->getUserId(), $message_id, $message);
-            $request_transfer = RequestTransfer::with("transfer.user")
-                ->whereDate("created_at", $date)
-                ->where("request_id", $customer_id)->get();
+            $trade_me = Transfer::where("customer_id", $customer_id)->whereDate("date",$date)->with("requestTransfer")->whereHas("requestTransfer",function (){
+
+            });
+            $request_transfer = Transfer::whereDate("date",$date)
+                ->with(["requestTransfer"=>function ($query) use ($customer_id){
+                    $query->where("customer_id", $customer_id);
+                }])
+                ->whereHas("requestTransfer",function ($query) use ($customer_id){
+                $query->where("customer_id", $customer_id);
+            })->union($trade_me)->orderBy("created_at")
+                ->get();
+//            $request_transfer = RequestTransfer::with(["transfer"=>function ($request) use ($date) {
+//              $request->whereDate("date",$date);
+//            }])
+//                ->whereDate("date", $date)
+//                ->where("request_id", $customer_id)
+//                ->get();
             logger("request_transfer", [$request_transfer, $customer_id, $request_transfer->count()]);
             if ($request_transfer->count()) {
                 $customer = $customer ?: $this->getUser();
