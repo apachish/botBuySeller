@@ -117,6 +117,7 @@ class ActionAdminServices extends TextServices
 
     public function actionData()
     {
+        cache()->forget($this->getKeyCache() . $this->getUserId());
         logger("actionText", [$this->getData()]);
         if (str_contains($this->getData(), "ok_user_"))
             $this->custromer->AcceptUser($this);

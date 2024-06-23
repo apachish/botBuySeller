@@ -702,12 +702,12 @@ class CustomerServices
             $text = "\n\nلیست  همکاران";
             $text .= "\n\n";
             $text .= "با کلیک بر\xE2\x9D\x8C کاربر غیر فعال شده و با کلیک بر \xE2\x9C\x85 کاربرفعال گردید در صورت کلیک بر روی اسم شخص نوع کاربر از مشتری به همکار و به لیست مشتری انتقال می یابد ";
-            $users = UserTelegram::withTrashed()->where("role", "colleague");
+            $users = UserTelegram::with("customer")->withTrashed()->where("role", "colleague");
         }elseif($type == "customer") {
             $text = "\n\nلیست  مشتریان";
             $text .= "\n\n";
             $text .= "با کلیک بر\xE2\x9D\x8C کاربر غیر فعال شده و با کلیک بر \xE2\x9C\x85 کاربرفعال گردید در صورت کلیک بر روی اسم شخص نوع کاربر از همکار به مشتری و به لیست همکار انتقال می یابد ";
-            $users = UserTelegram::withTrashed()->where("role", "customer");
+            $users = UserTelegram::with("customerUser")->withTrashed()->where("role", "customer");
         }else{
             $text = "\n\nلیست  کاربران";
             $text .= "\n\n";

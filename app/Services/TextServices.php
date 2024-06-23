@@ -786,7 +786,6 @@ class TextServices
         $i = 0;
         if ($this->getUser()->role == "colleague") {
             $keyboard_menu[$i++] = [
-                ['text' => "\xF0\x9F\x91\xA5معرفی مشتری"],
                 ['text' => "\xF0\x9F\x93\x8Bلیست همکاران"],
             ];
 
