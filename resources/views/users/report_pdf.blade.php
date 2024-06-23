@@ -136,25 +136,7 @@
         <tbody>
         @foreach($request_transfer as $i=> $item)
             <tr>
-                @php
-                    if(data_get($customer,'id') == data_get($item,'user_id'))
-                        {
-                                                  $type =  getTypeOrder(data_get($item,"type"))=="buy"?"sell":"buy";
-                           $name_owner = data_get($item,"requestTransfer.userRequest.fullName");
 
-
-
-                        }
-                    else
-                       {
-
-                           $type = data_get($item,"requestTransfer.type");
-                            $name_owner = data_get($item,"user.fullName");
-                       }
-    $color = "dodgerblue";
-    if($type == "sell")
-        $color = "#ef4444";
-                @endphp
                 <td>{{data_get($item,'requestTransfer.id')}}</td>
                  <td style="color: {{$color}}">{{$type . getTypeTitleOrder($type)}}</td>
                 <td>{{$name_owner}}</td>

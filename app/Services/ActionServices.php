@@ -752,23 +752,56 @@ class ActionServices extends TextServices
             $message .= "  تاریخ   " . toJalali($date, "Y/m/d");
             $message .= "\n\n ";
             $this->telegram_services->editMessageTextAndInlineKeyboard($this->getUserId(), $message_id, $message);
-            $request_transfer = Transfer::where("user_id", $customer_id)
+            $me = Transfer::where("user_id", $customer_id)
                 ->whereDate("date",$date)
                 ->with(["requestTransfer"=>function ($query) {
                         $query->with("userRequest");
                     },"user"])
                 ->whereHas("requestTransfer")->get();
-//
-//            $request_transfer = Transfer::whereDate("date",$date)
-//                ->with(["user",
-//                    "requestTransfer"=>function ($query) use ($customer_id){
-//                    $query->where("request_id", $customer_id);
-//                    $query->with("userRequest");
-//                }])
-//                ->whereHas("requestTransfer",function ($query) use ($customer_id){
-//                    $query->where("request_id", $customer_id);
-//                })->union($trade_me)->orderBy("created_at")
-//                ->get();
+
+            $request = Transfer::whereDate("date",$date)
+                ->with(["user",
+                    "requestTransfer"=>function ($query) use ($customer_id){
+                    $query->where("request_id", $customer_id);
+                    $query->with("userRequest");
+                }])
+                ->whereHas("requestTransfer",function ($query) use ($customer_id){
+                    $query->where("request_id", $customer_id);
+                })->orderBy("created_at")
+                ->get();
+            $request_transfer = [];
+            foreach ($me as $req) {
+                $request_transfer = $req;
+                    if(data_get($customer,'id') == data_get($req,'user_id'))
+                    {
+                        $req->type_label =  getTypeOrder(data_get($req,"type"))=="buy"?"sell":"buy";
+                        $req->said = data_get($req,"requestTransfer.userRequest.fullName");
+                        $req->color = $req->type_label =="sell"?"#ef4444":"dodgerblue";
+                    }
+                    else
+                    {
+
+                        $req->type_label = data_get($req,"requestTransfer.type");
+                        $req->said = data_get($req,"user.fullName");
+                        $req->color = $req->type_label =="sell"?"#ef4444":"dodgerblue";
+                    }
+
+            foreach ($request as $req) {
+                $request_transfer = $req;
+                if(data_get($customer,'id') == data_get($req,'user_id'))
+                {
+                    $req->type_label =  getTypeOrder(data_get($req,"type"))=="buy"?"sell":"buy";
+                    $req->said = data_get($req,"requestTransfer.userRequest.fullName");
+                    $req->color = $req->type_label =="sell"?"#ef4444":"dodgerblue";
+                }
+                else
+                {
+
+                    $req->type_label = data_get($req,"requestTransfer.type");
+                    $req->said = data_get($req,"user.fullName");
+                    $req->color = $req->type_label =="sell"?"#ef4444":"dodgerblue";
+                }
+            }
             logger("request_transfer",[$request_transfer]);
 
             logger("request_transfer", [$request_transfer, $customer_id, $request_transfer->count()]);
