@@ -355,6 +355,12 @@ class TextServices
         // data_get($cache_data, "title")
     }
 
+    public function removeMessageCache(): void
+    {
+        $this->message_cache = null;
+
+        // data_get($cache_data, "title")
+    }
     /**
      * @return mixed
      */

@@ -115,13 +115,15 @@ class ActionAdminServices extends TextServices
         }
     }
 
+
     public function actionData()
     {
         cache()->forget($this->getKeyCache() . $this->getUserId());
+        $this->removeMessageCache();
         logger("actionText", [$this->getData()]);
         if (str_contains($this->getData(), "ok_user_"))
             $this->custromer->AcceptUser($this);
-        if (str_contains($this->getData(), "reject_user_"))
+        elseif (str_contains($this->getData(), "reject_user_"))
             $this->custromer->rejectUser($this);
         elseif (str_contains($this->getData(), "pre_"))
             $this->custromer->pre($this);
