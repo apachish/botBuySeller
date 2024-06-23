@@ -972,8 +972,9 @@ class ActionServices extends TextServices
             $forbidden_day = cache()->remember("forbidden_day", now()->setTime(23, 59), function () {
                 return Setting::where("key", "forbidden_day")->get()->keyBy("key");
             });
-            if ($forbidden_day && in_array($this->getType(), $this->list_type_today) ) {
-                $this->telegram_services->sendMessage($this->getUserId(), "معامله روز تعطیل می باشد");
+            logger("forbidden_day",[$forbidden_day , $forbidden_day->value]);
+            if ($forbidden_day && $forbidden_day->value && in_array($this->getType(), $this->list_type_today) ) {
+                $this->telegram_services->sendMessage($this->getUserId(), "تمام معاملات برای اولین روز کاری می باشد و امکان معامله روز در حال حاظر وجود ندارد");
                 return true;
             }
             if (!$time->between($morning, $none_13_30, true) && in_array($this->getType(), $this->list_type_today_r_f)) {
