@@ -350,7 +350,7 @@ class CustomerServices
                 $response = $object->telegram->kickChatMember(
                     [
                         'chat_id' => $object->bot->chanel_id,
-                        'user_id' => $user_con->id,
+                        'user_id' => $user_con->telegram_id,
                     ]);
 
                 if ($response) {
