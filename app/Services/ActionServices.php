@@ -799,15 +799,16 @@ class ActionServices extends TextServices
 //                    $req->color = $req->type_label =="sell"?"#ef4444":"dodgerblue";
 //                }
 //            }
-            $me = RequestTransfer::whereDate("date",$date)
-                ->with(["transfer"=>function ($query) use($customer_id){
+            $me = RequestTransfer::with(["transfer"=>function ($query) use($customer_id,$date){
                         $query->where("user_id",$customer_id);
+                        $query->whereDate("date",$date);
                         $query->with("user");
                     },"userRequest"])
                 ->get();
             $request = RequestTransfer::whereDate("date",$date)->where("request_id",$customer_id)
-                ->with(["transfer"=>function ($query) use($customer_id){
+                ->with(["transfer"=>function ($query) use($customer_id,$date){
                     $query->with("user");
+                    $query->whereDate("date",$date);
                 },"userRequest"])
                 ->get();
                         $request_transfer = [];
