@@ -752,27 +752,25 @@ class ActionServices extends TextServices
             $message .= "  تاریخ   " . toJalali($date, "Y/m/d");
             $message .= "\n\n ";
             $this->telegram_services->editMessageTextAndInlineKeyboard($this->getUserId(), $message_id, $message);
-            $trade_me = Transfer::where("user_id", $customer_id)->whereDate("date",$date)->with(["requestTransfer"=>function ($query) {
-                $query->with("userRequest");
-            },"user"])->whereHas("requestTransfer",function ($query){
-            });
-            $request_transfer = Transfer::whereDate("date",$date)
-                ->with(["user","requestTransfer"=>function ($query) use ($customer_id){
-                    $query->where("request_id", $customer_id);
-                    $query->with("userRequest");
-
-                }])
-                ->whereHas("requestTransfer",function ($query) use ($customer_id){
-                $query->where("request_id", $customer_id);
-            })->union($trade_me)->orderBy("created_at")
-                ->get();
-            logger("request_transfer",[$request_transfer]);
-//            $request_transfer = RequestTransfer::with(["transfer"=>function ($request) use ($date) {
-//              $request->whereDate("date",$date);
-//            }])
-//                ->whereDate("date", $date)
-//                ->where("request_id", $customer_id)
+            $request_transfer = Transfer::where("user_id", $customer_id)
+                ->whereDate("date",$date)
+                ->with(["requestTransfer"=>function ($query) {
+                        $query->with("userRequest");
+                    },"user"])
+                ->whereHas("requestTransfer")->get();
+//
+//            $request_transfer = Transfer::whereDate("date",$date)
+//                ->with(["user",
+//                    "requestTransfer"=>function ($query) use ($customer_id){
+//                    $query->where("request_id", $customer_id);
+//                    $query->with("userRequest");
+//                }])
+//                ->whereHas("requestTransfer",function ($query) use ($customer_id){
+//                    $query->where("request_id", $customer_id);
+//                })->union($trade_me)->orderBy("created_at")
 //                ->get();
+            logger("request_transfer",[$request_transfer]);
+
             logger("request_transfer", [$request_transfer, $customer_id, $request_transfer->count()]);
             if ($request_transfer->count()) {
                 $customer = $customer ?: $this->getUser();

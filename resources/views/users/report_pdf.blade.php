@@ -137,17 +137,19 @@
         @foreach($request_transfer as $i=> $item)
             <tr>
                 @php
-                    if(data_get($customer,'id') == data_get($item,'requestTransfer.request_id'))
+                    if(data_get($customer,'id') == data_get($item,'user_id'))
                         {
-                            $type = data_get($item,"requestTransfer.type");
-                            $name_owner = data_get($item,"user.fullName");
+                                                  $type =  getTypeOrder(data_get($item,"type"))=="buy"?"sell":"buy";
+                           $name_owner = data_get($item,"requestTransfer.userRequest.fullName");
+
+
 
                         }
                     else
                        {
-                           $type =  getTypeOrder(data_get($item,"type"))=="buy"?"sell":"buy";
-                           $name_owner = data_get($item,"requestTransfer.userRequest.fullName");
 
+                           $type = data_get($item,"requestTransfer.type");
+                            $name_owner = data_get($item,"user.fullName");
                        }
     $color = "dodgerblue";
     if($type == "sell")
