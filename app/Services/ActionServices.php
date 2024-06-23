@@ -818,7 +818,7 @@ class ActionServices extends TextServices
                     $req->type_label = data_get($req, "type") ;
                     $req->said = data_get($req, "user_request.fullName");
                     $req->color = $req->type_label == "sell" ? "#ef4444" : "dodgerblue";
-                    logger("1",[$req]);
+                    logger("1",[$req,data_get($req, "user_request"),data_get($req, "user_request.fullName")]);
 
                 } else {
 
