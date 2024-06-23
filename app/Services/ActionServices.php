@@ -173,7 +173,7 @@ class ActionServices extends TextServices
             cache()->set($this->getKeyCache() . $this->getUserId(), "add_mobile");
 
         } elseif (!$this->getUser()->status) {
-//            cache()->set($this->getKeyCache() . $this->getUserId(), "pending_accept");
+            cache()->set($this->getKeyCache() . $this->getUserId(), "pending_accept");
             $text = "منتظر تایید مدیر سیستم باشید تا دسترسی به شما ارائه گردد";
             $this->telegram->sendMessage(['chat_id' => $this->getUserId(), 'text' => $text]);
         }
@@ -205,11 +205,15 @@ class ActionServices extends TextServices
     public function helpAccept()
     {
         logger("accept help");
-        $text = "اطلاعات شما برای مدیر سیستم ارسال شد پس از تایید شما در گروه اضافه می شوید";
+//        $text = "اطلاعات شما برای مدیر سیستم ارسال شد پس از تایید شما در گروه اضافه می شوید";
         $this->getUser()->update(["accept_help" => now()->format("Y-m-d H:i")]);
 //        cache()->set($this->getKeyCache() . $this->getUserId(), "pending_accept");
 //        $message_id = cache()->get("rule_accept". $this->getUserId());
-        $this->telegram_services->deleteKeyboard($this->getUserId(), $text);
+//        $this->telegram_services->deleteKeyboard($this->getUserId(), $text);
+        $keyboard_menu = $this->setMenu();
+        $this->message_menu = "خوش آمدید، از این لحظه منو کاربری فعال شد";
+        $this->menu($keyboard_menu, $this->getUser()->status);
+
 //        $this->getTelegramServices()->editMessageTextAndInlineKeyboard($this->getUserId(), $message_id, $text, []);
 //        cache()->forget("rule_accept". $this->getUserId());
     }
