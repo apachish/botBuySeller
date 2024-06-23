@@ -766,6 +766,7 @@ class ActionServices extends TextServices
                 $query->where("request_id", $customer_id);
             })->union($trade_me)->orderBy("created_at")
                 ->get();
+            logger("request_transfer",[$request_transfer]);
 //            $request_transfer = RequestTransfer::with(["transfer"=>function ($request) use ($date) {
 //              $request->whereDate("date",$date);
 //            }])
