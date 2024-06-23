@@ -137,16 +137,18 @@
         @foreach($request_transfer as $i=> $item)
             <tr>
                 @php
-                    $color = "dodgerblue";
-                    $type = data_get($item,"type");
-                    if($type == "sell")
-                        $color = "#ef4444";
+                    if(data_get($customer,'id') == data_get($item,'requestTransfer.request_id'))
+                        $type = data_get($item,"requestTransfer.type");
+                    else
+                       $type =  getTypeOrder(data_get($item,"type"));
+    $color = "dodgerblue";
+    if($type == "sell")
+        $color = "#ef4444";
                 @endphp
                 <td>{{data_get($item,'requestTransfer.id')}}</td>
-                @if(data_get($customer,'id') == data_get($item,'requestTransfer.request_id'))
-                    <td style="color: {{$color}}">{{getTypeTitleOrder(data_get($item,"requestTransfer.type"))}}</td>
+                    خخخ<td style="color: {{$color}}">{{getTypeTitleOrder($type)}}</td>
                 @else
-                    <td style="color: {{$color}}">{{getTypeTitleOrder(getTypeOrder(data_get($item,"type")))}}</td>
+                    شش<td style="color: {{$color}}">{{getTypeTitleOrder($type)}}</td>
                 @endif
                 <td>{{data_get($item,"user.fullName")}}</td>
                 <td>{{toJalali(data_get($item,"date"),"Y/m/d")}}</td>
