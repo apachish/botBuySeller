@@ -18,7 +18,7 @@ return new class extends Migration
             $table->unsignedBigInteger('transfer_id');
             $table->foreign('transfer_id')->references('id')->on('transfer');
             $table->integer("number");
-            $table->float("price");
+            $table->float("price",22,2);
             $table->string("status");
             $table->string("type");
             $table->timestamps();

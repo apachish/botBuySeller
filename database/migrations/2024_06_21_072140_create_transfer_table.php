@@ -17,7 +17,7 @@ return new class extends Migration
             $table->foreign('user_id')->references('id')->on('user_telegram');
             $table->string("type");
             $table->integer("number");
-            $table->float("price");
+            $table->float("price",22,2);
             $table->enum("status",\App\Models\Transfer::getStatus());
             $table->string("message");
             $table->string("description");
