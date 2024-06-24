@@ -199,12 +199,14 @@ class ActionAdminServices extends TextServices
             case "\xE2\x9D\x8C\xE2\x9D\x97حذف پیام های کانال":
                 $targetDate = cache()->get("date_delete_message_chanel");
                 cache()->forget("date_delete_message_chanel");
-                logger($targetDate->format("Y-m-d H:i"));
                 $updates = Transfer::withTrashed()->
                 whereNotNull("message_id");
 
                 if($targetDate)
+                {
+                    logger($targetDate->format("Y-m-d H:i"));
                     $updates->where("created_at", ">=", $targetDate);
+                }
 
                 $updates =  $updates->where("created_at", "<=", now()->format("Y-m-d H:i"))->get();
                 try {
