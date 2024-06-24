@@ -906,7 +906,7 @@ class ActionServices extends TextServices
     public function rejectAll()
     {
         $result = false;
-        $transfers = Transfer::where("user_id", $this->getUserId())
+        $transfers = Transfer::where("user_id", $this->getUser()->id)
             ->whereIn("status", [Transfer::STATUS_ACTIVE, Transfer::STATUS_ACTIVE_DO])
             ->get();
         $i = 0;
