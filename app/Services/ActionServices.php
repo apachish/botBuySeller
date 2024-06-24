@@ -1115,7 +1115,9 @@ class ActionServices extends TextServices
 
                 $message .= "\xF0\x9F\x92\xB0	";
 
-            } else
+            } elseif($time->between($morning, $none, true) && (in_array($this->getType(), $this->list_type_today) ))
+                $message .= " روز   ";
+            else
                 $message .= "  با حواله  ";
             $message .= $number;
             $message .= " تا ";
@@ -1151,6 +1153,7 @@ class ActionServices extends TextServices
             logger("ke", [$this->getUserId(), $message, $keyboard]);
             $result_word = $this->telegram_services->MessageReplyMarkup($this->telegram, $this->getUserId(), $message, $keyboard, false);
             if ($result_word) {
+                logger("send word",[$result_word]);
                 $word_telegram->message_id = $result_word;
                 $word_telegram->update();
             } else {
