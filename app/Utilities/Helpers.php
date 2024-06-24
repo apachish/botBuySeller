@@ -175,13 +175,21 @@ if (!function_exists('generateUniqueSixDigitCode')) {
 if (!function_exists('getTypeTransfer')) {
     function getTypeTransfer($type)
     {
-        if (in_array($type, ["فف", "خف", "خ", "ف"]))
+        if (in_array($type, [ "خ", "ف"]))
+            return "عادی روز";
+        elseif (in_array($type, ["فف", "خف"]))
             return "عادی";
-        elseif (in_array($type, ["خفش", "ففش", "خش", "فش"]))
+        elseif (in_array($type, [ "خش", "فش"]))
+            return "شنا روز";
+        elseif (in_array($type, ["خفش", "ففش"]))
             return "شنا";
-        elseif (in_array($type, ["خفن", "ففن", "خن", "فن"]))
+        elseif (in_array($type, [ "خن", "فن"]))
+            return "نقدی حاضر";
+        elseif (in_array($type, ["خفن", "ففن"]))
             return "نقدی";
-        elseif (in_array($type, ["ففم", "خفم", "فم", "خم"]))
+        elseif (in_array($type, [ "فم", "خم"]))
+            return "معکوس روز";
+        elseif (in_array($type, ["ففم", "خفم"]))
             return "معکوس";
 
     }
