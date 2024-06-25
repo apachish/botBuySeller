@@ -678,7 +678,7 @@ class ActionServices extends TextServices
         logger("worker", [$worker_id, $worker, $page]);
         if ($worker) {
                 $name_worker = $worker->fullName ?: $worker->first_name . " " . $worker->last_name;
-            $message_id = cache()->get("menu_List_worker_" . $this->getUserId());
+            $message_id = cache()->get("menu_List_worker_" . $this->getUser()->id);
                 logger("menu_List_worker_", [$message_id]);
                 UserTradeAccess::updateOrCreate([
                 "user_id" => $this->getUser()->id,
