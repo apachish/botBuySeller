@@ -264,11 +264,37 @@ class ActionServices extends TextServices
                 $transaction_party_req_s = null;
                 $request_transfer = [];
 
-                $head = data_get($this->getUser(), "customer");
+                if ($this->getUser()->role == "customer")
+                    $head = data_get($this->getUser(), "customer");
+                else
+                    $head = $this->getUser();
+
+                if (data_get($transfer, "user.role") == "customer")
+                    $colleague = data_get($transfer, "user.customer");
+                else
+                    $colleague = data_get($transfer, "user");
+
+                logger("head", [$head]);
+                logger("colleague", [$colleague]);
+
+                $access_limit_head = data_get($head, 'userTradeAccess');
+                $access_limit_transaction = data_get($colleague, "userTradeAccess");
+
+                if ($access_limit_head)
+                    $user_request = $access_limit_head->where("user_trade_id", $colleague->id)->first();
+                if ($access_limit_transaction)
+                    $user_transfer_limit = $access_limit_transaction->where("user_trade_id", $head->id)->first();
+
+                logger("limiit",[$user_request,$user_transfer_limit]);
+
+                if (($user_request && $user_request->limit_access) && ($user_transfer_limit && $user_transfer_limit->limit_access))
+                    $limit_day = min($user_request->limit_access, $user_transfer_limit->limit_access);
+                elseif (($user_transfer_limit && $user_transfer_limit->limit_access))
+                    $limit_day = $user_transfer_limit->limit_access;
+                elseif (($user_request && $user_request->limit_access))
+                    $limit_day = $user_request->limit_access;
 
                 if ($this->getUser()->role == "customer") {
-                    logger("head", [$head]);
-
                     if ($forbidden && data_get($transfer, "user.role") == "colleague") {
                         $list_worker = $head->customerUsers->pluck("id")->toArray();
                         $list_worker[] = data_get($head, "id");
@@ -278,29 +304,6 @@ class ActionServices extends TextServices
                             return true;
                         }
                     }
-
-                    $user_transfer_limit = null;
-                    $access_limit = null;
-                    logger("head limit",[$head, $head->userTradeAccess]);
-                    if ($head && $head->userTradeAccess)
-                        $access_limit = $head->userTradeAccess
-                            ->where("user_id", $transfer->user_id)->first();
-                    if (data_get($transfer, "user.role") == "customer")
-                        $access_limit_transaction = data_get($transfer, "user.customer.userTradeAccess")
-                            ->where("user_id", $head->id)->first();
-                        else
-                            $access_limit_transaction = data_get($transfer, "user.userTradeAccess")
-                                ->where("user_id", $head->id)->first();
-
-                    logger("head limit",[$access_limit,$access_limit_transaction]);
-                    if (($access_limit && $access_limit->limit_access) && ($access_limit_transaction && $access_limit_transaction->limit_access))
-                        $limit_day = min($access_limit->limit_access, $access_limit_transaction->limit_access);
-                    elseif (($access_limit_transaction && $access_limit_transaction->limit_access))
-                        $limit_day = $access_limit_transaction->limit_access;
-                    elseif (($access_limit && $access_limit->limit_access))
-                        $limit_day = $access_limit->limit_access;
-
-                    logger("limit_day",[$limit_day]);
                 } elseif ($this->getUser()->role == "colleague") {
                     if ($forbidden && data_get($transfer, "user.role") == "customer") {
                         if (in_array($this->getUserId(), $this->getUser()->customerUsers)) {
@@ -308,28 +311,6 @@ class ActionServices extends TextServices
                             return true;
                         }
                     }
-                    $user_request = UserTradeAccess::where("user_id", $this->getUser()->id)
-                        ->where("user_trade_id", $transfer->user_id)->first();
-//                    $user_transfer = UserTradeAccess::where("user_id", $transfer->user_id)
-//                        ->where("user_trade_id", $this->getUser()->id)->first();
-
-                    if (data_get($transfer, "user.role") == "customer")
-                        $user_transfer_limit = data_get($transfer, "user.customer.userTradeAccess")
-                            ->where("user_trade_id",$head->id)
-                            ->orWhere("user_id", $head->id)->first();
-                    else
-                        $user_transfer_limit = data_get($transfer, "user.userTradeAccess")
-                            ->where("user_trade_id",$head->id)
-                            ->orWhere("user_id", $head->id)->first();
-
-
-                    if (($user_request && $user_request->limit_access) && ($user_transfer_limit && $user_transfer_limit->limit_access))
-                        $limit_day = min($user_request->limit_access, $user_transfer_limit->limit_access);
-                    elseif (($user_transfer_limit && $user_transfer_limit->limit_access))
-                        $limit_day = $user_transfer_limit->limit_access;
-                    elseif (($user_request && $user_request->limit_access))
-                        $limit_day = $user_request->limit_access;
-
                 }
                 logger("type_t" . $transfer_type, [$transfer->user_id, $this->getUser()->id]);
                 $buyer = $transfer_type == "buy" ? $transfer->user : $this->getUser();
