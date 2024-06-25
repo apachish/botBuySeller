@@ -574,7 +574,7 @@ class ActionServices extends TextServices
 
                     $total_sold_by_buyer += DailyRequestTransfer::where('seller_id', $buyer_id)
                         ->whereDate("created_at", now())
-                        ->where('buyer_id', $buyer_id)->sum('use_day');
+                        ->where('buyer_id', $seller_id)->sum('use_day');
                     logger("errr",[$total_sold_by_seller,$total_sold_by_buyer]);
 
                 }
