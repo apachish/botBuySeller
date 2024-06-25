@@ -558,13 +558,19 @@ class ActionServices extends TextServices
         $total_sold_by_seller = DailyRequestTransfer::whereIn('seller_id', $seller_ids)
             ->whereDate("created_at", now())
             ->whereIn('buyer_id', $buyer_ids)->sum('use_day');
+        logger("total_sold_by_seller",[$total_sold_by_seller]);
         $total_sold_by_buyer = DailyRequestTransfer::whereIn('seller_id', $buyer_ids)
             ->whereDate("created_at", now())
             ->whereIn('buyer_id', $seller_ids)->sum('use_day');
 
+        logger("total_sold_by_buyer",[$total_sold_by_buyer]);
 
         $available_to_sell = $max_trade_limit - $total_sold_by_seller + $total_sold_by_buyer;
+        logger("available_to_sell",[$available_to_sell]);
+
         $new_quantity = min($quantity, $available_to_sell);
+
+        logger("new_quantity",[$new_quantity]);
 
         if ($new_quantity > 0) {
             DailyRequestTransfer::create([
