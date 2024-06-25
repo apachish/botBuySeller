@@ -880,7 +880,7 @@ class TextServices
         $text .= "میزان حد معامله خود با همکاران خود مشخص کنید";
         $users = UserTelegram::where("id", "!=", $this->user->id)
             ->where("role", "colleague")
-            ->with("userTradeAccess")
+            ->with("userTraderAccess")
             ->simplePaginate(5, ['*'], 'page', $page);
         logger("users", [$users]);
         $page = $users->currentPage();
@@ -892,7 +892,7 @@ class TextServices
 //        logger("userTradeAccess", [$userTradeAccess]);
         $users->each(function ($user) use (&$keyboard, &$i, $page) {
             $text = $user->fullName ?: $user->first_name . " " . $user->last_name;
-            $limit_trade = $user->userTradeAccess->where("user_id", $user->id)->first();
+            $limit_trade = $user->userTraderAccess->where("user_id", $user->id)->first();
 
 
             logger('limit_trade', [$limit_trade, data_get($limit_trade, "limit_access")]);
