@@ -642,19 +642,7 @@ class ActionServices extends TextServices
                 "message_request" => data_get($word, "message_request"),
                 "message_request_me" => data_get($word, "message_request_me"),
             ];
-
-            logger("order", [
-                "status" => Transfer::STATUS_ACTIVE,
-                "user_id" => $this->getUser()->id,
-                "type" => data_get($word, "type"),
-                "number" => (int)data_get($word, "number"),
-                "price" => data_get($word, "price"),
-                "message" => data_get($word, "message"),
-                "date" => data_get($word, "date"),
-                "message_request" => data_get($word, "message_request"),
-            ]);
             $transfer_new = Transfer::create($order);
-            logger("a", [$this->getUserId(), $this->getMessageId(), []]);
             $this->telegram_services->editMessageReplyMarkup($this->getUserId(), $this->getMessageId(), new \stdClass());
             $this->telegram_services->sendMessage($this->getUserId(), "لفظ شما تایید شد\xE2\x9C\x85	");
             $message = $transfer_new->message;
