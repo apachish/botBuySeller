@@ -687,7 +687,6 @@ class ActionServices extends TextServices
                 [
                     "limit_access" => 0
                 ]);
-                sleep(2);
                 $this->telegram->sendMessage([
                     'chat_id' => $this->getUserId(),
                     'text' => "حد مجاز برای $name_worker  محدود شد "
