@@ -764,7 +764,7 @@ class TextServices
                     $response = $this->telegram->kickChatMember(
                         [
                             'chat_id' => $this->bot->chanel_id,
-                            'user_id' => $this->user->id,
+                            'user_id' => $this->user->telegram_id,
                         ]);
 
                     if ($response) {
