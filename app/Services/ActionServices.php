@@ -569,11 +569,11 @@ class ActionServices extends TextServices
                 foreach ($buyer_ids as $buyer_id) {
                     $total_sold_by_seller += DailyRequestTransfer::where('seller_id', $seller_id)
                         ->whereDate("created_at", now())
-                        ->whereIn('buyer_id', $buyer_id)->sum('use_day');
+                        ->where('buyer_id', $buyer_id)->sum('use_day');
 
-                    $total_sold_by_buyer += DailyRequestTransfer::whereIn('seller_id', $buyer_ids)
+                    $total_sold_by_buyer += DailyRequestTransfer::where('seller_id', $buyer_id)
                         ->whereDate("created_at", now())
-                        ->whereIn('buyer_id', $buyer_id)->sum('use_day');
+                        ->where('buyer_id', $buyer_id)->sum('use_day');
 
                 }
             }
