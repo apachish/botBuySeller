@@ -621,6 +621,8 @@ class TextServices
             $this->ruleAccept();
         elseif (str_contains($this->data, "transfer_buy_"))
             $this->transferBuy();
+        elseif (str_contains($this->data, "trade_limit_open_"))
+            $this->tradeLimitOpen();
         elseif (str_contains($this->data, "trade_limit_close_"))
             $this->tradeLimitClose();
         elseif (str_contains($this->data, "trade_limit_"))
@@ -908,7 +910,7 @@ class TextServices
             else
                 $keyboard[$i][] = [
                     'text' => "  $text " . "\xE2\x9C\x85",
-                    'callback_data' => "trade_limit_" . $user->id . "_" . $page
+                    'callback_data' => "trade_limit_open_" . $user->id . "_" . $page
                 ];
             $i++;
         });

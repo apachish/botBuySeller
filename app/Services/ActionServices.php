@@ -239,7 +239,10 @@ class ActionServices extends TextServices
             return true;
         } elseif ($this->getUser()->verify_two && cache()->get("double_click_" . $id . "_" . $this->getUserId()))
             cache()->forget("double_click_" . $id . "_" . $this->getUserId());
-        $transfer = Transfer::with("user.customer")->find($id);
+        $transfer = Transfer::with(["user"=>function($query){
+            $query->with("customer");
+            $query->with("customerUser");
+        }])->find($id);
 
         if ($transfer->user_id == $this->getUser()->id) {
             $this->telegram_services->sendMessage($this->getUserId(), "شما نمی توانید لفظ خود را دریافت کنید");
@@ -303,13 +306,15 @@ class ActionServices extends TextServices
 
                 }
                 logger("type_t" . $transfer_type, [$transfer->user_id, $this->getUser()->id]);
+                $buyer = $transfer_type == "buy" ? $transfer->user : $this->getUser();
+                $seller = $transfer_type == "sell" ? $transfer->user : $this->getUser();
                 $buyer_id = $transfer_type == "buy" ? $transfer->user_id : $this->getUser()->id;
                 $seller_id = $transfer_type == "sell" ? $transfer->user_id : $this->getUser()->id;
 
                 logger("limit_day", [$limit_day]);
                 logger("limit_day", [$buyer_id, $seller_id]);
                 if ($limit_day) {
-                    $num = $this->performTransaction($seller_id, $buyer_id, $num, $limit_day);
+                    $num = $this->performTransaction($seller, $buyer, $num, $limit_day);
                     $transfer->number -= $num;
                     $request_transfer["number"] = $num;
                     $use_day = $num;
@@ -521,18 +526,34 @@ class ActionServices extends TextServices
         }
     }
 
-    private function performTransaction($seller_id, $buyer_id, $quantity, $max_trade_limit)
+    private function performTransaction($seller, $buyer, $quantity, $max_trade_limit)
     {
-        if (!$seller_id || !$buyer_id) {
+        if (!$seller || !$buyer) {
             return 0;
         }
 
-        $total_sold_by_seller = DailyRequestTransfer::where('seller_id', $seller_id)
+        $seller_head = $seller->customer;
+        $seller_customer = $seller->customerUser->pluck("id")->toArray();
+        $seller_ids[] = $seller->id;
+        if($seller_head)
+            $seller_ids[] = $seller_head->id;
+        if($seller_customer)
+            $seller_ids  = array_merge($seller_ids,$seller_customer);
+
+        $buyer_head = $buyer->customer;
+        $buyer_customer = $buyer->customerUser->pluck("id")->toArray();
+        $buyer_ids[] = $buyer->id;
+        if($buyer_head)
+            $buyer_ids[] = $buyer_head->id;
+        if($buyer_customer)
+            $buyer_ids  = array_merge($buyer_ids,$buyer_customer);
+
+        $total_sold_by_seller = DailyRequestTransfer::whereIn('seller_id', $seller_ids)
             ->whereDate("created_at", now())
-            ->where('buyer_id', $buyer_id)->sum('use_day');
-        $total_sold_by_buyer = DailyRequestTransfer::where('seller_id', $buyer_id)
+            ->whereIn('buyer_id', $buyer_ids)->sum('use_day');
+        $total_sold_by_buyer = DailyRequestTransfer::whereIn('seller_id', $buyer_ids)
             ->whereDate("created_at", now())
-            ->where('buyer_id', $seller_id)->sum('use_day');
+            ->whereIn('buyer_id', $seller_ids)->sum('use_day');
 
 
         $available_to_sell = $max_trade_limit - $total_sold_by_seller + $total_sold_by_buyer;
@@ -540,8 +561,8 @@ class ActionServices extends TextServices
 
         if ($new_quantity > 0) {
             DailyRequestTransfer::create([
-                'seller_id' => $seller_id,
-                'buyer_id' => $buyer_id,
+                'seller_id' => $seller->id,
+                'buyer_id' => $buyer->id,
                 'use_day' => $new_quantity,
             ]);
 
@@ -634,17 +655,7 @@ class ActionServices extends TextServices
             if ($limit_access) {
                 $name_worker = $worker->fullName ?: $worker->first_name . " " . $worker->last_name;
 
-//                $message_menu = cache()->get("menu_" . $this->getUserId());
-//                if ($message_menu) {
-//                    $keyboard = data_get($message_menu, "keyboard");
-//                    $text = $worker->fullName ?: $worker->first_name . " " . $worker->last_name;
-//                    $keyboard[$worker_i] = [[
-//                        'text' => "  $text " . "\xE2\x9C\x85",
-//                        'callback_data' => "trade_limit_" . $worker->id
-//                    ]];
-//                    logger("close", [$this->getUserId(), data_get($message_menu, "id"), "لیست همکاران", $keyboard]);
-//                    $this->telegram_services->editMessageTextAndInlineKeyboard($this->getUserId(), data_get($message_menu, "id"), "لیست همکاران", $keyboard);
-//                }
+
                 $data_old = cache()->get("menu_List_worker_" . $this->getUserId());
                 logger("menu_List_worker_", [$data_old]);
                 $message_id = data_get($data_old, "id", null);
@@ -657,6 +668,34 @@ class ActionServices extends TextServices
             }
         }
     }
+
+    public function tradeLimitOpen()
+    {
+        $array = explode("_", str_replace('trade_limit_open_', '', $this->getData()));
+        $worker_id = (int)data_get($array, 0);
+        $page = (int)data_get($array, 1);
+
+        $worker = UserTelegram::find($worker_id);
+        logger("worker", [$worker_id, $worker, $page]);
+        if ($worker) {
+                $name_worker = $worker->fullName ?: $worker->first_name . " " . $worker->last_name;
+                $data_old = cache()->get("menu_List_worker_" . $this->getUserId());
+                logger("menu_List_worker_", [$data_old]);
+                UserTradeAccess::updateOrCreate([
+                "user_id" => $this->getUser()->id,
+                "user_trade_id" => $worker_id,],
+                [
+                    "limit_access" => 0
+                ]);
+                $message_id = data_get($data_old, "id", null);
+                $this->listWorker($page, $message_id);
+                $this->telegram->sendMessage([
+                    'chat_id' => $this->getUserId(),
+                    'text' => "حد مجاز برای $name_worker نا محدود شد "
+                ]);
+        }
+    }
+
 
     public function tradeLimit()
     {
