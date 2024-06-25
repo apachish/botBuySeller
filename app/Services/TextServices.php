@@ -878,7 +878,7 @@ class TextServices
         $text = "      لیست  همکاران    ";
         $text .= "\n\n";
         $text .= "میزان حد معامله خود با همکاران خود مشخص کنید";
-        $users = UserTelegram::where("id", "!=", $this->user_id)
+        $users = UserTelegram::where("id", "!=", $this->user->id)
             ->where("role", "colleague")
             ->simplePaginate(5, ['*'], 'page', $page);
         logger("users", [$users]);
