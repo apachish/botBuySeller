@@ -880,6 +880,7 @@ class TextServices
         $text .= "میزان حد معامله خود با همکاران خود مشخص کنید";
         $users = UserTelegram::where("id", "!=", $this->user->id)
             ->where("role", "colleague")
+            ->with("userTradeAccess")
             ->simplePaginate(5, ['*'], 'page', $page);
         logger("users", [$users]);
         $page = $users->currentPage();
