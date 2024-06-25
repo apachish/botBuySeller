@@ -114,6 +114,7 @@ class TelegramServices
                 logger("result_delete",[$result_delete]);
             }
             cache()->set($this->menu_key.$chat_id,data_get($response, "message_id"));
+            logger("message_id",[cache()->get($this->menu_key.$chat_id),$this->menu_key.$chat_id]);
         }
         else
             logger("exption", [$response]);
