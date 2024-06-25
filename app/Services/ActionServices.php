@@ -681,16 +681,19 @@ class ActionServices extends TextServices
             $message_id = cache()->get("menu_List_worker_" . $this->getUserId());
                 logger("message id open limit", [$message_id]);
                 UserTradeAccess::updateOrCreate([
-                "user_id" => $this->getUser()->id,
-                "user_trade_id" => $worker_id,],
+                    "user_id" => $this->getUser()->id,
+                    "user_trade_id" => $worker_id
+                ],
                 [
                     "limit_access" => 0
                 ]);
-                $this->listWorker($page, $message_id);
+                sleep(2);
                 $this->telegram->sendMessage([
                     'chat_id' => $this->getUserId(),
                     'text' => "حد مجاز برای $name_worker  محدود شد "
                 ]);
+            $this->listWorker($page, $message_id);
+
         }
     }
 
