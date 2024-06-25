@@ -649,7 +649,7 @@ class ActionServices extends TextServices
             $keyboard = $this->getKeyboardRequest($transfer_new);
 
             logger("test", [$this->bot->chanel_id, $message, $keyboard]);
-            $message_result = $this->telegram_services->MessageReplyMarkup($this->telegram, $this->bot->chanel_id, $message, $keyboard);
+            $message_result = $this->telegram_services->MessageReplyMarkup($this->telegram, $this->bot->chanel_id, $message, $keyboard,false);
             $transfer_new->message_id = $message_result;
             $transfer_new->update();
             dispatch(new DeactivateTransfer($transfer_new->id))->delay(now()->addMinute(1));
