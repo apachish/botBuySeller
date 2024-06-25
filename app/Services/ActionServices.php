@@ -540,28 +540,28 @@ class ActionServices extends TextServices
         }
 
         $seller_head = $seller->customer;
-        logger("1",[$seller_head,$seller->customerUser,$seller->customerUser->pluck("id")]);
-        $seller_customer = $seller->customerUser;
+        logger("1",[$seller_head,$seller->customerUsers]);
+        $seller_customer = $seller->customerUser?$seller->customerUsers->pluck("id")->toArray():[];
         logger("2",[$seller_customer]);
         $seller_ids[] = $seller->id;
         logger("23",[$seller_ids]);
+
         if ($seller_head)
             $seller_ids[] = $seller_head->id;
-        foreach ($seller_customer as $customer)
-            $seller_ids[] = data_get($customer,"id");
+        if ($seller_customer)
+            $seller_ids = array_merge($seller_ids, $seller_customer);
 
         $buyer_head = $buyer->customer;
-        logger("12",[$buyer_head,$buyer->customerUser]);
+        logger("12",[$buyer_head,$buyer->customerUsers]);
 
-        $buyer_customer = $buyer->customerUser;
+        $buyer_customer = $buyer->customerUser?$buyer->customerUsers->pluck("id")->toArray():[];
         logger("22",[$buyer_customer]);
 
         $buyer_ids[] = $buyer->id;
         if ($buyer_head)
             $buyer_ids[] = $buyer_head->id;
-        foreach ($buyer_customer as $customer)
-            $buyer_ids[] = data_get($customer,"id");
-
+        if ($buyer_customer)
+            $buyer_ids = array_merge($buyer_ids, $buyer_customer);
 
         logger("aaaakk",[$seller_ids,$buyer_ids]);
         $total_sold_by_seller = DailyRequestTransfer::whereIn('seller_id', $seller_ids)
