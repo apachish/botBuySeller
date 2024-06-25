@@ -374,14 +374,14 @@ class ActionServices extends TextServices
                         $transaction_party_req = "مشاهده فقط برای سرگروه";
                         if (data_get($transfer, 'user.customer')) {
                             $transaction_party_req_s = data_get($transfer, 'user.fullName');
-                            $transaction_party_req_s .= "(" . data_get($transfer, 'user.customer.fullName') . ")";
+                            $transaction_party_req_s .= "(" . data_get($colleague, 'fullName') . ")";
                         } else
                             $transaction_party_req_s = data_get($transfer, 'user.fullName');
 
                         $transaction_party = "مشاهده فقط برای سرگروه";
                         if (data_get($this->getUser(), 'customer')) {
                             $transaction_party_s = data_get($this->getUser(), 'fullName');
-                            $transaction_party_s .= "(" . data_get($this->getUser(), 'customer.fullName') . ")";
+                            $transaction_party_s .= "(" . data_get($head, 'fullName') . ")";
                         } else
                             $transaction_party_s = data_get($transfer, 'user.fullName');
 
@@ -391,13 +391,13 @@ class ActionServices extends TextServices
                             $transaction_party_req_s = data_get($transfer, 'user.fullName');
                         if (data_get($this->getUser(), 'customer')) {
                             $transaction_party = data_get($this->getUser(), 'fullName');
-                            $transaction_party .= "(" . data_get($this->getUser(), 'customer.fullName') . ")";
+                            $transaction_party .= "(" . data_get($head, 'fullName') . ")";
                         } else
                             $transaction_party = data_get($this->getUser(), 'fullName');
                     } elseif ($transfer->user->role == "customer" && $this->getUser()->role == "colleague") {
                         if (data_get($transfer, 'user.customer')) {
                             $transaction_party_req = data_get($transfer, 'user.fullName');
-                            $transaction_party_req .= "(" . data_get($transfer, 'user.customer.fullName') . ")";
+                            $transaction_party_req .= "(" . data_get($colleague, 'fullName') . ")";
                         } else
                             $transaction_party_req = data_get($transfer, 'user.fullName');
 
@@ -477,6 +477,7 @@ class ActionServices extends TextServices
                     }
                     $bot_accounting = Bot::where('title', "botAccounting")
                         ->first();
+                    logger("accounting",[$bot_accounting]);
                     if ($bot_accounting) {
                         $telegram_accounting = new Api($bot_accounting->token);
                         $telegram_accounting_services = new TelegramServices($bot_accounting->token);
@@ -513,7 +514,9 @@ class ActionServices extends TextServices
                         $message .= "\n\n";
                         $message .= "نوع:" . getTypeTransfer($transfer->type);
                         foreach ($admins as $admin) {
-                            $telegram_accounting_services->sendMessage($admin->user_id, $message);
+                            logger("send",[$admin]);
+                            $send_accounting = $telegram_accounting_services->sendMessage($admin->user_id, $message);
+                            logger("aco",[$send_accounting]);
                         }
                     }
 
