@@ -789,7 +789,7 @@ class ActionServices extends TextServices
             $tomorrow = $tomorrow?:now()->addDay(1)->format("Y-m-d");
             $keyboard[0] = [
                 ['text' => toJalali(now(), "Y/m/d"), 'callback_data' => "trade_open_report_date_" . $customer_id . "_" . $today],
-                ['text' => toJalali(now()->addDay(1), "Y/m/d"), 'callback_data' => "trade_open_report_date_" . $customer_id . "_" . $tomorrow],
+                ['text' => $tomorrow, 'callback_data' => "trade_open_report_date_" . $customer_id . "_" . $tomorrow],
             ];
             $message = ' گزارش ';
             $message .= $customer ? $customer->fullName : $customer->first_name . " " . $customer->last_name;
@@ -900,14 +900,14 @@ class ActionServices extends TextServices
             foreach ($request as $req) {
                 $request_transfer[] = $req;
                 if (data_get($customer, 'id') == data_get($req, 'transfer.user_id')) {
-                    $req->type_label = data_get($req, "type");
+                    $req->type_label = data_get($req, "type") == "buy" ? "sell" : "buy";
                     $req->said = data_get($req, "user_request.fullName");
                     $req->color = $req->type_label == "sell" ? "#ef4444" : "dodgerblue";
                     logger("3", [$req, data_get($req, "userRequest"), data_get($req, "userRequest.fullName"), data_get($req, "transfer"), data_get($req, "transfer.user")]);
 
                 } else {
 
-                    $req->type_label = data_get($req, "type") == "buy" ? "sell" : "buy";
+                    $req->type_label = data_get($req, "type") ;
                     $req->said = data_get($req, "transfer.user.fullName");
                     $req->color = $req->type_label == "sell" ? "#ef4444" : "dodgerblue";
                     logger("3", [$req, data_get($req, "userRequest"), data_get($req, "userRequest.fullName"), data_get($req, "transfer"), data_get($req, "transfer.user")]);
