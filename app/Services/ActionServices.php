@@ -279,7 +279,7 @@ class ActionServices extends TextServices
                         }
                     }
                     if ($head && $head->userTradeAccess) {
-
+                        $user_transfer_limit = null;
                         $access_limit = $head->userTradeAccess->where("user_trade_id", $transfer->user_id)->first();
                         if(data_get($transfer, "user.role") == "customer") {
                             $head_transfer_limit = data_get($transfer, "user.customer.userTradeAccess");
