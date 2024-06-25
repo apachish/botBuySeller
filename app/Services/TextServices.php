@@ -252,7 +252,7 @@ class TextServices
      */
     public function setUser(): void
     {
-        $user_telegram = UserTelegram::where("telegram_id", $this->user_id)->with(["customerUser", "customer", "userTradeAccess"])->withTrashed()->first();
+        $user_telegram = UserTelegram::where("telegram_id", $this->user_id)->with(["customerUser", "customer.userTradeAccess", "userTradeAccess"])->withTrashed()->first();
         if ($user_telegram == null && $this->user_id) {
             $update = $this->update;
             $type = $this->type_message;
