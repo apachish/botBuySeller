@@ -65,22 +65,29 @@ class SetDateTomorrow extends Command
         foreach ($elements as $i => $element) {
             $key = Str::slug(convertNumber($element->children()[1]->text()));
             $array = explode("-", $key);
-            $events[$array[0]] = trim($element->children()[2]->text());
+            $events[] = $array[0];
         }
-        $elements = $document->find('.holiday');
 
 
-        foreach ($elements as $i => $element) {
-            $days = [];
-            foreach ($element->children()[0]->children() as $day)
-                $days[] = Str::slug(convertNumber($day->text()));
-        }
+        logger("event",[$events]);
+
         $i = 1;
+        $date_sh = null;
         do {
+
             $day = convertNumber(toJalali(now()->addDay($i), "d"));
-            $date_sh = $year . "/" . $month . "/" . $day;
+            $this->info($day);
+            $friday = (new Jalalian($year, $month, $day))->isFriday();
+            $this->info("friday:".$friday);
+
+            $thursday = (new Jalalian($year, $month, $day))->isThursday();
+            $this->info("thursday:".$thursday);
+
+            if(!$friday && !$thursday && !in_array($day,$events))
+                $date_sh = $year . "/" . $month . "/" . $day;
             $i++;
-        }while(!in_array($day,$days));
+        }while(!$date_sh);
+
         $date = toGregorian($date_sh, "Y/m/d");
         Setting::updateOrCreate(["key"=>"tomorrow"],[
             "value"=>$date
