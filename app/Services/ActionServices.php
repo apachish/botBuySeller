@@ -650,7 +650,7 @@ class ActionServices extends TextServices
         $worker = UserTelegram::find($worker_id);
         logger("worker", [$worker_id, $worker, $page]);
         if ($worker) {
-            $limit_access = UserTradeAccess::where("user_id", $this->getUserId())
+            $limit_access = UserTradeAccess::where("user_id", $this->getUser()->id)
                 ->where("user_trade_id", $worker->id)->first();
             if ($limit_access) {
                 $name_worker = $worker->fullName ?: $worker->first_name . " " . $worker->last_name;
