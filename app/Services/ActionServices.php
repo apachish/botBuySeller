@@ -562,22 +562,22 @@ class ActionServices extends TextServices
             $buyer_ids[] = $buyer_head->id;
         if ($buyer_customer)
             $buyer_ids = array_merge($buyer_ids, $buyer_customer);
-
+        $total_sold_by_seller = 0;
+        $total_sold_by_buyer = 0;
         logger("aaaakk",[$seller_ids,$buyer_ids]);
-        $total_sold_by_seller = DailyRequestTransfer::whereIn('seller_id', $seller_ids)
-            ->whereDate("created_at", now())
-            ->whereIn('buyer_id', $buyer_ids)->sum('use_day');
-        logger("seller",[DailyRequestTransfer::whereIn('seller_id', $seller_ids)
-            ->whereDate("created_at", now())
-            ->whereIn('buyer_id', $buyer_ids)->get()]);
-        logger("total_sold_by_seller",[$total_sold_by_seller]);
-        $total_sold_by_buyer = DailyRequestTransfer::whereIn('seller_id', $buyer_ids)
-            ->whereDate("created_at", now())
-            ->whereIn('buyer_id', $seller_ids)->sum('use_day');
-logger("qqq",[DailyRequestTransfer::whereIn('seller_id', $buyer_ids)
-    ->whereDate("created_at", now())
-    ->whereIn('buyer_id', $seller_ids)->get()]);
-        logger("total_sold_by_buyer",[$total_sold_by_buyer]);
+            foreach($seller_ids as $seller_id) {
+                foreach ($buyer_ids as $buyer_id) {
+                    $total_sold_by_seller += DailyRequestTransfer::where('seller_id', $seller_id)
+                        ->whereDate("created_at", now())
+                        ->whereIn('buyer_id', $buyer_id)->sum('use_day');
+
+                    $total_sold_by_buyer += DailyRequestTransfer::whereIn('seller_id', $buyer_ids)
+                        ->whereDate("created_at", now())
+                        ->whereIn('buyer_id', $buyer_id)->sum('use_day');
+
+                }
+            }
+        logger("total_sold_by_buyer",[$total_sold_by_seller,$total_sold_by_buyer]);
 
         $available_to_sell = $max_trade_limit - $total_sold_by_seller + $total_sold_by_buyer;
         logger("available_to_sell",[$available_to_sell]);
