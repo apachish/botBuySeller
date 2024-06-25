@@ -238,7 +238,7 @@ class TelegramServices
 
         $post_fields = [
             'chat_id' => $channel_chat_id,
-            'message_id' => $message_id,
+            'message_id' => (int)$message_id,
             'text' => $message,
             'reply_markup' => json_encode($keyboard)
         ];
