@@ -793,7 +793,12 @@ class ActionServices extends TextServices
             $customer = UserTelegram::find($customer_id);
 
             $today = now()->format("Y-m-d");
-            $tomorrow = now()->addDay(1)->format("Y-m-d");
+            $tomorrow = cache()->remember("set_tomorrow_date", now()->setTime(22, 59), function () {
+                $tomorrow = Setting::where("key", "tomorrow")->first();
+                if ($tomorrow)
+                    return $tomorrow->value;
+            });
+            $tomorrow = $tomorrow?:now()->addDay(1)->format("Y-m-d");
             $keyboard[0] = [
                 ['text' => toJalali(now(), "Y/m/d"), 'callback_data' => "trade_open_report_date_" . $customer_id . "_" . $today],
                 ['text' => toJalali(now()->addDay(1), "Y/m/d"), 'callback_data' => "trade_open_report_date_" . $customer_id . "_" . $tomorrow],

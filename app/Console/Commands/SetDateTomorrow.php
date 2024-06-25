@@ -92,6 +92,7 @@ class SetDateTomorrow extends Command
         Setting::updateOrCreate(["key"=>"tomorrow"],[
             "value"=>$date
         ]);
+        cache()->forget("set_tomorrow_date");
 
     }
 }
