@@ -513,6 +513,7 @@ class ActionServices extends TextServices
                         $message .= "مقدار:" . data_get($request_transfer, "number") . "کیلو";
                         $message .= "\n\n";
                         $message .= "نوع:" . getTypeTransfer($transfer->type);
+                        logger("message accounting",[$message]);
                         foreach ($admins as $admin) {
                             logger("send",[$admin]);
                             $send_accounting = $telegram_accounting_services->sendMessage($admin->user_id, $message);
