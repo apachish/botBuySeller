@@ -106,8 +106,7 @@ class CustomerServices
         $page = (int)data_get($array, 0);
         $role = data_get($array, 1, null);
         $filter = data_get($array, 2, null);
-        $data_old = cache()->get("menu_List_user_" . $object->getUserId());
-        $message_id = data_get($data_old, "id", null);
+        $message_id = cache()->get("menu_List_user_" . $object->getUserId());
         if ($message_id)
             $this->listUser($role,$object,$page, $message_id, $filter);
     }
@@ -119,9 +118,8 @@ class CustomerServices
         $page = (int)data_get($array, 0);
         $role = data_get($array, 1, null);
         $filter = data_get($array, 2, null);
-        $data_old = cache()->get("menu_List_user_" . $object->getUserId());
-        $message_id = data_get($data_old, "id", null);
-        logger("aa", [$data_old, $message_id, $page]);
+        $message_id = cache()->get("menu_List_user_" . $object->getUserId());
+        logger("aa", [ $message_id, $page]);
         if ($message_id)
             $this->listUser($role,$object,$page, $message_id, $filter);
     }
@@ -145,8 +143,7 @@ class CustomerServices
             $object->service_user->message_menu = "$fullName همکار گرامی به سیستم ما خوش آمدید\n\n ";
             $object->service_user->menu($this->keyword_colleague, $user_con->status, $user_con);//->sendMessage($user_con->id, $response_text);
 //                $object->service_user->telegram_services->sendMessage($user_con->id, $response_text);
-            $data_old = cache()->get("menu_List_user_" . $object->getUserId());
-            $message_id = data_get($data_old, "id", null);
+            $message_id = cache()->get("menu_List_user_" . $object->getUserId());
             $this->listUser($object,$page, $message_id, $filter);
 
         }
@@ -188,8 +185,7 @@ class CustomerServices
 
             }
             $object->getTelegramServices()->sendMessage($object->getUserId(), $response_text);
-            $data_old = cache()->get("menu_List_user_" . $object->getUserId());
-            $message_id = data_get($data_old, "id", null);
+            $message_id = cache()->get("menu_List_user_" . $object->getUserId());
             $this->listUser($role,$object,$page, $message_id, $filter);
         }
     }
@@ -229,8 +225,7 @@ class CustomerServices
             $message_link = "لطفا با استفاده از لینک دعوت[فقط ۳ دقیقه معتبر می باشد] به کانال  " . env("APP_NAME") . " بپیوندید: " ;
             $message_link .= "\n\n " . $inviteLink;
             $object->service_user->telegram_services->sendMessage($user_con->telegram_id, $message_link);
-            $data_old = cache()->get("menu_List_user_" . $object->getUserId());
-            $message_id = data_get($data_old, "id", null);
+            $message_id = cache()->get("menu_List_user_" . $object->getUserId());
             $this->listUser($role,$object,$page, $message_id, $filter);
         }
     }
@@ -258,8 +253,7 @@ class CustomerServices
 //                $object->service_user->telegram_services->sendMessage($user_con->id, $response_text);
             $object->service_user->message_menu = "$fullName اکانت کاربریتان فعال شد\n\n ";
             $object->service_user->menu($this->keyword_customer, $user_con->status, $user_con);
-            $data_old = cache()->get("menu_List_user_" . $object->getUserId());
-            $message_id = data_get($data_old, "id", null);
+            $message_id = cache()->get("menu_List_user_" . $object->getUserId());
             $this->listUser($role,$object,$page, $message_id, $filter);
         }
     }
@@ -288,8 +282,7 @@ class CustomerServices
 //                $object->service_user->telegram_services->sendMessage($user_con->id, $response_text);
             $object->service_user->message_menu = "$fullName اکانت کاربریتان فعال شد\n\n ";
             $object->service_user->menu($this->keyword_customer, $user_con->status, $user_con);
-            $data_old = cache()->get("menu_List_user_" . $object->getUserId());
-            $message_id = data_get($data_old, "id", null);
+            $message_id = cache()->get("menu_List_user_" . $object->getUserId());
             $this->listUser($role,$object,$page, $message_id, $filter);
         }
     }
@@ -318,8 +311,7 @@ class CustomerServices
 //                $object->service_user->telegram_services->sendMessage($user_con->id, $response_text);
             $object->service_user->message_menu = "$fullName اکانت کاربریتان غیر فعال شد \n\n ";
             $object->service_user->menu([], $user_con->status, $user_con);
-            $data_old = cache()->get("menu_List_user_" . $object->getUserId());
-            $message_id = data_get($data_old, "id", null);
+            $message_id = cache()->get("menu_List_user_" . $object->getUserId());
             $this->listUser($role,$object,$page, $message_id, $filter);
         }
     }
@@ -363,8 +355,7 @@ class CustomerServices
             }
             $object->service_user->message_menu = "اکانت کاربریش حذف شد";
             $object->service_user->menu([], $user_con->status, $user_con);
-            $data_old = cache()->get("menu_List_user_" . $object->getUserId());
-            $message_id = data_get($data_old, "id", null);
+            $message_id = cache()->get("menu_List_user_" . $object->getUserId());
             $this->listUser($role,$object,$page, $message_id, $filter);
 
         }
@@ -459,8 +450,7 @@ class CustomerServices
         {
             $user_con["agent_id"] = $parent;
             $user_con->update();
-            $data_old = cache()->get("menu_List_user_" . $object->getUserId());
-            $message_id = data_get($data_old, "id", null);
+            $message_id = cache()->get("menu_List_user_" . $object->getUserId());
             $this->listUser($role,$object,$page, $message_id, $filter);
             $action_id = cache()->get("set_head_done_".$object->getUserId());
             $object->getTelegramServices()->deleteMessage($object->getUserId(),$action_id);
@@ -621,8 +611,7 @@ class CustomerServices
             $user_old->update();
             $object->getTelegramServices()->sendMessage($object->getUserId(), $message);
             $object->getTelegramServices()->deleteMessage($object->getUserId(),$action_id);
-            $data_old = cache()->get("menu_List_user_" . $object->getUserId());
-            $message_id = data_get($data_old, "id", null);
+            $message_id = cache()->get("menu_List_user_" . $object->getUserId());
             $object->getTelegramServices()->deleteMessage($object->getUserId(),$message_id);
             cache()->forget("say_mobile_new_".$object->getUserId());
             cache()->forget($object->getKeyCache() . $object->getUserId());
@@ -651,8 +640,7 @@ class CustomerServices
             $message .= "نام و نام خانوادگی بروزرسانی شد ";
             $object->getTelegramServices()->sendMessage($object->getUserId(), $message);
         }
-        $data_old = cache()->get("menu_List_user_" . $object->getUserId());
-        $message_id = data_get($data_old, "id", null);
+        $message_id = cache()->get("menu_List_user_" . $object->getUserId());
         $this->listUser($role,$object,$page, $message_id, $filter);
         cache()->forget($object->getKeyCache() . $object->getUserId());
     }
