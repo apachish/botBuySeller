@@ -656,9 +656,8 @@ class ActionServices extends TextServices
                 $name_worker = $worker->fullName ?: $worker->first_name . " " . $worker->last_name;
 
 
-                $data_old = cache()->get("menu_List_worker_" . $this->getUserId());
-                logger("menu_List_worker_", [$data_old]);
-                $message_id = data_get($data_old, "id", null);
+                $message_id = cache()->get("menu_List_worker_" . $this->getUserId());
+                logger("menu_List_worker_", [$message_id]);
                 $limit_access->delete();
                 $this->listWorker($page, $message_id);
                 $this->telegram->sendMessage([
@@ -679,15 +678,14 @@ class ActionServices extends TextServices
         logger("worker", [$worker_id, $worker, $page]);
         if ($worker) {
                 $name_worker = $worker->fullName ?: $worker->first_name . " " . $worker->last_name;
-                $data_old = cache()->get("menu_List_worker_" . $this->getUserId());
-                logger("menu_List_worker_", [$data_old]);
+            $message_id = cache()->get("menu_List_worker_" . $this->getUserId());
+                logger("menu_List_worker_", [$message_id]);
                 UserTradeAccess::updateOrCreate([
                 "user_id" => $this->getUser()->id,
                 "user_trade_id" => $worker_id,],
                 [
                     "limit_access" => 0
                 ]);
-                $message_id = data_get($data_old, "id", null);
                 $this->listWorker($page, $message_id);
                 $this->telegram->sendMessage([
                     'chat_id' => $this->getUserId(),
@@ -933,8 +931,7 @@ class ActionServices extends TextServices
                     "limit_access" => $number
                 ]);
             $this->telegram->sendMessage(['chat_id' => $this->getUserId(), 'text' => 'حد ثابت شد']);
-            $data_old = cache()->get("menu_List_worker_" . $this->getUserId());
-            $message_id = data_get($data_old, "id", null);
+            $message_id = cache()->get("menu_List_worker_" . $this->getUserId());
             $this->listWorker($page, $message_id);
             cache()->forget($this->getKeyCache() . $this->getUserId());
         } else {

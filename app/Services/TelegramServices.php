@@ -113,7 +113,7 @@ class TelegramServices
                 $result_delete = $this->deleteMessage($chat_id,cache()->get($this->menu_key.$chat_id));
                 logger("result_delete",[$result_delete]);
             }
-            cache()->set($this->menu_key.$chat_id,["id"=>data_get($response, "message_id"),"keyboard"=>$keyboard]);
+            cache()->set($this->menu_key.$chat_id,data_get($response, "message_id"));
         }
         else
             logger("exption", [$response]);
