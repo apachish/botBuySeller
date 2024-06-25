@@ -555,6 +555,7 @@ class ActionServices extends TextServices
         if ($buyer_customer)
             $buyer_ids = array_merge($buyer_ids, $buyer_customer);
 
+        logger("aaaakk",[$seller_ids,$buyer_ids]);
         $total_sold_by_seller = DailyRequestTransfer::whereIn('seller_id', $seller_ids)
             ->whereDate("created_at", now())
             ->whereIn('buyer_id', $buyer_ids)->sum('use_day');
