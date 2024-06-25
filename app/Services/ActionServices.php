@@ -540,7 +540,7 @@ class ActionServices extends TextServices
         }
 
         $seller_head = $seller->customer;
-        $seller_customer = $seller->customerUser->pluck("id")->toArray();
+        $seller_customer = $seller->customerUser?$seller->customerUser->pluck("id")->toArray():[];
         $seller_ids[] = $seller->id;
         if ($seller_head)
             $seller_ids[] = $seller_head->id;
@@ -548,7 +548,7 @@ class ActionServices extends TextServices
             $seller_ids = array_merge($seller_ids, $seller_customer);
 
         $buyer_head = $buyer->customer;
-        $buyer_customer = $buyer->customerUser->pluck("id")->toArray();
+        $buyer_customer = $buyer->customerUser?$buyer->customerUser->pluck("id")->toArray():[];
         $buyer_ids[] = $buyer->id;
         if ($buyer_head)
             $buyer_ids[] = $buyer_head->id;
