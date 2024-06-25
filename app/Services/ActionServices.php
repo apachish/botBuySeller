@@ -620,7 +620,7 @@ class ActionServices extends TextServices
         if ($word == null) return false;
 
         if ($check == "true") {
-            $transfer_olds = Transfer::where("user_id", $this->getUserId())
+            $transfer_olds = Transfer::where("user_id", $this->getUser()->id)
                 ->where("type", data_get($word, "type"))
                 ->get();
             foreach ($transfer_olds as $row_delet) {
