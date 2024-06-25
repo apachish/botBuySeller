@@ -567,6 +567,7 @@ class ActionServices extends TextServices
         logger("aaaakk",[$seller_ids,$buyer_ids]);
             foreach($seller_ids as $seller_id) {
                 foreach ($buyer_ids as $buyer_id) {
+                    logger("idss",[$seller_id,$buyer_id]);
                     $total_sold_by_seller += DailyRequestTransfer::where('seller_id', $seller_id)
                         ->whereDate("created_at", now())
                         ->where('buyer_id', $buyer_id)->sum('use_day');
@@ -574,6 +575,7 @@ class ActionServices extends TextServices
                     $total_sold_by_buyer += DailyRequestTransfer::where('seller_id', $buyer_id)
                         ->whereDate("created_at", now())
                         ->where('buyer_id', $buyer_id)->sum('use_day');
+                    logger("errr",[$total_sold_by_seller,$total_sold_by_buyer]);
 
                 }
             }
