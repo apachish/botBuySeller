@@ -284,17 +284,15 @@ class ActionServices extends TextServices
                     logger("head limit",[$head, $head->userTradeAccess]);
                     if ($head && $head->userTradeAccess)
                         $access_limit = $head->userTradeAccess
-                            ->where("user_trade_id",$transfer->user_id)
-                            ->orWhere("user_id", $transfer->user_id)->first();
+                            ->where("user_id", $transfer->user_id)->first();
                     if (data_get($transfer, "user.role") == "customer")
                         $access_limit_transaction = data_get($transfer, "user.customer.userTradeAccess")
-                            ->where("user_trade_id",$head->id)
-                            ->orWhere("user_id", $head->id)->first();
+                            ->where("user_id", $head->id)->first();
                         else
                             $access_limit_transaction = data_get($transfer, "user.userTradeAccess")
-                                ->where("user_trade_id",$head->id)
-                                ->orWhere("user_id", $head->id)->first();
+                                ->where("user_id", $head->id)->first();
 
+                    logger("head limit",[$access_limit,$access_limit_transaction]);
                     if (($access_limit && $access_limit->limit_access) && ($access_limit_transaction && $access_limit_transaction->limit_access))
                         $limit_day = min($access_limit->limit_access, $access_limit_transaction->limit_access);
                     elseif (($access_limit_transaction && $access_limit_transaction->limit_access))
@@ -302,6 +300,7 @@ class ActionServices extends TextServices
                     elseif (($access_limit && $access_limit->limit_access))
                         $limit_day = $access_limit->limit_access;
 
+                    logger("limit_day",[$limit_day]);
                 } elseif ($this->getUser()->role == "colleague") {
                     if ($forbidden && data_get($transfer, "user.role") == "customer") {
                         if (in_array($this->getUserId(), $this->getUser()->customerUsers)) {
