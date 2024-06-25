@@ -789,7 +789,7 @@ class ActionServices extends TextServices
             $tomorrow = $tomorrow?:now()->addDay(1)->format("Y-m-d");
             $keyboard[0] = [
                 ['text' => toJalali(now(), "Y/m/d"), 'callback_data' => "trade_open_report_date_" . $customer_id . "_" . $today],
-                ['text' => $tomorrow, 'callback_data' => "trade_open_report_date_" . $customer_id . "_" . $tomorrow],
+                ['text' => toJalali($tomorrow, "Y/m/d"), 'callback_data' => "trade_open_report_date_" . $customer_id . "_" . $tomorrow],
             ];
             $message = ' گزارش ';
             $message .= $customer ? $customer->fullName : $customer->first_name . " " . $customer->last_name;
