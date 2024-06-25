@@ -892,6 +892,7 @@ class TextServices
 //        logger("userTradeAccess", [$userTradeAccess]);
         $users->each(function ($user) use (&$keyboard, &$i, $page) {
             $text = $user->fullName ?: $user->first_name . " " . $user->last_name;
+            logger("user_trader_access",[$user->user_trader_access,$user->userTraderAccess]);
             $limit_trade = $user->userTraderAccess->where("user_id", $user->id)->first();
 
 
