@@ -921,10 +921,14 @@ class TextServices
             $keyboard[$i][] = ['text' => "بعدی", "callback_data" => "next_worker_" . $next];
 
         if ($message_id)
+        {
+            logger("update list menu ",[$message_id]);
             $this->getTelegramServices()->editMessageTextAndInlineKeyboard($this->getUserId(), $message_id, $text, $keyboard);
+        }
         else {
             $this->getTelegramServices()->menu_key = "menu_List_worker_";
             $menu = $this->getTelegramServices()->MessageReplyMarkup($this->getTelegram(), $this->getUserId(), $text, $keyboard);
+            logger("create list menu",[$menu]);
         }
     }
 

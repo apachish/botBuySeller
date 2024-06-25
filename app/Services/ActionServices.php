@@ -679,7 +679,7 @@ class ActionServices extends TextServices
         if ($worker) {
                 $name_worker = $worker->fullName ?: $worker->first_name . " " . $worker->last_name;
             $message_id = cache()->get("menu_List_worker_" . $this->getUser()->id);
-                logger("menu_List_worker_", [$message_id]);
+                logger("message id open limit", [$message_id]);
                 UserTradeAccess::updateOrCreate([
                 "user_id" => $this->getUser()->id,
                 "user_trade_id" => $worker_id,],
@@ -689,7 +689,7 @@ class ActionServices extends TextServices
                 $this->listWorker($page, $message_id);
                 $this->telegram->sendMessage([
                     'chat_id' => $this->getUserId(),
-                    'text' => "حد مجاز برای $name_worker نا محدود شد "
+                    'text' => "حد مجاز برای $name_worker  محدود شد "
                 ]);
         }
     }
