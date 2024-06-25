@@ -240,7 +240,7 @@ class ActionServices extends TextServices
         } elseif ($this->getUser()->verify_two && cache()->get("double_click_" . $id . "_" . $this->getUserId()))
             cache()->forget("double_click_" . $id . "_" . $this->getUserId());
         $transfer = Transfer::with(["user" => function ($query) {
-            $query->with("customer");
+            $query->with("customer.userTradeAccess");
             $query->with("customerUser");
         }])->find($id);
 
@@ -264,9 +264,9 @@ class ActionServices extends TextServices
                 $transaction_party_req_s = null;
                 $request_transfer = [];
 
+                $head = data_get($this->getUser(), "customer");
 
                 if ($this->getUser()->role == "customer") {
-                    $head = data_get($this->getUser(), "customer");
                     logger("head", [$head]);
 
                     if ($forbidden && data_get($transfer, "user.role") == "colleague") {
@@ -283,28 +283,24 @@ class ActionServices extends TextServices
                     $access_limit = null;
                     logger("head limit",[$head, $head->userTradeAccess]);
                     if ($head && $head->userTradeAccess)
-                        $access_limit = $head->userTradeAccess->where("user_trade_id", $transfer->user_id)->first();
-                    if (data_get($transfer, "user.role") == "customer") {
+                        $access_limit = $head->userTradeAccess
+                            ->where("user_trade_id",$transfer->user_id)
+                            ->orWhere("user_id", $transfer->user_id)->first();
+                    if (data_get($transfer, "user.role") == "customer")
+                        $access_limit_transaction = data_get($transfer, "user.customer.userTradeAccess")
+                            ->where("user_trade_id",$head->id)
+                            ->orWhere("user_id", $head->id)->first();
+                        else
+                            $access_limit_transaction = data_get($transfer, "user.userTradeAccess")
+                                ->where("user_trade_id",$head->id)
+                                ->orWhere("user_id", $head->id)->first();
 
-                        $head_transfer_limit = data_get($transfer, "user.customer.userTradeAccess");
-                        logger("tr cu limit",[data_get($transfer, "user.customer"),$head_transfer_limit]);
-                        if ($head_transfer_limit)
-                            $user_transfer_limit = $head_transfer_limit->where("user_id", $head->id)->first();
-                    } else {
-                        $transfer_limit = data_get($transfer, "user.userTradeAccess");
-                        logger("tr col limit",[data_get($transfer, "user"),$transfer_limit]);
-
-                        if ($transfer_limit)
-                            $user_transfer_limit = $transfer_limit->where("user_id", $head->id)->first();
-                    }
-                    if (($access_limit && $access_limit->limit_access) && ($user_transfer_limit && $user_transfer_limit->limit_access))
-                        $limit_day = min($access_limit->limit_access, $user_transfer_limit->limit_access);
-                    elseif (($user_transfer_limit && $user_transfer_limit->limit_access))
-                        $limit_day = $user_transfer_limit->limit_access;
+                    if (($access_limit && $access_limit->limit_access) && ($access_limit_transaction && $access_limit_transaction->limit_access))
+                        $limit_day = min($access_limit->limit_access, $access_limit_transaction->limit_access);
+                    elseif (($access_limit_transaction && $access_limit_transaction->limit_access))
+                        $limit_day = $access_limit_transaction->limit_access;
                     elseif (($access_limit && $access_limit->limit_access))
                         $limit_day = $access_limit->limit_access;
-                    logger("access_limit", [$access_limit, $limit_day]);
-
 
                 } elseif ($this->getUser()->role == "colleague") {
                     if ($forbidden && data_get($transfer, "user.role") == "customer") {
@@ -317,16 +313,17 @@ class ActionServices extends TextServices
                         ->where("user_trade_id", $transfer->user_id)->first();
 //                    $user_transfer = UserTradeAccess::where("user_id", $transfer->user_id)
 //                        ->where("user_trade_id", $this->getUser()->id)->first();
-                    if (data_get($transfer, "user.role") == "customer") {
-                        $head_transfer_limit = data_get($transfer, "user.customer.userTradeAccess");
-                        if ($head_transfer_limit)
-                            $user_transfer_limit = $head_transfer_limit->where("user_id", $head->id)->first();
-                    } else {
-                        $transfer_limit = data_get($transfer, "user.userTradeAccess");
-                        if ($transfer_limit)
-                            $user_transfer_limit = $transfer_limit->where("user_id", $head->id)->first();
-                    }
-                    logger("www", [$user_request, $user_transfer_limit]);
+
+                    if (data_get($transfer, "user.role") == "customer")
+                        $user_transfer_limit = data_get($transfer, "user.customer.userTradeAccess")
+                            ->where("user_trade_id",$head->id)
+                            ->orWhere("user_id", $head->id)->first();
+                    else
+                        $user_transfer_limit = data_get($transfer, "user.userTradeAccess")
+                            ->where("user_trade_id",$head->id)
+                            ->orWhere("user_id", $head->id)->first();
+
+
                     if (($user_request && $user_request->limit_access) && ($user_transfer_limit && $user_transfer_limit->limit_access))
                         $limit_day = min($user_request->limit_access, $user_transfer_limit->limit_access);
                     elseif (($user_transfer_limit && $user_transfer_limit->limit_access))
