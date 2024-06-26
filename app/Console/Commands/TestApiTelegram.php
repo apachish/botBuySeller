@@ -40,8 +40,8 @@ class TestApiTelegram extends Command
     public function handle()
     {
 
-        $customer = UserTelegram::find(5);
-        $date = "1403/04/09";
+        $customer = UserTelegram::find(8);
+        $date = "1403/04/06";
         $date = toGregorian($date, "Y/m/d");
 
         $date_p = toJalali($date, "Y_m_d");
@@ -55,6 +55,7 @@ class TestApiTelegram extends Command
                 $query->where("user_id", $customer->id);
                 $query->whereDate("date", $date);
             })->get();
+        dd($me);
         $request = RequestTransfer::where("request_id", $customer->id)
             ->with(["transferReport" => function ($query) use ($date) {
                 $query->with("user");

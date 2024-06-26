@@ -844,10 +844,14 @@ class ActionServices extends TextServices
                 $request_transfer[] = $req;
                 if (data_get($customer, 'id') == data_get($req, 'transferReport.user_id')) {
                     $req->type_label = data_get($req, "type") == "buy" ? "sell" : "buy";
-                    if (data_get($req, "userRequest.customer"))
-                        $req->said = data_get($req, "userRequest.fullName") . "(" . data_get($req, "userRequest.customer.fullName") . ")";
-                    else
-                        $req->said = data_get($req, "userRequest.fullName");
+                    if ($this->getUser()->role == "customer")
+                        $req->said = "مشاهده فقط برای سرگروه";
+                    else {
+                        if (data_get($req, "userRequest.customer"))
+                            $req->said = data_get($req, "userRequest.fullName") . "(" . data_get($req, "userRequest.customer.fullName") . ")";
+                        else
+                            $req->said = data_get($req, "userRequest.fullName");
+                    }
                     $req->color = $req->type_label == "sell" ? "#ef4444" : "dodgerblue";
                 } else {
                     $req->type_label = data_get($req, "type");
@@ -867,23 +871,27 @@ class ActionServices extends TextServices
                 $request_transfer[] = $req;
                 if (data_get($customer, 'id') == data_get($req, 'transferReport.user_id')) {
                     $req->type_label = data_get($req, "type") == "buy" ? "sell" : "buy";
-                    if (data_get($req, "userRequest.customer"))
-                        $req->said = data_get($req, "userRequest.fullName") . "(" . data_get($req, "userRequest.customer.fullName") . ")";
-                    else
-                        $req->said = data_get($req, "userRequest.fullName");
+                    if ($this->getUser()->role == "customer")
+                        $req->said = "مشاهده فقط برای سرگروه";
+                    else {
+                        if (data_get($req, "userRequest.customer"))
+                            $req->said = data_get($req, "userRequest.fullName") . "(" . data_get($req, "userRequest.customer.fullName") . ")";
+                        else
+                            $req->said = data_get($req, "userRequest.fullName");
+                    }
                     $req->color = $req->type_label == "sell" ? "#ef4444" : "dodgerblue";
 
                 } else {
 
                     $req->type_label = data_get($req, "type");
-                    if($this->getUser()->role == "customer")
+                    if ($this->getUser()->role == "customer")
                         $req->said = "مشاهده فقط برای سرگروه";
                     else {
-                    if (data_get($req, "transferReport.user.customer"))
-                        $req->said = data_get($req, "transferReport.user.fullName") . "(" . data_get($req, "transferReport.user.customer.fullName") . ")";
-                    else
-                        $req->said = data_get($req, "transferReport.user.fullName");
-                        }
+                        if (data_get($req, "transferReport.user.customer"))
+                            $req->said = data_get($req, "transferReport.user.fullName") . "(" . data_get($req, "transferReport.user.customer.fullName") . ")";
+                        else
+                            $req->said = data_get($req, "transferReport.user.fullName");
+                    }
                     $req->color = $req->type_label == "sell" ? "#ef4444" : "dodgerblue";
                 }
             }
