@@ -234,6 +234,7 @@ class ActionAccountingServices extends TextServices
                     $date_p = toJalali($date, "Y_m_d");
                     $me = RequestTransfer::with(["transfer" => function ($query) use ($customer, $date) {
                         $query->where("user_id", $customer->id);
+                        $query->withTrashed();
                         $query->whereDate("date", $date);
                         $query->with("user");
                     }, "userRequest"])
@@ -244,6 +245,7 @@ class ActionAccountingServices extends TextServices
                     $request = RequestTransfer::where("request_id", $customer->id)
                         ->with(["transfer" => function ($query) use ( $date) {
                             $query->with("user");
+                            $query->withTrashed();
                             $query->whereDate("date", $date);
                         }, "userRequest"])
                         ->get();
