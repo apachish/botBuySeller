@@ -134,7 +134,7 @@
         </tr>
         </thead>
         <tbody>
-        @foreach($request_transfer as $i=> $item)
+        @foreach(collect($request_transfer)->sortBy("created_at") as $i=> $item)
             <tr>
 
                 <td>{{data_get($item,'id')}}</td>

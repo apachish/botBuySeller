@@ -86,7 +86,8 @@ class TestApiTelegram extends Command
 
             }
         }
-        dd($request_transfer[0]);
+
+        dd(collect($request_transfer)->sortBy("created_at"));
         exit;
         echo cleanInput("320خف1 : توضیحات متنی");exit;
 //        $customer_id = (int)$this->ask('What is  customer_id?');
