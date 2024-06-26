@@ -165,7 +165,7 @@ class ActionAccountingServices extends TextServices
                        'text' => "کنسل کردن",
                        'callback_data' => "cancel_request_transfer_" . $order_buy->id,
                    ];
-                   $keyboard[0][0] = [
+                   $keyboard[0][1] = [
                        'text' => "لغو ",
                        'callback_data' => "no_request_transfer_" . $order_buy->id,
                    ];
