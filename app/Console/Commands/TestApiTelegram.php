@@ -66,15 +66,13 @@ class TestApiTelegram extends Command
         $request_transfer = [];
         foreach ($me as $req) {
             $request_transfer[] = $req;
-            if (data_get($customer, 'id') == data_get($req, 'transfer.user_id')) {
+            if (data_get($customer, 'id') == data_get($req, 'transferReport.user_id')) {
                 $req->type_label = data_get($req, "type") == "buy" ? "sell" : "buy";
                 if (data_get($req, "user_request.customer"))
                     $req->said = data_get($req, "user_request.fullName") . "(" . data_get($req, "user_request.customer.fullName") . ")";
                 else
                     $req->said = data_get($req, "user_request.fullName");
                 $req->color = $req->type_label == "sell" ? "#ef4444" : "dodgerblue";
-                dd("1", [$req, data_get($req, "userRequest"), data_get($req, "userRequest.fullName"), data_get($req, "transfer"), data_get($req, "transfer.user")]);
-
             } else {
                 $req->type_label = data_get($req, "type");
                 if (data_get($req, "transferReport.user.customer"))
@@ -86,8 +84,42 @@ class TestApiTelegram extends Command
 
             }
         }
+        foreach ($request as $req) {
+            $request_transfer[] = $req;
+            if (data_get($customer, 'id') == data_get($req, 'transfer.user_id')) {
+                $req->type_label = data_get($req, "type") == "buy" ? "sell" : "buy";
+                if (data_get($req, "user_request.customer"))
+                    $req->said = data_get($req, "user_request.fullName") . "(" . data_get($req, "user_request.customer.fullName") . ")";
+                else
+                    $req->said = data_get($req, "user_request.fullName");
+                $req->color = $req->type_label == "sell" ? "#ef4444" : "dodgerblue";
+                logger("3", [$req, data_get($req, "userRequest"), data_get($req, "userRequest.fullName"), data_get($req, "transfer"), data_get($req, "transfer.user")]);
 
-        dd(collect($request_transfer)->sortBy("created_at"));
+            } else {
+
+                $req->type_label = data_get($req, "type");
+                if (data_get($req, "transferReport.user.customer"))
+                    $req->said = data_get($req, "transferReport.user.fullName") . "(" . data_get($req, "transferReport.user.customer.fullName") . ")";
+                else
+                    $req->said = data_get($req, "transferReport.user.fullName");
+                $req->color = $req->type_label == "sell" ? "#ef4444" : "dodgerblue";
+                logger("3", [$req, data_get($req, "userRequest"), data_get($req, "userRequest.fullName"), data_get($req, "transferReport"), data_get($req, "transferReport.user")]);
+            }
+        }
+        foreach(collect($request_transfer)->sortBy("created_at") as $i=> $item) {
+
+
+            $this->info(data_get($item, 'id'));
+            $this->info(data_get($item, "type_label") == "buy" ? "خرید" : "فروش");
+            $this->info(data_get($item, "said"));
+            $this->info(toJalali(data_get($item, "transferReport.date"), "Y/m/d"));
+            $this->info(data_get($item, "number"));
+            $this->info(getTypeTransfer(data_get($item, "transferReport.type")));
+            $this->info(data_get($item, "transferReport.description"));
+            $this->info(number_format(data_get($item, "price")));
+            $this->info(toJalali(data_get($item, 'created_at'), "Y/m/d H:i:s"));
+            $this->info("___");
+        }
         exit;
         echo cleanInput("320خف1 : توضیحات متنی");exit;
 //        $customer_id = (int)$this->ask('What is  customer_id?');
