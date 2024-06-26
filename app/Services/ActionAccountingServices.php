@@ -266,6 +266,22 @@ class ActionAccountingServices extends TextServices
 
                         }
                     }
+                    foreach ($request as $req) {
+                        $request_transfer[] = $req;
+                        if (data_get($customer, 'id') == data_get($req, 'transfer.user_id')) {
+                            $req->type_label = data_get($req, "type") == "buy" ? "sell" : "buy";
+                            $req->said = data_get($req, "user_request.fullName");
+                            $req->color = $req->type_label == "sell" ? "#ef4444" : "dodgerblue";
+                            logger("3", [$req, data_get($req, "userRequest"), data_get($req, "userRequest.fullName"), data_get($req, "transfer"), data_get($req, "transfer.user")]);
+
+                        } else {
+
+                            $req->type_label = data_get($req, "type") ;
+                            $req->said = data_get($req, "transfer.user.fullName");
+                            $req->color = $req->type_label == "sell" ? "#ef4444" : "dodgerblue";
+                            logger("3", [$req, data_get($req, "userRequest"), data_get($req, "userRequest.fullName"), data_get($req, "transfer"), data_get($req, "transfer.user")]);
+                        }
+                    }
                     if ($request_transfer) {
                         $mpdf = new \Mpdf\Mpdf(['tempDir' => public_path("tmp")]);
                         $html = view('users.report_pdf', compact('date_p', 'request_transfer', 'customer'))->render();
