@@ -272,7 +272,7 @@ class ActionAccountingServices extends TextServices
                     }
                     foreach ($request as $req) {
                         $request_transfer[] = $req;
-                        if (data_get($customer, 'id') == data_get($req, 'transfer.user_id')) {
+                        if (data_get($customer, 'id') == data_get($req, 'transferReport.user_id')) {
                             $req->type_label = data_get($req, "type") == "buy" ? "sell" : "buy";
                             if (data_get($req, "userRequest.customer"))
                                 $req->said = data_get($req, "userRequest.fullName") . "(" . data_get($req, "userRequest.customer.fullName") . ")";

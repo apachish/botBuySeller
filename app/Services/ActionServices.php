@@ -285,7 +285,7 @@ class ActionServices extends TextServices
                 if ($access_limit_transaction)
                     $user_transfer_limit = $access_limit_transaction->where("user_trade_id", $head->id)->first();
 
-                logger("limiit",[$user_request,$user_transfer_limit]);
+                logger("limiit", [$user_request, $user_transfer_limit]);
 
                 if (($user_request && $user_request->limit_access) && ($user_transfer_limit && $user_transfer_limit->limit_access))
                     $limit_day = min($user_request->limit_access, $user_transfer_limit->limit_access);
@@ -321,7 +321,7 @@ class ActionServices extends TextServices
                 logger("limit_day", [$limit_day]);
                 logger("limit_day", [$buyer_id, $seller_id]);
                 if ($limit_day) {
-                    [$daily_transfer,$num] = $this->performTransaction($seller, $buyer, $num, $limit_day);
+                    [$daily_transfer, $num] = $this->performTransaction($seller, $buyer, $num, $limit_day);
                     $transfer->number -= $num;
                     $request_transfer["number"] = $num;
                     $use_day = $num;
@@ -482,7 +482,7 @@ class ActionServices extends TextServices
                     }
                     $bot_accounting = Bot::where('title', "botAccounting")
                         ->first();
-                    logger("accounting",[$bot_accounting]);
+                    logger("accounting", [$bot_accounting]);
                     if ($bot_accounting) {
                         $telegram_accounting = new Api($bot_accounting->token);
                         $telegram_accounting_services = new TelegramServices($bot_accounting->token);
@@ -518,11 +518,11 @@ class ActionServices extends TextServices
                         $message .= "مقدار:" . data_get($request_transfer, "number") . "کیلو";
                         $message .= "\n\n";
                         $message .= "نوع:" . getTypeTransfer($transfer->type);
-                        logger("message accounting",[$message]);
+                        logger("message accounting", [$message]);
                         foreach ($admins as $admin) {
-                            logger("send",[$admin]);
+                            logger("send", [$admin]);
                             $send_accounting = $telegram_accounting_services->sendMessage($admin->user_id, $message);
-                            logger("aco",[$send_accounting]);
+                            logger("aco", [$send_accounting]);
                         }
                     }
 
@@ -549,11 +549,11 @@ class ActionServices extends TextServices
         }
 
         $seller_head = $seller->customer;
-        logger("1",[$seller_head,$seller->customerUsers]);
-        $seller_customer = $seller->customerUser?$seller->customerUsers->pluck("id")->toArray():[];
-        logger("2",[$seller_customer]);
+        logger("1", [$seller_head, $seller->customerUsers]);
+        $seller_customer = $seller->customerUser ? $seller->customerUsers->pluck("id")->toArray() : [];
+        logger("2", [$seller_customer]);
         $seller_ids[] = $seller->id;
-        logger("23",[$seller_ids]);
+        logger("23", [$seller_ids]);
 
         if ($seller_head)
             $seller_ids[] = $seller_head->id;
@@ -561,10 +561,10 @@ class ActionServices extends TextServices
             $seller_ids = array_merge($seller_ids, $seller_customer);
 
         $buyer_head = $buyer->customer;
-        logger("12",[$buyer_head,$buyer->customerUsers]);
+        logger("12", [$buyer_head, $buyer->customerUsers]);
 
-        $buyer_customer = $buyer->customerUser?$buyer->customerUsers->pluck("id")->toArray():[];
-        logger("22",[$buyer_customer]);
+        $buyer_customer = $buyer->customerUser ? $buyer->customerUsers->pluck("id")->toArray() : [];
+        logger("22", [$buyer_customer]);
 
         $buyer_ids[] = $buyer->id;
         if ($buyer_head)
@@ -573,29 +573,29 @@ class ActionServices extends TextServices
             $buyer_ids = array_merge($buyer_ids, $buyer_customer);
         $total_sold_by_seller = 0;
         $total_sold_by_buyer = 0;
-        logger("aaaakk",[$seller_ids,$buyer_ids]);
-            foreach($seller_ids as $seller_id) {
-                foreach ($buyer_ids as $buyer_id) {
-                    logger("idss",[$seller_id,$buyer_id]);
-                    $total_sold_by_seller += DailyRequestTransfer::where('seller_id', $seller_id)
-                        ->whereDate("created_at", now())
-                        ->where('buyer_id', $buyer_id)->sum('use_day');
+        logger("aaaakk", [$seller_ids, $buyer_ids]);
+        foreach ($seller_ids as $seller_id) {
+            foreach ($buyer_ids as $buyer_id) {
+                logger("idss", [$seller_id, $buyer_id]);
+                $total_sold_by_seller += DailyRequestTransfer::where('seller_id', $seller_id)
+                    ->whereDate("created_at", now())
+                    ->where('buyer_id', $buyer_id)->sum('use_day');
 
-                    $total_sold_by_buyer += DailyRequestTransfer::where('seller_id', $buyer_id)
-                        ->whereDate("created_at", now())
-                        ->where('buyer_id', $seller_id)->sum('use_day');
-                    logger("errr",[$total_sold_by_seller,$total_sold_by_buyer]);
+                $total_sold_by_buyer += DailyRequestTransfer::where('seller_id', $buyer_id)
+                    ->whereDate("created_at", now())
+                    ->where('buyer_id', $seller_id)->sum('use_day');
+                logger("errr", [$total_sold_by_seller, $total_sold_by_buyer]);
 
-                }
             }
-        logger("total_sold_by_buyer",[$total_sold_by_seller,$total_sold_by_buyer]);
+        }
+        logger("total_sold_by_buyer", [$total_sold_by_seller, $total_sold_by_buyer]);
 
         $available_to_sell = $max_trade_limit - $total_sold_by_seller + $total_sold_by_buyer;
-        logger("available_to_sell",[$available_to_sell]);
+        logger("available_to_sell", [$available_to_sell]);
 
         $new_quantity = min($quantity, $available_to_sell);
 
-        logger("new_quantity",[$new_quantity]);
+        logger("new_quantity", [$new_quantity]);
 
         if ($new_quantity > 0) {
             $daily_transfer = DailyRequestTransfer::create([
@@ -604,7 +604,7 @@ class ActionServices extends TextServices
                 'use_day' => $new_quantity,
             ]);
 
-            return [$daily_transfer,$new_quantity];
+            return [$daily_transfer, $new_quantity];
         } else {
             return false;
         }
@@ -654,7 +654,7 @@ class ActionServices extends TextServices
             $keyboard = $this->getKeyboardRequest($transfer_new);
 
             logger("test", [$this->bot->chanel_id, $message, $keyboard]);
-            $message_result = $this->telegram_services->MessageReplyMarkup($this->telegram, $this->bot->chanel_id, $message, $keyboard,false);
+            $message_result = $this->telegram_services->MessageReplyMarkup($this->telegram, $this->bot->chanel_id, $message, $keyboard, false);
             $transfer_new->message_id = $message_result;
             $transfer_new->update();
             dispatch(new DeactivateTransfer($transfer_new->id))->delay(now()->addMinute(1));
@@ -791,7 +791,7 @@ class ActionServices extends TextServices
                 if ($tomorrow)
                     return $tomorrow->value;
             });
-            $tomorrow = $tomorrow?:now()->addDay(1)->format("Y-m-d");
+            $tomorrow = $tomorrow ?: now()->addDay(1)->format("Y-m-d");
             $keyboard[0] = [
                 ['text' => toJalali(now(), "Y/m/d"), 'callback_data' => "trade_open_report_date_" . $customer_id . "_" . $today],
                 ['text' => toJalali($tomorrow, "Y/m/d"), 'callback_data' => "trade_open_report_date_" . $customer_id . "_" . $tomorrow],
@@ -836,64 +836,55 @@ class ActionServices extends TextServices
                     $query->with("user");
                     $query->whereDate("date", $date);
                 }, "userRequest"])
-                ->whereHas("transferReport",function ($query) use ($date){
-                    $query->whereDate("date",$date);
+                ->whereHas("transferReport", function ($query) use ($date) {
+                    $query->whereDate("date", $date);
                 })->get();
             $request_transfer = [];
             foreach ($me as $req) {
                 $request_transfer[] = $req;
                 if (data_get($customer, 'id') == data_get($req, 'transferReport.user_id')) {
-                    $req->type_label = data_get($req, "type")== "buy" ? "sell" : "buy";
-                    if($this->getUser()->role == "customer")
+                    $req->type_label = data_get($req, "type") == "buy" ? "sell" : "buy";
+                    if (data_get($req, "userRequest.customer"))
+                        $req->said = data_get($req, "userRequest.fullName") . "(" . data_get($req, "userRequest.customer.fullName") . ")";
+                    else
+                        $req->said = data_get($req, "userRequest.fullName");
+                    $req->color = $req->type_label == "sell" ? "#ef4444" : "dodgerblue";
+                } else {
+                    $req->type_label = data_get($req, "type");
+                    if ($this->getUser()->role == "customer")
                         $req->said = "مشاهده فقط برای سرگروه";
                     else {
-                        if (data_get($req, "user_request.customer"))
-                            $req->said = data_get($req, "user_request.fullName") . "(" . data_get($req, "user_request.customer.fullName") . ")";
-                        else
-                            $req->said = data_get($req, "user_request.fullName");
-                    }
-                    $req->color = $req->type_label == "sell" ? "#ef4444" : "dodgerblue";
-                    logger("1", [$req, data_get($req, "userRequest"), data_get($req, "userRequest.fullName"), data_get($req, "transferReport"), data_get($req, "transferReport.user")]);
-
-                } else {
-
-                    $req->type_label = data_get($req, "type") ;
-                    $req->said = data_get($req, "transferReport.user.fullName");
                         if (data_get($req, "transferReport.user.customer"))
                             $req->said = data_get($req, "transferReport.user.fullName") . "(" . data_get($req, "transferReport.user.customer.fullName") . ")";
                         else
                             $req->said = data_get($req, "transferReport.user.fullName");
-
+                    }
                     $req->color = $req->type_label == "sell" ? "#ef4444" : "dodgerblue";
-                    logger("2", [$req, data_get($req, "userRequest"), data_get($req, "userRequest.fullName"), data_get($req, "transferReport"), data_get($req, "transferReport.user")]);
 
                 }
             }
             foreach ($request as $req) {
-                if (data_get($customer, 'id') == data_get($req, 'transfer_report.user_id')) {
+                $request_transfer[] = $req;
+                if (data_get($customer, 'id') == data_get($req, 'transferReport.user_id')) {
                     $req->type_label = data_get($req, "type") == "buy" ? "sell" : "buy";
-                    $req->said = data_get($req, "user_request.fullName");
-                    if (data_get($req, "user_request.customer"))
-                        $req->said = data_get($req, "user_request.fullName") . "(" . data_get($req, "user_request.customer.fullName") . ")";
+                    if (data_get($req, "userRequest.customer"))
+                        $req->said = data_get($req, "userRequest.fullName") . "(" . data_get($req, "userRequest.customer.fullName") . ")";
                     else
-                        $req->said = data_get($req, "user_request.fullName");
+                        $req->said = data_get($req, "userRequest.fullName");
                     $req->color = $req->type_label == "sell" ? "#ef4444" : "dodgerblue";
-                    logger("3", [$req, data_get($req, "userRequest"), data_get($req, "userRequest.fullName"), data_get($req, "transfer_report"), data_get($req, "transfer_report.user")]);
 
                 } else {
 
-                    $req->type_label = data_get($req, "type") ;
+                    $req->type_label = data_get($req, "type");
                     if($this->getUser()->role == "customer")
                         $req->said = "مشاهده فقط برای سرگروه";
                     else {
-                        if (data_get($req, "transfer_report.user.customer"))
-                            $req->said = data_get($req, "transfer_report.user.fullName") . "(" . data_get($req, "transfer_report.user.customer.fullName") . ")";
-                        else
-                            $req->said = data_get($req, "transfer_report.user.fullName");
-                    }
-                    $req->said = data_get($req, "transfer_report.user.fullName");
+                    if (data_get($req, "transferReport.user.customer"))
+                        $req->said = data_get($req, "transferReport.user.fullName") . "(" . data_get($req, "transferReport.user.customer.fullName") . ")";
+                    else
+                        $req->said = data_get($req, "transferReport.user.fullName");
+                        }
                     $req->color = $req->type_label == "sell" ? "#ef4444" : "dodgerblue";
-                    logger("3", [$req, data_get($req, "userRequest"), data_get($req, "userRequest.fullName"), data_get($req, "transfer_report"), data_get($req, "transfer_report.user")]);
                 }
             }
 
