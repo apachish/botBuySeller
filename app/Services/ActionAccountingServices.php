@@ -58,6 +58,11 @@ class ActionAccountingServices extends TextServices
             }
 
         }
+        elseif (str_contains($this->getData(), "no_request_transfer_")){
+            $id = str_replace('cancel_request_transfer_', '', $this->getData());
+            $message_id = cache()->get("cancel_number_transaction");
+            $this->telegram_services->editMessageReplyMarkup($this->getUserId(), $message_id, new \stdClass());
+        }
         elseif (str_contains($this->getData(), "cancel_request_transfer_")){
             $id = str_replace('cancel_request_transfer_', '', $this->getData());
             $order = RequestTransfer::with(["userRequest.customer","transfer","dailyRequest"])->find($id);
