@@ -997,6 +997,11 @@ class ActionServices extends TextServices
             return true;
         }
 
+        if (!$this->getUser()->set_word) {
+            $this->telegram_services->sendMessage($this->getUserId(), "اکانت کاربری شما فقط می تواند لفظ بگیرد ");
+            return true;
+        }
+
         if ($this->getDescription() && !in_array($this->getType(), $this->list_type_cash)) {
             $this->telegram_services->sendMessage($this->getUserId(), "توضیحات برای معاملات نقدی می باشد");
             return true;
