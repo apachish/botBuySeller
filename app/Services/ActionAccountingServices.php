@@ -53,6 +53,7 @@ class ActionAccountingServices extends TextServices
             $id = str_replace('get_report_', '', $this->getData());
             if ($id) {
                 $message = "تاریخ را بصورت زیر وارد کنید";
+                $message .= "   1403/03/09 ";
                 $this->getTelegramServices()->sendMessage($this->getUserId(), $message);
                 cache()->set($this->getKeyCache() . $this->getUserId(), "get_report_" . $id);
 
@@ -179,7 +180,7 @@ class ActionAccountingServices extends TextServices
         switch ($key_case) {
 
             case "set_number_transaction":
-                $order_buy = RequestTransfer::with(["userRequest.customer", "transfer"])->find($this->getMessage());
+                $order_buy = RequestTransfer::with(["userRequest.customer", "transferReport"])->find($this->getMessage());
                 if ($order_buy) {
                     $message = $this->getfactor($order_buy);
                     logger("message accounting", [$message]);
@@ -361,11 +362,11 @@ class ActionAccountingServices extends TextServices
         $message .= "\n\n";
         $type = data_get($order_buy, "type");
         if ($type == "sell") {
-            $title_request = "خریدار";
-            $title_mal = "فروشنده";
-        } else {
             $title_request = "فروشنده";
             $title_mal = "خریدار";
+        } else {
+            $title_request = "خریدار";
+            $title_mal = "فروشنده";
 
         }
         $transfer = $order_buy->transfer;

@@ -657,6 +657,26 @@ class ActionServices extends TextServices
             $message_result = $this->telegram_services->MessageReplyMarkup($this->telegram, $this->bot->chanel_id, $message, $keyboard, false);
             $transfer_new->message_id = $message_result;
             $transfer_new->update();
+            $bot_accounting = Bot::where('title', "botAccounting")->first();
+            if($bot_accounting){
+                $telegram_accounting_services = new TelegramServices($bot_accounting->token);
+                $admins = $bot_accounting->accessBot;
+                logger("message accounting", [$message]);
+                foreach ($admins as $admin) {
+                    logger("send", [$admin]);
+                    $message_accounting = $transfer_new->user->fullName;
+                    $message_accounting .= "\n\n";
+                    if(data_get($transfer_new,"user.customer"))
+                    {
+                        $message_accounting .= " مشتری :".data_get($transfer_new,"user.customer.fullName");
+                        $message_accounting .= "\n\n";
+
+                    }
+                    $message_accounting .= data_get($word, "message");
+                    $send_accounting = $telegram_accounting_services->sendMessage($admin->user_id,$message_accounting);
+                    logger("aco", [$send_accounting]);
+                }
+            }
             dispatch(new DeactivateTransfer($transfer_new->id))->delay(now()->addMinute(1));
         } elseif ($check == "false") {
             $word->status = WordTelegram::STATUS_REJECT;
