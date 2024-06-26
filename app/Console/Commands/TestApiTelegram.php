@@ -48,7 +48,6 @@ class TestApiTelegram extends Command
 
         $me = RequestTransfer::with(["transferReport" => function ($query) use ($customer, $date) {
             $query->where("user_id", $customer->id);
-            $query->withTrashed();
             $query->whereDate("date", $date);
             $query->with("user");
         }, "userRequest"])
@@ -64,7 +63,30 @@ class TestApiTelegram extends Command
             ->whereHas("transferReport", function ($query) use ($date) {
                 $query->whereDate("date", $date);
             })->get();
-        dd($request[0]->transferReport);
+        $request_transfer = [];
+        foreach ($me as $req) {
+            $request_transfer[] = $req;
+            if (data_get($customer, 'id') == data_get($req, 'transfer.user_id')) {
+                $req->type_label = data_get($req, "type") == "buy" ? "sell" : "buy";
+                if (data_get($req, "user_request.customer"))
+                    $req->said = data_get($req, "user_request.fullName") . "(" . data_get($req, "user_request.customer.fullName") . ")";
+                else
+                    $req->said = data_get($req, "user_request.fullName");
+                $req->color = $req->type_label == "sell" ? "#ef4444" : "dodgerblue";
+                dd("1", [$req, data_get($req, "userRequest"), data_get($req, "userRequest.fullName"), data_get($req, "transfer"), data_get($req, "transfer.user")]);
+
+            } else {
+                $req->type_label = data_get($req, "type");
+                if (data_get($req, "transferReport.user.customer"))
+                    $req->said = data_get($req, "transferReport.user.fullName") . "(" . data_get($req, "transferReport.user.customer.fullName") . ")";
+                else
+                    $req->said = data_get($req, "transferReport.user.fullName");
+                $req->color = $req->type_label == "sell" ? "#ef4444" : "dodgerblue";
+                logger("2", [$req, data_get($req, "userRequest"), data_get($req, "userRequest.fullName"), data_get($req, "transferReport"), data_get($req, "transferReport.user")]);
+
+            }
+        }
+        dd($request_transfer[0]);
         exit;
         echo cleanInput("320خف1 : توضیحات متنی");exit;
 //        $customer_id = (int)$this->ask('What is  customer_id?');
