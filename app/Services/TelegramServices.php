@@ -342,45 +342,26 @@ class TelegramServices
         return $result;
     }
 
-    public function checkMember($user, $bot)
+    public function checkMember($chatId,$userId)
     {
-//        $telegram = new Api(data_get($bot,'token')); // توکن ربات تلگرام خود را جایگزین کنید
-        $token = data_get($bot, 'token'); // توکن ربات تلگرام خود را جایگزین کنید
-
-        $chatId = '@apdadana'; // نام کاربری یا آیدی کانال مورد نظر
-        $userId = data_get($user, 'id'); // آیدی کاربری مورد نظر
-
-// درخواست اطلاعات کاربر در کانال
-//        $response = $telegram->getChatMember([
-//            'chat_id' => $chatId,
-//            'user_id' => $userId
-//        ]);
-//
-//        logger("response",[$response,$response->isOk() , $response->getChatMember() ]);
-//// بررسی وضعیت عضویت کاربر در کانال
-//        if ($response->isOk() && $response->getChatMember()->getStatus() == 'member') {
-//            logger( "کاربر عضو کانال است.");
-//            return true;
-//        } else {
-//            logger( "کاربر عضو کانال نیست یا خطایی رخ داده است.");
-//            return false;
-//
-//        }
         // ارسال درخواست به API تلگرام
-        logger("https://api.telegram.org/bot$token/getChatMember?chat_id=$chatId&user_id=$userId");
-        $response = file_get_contents("https://api.telegram.org/bot$token/getChatMember?chat_id=$chatId&user_id=$userId");
+        return cache()->remember("check_member_".$userId,now()->addDay(1),function () use($chatId,$userId){
+            logger("https://api.telegram.org/bot$this->access_token/getChatMember?chat_id=$chatId&user_id=$userId");
+            $response = file_get_contents("https://api.telegram.org/bot$this->access_token/getChatMember?chat_id=$chatId&user_id=$userId");
 
 // تبدیل پاسخ از JSON به آرایه
-        $result = json_decode($response, true);
-        logger("response", [$response]);
+            $result = json_decode($response, true);
+            logger("response", [$response]);
 // بررسی وضعیت عضویت کاربر در کانال
-        if (data_get($result, 'ok') && in_array(data_get($result, 'result.status'), ['member', 'creator'])) {
-            logger("کاربر عضو کانال است.");
-            return true;
-        } else {
-            logger("کاربر عضو کانال نیست یا خطایی رخ داده است.");
-            return false;
-        }
+            if (data_get($result, 'ok') && in_array(data_get($result, 'result.status'), ['member', 'creator'])) {
+                logger("کاربر عضو کانال است.");
+                return true;
+            } else {
+                logger("کاربر عضو کانال نیست یا خطایی رخ داده است.");
+                return false;
+            }
+        });
+
     }
 
 

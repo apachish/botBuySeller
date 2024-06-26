@@ -345,6 +345,7 @@ class CustomerServices
                         'user_id' => $user_con->telegram_id,
                     ]);
 
+                cache()->forget("check_member_".$user_con->telegram_id);
                 if ($response) {
                     logger("User has been successfully removed from the channel.");
                 } else {
@@ -769,7 +770,7 @@ class CustomerServices
         $keyboard = [];
         $i = 0;
 
-        $users->each(function ($user) use (&$keyboard, &$i, $page, $filter) {
+        $users->each(function ($user) use (&$keyboard, &$i, $page, $filter,$object) {
             $text = $user->fullName ?: $user->first_name . " " . $user->last_name;
             $key_i = $user->role ."_".$user->id . "_" . $page;
             if ($filter)
@@ -803,7 +804,8 @@ class CustomerServices
                 $array[] = ['text' => "\xF0\x9F\x9A\xAF", 'callback_data' => 'delete_' . $key_i];
                 if ($user->status) {
                     $array[] = ['text' => "\xE2\x9D\x8C", 'callback_data' => 'reject_' . $key_i];
-                    $array[] = ['text' => "\xE2\x9E\x95	\xF0\x9F\x8C\xB3", 'callback_data' => 'add_chanel_' . $key_i];
+                    if(!$object->getTelegramServices()->checkMember(data_get($object,"bot.chanel_id"),$user->telegram_id))
+                        $array[] = ['text' => "\xE2\x9E\x95	\xF0\x9F\x8C\xB3", 'callback_data' => 'add_chanel_' . $key_i];
                 } else
                     $array[] = ['text' => "\xE2\x9C\x85 ", 'callback_data' => 'confirm_' . $key_i];
 
