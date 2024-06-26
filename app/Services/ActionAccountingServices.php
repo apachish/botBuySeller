@@ -65,9 +65,9 @@ class ActionAccountingServices extends TextServices
             $this->telegram_services->editMessageReplyMarkup($this->getUserId(), $message_id, new \stdClass());
         } elseif (str_contains($this->getData(), "cancel_request_transfer_")) {
             $id = str_replace('cancel_request_transfer_', '', $this->getData());
-            $order = RequestTransfer::with(["userRequest.customer", "transfer", "dailyRequest"])->find($id);
+            $order = RequestTransfer::with(["userRequest.customer", "transferReport", "dailyRequest"])->find($id);
             if ($order) {
-                $transfer = $order->transfer;
+                $transfer = $order->transferReport;
 
                 if (data_get($order, "userRequest.role") == "customer") {
                     $transaction_party_req = "مشاهده فقط برای سرگروه";
@@ -75,11 +75,11 @@ class ActionAccountingServices extends TextServices
                 } else
                     $transaction_party_req = data_get($order, "userRequest.fullName");
 
-                if (data_get($order, "transfer.user.role") == "customer") {
+                if (data_get($order, "transferReport.user.role") == "customer") {
                     $transaction_party = "مشاهده فقط برای سرگروه";
-                    $transaction_partys = data_get($order, "transfer.user.fullName") . "(" . data_get($order, "transfer.user.customer.fullName") . ")";
+                    $transaction_partys = data_get($order, "transferReport.user.fullName") . "(" . data_get($order, "transferReport.user.customer.fullName") . ")";
                 } else
-                    $transaction_party = data_get($order, "transfer.user.fullName");
+                    $transaction_party = data_get($order, "transferReport.user.fullName");
 
 
                 /*
