@@ -28,7 +28,7 @@ class RequestTransfer extends Model
 
     public function transfer()
     {
-        return $this->belongsTo(Transfer::class);
+        return $this->belongsTo(Transfer::class, 'transfer_id',"id");
     }
     public function userRequest()
     {
