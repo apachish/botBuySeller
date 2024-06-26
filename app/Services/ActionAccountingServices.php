@@ -225,6 +225,7 @@ class ActionAccountingServices extends TextServices
                 break;
             case "get_report_":
                 $id = str_replace('get_report_', '', $this->getMessageCache());
+                logger("iddd".$id);
                 $customer = UserTelegram::find($id);
                 if(!isValidShamsiDate($this->getMessage()))
                     $this->getTelegramServices()->sendMessage($this->getUserId(), "فرمت تاریخ دست نمی باشد");
@@ -246,6 +247,7 @@ class ActionAccountingServices extends TextServices
                             $query->whereDate("date", $date);
                         }, "userRequest"])
                         ->get();
+                    logger("aaaz",[$me,$request]);
                     $request_transfer = [];
                     foreach ($me as $req) {
                         $request_transfer[] = $req;
@@ -264,18 +266,22 @@ class ActionAccountingServices extends TextServices
 
                         }
                     }
-                    $mpdf = new \Mpdf\Mpdf(['tempDir' => public_path("tmp")]);
-                    $html = view('users.report_pdf', compact('date_p', 'request_transfer', 'customer'))->render();
-                    $mpdf->WriteHTML($html);
-                    $name_file = $this->getUserId() . "_" . $date_p . ".pdf";
-                    $path = "app/public/report/" . $this->getUserId() . "/";
-                    makeDirectoryStorage($path);
-                    $path_report = storage_path($path . $name_file);
-                    $document = $mpdf->Output($path_report, 'F');
-                    $response = $this->telegram->sendDocument([
-                        'chat_id' => $this->getUserId(),
-                        'document' => InputFile::create($path_report, "$date_p.pdf")
-                    ]);
+                    if ($request_transfer) {
+                        $mpdf = new \Mpdf\Mpdf(['tempDir' => public_path("tmp")]);
+                        $html = view('users.report_pdf', compact('date_p', 'request_transfer', 'customer'))->render();
+                        $mpdf->WriteHTML($html);
+                        $name_file = $this->getUserId() . "_" . $date_p . ".pdf";
+                        $path = "app/public/report/" . $this->getUserId() . "/";
+                        makeDirectoryStorage($path);
+                        $path_report = storage_path($path . $name_file);
+                        $document = $mpdf->Output($path_report, 'F');
+                        $response = $this->telegram->sendDocument([
+                            'chat_id' => $this->getUserId(),
+                            'document' => InputFile::create($path_report, "$date_p.pdf")
+                        ]);
+                    }else{
+                        $this->telegram->sendMessage(['chat_id' => $this->getUserId(), 'text' => 'معامله ای در این تاریخ انجام نشده']);
+                    }
                 }else
                     $this->getTelegramServices()->sendMessage($this->getUserId(), "کاربری یافت نشد ");
 
