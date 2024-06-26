@@ -231,7 +231,10 @@ class ActionAccountingServices extends TextServices
                     $this->getTelegramServices()->sendMessage($this->getUserId(), "فرمت تاریخ دست نمی باشد");
                 elseif($customer) {
                     $date = $this->getMessage();
+                    $date = toGregorian($this->getMessage(), "Y/m/d");
+
                     $date_p = toJalali($date, "Y_m_d");
+
                     $me = RequestTransfer::with(["transfer" => function ($query) use ($customer, $date) {
                         $query->where("user_id", $customer->id);
                         $query->withTrashed();
