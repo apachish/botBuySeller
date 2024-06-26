@@ -369,16 +369,16 @@ class ActionAccountingServices extends TextServices
             $title_mal = "فروشنده";
 
         }
-        $transfer = $order_buy->transfer;
+        $transfer = $order_buy->transferReport;
         if (data_get($order_buy, "userRequest.role") == "customer")
             $message .= "  $title_request: " . data_get($order_buy, "userRequest.fullName") . "(" . data_get($order_buy, "userRequest.customer.fullName") . ")";
         else
             $message .= "  $title_request: " . data_get($order_buy, "userRequest.fullName");
         $message .= "\n\n";
-        if (data_get($order_buy, "transfer.user.role") == "customer")
-            $message .= "  $title_mal: " . data_get($order_buy, "transfer.user.fullName") . "(" . data_get($order_buy, "transfer.user.customer.fullName") . ")";
+        if (data_get($order_buy, "transferReport.user.role") == "customer")
+            $message .= "  $title_mal: " . data_get($order_buy, "transferReport.user.fullName") . "(" . data_get($order_buy, "transferReport.user.customer.fullName") . ")";
         else
-            $message .= "  $title_mal: " . data_get($order_buy, "transfer.user.fullName");
+            $message .= "  $title_mal: " . data_get($order_buy, "transferReport.user.fullName");
         $message .= "\n\n";
         $message .= "برای:" . toJalali($transfer->date, "Y/m/d");
         $message .= "\n\n";
