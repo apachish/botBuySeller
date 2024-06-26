@@ -250,6 +250,12 @@ class ActionAccountingServices extends TextServices
                         }, "userRequest"])
                         ->get();
                     logger("aaaz",[$me,$request]);
+                    logger("query",[RequestTransfer::where("request_id", $customer->id)
+                        ->with(["transfer" => function ($query) use ( $date) {
+                            $query->with("user");
+                            $query->withTrashed();
+                            $query->whereDate("date", $date);
+                        }, "userRequest"])->toSql()]);
                     $request_transfer = [];
                     foreach ($me as $req) {
                         $request_transfer[] = $req;
