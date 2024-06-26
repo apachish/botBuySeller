@@ -494,11 +494,11 @@ class ActionServices extends TextServices
                         $message .= "\n\n";
                         $type = data_get($order_buy, "type");
                         if ($type == "sell") {
-                            $title_request = "خریدار";
-                            $title_mal = "فروشنده";
-                        } else {
                             $title_request = "فروشنده";
                             $title_mal = "خریدار";
+                        } else {
+                            $title_request = "خریدار";
+                            $title_mal = "فروشنده";
 
                         }
                         if ($this->getUser()->role == "customer")
