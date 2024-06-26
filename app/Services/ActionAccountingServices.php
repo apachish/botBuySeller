@@ -232,32 +232,24 @@ class ActionAccountingServices extends TextServices
 
                     $date_p = toJalali($date, "Y_m_d");
 
-                    $me = RequestTransfer::with(["transfer" => function ($query) use ($customer, $date) {
+                    $me = RequestTransfer::with(["transferReport" => function ($query) use ($customer, $date) {
                         $query->where("user_id", $customer->id);
-                        $query->withTrashed();
                         $query->whereDate("date", $date);
                         $query->with("user");
                     }, "userRequest"])
-                        ->whereHas("transfer", function ($query) use ($customer, $date) {
+                        ->whereHas("transferReport", function ($query) use ($customer, $date) {
                             $query->where("user_id", $customer->id);
                             $query->whereDate("date", $date);
                         })->get();
                     $request = RequestTransfer::where("request_id", $customer->id)
-                        ->with(["transfer" => function ($query) use ($date) {
+                        ->with(["transferReport" => function ($query) use ($date) {
                             $query->with("user");
-                            $query->withTrashed();
                             $query->whereDate("date", $date);
                         }, "userRequest"])
-                        ->whereHas("transfer", function ($query) use ($date) {
+                        ->whereHas("transferReport", function ($query) use ($date) {
                             $query->whereDate("date", $date);
                         })->get();
-                    logger("aaaz", [$me, $request]);
-                    logger("query", [RequestTransfer::where("request_id", $customer->id)
-                        ->with(["transfer" => function ($query) use ($date) {
-                            $query->with("user");
-                            $query->withTrashed();
-                            $query->whereDate("date", $date);
-                        }, "userRequest"])->toSql()]);
+
                     $request_transfer = [];
                     foreach ($me as $req) {
                         $request_transfer[] = $req;

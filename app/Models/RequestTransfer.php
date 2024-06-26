@@ -25,10 +25,13 @@ class RequestTransfer extends Model
         "type"
     ];
 
-
     public function transfer()
     {
         return $this->belongsTo(Transfer::class, 'transfer_id',"id");
+    }
+    public function transferReport()
+    {
+        return $this->belongsTo(Transfer::class, 'transfer_id',"id")->withTrashed();
     }
     public function userRequest()
     {

@@ -822,76 +822,27 @@ class ActionServices extends TextServices
             $message .= "  تاریخ   " . toJalali($date, "Y/m/d");
             $message .= "\n\n ";
             $this->telegram_services->editMessageTextAndInlineKeyboard($this->getUserId(), $message_id, $message);
-//            $me = Transfer::where("user_id", $customer_id)
-//                ->whereDate("date",$date)
-//                ->with(["requestTransfer"=>function ($query) {
-//                        $query->with("userRequest");
-//                    },"user"])
-//                ->whereHas("requestTransfer")->get();
-//
-//            $request = Transfer::whereDate("date",$date)
-//                ->with(["user",
-//                    "requestTransfer"=>function ($query) use ($customer_id){
-//                    $query->where("request_id", $customer_id);
-//                    $query->with("userRequest");
-//                }])
-//                ->whereHas("requestTransfer",function ($query) use ($customer_id){
-//                    $query->where("request_id", $customer_id);
-//                })->orderBy("created_at")
-//                ->get();
-//            $request_transfer = [];
-//            foreach ($me as $req) {
-//                $request_transfer[] = $req;
-//                if (data_get($customer, 'id') == data_get($req, 'user_id')) {
-//                    $req->type_label = getTypeOrder(data_get($req, "type")) == "buy" ? "sell" : "buy";
-//                    $req->said = data_get($req, "request_transfer.user_request.fullName");
-//                    $req->color = $req->type_label == "sell" ? "#ef4444" : "dodgerblue";
-//                } else {
-//
-//                    $req->type_label = data_get($req, "requestTransfer.type");
-//                    $req->said = data_get($req, "user.fullName");
-//                    $req->color = $req->type_label == "sell" ? "#ef4444" : "dodgerblue";
-//                }
-//            }
-//            foreach ($request as $req) {
-//                $request_transfer[] = $req;
-//                if(data_get($customer,'id') == data_get($req,'user_id'))
-//                {
-//                    $req->type_label =  getTypeOrder(data_get($req,"type"))=="buy"?"sell":"buy";
-//                    $req->said = data_get($req,"requestTransfer.userRequest.fullName");
-//                    $req->color = $req->type_label =="sell"?"#ef4444":"dodgerblue";
-//                }
-//                else
-//                {
-//
-//                    $req->type_label = data_get($req,"requestTransfer.type");
-//                    $req->said = data_get($req,"user.fullName");
-//                    $req->color = $req->type_label =="sell"?"#ef4444":"dodgerblue";
-//                }
-//            }
-            $me = RequestTransfer::with(["transfer" => function ($query) use ($customer_id, $date) {
+            $me = RequestTransfer::with(["transferReport" => function ($query) use ($customer_id, $date) {
                 $query->where("user_id", $customer_id);
                 $query->whereDate("date", $date);
-                $query->withTrashed();
                 $query->with("user");
             }, "userRequest"])
-                ->whereHas("transfer", function ($query) use ($customer_id, $date) {
+                ->whereHas("transferReport", function ($query) use ($customer_id, $date) {
                     $query->where("user_id", $customer_id);
                     $query->whereDate("date", $date);
                 })->get();
             $request = RequestTransfer::where("request_id", $customer_id)
-                ->with(["transfer" => function ($query) use ($customer_id, $date) {
+                ->with(["transferReport" => function ($query) use ($customer_id, $date) {
                     $query->with("user");
-                    $query->withTrashed();
                     $query->whereDate("date", $date);
                 }, "userRequest"])
-                ->whereHas("transfer",function ($query) use ($date){
+                ->whereHas("transferReport",function ($query) use ($date){
                     $query->whereDate("date",$date);
                 })->get();
             $request_transfer = [];
             foreach ($me as $req) {
                 $request_transfer[] = $req;
-                if (data_get($customer, 'id') == data_get($req, 'transfer.user_id')) {
+                if (data_get($customer, 'id') == data_get($req, 'transferReport.user_id')) {
                     $req->type_label = data_get($req, "type")== "buy" ? "sell" : "buy";
                     if($this->getUser()->role == "customer")
                         $req->said = "مشاهده فقط برای سرگروه";
@@ -902,25 +853,24 @@ class ActionServices extends TextServices
                             $req->said = data_get($req, "user_request.fullName");
                     }
                     $req->color = $req->type_label == "sell" ? "#ef4444" : "dodgerblue";
-                    logger("1", [$req, data_get($req, "userRequest"), data_get($req, "userRequest.fullName"), data_get($req, "transfer"), data_get($req, "transfer.user")]);
+                    logger("1", [$req, data_get($req, "userRequest"), data_get($req, "userRequest.fullName"), data_get($req, "transferReport"), data_get($req, "transferReport.user")]);
 
                 } else {
 
                     $req->type_label = data_get($req, "type") ;
-                    $req->said = data_get($req, "transfer.user.fullName");
-                        if (data_get($req, "transfer.user.customer"))
-                            $req->said = data_get($req, "transfer.user.fullName") . "(" . data_get($req, "transfer.user.customer.fullName") . ")";
+                    $req->said = data_get($req, "transferReport.user.fullName");
+                        if (data_get($req, "transferReport.user.customer"))
+                            $req->said = data_get($req, "transferReport.user.fullName") . "(" . data_get($req, "transferReport.user.customer.fullName") . ")";
                         else
-                            $req->said = data_get($req, "transfer.user.fullName");
+                            $req->said = data_get($req, "transferReport.user.fullName");
 
                     $req->color = $req->type_label == "sell" ? "#ef4444" : "dodgerblue";
-                    logger("2", [$req, data_get($req, "userRequest"), data_get($req, "userRequest.fullName"), data_get($req, "transfer"), data_get($req, "transfer.user")]);
+                    logger("2", [$req, data_get($req, "userRequest"), data_get($req, "userRequest.fullName"), data_get($req, "transferReport"), data_get($req, "transferReport.user")]);
 
                 }
             }
             foreach ($request as $req) {
-                $request_transfer[] = $req;
-                if (data_get($customer, 'id') == data_get($req, 'transfer.user_id')) {
+                if (data_get($customer, 'id') == data_get($req, 'transfer_report.user_id')) {
                     $req->type_label = data_get($req, "type") == "buy" ? "sell" : "buy";
                     $req->said = data_get($req, "user_request.fullName");
                     if (data_get($req, "user_request.customer"))
@@ -928,7 +878,7 @@ class ActionServices extends TextServices
                     else
                         $req->said = data_get($req, "user_request.fullName");
                     $req->color = $req->type_label == "sell" ? "#ef4444" : "dodgerblue";
-                    logger("3", [$req, data_get($req, "userRequest"), data_get($req, "userRequest.fullName"), data_get($req, "transfer"), data_get($req, "transfer.user")]);
+                    logger("3", [$req, data_get($req, "userRequest"), data_get($req, "userRequest.fullName"), data_get($req, "transfer_report"), data_get($req, "transfer_report.user")]);
 
                 } else {
 
@@ -936,26 +886,19 @@ class ActionServices extends TextServices
                     if($this->getUser()->role == "customer")
                         $req->said = "مشاهده فقط برای سرگروه";
                     else {
-                        if (data_get($req, "transfer.user.customer"))
-                            $req->said = data_get($req, "transfer.user.fullName") . "(" . data_get($req, "transfer.user.customer.fullName") . ")";
+                        if (data_get($req, "transfer_report.user.customer"))
+                            $req->said = data_get($req, "transfer_report.user.fullName") . "(" . data_get($req, "transfer_report.user.customer.fullName") . ")";
                         else
-                            $req->said = data_get($req, "transfer.user.fullName");
+                            $req->said = data_get($req, "transfer_report.user.fullName");
                     }
-                    $req->said = data_get($req, "transfer.user.fullName");
+                    $req->said = data_get($req, "transfer_report.user.fullName");
                     $req->color = $req->type_label == "sell" ? "#ef4444" : "dodgerblue";
-                    logger("3", [$req, data_get($req, "userRequest"), data_get($req, "userRequest.fullName"), data_get($req, "transfer"), data_get($req, "transfer.user")]);
+                    logger("3", [$req, data_get($req, "userRequest"), data_get($req, "userRequest.fullName"), data_get($req, "transfer_report"), data_get($req, "transfer_report.user")]);
                 }
             }
 
             if ($request_transfer) {
                 $customer = $customer ?: $this->getUser();
-//                $pdf = Pdf::loadView('users.report_pdf', compact('date_p', 'request_transfer', 'customer'));
-//                $name_file = $customer_id . "_" . $date_p . ".pdf";
-//                $path = "app/public/report/" . $this->getUserId() . "/" ;
-//                makeDirectoryStorage($path);
-//                $path_report = storage_path($path. $name_file);
-//                logger("path_re",[$path_report]);
-//                $pdf->save($path_report);
                 $mpdf = new \Mpdf\Mpdf(['tempDir' => public_path("tmp")]);
                 $html = view('users.report_pdf', compact('date_p', 'request_transfer', 'customer'))->render();
                 $mpdf->WriteHTML($html);

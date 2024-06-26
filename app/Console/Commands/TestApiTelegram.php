@@ -39,6 +39,33 @@ class TestApiTelegram extends Command
      */
     public function handle()
     {
+
+        $customer = UserTelegram::find(5);
+        $date = "1403/04/09";
+        $date = toGregorian($date, "Y/m/d");
+
+        $date_p = toJalali($date, "Y_m_d");
+
+        $me = RequestTransfer::with(["transferReport" => function ($query) use ($customer, $date) {
+            $query->where("user_id", $customer->id);
+            $query->withTrashed();
+            $query->whereDate("date", $date);
+            $query->with("user");
+        }, "userRequest"])
+            ->whereHas("transferReport", function ($query) use ($customer, $date) {
+                $query->where("user_id", $customer->id);
+                $query->whereDate("date", $date);
+            })->get();
+        $request = RequestTransfer::where("request_id", $customer->id)
+            ->with(["transferReport" => function ($query) use ($date) {
+                $query->with("user");
+                $query->whereDate("date", $date);
+            }, "userRequest"])
+            ->whereHas("transferReport", function ($query) use ($date) {
+                $query->whereDate("date", $date);
+            })->get();
+        dd($request[0]->transferReport);
+        exit;
         echo cleanInput("320خف1 : توضیحات متنی");exit;
 //        $customer_id = (int)$this->ask('What is  customer_id?');
 //        $customer = CustomerUser::with("user")->find($customer_id);
