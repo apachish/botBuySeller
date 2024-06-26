@@ -178,7 +178,7 @@ if (!function_exists('getTypeTransfer')) {
         if (in_array($type, [ "خ", "ف"]))
             return "عادی روز";
         elseif (in_array($type, ["فف", "خف"]))
-            return "عادی";
+            return "با حواله عادی";
         elseif (in_array($type, [ "خش", "فش"]))
             return "شنا روز";
         elseif (in_array($type, ["خفش", "ففش"]))
