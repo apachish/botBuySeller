@@ -5,12 +5,14 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use MongoDB\Laravel\Eloquent\HybridRelations;
 
 
 class RequestTransfer extends Model
 {
     use SoftDeletes;
     use HasFactory;
+    use HybridRelations;
 
     protected $table = 'request_transfer';
 
