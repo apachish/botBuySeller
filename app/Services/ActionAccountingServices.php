@@ -67,28 +67,48 @@ class ActionAccountingServices extends TextServices
             $id = str_replace('cancel_request_transfer_', '', $this->getData());
             $order = RequestTransfer::with(["userRequest.customer","transfer","dailyRequest"])->find($id);
             if($order){
-                $message = "\xE2\x9D\x8C\xE2\x9D\x97";
-                $message .= "حذف معامله زیر توسط ادمین به درخواست طرفبن معامله";
-                $message .= "\xE2\x9D\x8C\xE2\x9D\x97";
-                $message .= $this->getfactor($order);
-                $order->dailyRequest->delete();
-                $order->delete();
+                $transfer = $order->transfer;
+
+                if (data_get($order, "userRequest.role") == "customer") {
+                    $transaction_party_req = "مشاهده فقط برای سرگروه";
+                    $transaction_party_reqs = data_get($order, "userRequest.fullName") . "(" . data_get($order, "userRequest.customer.fullName") . ")";
+                }else
+                    $transaction_party_req = data_get($order, "userRequest.fullName");
+
+                if (data_get($order, "transfer.user.role") == "customer") {
+                    $transaction_party = "مشاهده فقط برای سرگروه";
+                    $transaction_partys = data_get($order, "transfer.user.fullName") . "(" . data_get($order, "transfer.user.customer.fullName") . ")";
+                }
+                else
+                    $transaction_party =  data_get($order, "transfer.user.fullName");
+
+
+
                 /*
                  * message for req and head
                  */
+                $message = $this->getStr(1,$transfer, $order, $transaction_party_req);
                 $this->sendBotWord(data_get($order, "userRequest.telegram_id"),$message);
-                if (data_get($order, "userRequest.role") == "customer")
-                    $this->sendBotCustomer(data_get($order, "userRequest.customer.telegram_id"),$message);
+                if (data_get($order, "userRequest.role") == "customer") {
+                    $message = $this->getStr(1,$transfer, $order, $transaction_party_reqs);
+                    $this->sendBotCustomer(data_get($order, "userRequest.customer.telegram_id"), $message);
+                }
 
                     /*
                  * message for transfer and head
                  */
-                    $this->sendBotWord(data_get($order, "transfer.user.telegram_id"),$message);
+                $message = $this->getStr(2,$transfer, $order, $transaction_party);
+                $this->sendBotWord(data_get($order, "transfer.user.telegram_id"),$message);
                 if (data_get($order, "transfer.user.role") == "customer")
-                        $this->sendBotCustomer(data_get($order, "transfer.user.customer.telegram_id"),$message);
+                {
+                    $message = $this->getStr(2,$transfer, $order, $transaction_partys);
+                    $this->sendBotCustomer(data_get($order, "transfer.user.customer.telegram_id"),$message);
+                }
 
                         $this->getTelegramServices()->sendMessage($this->getUserId(), "کنسل شد پیغام برای مشتریان و سرگروه ارسال شد");
 
+                $order->dailyRequest->delete();
+                $order->delete();
                 $message_id = cache()->get("cancel_number_transaction_".$order->id);
                 $this->telegram_services->editMessageReplyMarkup($this->getUserId(), $message_id, new \stdClass());
 
@@ -340,6 +360,37 @@ class ActionAccountingServices extends TextServices
         $message .= "مقدار:" . data_get($order_buy, "number") . "کیلو";
         $message .= "\n\n";
         $message .= "نوع:" . getTypeTransfer($transfer->type);
+        return $message;
+    }
+
+    /**
+     * @param mixed $transfer
+     * @param \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection|\Illuminate\Database\Eloquent\Builder|array $order
+     * @param mixed $transaction_party_req
+     * @return string
+     */
+    public function getStr($type,mixed $transfer, \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection|\Illuminate\Database\Eloquent\Builder|array $order, mixed $transaction_party_req): string
+    {
+        $message = "\xE2\x9D\x8C\xE2\x9D\x97";
+        $message .= "حذف معامله زیر توسط ادمین به درخواست طرفبن معامله";
+        $message .= "\xE2\x9D\x8C\xE2\x9D\x97";
+        $message .= "\n\n";
+        $message = $type==1?$transfer->message_request_me:$transfer->message_request;
+        $message .= "\n\n";
+        $message .= "مقدار:" . data_get($order, "number") . "کیلو";
+        $message .= "\n\n";
+        $message .= "نوع:" . getTypeTransfer($transfer->type);
+        if ($transfer->description) {
+            $message .= "\n\n";
+            $message .= "توضیحات";
+            $message .= "\xE2\x9D\x97 : \n\n" . $transfer->description;
+        }
+        $message .= "\n\n";
+        $message .= "طرف معامله:" . $transaction_party_req;
+        $message .= "\n\n";
+        $message .= "برای:" . toJalali($transfer->date, "Y/m/d");
+        $message .= "\n\n";
+        $message .= "       شماره حواله:" . data_get($order, 'id');
         return $message;
     }
 
