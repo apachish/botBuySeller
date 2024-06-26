@@ -51,9 +51,10 @@ class CustomerServices
 
     protected $keyword_customer = [
         [
-            [
-                ['text' => "\xF0\x9F\x93\x88معاملات باز"]
-            ],
+            ['text' => "\xF0\x9F\x93\x88معاملات باز"]
+        ],
+        [
+
             ['text' => "\xF0\x9F\x93\x9Aقوانین"],
             ['text' => "راهنما\xE2\x81\x89"],
             ['text' => "\xE2\x8C\x9Bمدت اشتراک"],
