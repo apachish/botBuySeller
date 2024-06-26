@@ -33,4 +33,10 @@ class RequestTransfer extends Model
         return $this->belongsTo(UserTelegram::class,"request_id");
     }
 
+    public function dailyRequest()
+    {
+        return $this->hasOne(DailyRequestTransfer::class,"request_id","id");
+
+    }
+
 }

@@ -321,7 +321,7 @@ class ActionServices extends TextServices
                 logger("limit_day", [$limit_day]);
                 logger("limit_day", [$buyer_id, $seller_id]);
                 if ($limit_day) {
-                    $num = $this->performTransaction($seller, $buyer, $num, $limit_day);
+                    [$daily_transfer,$num] = $this->performTransaction($seller, $buyer, $num, $limit_day);
                     $transfer->number -= $num;
                     $request_transfer["number"] = $num;
                     $use_day = $num;
@@ -337,18 +337,21 @@ class ActionServices extends TextServices
                         $request_transfer["status"] = $num == $transfer->number ? "complete" : "half";
                         logger("request", [$request_transfer]);
                         $use_day = $num;
+                        if (data_get($request_transfer, "number")) {
+                            $daily_transfer = DailyRequestTransfer::updateOrCreate([
+                                "seller_id" => $seller_id,
+                                "buyer_id" => $buyer_id,
+                            ], [
+                                "use_day" => $use_day,
+                            ]);
+                        }
                     }
                 }
 
 
                 if (data_get($request_transfer, "number")) {
                     logger("number" . data_get($request_transfer, "number"));
-                    DailyRequestTransfer::updateOrCreate([
-                        "seller_id" => $seller_id,
-                        "buyer_id" => $buyer_id,
-                    ], [
-                        "use_day" => $use_day,
-                    ]);
+
 
                     $keyboard = self::getKeyboardRequest($transfer);
 
@@ -369,6 +372,8 @@ class ActionServices extends TextServices
                     $request_transfer["type"] = getTypeOrder(data_get($transfer, "type")) == "buy" ? "sell" : "buy";
 
                     $order_buy = RequestTransfer::create($request_transfer);
+                    $daily_transfer->request_id = $order_buy->id;
+                    $daily_transfer->update();
 
                     if ($transfer->user->role == "customer" && $this->getUser()->role == "customer") {
                         $transaction_party_req = "مشاهده فقط برای سرگروه";
@@ -593,13 +598,13 @@ class ActionServices extends TextServices
         logger("new_quantity",[$new_quantity]);
 
         if ($new_quantity > 0) {
-            DailyRequestTransfer::create([
+            $daily_transfer = DailyRequestTransfer::create([
                 'seller_id' => $seller->id,
                 'buyer_id' => $buyer->id,
                 'use_day' => $new_quantity,
             ]);
 
-            return $new_quantity;
+            return [$daily_transfer,$new_quantity];
         } else {
             return false;
         }

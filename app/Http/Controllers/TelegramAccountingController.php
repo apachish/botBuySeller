@@ -18,7 +18,7 @@ class TelegramAccountingController extends Controller
             $text_services->setUserId();
             $text_services->setMessageId();
             $text_services->setData();
-            $key_cache = "text_admin_";
+            $key_cache = "text_accounting_";
             $text_services->setKeyCache($key_cache);
             $text_services->setMessage();
             $text_services->setMessageCache();
