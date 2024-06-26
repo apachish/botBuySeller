@@ -96,10 +96,10 @@ class ActionAccountingServices extends TextServices
              * message for transfer and head
              */
                 $message = $this->getStr(2, $transfer, $order, $transaction_party);
-                $this->sendBotWord(data_get($order, "transfer.user.telegram_id"), $message);
-                if (data_get($order, "transfer.user.role") == "customer") {
+                $this->sendBotWord(data_get($order, "transferReport.user.telegram_id"), $message);
+                if (data_get($order, "transferReport.user.role") == "customer") {
                     $message = $this->getStr(2, $transfer, $order, $transaction_partys);
-                    $this->sendBotCustomer(data_get($order, "transfer.user.customer.telegram_id"), $message);
+                    $this->sendBotCustomer(data_get($order, "transferReport.user.customer.telegram_id"), $message);
                 }
 
                 $this->getTelegramServices()->sendMessage($this->getUserId(), "کنسل شد پیغام برای مشتریان و سرگروه ارسال شد");
