@@ -12,7 +12,7 @@ class RequestTransfer extends Model
 {
     use SoftDeletes;
     use HasFactory;
-    use HybridRelations;
+//    use HybridRelations;
 
     protected $table = 'request_transfer';
 
