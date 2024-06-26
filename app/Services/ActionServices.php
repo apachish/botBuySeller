@@ -997,7 +997,7 @@ class ActionServices extends TextServices
             return true;
         }
 
-        if (!$this->getUser()->set_word) {
+        if ($this->getUser()->set_word) {
             $this->telegram_services->sendMessage($this->getUserId(), "اکانت کاربری شما فقط می تواند لفظ بگیرد ");
             return true;
         }
