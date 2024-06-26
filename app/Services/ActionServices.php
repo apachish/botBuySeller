@@ -872,6 +872,7 @@ class ActionServices extends TextServices
             $me = RequestTransfer::with(["transfer" => function ($query) use ($customer_id, $date) {
                 $query->where("user_id", $customer_id);
                 $query->whereDate("date", $date);
+                $query->withTrashed();
                 $query->with("user");
             }, "userRequest"])
                 ->whereHas("transfer", function ($query) use ($customer_id, $date) {
@@ -881,9 +882,12 @@ class ActionServices extends TextServices
             $request = RequestTransfer::where("request_id", $customer_id)
                 ->with(["transfer" => function ($query) use ($customer_id, $date) {
                     $query->with("user");
+                    $query->withTrashed();
                     $query->whereDate("date", $date);
                 }, "userRequest"])
-                ->get();
+                ->whereHas("transfer",function ($query) use ($date){
+                    $query->whereDate("date",$date);
+                })->get();
             $request_transfer = [];
             foreach ($me as $req) {
                 $request_transfer[] = $req;

@@ -251,7 +251,9 @@ class ActionAccountingServices extends TextServices
                             $query->withTrashed();
                             $query->whereDate("date", $date);
                         }, "userRequest"])
-                        ->get();
+                        ->whereHas("transfer",function ($query) use ($date){
+                            $query->whereDate("date",$date);
+                        })->get();
                     logger("aaaz",[$me,$request]);
                     logger("query",[RequestTransfer::where("request_id", $customer->id)
                         ->with(["transfer" => function ($query) use ( $date) {
