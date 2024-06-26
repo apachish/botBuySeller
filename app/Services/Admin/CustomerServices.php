@@ -537,13 +537,13 @@ class CustomerServices
         if($user_con)
         {
             $message = "\n\n";
-            $user_con->set_word = true;
+            $user_con->set_word = false;
            $user_con->update();
-                $message .= "کاربر";
+            $message .= " کاربر ";
                 $message .= "\n\n";
                 $message .= $user_con->fullName;
-                $message .= " نمی تواند لفظ بدهد ";
-                $message .= "\n\n";
+            $message .= " از حالت مسدود لفظ آزد شد ";
+            $message .= "\n\n";
             $object->getTelegramServices()->sendMessage($object->getUserId(), $message);
             $message_id = cache()->get("menu_List_user_" . $object->getUserId());
             $this->listUser($role,$object,$page, $message_id, $filter);
@@ -562,12 +562,12 @@ class CustomerServices
         if($user_con)
         {
             $message = "\n\n";
-            $user_con->set_word = false;
+            $user_con->set_word = true;
            $user_con->update();
-                $message .= "کاربر";
-                $message .= "\n\n";
+
+                $message .= " کاربر ";
                 $message .= $user_con->fullName;
-                $message .= " از حالت مسدود لفظ آزد شد ";
+            $message .= " نمی تواند لفظ بدهد ";
                 $message .= "\n\n";
             $object->getTelegramServices()->sendMessage($object->getUserId(), $message);
             $message_id = cache()->get("menu_List_user_" . $object->getUserId());
