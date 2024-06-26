@@ -523,6 +523,58 @@ class CustomerServices
             $object->getTelegramServices()->sendMessage($object->getUserId(), $message);
         }
     }
+
+    public function setGetWordOnly($object)
+    {
+        $data = str_replace('set_word_only_', '', $object->getData());
+        $array = explode("_", $data);
+        logger("data",[$array]);
+        $role = data_get($array, 0);
+        $id = (int)data_get($array, 1);
+        $page = (int)data_get($array, 2);
+        $filter = data_get($array, 3, null);
+        $user_con = UserTelegram::find($id);
+        if($user_con)
+        {
+            $message = "\n\n";
+            $user_con->set_word = true;
+           $user_con->update();
+                $message .= "کاربر";
+                $message .= "\n\n";
+                $message .= $user_con->fullName;
+                $message .= " نمی تواند لفظ بدهد ";
+                $message .= "\n\n";
+            $object->getTelegramServices()->sendMessage($object->getUserId(), $message);
+            $message_id = cache()->get("menu_List_user_" . $object->getUserId());
+            $this->listUser($role,$object,$page, $message_id, $filter);
+        }
+    }
+    public function setFreeActivity($object)
+    {
+        $data = str_replace('free_activity_', '', $object->getData());
+        $array = explode("_", $data);
+        logger("data",[$array]);
+        $role = data_get($array, 0);
+        $id = (int)data_get($array, 1);
+        $page = (int)data_get($array, 2);
+        $filter = data_get($array, 3, null);
+        $user_con = UserTelegram::find($id);
+        if($user_con)
+        {
+            $message = "\n\n";
+            $user_con->set_word = false;
+           $user_con->update();
+                $message .= "کاربر";
+                $message .= "\n\n";
+                $message .= $user_con->fullName;
+                $message .= " از حالت مسدود لفظ آزد شد ";
+                $message .= "\n\n";
+            $object->getTelegramServices()->sendMessage($object->getUserId(), $message);
+            $message_id = cache()->get("menu_List_user_" . $object->getUserId());
+            $this->listUser($role,$object,$page, $message_id, $filter);
+        }
+    }
+
     public function syncMobile($object)
     {
         $data = str_replace('sync_mobile_', '', $object->getData());
@@ -735,8 +787,15 @@ class CustomerServices
                 ['text' => "\xE2\x86\x94", 'callback_data' => 'sync_mobile_' . $key_i],
                 ['text' => "\xF0\x9F\x93\x9D", 'callback_data' => 'get_membership_' . $key_i],
             ];
+
             if($user->role == "customer")
                 $array[] =  ['text' => "\xF0\x9F\x91\xA4", 'callback_data' => 'head_customer_' . $key_i];
+
+
+            if($user->set_word)
+                $keyboard[] = ['text' => "\xE2\x9B\x94", 'callback_data' => 'set_word_only_' . $key_i];
+            else
+                $keyboard[] = ['text' => "\xE2\x98\x91", 'callback_data' => 'free_activity_' . $key_i];
 
             if ($user->deleted_at)
                 $array[] = ['text' => "\xF0\x9F\x86\x97", 'callback_data' => 'active_' . $key_i];

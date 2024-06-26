@@ -125,6 +125,10 @@ class ActionAdminServices extends TextServices
             $this->custromer->AcceptUser($this);
         elseif (str_contains($this->getData(), "reject_user_"))
             $this->custromer->rejectUser($this);
+        if (str_contains($this->getData(), "set_word_only_"))
+            $this->custromer->setGetWordOnly($this);
+        elseif (str_contains($this->getData(), "free_activity_"))
+            $this->custromer->setFreeActivity($this);
         elseif (str_contains($this->getData(), "pre_"))
             $this->custromer->pre($this);
         elseif (str_contains($this->getData(), "next_"))

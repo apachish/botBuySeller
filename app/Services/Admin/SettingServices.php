@@ -15,7 +15,7 @@ class SettingServices
                 ],
                 [
                     ['text' => "\xF0\x9F\x92\xB3\xF0\x9F\x8C\xB3ویرایش حق اشتراک"],
-                    ['text' => "\xF0\x9F\x92\xB1کیف پول"]
+//                    ['text' => "\xF0\x9F\x92\xB1کیف پول"]
                 ],
                 [
                     ['text' => "\xE2\x86\xA9منو"]
