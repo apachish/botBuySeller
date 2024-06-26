@@ -345,7 +345,6 @@ class TelegramServices
     public function checkMember($chatId,$userId)
     {
         // ارسال درخواست به API تلگرام
-        return cache()->remember("check_member_".$userId,now()->addDay(1),function () use($chatId,$userId){
             logger("https://api.telegram.org/bot$this->access_token/getChatMember?chat_id=$chatId&user_id=$userId");
             $response = file_get_contents("https://api.telegram.org/bot$this->access_token/getChatMember?chat_id=$chatId&user_id=$userId");
 
@@ -360,7 +359,6 @@ class TelegramServices
                 logger("کاربر عضو کانال نیست یا خطایی رخ داده است.");
                 return false;
             }
-        });
 
     }
 

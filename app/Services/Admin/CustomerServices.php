@@ -345,7 +345,6 @@ class CustomerServices
                         'user_id' => $user_con->telegram_id,
                     ]);
 
-                cache()->forget("check_member_".$user_con->telegram_id);
                 if ($response) {
                     logger("User has been successfully removed from the channel.");
                 } else {
