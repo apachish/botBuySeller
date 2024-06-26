@@ -793,9 +793,9 @@ class CustomerServices
 
 
             if($user->set_word)
-                $keyboard[] = ['text' => "\xE2\x9B\x94", 'callback_data' => 'set_word_only_' . $key_i];
+                $array[] = ['text' => "\xE2\x9B\x94", 'callback_data' => 'set_word_only_' . $key_i];
             else
-                $keyboard[] = ['text' => "\xE2\x98\x91", 'callback_data' => 'free_activity_' . $key_i];
+                $array[] = ['text' => "\xE2\x98\x91", 'callback_data' => 'free_activity_' . $key_i];
 
             if ($user->deleted_at)
                 $array[] = ['text' => "\xF0\x9F\x86\x97", 'callback_data' => 'active_' . $key_i];
