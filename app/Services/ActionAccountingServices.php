@@ -255,10 +255,10 @@ class ActionAccountingServices extends TextServices
                         $request_transfer[] = $req;
                         if (data_get($customer, 'id') == data_get($req, 'transferReport.user_id')) {
                             $req->type_label = data_get($req, "type") == "buy" ? "sell" : "buy";
-                            if (data_get($req, "user_request.customer"))
-                                $req->said = data_get($req, "user_request.fullName") . "(" . data_get($req, "user_request.customer.fullName") . ")";
+                            if (data_get($req, "userRequest.customer"))
+                                $req->said = data_get($req, "userRequest.fullName") . "(" . data_get($req, "userRequest.customer.fullName") . ")";
                             else
-                                $req->said = data_get($req, "user_request.fullName");
+                                $req->said = data_get($req, "userRequest.fullName");
                             $req->color = $req->type_label == "sell" ? "#ef4444" : "dodgerblue";
                         } else {
                             $req->type_label = data_get($req, "type");
@@ -267,7 +267,6 @@ class ActionAccountingServices extends TextServices
                             else
                                 $req->said = data_get($req, "transferReport.user.fullName");
                             $req->color = $req->type_label == "sell" ? "#ef4444" : "dodgerblue";
-                            logger("2", [$req, data_get($req, "userRequest"), data_get($req, "userRequest.fullName"), data_get($req, "transferReport"), data_get($req, "transferReport.user")]);
 
                         }
                     }
@@ -275,12 +274,11 @@ class ActionAccountingServices extends TextServices
                         $request_transfer[] = $req;
                         if (data_get($customer, 'id') == data_get($req, 'transfer.user_id')) {
                             $req->type_label = data_get($req, "type") == "buy" ? "sell" : "buy";
-                            if (data_get($req, "user_request.customer"))
-                                $req->said = data_get($req, "user_request.fullName") . "(" . data_get($req, "user_request.customer.fullName") . ")";
+                            if (data_get($req, "userRequest.customer"))
+                                $req->said = data_get($req, "userRequest.fullName") . "(" . data_get($req, "userRequest.customer.fullName") . ")";
                             else
-                                $req->said = data_get($req, "user_request.fullName");
+                                $req->said = data_get($req, "userRequest.fullName");
                             $req->color = $req->type_label == "sell" ? "#ef4444" : "dodgerblue";
-                            logger("3", [$req, data_get($req, "userRequest"), data_get($req, "userRequest.fullName"), data_get($req, "transfer"), data_get($req, "transfer.user")]);
 
                         } else {
 
@@ -290,7 +288,6 @@ class ActionAccountingServices extends TextServices
                             else
                                 $req->said = data_get($req, "transferReport.user.fullName");
                             $req->color = $req->type_label == "sell" ? "#ef4444" : "dodgerblue";
-                            logger("3", [$req, data_get($req, "userRequest"), data_get($req, "userRequest.fullName"), data_get($req, "transferReport"), data_get($req, "transferReport.user")]);
                         }
                     }
                     if ($request_transfer) {
