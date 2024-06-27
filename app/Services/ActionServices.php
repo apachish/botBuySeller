@@ -493,6 +493,10 @@ class ActionServices extends TextServices
                         $message .= number_format(data_get($order_buy, 'price'), 0);
                         $message .= "\n\n";
                         $type = data_get($order_buy, "type");
+                        logger("typee",[$type,$order_buy,$transaction_party_req_s,
+                            $transaction_party_s,$transaction_party,$transaction_party_req]);
+                        $title_request = null;
+                        $title_mal = null;
                         if ($type == "sell") {
                             $title_request = "فروشنده";
                             $title_mal = "خریدار";
@@ -501,6 +505,7 @@ class ActionServices extends TextServices
                             $title_mal = "فروشنده";
 
                         }
+                        logger("tt",[$title_mal,$title_request]);
                         if ($this->getUser()->role == "customer")
                             $message .= "  $title_request: " . $transaction_party_req_s;
                         else
