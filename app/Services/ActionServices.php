@@ -495,44 +495,23 @@ class ActionServices extends TextServices
                         $type = data_get($order_buy, "type");
                         logger("typee",[$type,$order_buy,$transaction_party_req_s,
                             $transaction_party_s,$transaction_party,$transaction_party_req]);
-
                         if ($type == "sell") {
-                            logger("www");
                             $title_request = "فروشنده";
                             $title_mal = "خریدار";
                         } else {
-                            logger("221");
-
                             $title_request = "خریدار";
                             $title_mal = "فروشنده";
 
                         }
-                        logger("tt",[$title_mal,$title_request]);
                         if ($this->getUser()->role == "customer")
-                        {
-                            logger("1".$transaction_party_req_s);
-
-                            $message .= "  $title_request: " . $transaction_party_req_s;
-                        }
+                            $message .= "  $title_request: " . $transaction_party_s;
                         else
-                        {
-                            logger("2".$transaction_party_req);
-
-                            $message .= "  $title_request: " . $transaction_party_req;
-                        }
+                            $message .= "  $title_request: " . $transaction_party;
                         $message .= "\n\n";
                         if ($transfer->user->role == "customer")
-                        {
-                            logger("3".$transaction_party_s);
-
-                            $message .= "  $title_mal: " . $transaction_party_s;
-                        }
+                            $message .= "  $title_mal: " . $transaction_party_req_s ;
                         else
-                        {
-                            logger("4".$transaction_party);
-
-                            $message .= "  $title_mal: " . $transaction_party;
-                        }
+                            $message .= "  $title_mal: " . $transaction_party_req ;
                         $message .= "\n\n";
                         $message .= "برای:" . toJalali($transfer->date, "Y/m/d");
                         $message .= "\n\n";
@@ -1015,7 +994,7 @@ class ActionServices extends TextServices
             return true;
         }
 
-        if ($this->getUser()->set_word) {
+        if ($this->getUser()->set_word || ($this->getUser()->customer && $this->getUser()->customer->set_word)) {
             $this->telegram_services->sendMessage($this->getUserId(), "اکانت کاربری شما فقط می تواند لفظ بگیرد ");
             return true;
         }
