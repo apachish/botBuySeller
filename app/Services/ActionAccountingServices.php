@@ -431,7 +431,7 @@ class ActionAccountingServices extends TextServices
         $message .= "حذف معامله زیر توسط ادمین به درخواست طرفبن معامله";
         $message .= "\xE2\x9D\x8C\xE2\x9D\x97";
         $message .= "\n\n";
-        $message = $type == 1 ? $transfer->message_request_me : $transfer->message_request;
+        $message .= $type == 1 ? $transfer->message_request_me : $transfer->message_request;
         $message .= "\n\n";
         $message .= "مقدار:" . data_get($order, "number") . "کیلو";
         $message .= "\n\n";
