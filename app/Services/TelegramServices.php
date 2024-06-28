@@ -79,7 +79,7 @@ class TelegramServices
         return $result;
     }
 
-    public function MessageReplyMarkup($telegram, $chat_id, $text, $keyboard,$cache_use=true)
+    public function MessageReplyMarkup($telegram, $chat_id, $text, $keyboard,$cache_use=false)
     {
 //        $keyboard = [
 //            'inline_keyboard' => [
