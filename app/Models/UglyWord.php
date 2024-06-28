@@ -9,4 +9,5 @@ class UglyWord extends Model
 {
     protected $connection = "mongodb";
     protected $collection = 'ugly_word_collection';
+    protected $fillable = ["word"];
 }

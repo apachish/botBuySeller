@@ -167,8 +167,10 @@ class SettingServices
     }
     public function deleteUglyWord($object)
     {
-        $id = str_replace('next_ugly_word_', '', $object->getData());
+        $data = str_replace('delete_ugly_word_', '', $object->getData());
 
+        $id = data_get($data,0);
+        $page = data_get($data,1);
         $ugly = UglyWord::find($id);
 
         if($ugly) {
@@ -177,6 +179,8 @@ class SettingServices
             $response_text .= $ugly->word;
             $object->getTelegramServices()->sendMessage($object->getUserId(), $response_text);
             $ugly->delete();
+            $this->listUglyWord($object,$page);
+
         }else{
             $object->getTelegramServices()->sendMessage($object->getUserId(), "یافت نشد");
 
@@ -234,8 +238,8 @@ class SettingServices
         $ugly_words->each(function ($ugly_word) use (&$keyboard, &$i, $page,$object) {
 
             $keyboard[$i++] = [
-                ['text' => $ugly_word, 'callback_data' => $ugly_word."_".$page],
-                ['text' => "\xE2\x9D\x8C", 'callback_data' => "delete_ugly_word_".$page],
+                ['text' => $ugly_word->word, 'callback_data' => $ugly_word."_".$page],
+                ['text' => "\xE2\x9D\x8C", 'callback_data' => "delete_ugly_word_".$ugly_word->id."_".$page],
             ];
         });
         if ($pre)
