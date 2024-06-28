@@ -85,6 +85,8 @@ class ActionAdminServices extends TextServices
             "🕰تاریخ فردا️",
             "\xE2\x98\x81تعطیل",
             "\xF0\x9F\x9A\xAB\xE2\x98\x80ممنوع معامله روز",
+            "\xE2\x98\xBAلیست کلمات زشت",
+            "\xE2\x9E\x95افزودن کلمه زشت",
             "\xE2\x86\xA9منو",
         ];
         if (in_array($this->message, $access_text))
@@ -129,10 +131,17 @@ class ActionAdminServices extends TextServices
             $this->custromer->setGetWordOnly($this);
         elseif (str_contains($this->getData(), "free_activity_"))
             $this->custromer->setFreeActivity($this);
+        elseif (str_contains($this->getData(), "pre_ugly_word_"))
+            $this->setting->pre($this);
+        elseif (str_contains($this->getData(), "next_ugly_word_"))
+            $this->setting->next($this);
+        elseif (str_contains($this->getData(), "delete_ugly_word_"))
+            $this->setting->deleteUglyWord($this);
         elseif (str_contains($this->getData(), "pre_"))
             $this->custromer->pre($this);
         elseif (str_contains($this->getData(), "next_"))
             $this->custromer->next($this);
+
         elseif (str_contains($this->getData(), "forbidden_day"))
             $this->transaction->setForbiddenDay($this);
         elseif (str_contains($this->getData(), "forbidden_"))
@@ -206,13 +215,12 @@ class ActionAdminServices extends TextServices
                 $updates = Transfer::withTrashed()->
                 whereNotNull("message_id");
 
-                if($targetDate)
-                {
+                if ($targetDate) {
                     logger($targetDate->format("Y-m-d H:i"));
                     $updates->where("created_at", ">=", $targetDate);
                 }
 
-                $updates =  $updates->where("created_at", "<=", now()->format("Y-m-d H:i"))->get();
+                $updates = $updates->where("created_at", "<=", now()->format("Y-m-d H:i"))->get();
                 try {
                     foreach ($updates as $update) {
 
@@ -255,6 +263,14 @@ class ActionAdminServices extends TextServices
                 break;
             case  "\xE2\x81\x89ویرایش راهنما":
                 $this->setting->getHelp($this);
+                break;
+                case "\xE2\x98\xBAلیست کلمات زشت":
+                $this->setting->getsUglyWord($this);
+                break;
+            case  "\xE2\x9E\x95افزودن کلمه زشت":
+                cache()->set($this->getKeyCache() . $this->getUserId(), "set_ugly_word");
+                $this->getTelegramServices()->sendMessage($this->getUserId(), "کلمه زشت را وارد کنید:");
+
                 break;
             case  "\xF0\x9F\x92\xB3\xF0\x9F\x8C\xB3ویرایش حق اشتراک":
                 $this->setting->getMembership($this);
@@ -333,6 +349,9 @@ class ActionAdminServices extends TextServices
 
             case "send_message_group":
                 $this->custromer->setMessageGroup($this);
+                break;
+                case "set_ugly_word":
+                $this->setting->setUglyWord($this);
                 break;
             case "say_mobile_new_":
                 $this->custromer->getMobile($this);

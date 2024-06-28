@@ -4,6 +4,7 @@ namespace App\Services\Admin;
 
 
 use App\Models\Setting;
+use App\Models\UglyWord;
 
 class SettingServices
 {
@@ -13,6 +14,10 @@ class SettingServices
                     ['text' => "\xF0\x9F\x93\x9Aویرایش قوانین"],
                     ['text' => "\xE2\x81\x89ویرایش راهنما"],
                 ],
+                    [
+                    ['text' => "\xE2\x98\xBAلیست کلمات زشت"],
+                    ['text' => "\xE2\x9E\x95افزودن کلمه زشت"],
+                ],
                 [
                     ['text' => "\xF0\x9F\x92\xB3\xF0\x9F\x8C\xB3ویرایش حق اشتراک"],
 //                    ['text' => "\xF0\x9F\x92\xB1کیف پول"]
@@ -21,7 +26,27 @@ class SettingServices
                     ['text' => "\xE2\x86\xA9منو"]
                 ],
             ];
+    public function pre($object)
+    {
+        $data = str_replace('pre_ugly_word_', '', $object->getData());
+        $array = explode("_", $data);
+        $page = (int)data_get($array, 0);
+        $message_id = cache()->get("menu_List_ugly_word_" . $object->getUserId());
+        if ($message_id)
+            $this->listUglyWord($object,$page, $message_id);
+    }
 
+    public function next($object)
+    {
+        $data = str_replace('next_ugly_word_', '', $object->getData());
+        $array = explode("_", $data);
+        $page = (int)data_get($array, 0);
+
+        $message_id = cache()->get("menu_List_ugly_word_" . $object->getUserId());
+        logger("aa", [ $message_id, $page]);
+        if ($message_id)
+            $this->listUglyWord($object,$page, $message_id);
+    }
     public function getRule($object)
     {
         $rule = Setting::where("key", "rule")->first();
@@ -36,6 +61,11 @@ class SettingServices
         cache()->set($object->getKeyCache() . $object->getUserId(), "rule");
 
         $object->getTelegramServices()->sendMessage($object->getUserId(), $response_text);
+    }
+
+    public function getsUglyWord($object)
+    {
+        $this->listUglyWord($object,1);
     }
 
     public function getHelp($object)
@@ -106,6 +136,21 @@ class SettingServices
         cache()->forget($object->getKeyCache() . $object->getUserId());
     }
 
+    public function setUglyWord($object)
+    {
+        $ugly = UglyWord::updateOrCreate(
+            ["word" => $object->getMessage()],
+            ["word" => $object->getMessage()]
+        );
+
+
+        $response_text = "کلمه زیر افزوده شد:";
+        $response_text .= "\n\n";
+        $response_text .= $ugly->word;
+        $object->getTelegramServices()->sendMessage($object->getUserId(), $response_text);
+        cache()->forget($object->getKeyCache() . $object->getUserId());
+    }
+
     public function setHelp($object)
     {
         $rule = Setting::updateOrCreate(
@@ -119,6 +164,23 @@ class SettingServices
         $response_text .= $rule->value;
         $object->getTelegramServices()->sendMessage($object->getUserId(), $response_text);
         cache()->forget($object->getKeyCache() . $object->getUserId());
+    }
+    public function deleteUglyWord($object)
+    {
+        $id = str_replace('next_ugly_word_', '', $object->getData());
+
+        $ugly = UglyWord::find($id);
+
+        if($ugly) {
+            $response_text = "کلمه زیر حذف شد:";
+            $response_text .= "\n\n";
+            $response_text .= $ugly->word;
+            $object->getTelegramServices()->sendMessage($object->getUserId(), $response_text);
+            $ugly->delete();
+        }else{
+            $object->getTelegramServices()->sendMessage($object->getUserId(), "یافت نشد");
+
+        }
     }
 
     public function setMembership($object)
@@ -151,5 +213,41 @@ class SettingServices
 
         $object->getTelegramServices()->sendMessage($object->getUserId(), $response_text);
         cache()->forget($object->getKeyCache() . $object->getUserId());
+    }
+
+    private function listUglyWord($object,$page = 1, $message_id = null)
+    {
+
+        $text = "\n\nلیست  کلمات زشت";
+        $text .= "\n\n";
+        $text .= "با کلیک بر روی \xE2\x9D\x8C	 روبروی کلمه می توانید حذف کنید";
+        $ugly_words = UglyWord::query();
+
+        $ugly_words = $ugly_words->simplePaginate(10, ['*'], 'page', $page);
+        logger("ugly words",[$ugly_words]);
+        $page = $ugly_words->currentPage();
+        $next = $ugly_words->nextPageUrl() ? (int)str_replace("?page=", "", strstr($ugly_words->nextPageUrl(), "?page=")) : null;
+        $pre = $ugly_words->previousPageUrl() ? (int)str_replace("?page=", "", strstr($ugly_words->previousPageUrl(), "?page=")) : null;
+        $keyboard = [];
+        $i = 0;
+
+        $ugly_words->each(function ($ugly_word) use (&$keyboard, &$i, $page,$object) {
+
+            $keyboard[$i++] = [
+                ['text' => $ugly_word, 'callback_data' => $ugly_word."_".$page],
+                ['text' => "\xE2\x9D\x8C", 'callback_data' => "delete_ugly_word_".$page],
+            ];
+        });
+        if ($pre)
+            $keyboard[$i][] = ['text' => "قبلی", "callback_data" => "pre_ugly_word_" . $pre ];
+        if ($next)
+            $keyboard[$i][] = ['text' => "بعدی", "callback_data" => "next_ugly_word" . $next ];
+
+        if ($message_id)
+            $object->getTelegramServices()->editMessageTextAndInlineKeyboard($object->getUserId(), $message_id, $text, $keyboard);
+        else {
+            $object->getTelegramServices()->menu_key = "menu_List_ugly_word_";
+            $menu = $object->getTelegramServices()->MessageReplyMarkup($object->getTelegram(), $object->getUserId(), $text, $keyboard);
+        }
     }
 }
