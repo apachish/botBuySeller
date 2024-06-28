@@ -168,7 +168,7 @@ class SettingServices
     public function deleteUglyWord($object)
     {
         $data = str_replace('delete_ugly_word_', '', $object->getData());
-
+        $data = explode("_",$data);
         $id = data_get($data,0);
         $page = data_get($data,1);
         logger("ss",[$data,$id,$page]);
