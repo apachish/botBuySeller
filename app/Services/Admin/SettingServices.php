@@ -171,6 +171,7 @@ class SettingServices
 
         $id = data_get($data,0);
         $page = data_get($data,1);
+        logger("ss",[$data,$id,$page]);
         $ugly = UglyWord::find($id);
 
         if($ugly) {
