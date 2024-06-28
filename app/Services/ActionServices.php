@@ -488,40 +488,8 @@ class ActionServices extends TextServices
                         $telegram_accounting = new Api($bot_accounting->token);
                         $telegram_accounting_services = new TelegramServices($bot_accounting->token);
                         $admins = $bot_accounting->accessBot;
-                        $message = "شماره حواله:" . data_get($order_buy, 'id');
-                        $message .= "\n\n";
-                        $message .= "فی:";
-                        $message .= number_format(data_get($order_buy, 'price'), 0);
-                        $message .= "\n\n";
-                        $type = data_get($order_buy, "type");
-                        logger("typee",[$type,$order_buy,$transaction_party_req_s,
-                            $transaction_party_s,$transaction_party,$transaction_party_req]);
-                        if ($type == "sell") {
-                            $title_request = "فروشنده";
-                            $title_mal = "خریدار";
-                        } else {
-                            $title_request = "خریدار";
-                            $title_mal = "فروشنده";
-
-                        }
-                        if ($this->getUser()->role == "customer")
-                            $message .= "  $title_request: " . $transaction_party_s;
-                        else
-                            $message .= "  $title_request: " . $transaction_party;
-                        $message .= "\n\n";
-                        if ($transfer->user->role == "customer")
-                            $message .= "  $title_mal: " . $transaction_party_req_s ;
-                        else
-                            $message .= "  $title_mal: " . $transaction_party_req ;
-                        $message .= "\n\n";
-                        $message .= "برای:" . toJalali($transfer->date, "Y/m/d");
-                        $message .= "\n\n";
-                        $message .= "ساعت:" . toJalali($order_buy->created_at, "H:i:s");
-                        $message .= "\n\n";
-                        $message .= "مقدار:" . data_get($request_transfer, "number") . "کیلو";
-                        $message .= "\n\n";
-                        $message .= "نوع:" . getTypeTransfer($transfer->type);
-                        logger("message accounting", [$message]);
+                        $order_buy = RequestTransfer::with(["userRequest.customer", "transferReport"])->find(data_get($order_buy, 'id'));
+                        $message = $this->getfactor($order_buy);
                         foreach ($admins as $admin) {
                             logger("send", [$admin]);
                             $send_accounting = $telegram_accounting_services->sendMessage($admin->user_id, $message);
@@ -544,6 +512,44 @@ class ActionServices extends TextServices
             }
         }
     }
+
+    private function getfactor(\Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection|\Illuminate\Database\Eloquent\Builder|array $order_buy): string
+    {
+        $message = "شماره حواله:" . data_get($order_buy, 'id');
+        $message .= "\n\n";
+        $message .= "فی:";
+        $message .= number_format(data_get($order_buy, 'price'), 0);
+        $message .= "\n\n";
+        $type = data_get($order_buy, "type");
+        if ($type == "sell") {
+            $title_request = "فروشنده";
+            $title_mal = "خریدار";
+        } else {
+            $title_request = "خریدار";
+            $title_mal = "فروشنده";
+
+        }
+        $transfer = $order_buy->transferReport;
+        if (data_get($order_buy, "userRequest.role") == "customer")
+            $message .= "  $title_request: " . data_get($order_buy, "userRequest.fullName") . "(" . data_get($order_buy, "userRequest.customer.fullName") . ")";
+        else
+            $message .= "  $title_request: " . data_get($order_buy, "userRequest.fullName");
+        $message .= "\n\n";
+        if (data_get($order_buy, "transferReport.user.role") == "customer")
+            $message .= "  $title_mal: " . data_get($order_buy, "transferReport.user.fullName") . "(" . data_get($order_buy, "transferReport.user.customer.fullName") . ")";
+        else
+            $message .= "  $title_mal: " . data_get($order_buy, "transferReport.user.fullName");
+        $message .= "\n\n";
+        $message .= "برای:" . toJalali($transfer->date, "Y/m/d");
+        $message .= "\n\n";
+        $message .= "ساعت:" . toJalali($order_buy->created_at, "H:i:s");
+        $message .= "\n\n";
+        $message .= "مقدار:" . data_get($order_buy, "number") . "کیلو";
+        $message .= "\n\n";
+        $message .= "نوع:" . getTypeTransfer($transfer->type);
+        return $message;
+    }
+
 
     private function performTransaction($seller, $buyer, $quantity, $max_trade_limit)
     {
