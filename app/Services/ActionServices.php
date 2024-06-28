@@ -1003,8 +1003,11 @@ class ActionServices extends TextServices
         if($this->getDescription()){
             $ugly_words = UglyWord::get();
             foreach ($ugly_words as $ugly_word){
-                if(str_contains($this->getDescription(), $ugly_word->word))
+                if(str_contains($this->getDescription(), $ugly_word->word)) {
+                    $this->telegram_services->sendMessage($this->getUserId(), "لطفا کلمات نامتعارف در توضیحات به کار نبرید");
+
                     return true;
+                }
             }
         }
         if ($this->getDescription() && !in_array($this->getType(), $this->list_type_cash)) {
