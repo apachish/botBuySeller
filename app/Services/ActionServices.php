@@ -12,6 +12,7 @@ use App\Models\MessageTelegram;
 use App\Models\RequestTransfer;
 use App\Models\Setting;
 use App\Models\Transfer;
+use App\Models\UglyWord;
 use App\Models\UserTelegram;
 use App\Models\UserTradeAccess;
 use App\Models\WordTelegram;
@@ -999,6 +1000,13 @@ class ActionServices extends TextServices
             return true;
         }
 
+        if($this->getDescription()){
+            $ugly_words = UglyWord::get();
+            foreach ($ugly_words as $ugly_word){
+                if(str_contains($this->getDescription(), $ugly_word->word))
+                    return true;
+            }
+        }
         if ($this->getDescription() && !in_array($this->getType(), $this->list_type_cash)) {
             $this->telegram_services->sendMessage($this->getUserId(), "توضیحات برای معاملات نقدی می باشد");
             return true;
