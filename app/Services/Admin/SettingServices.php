@@ -238,7 +238,7 @@ class SettingServices
         $ugly_words->each(function ($ugly_word) use (&$keyboard, &$i, $page,$object) {
 
             $keyboard[$i++] = [
-                ['text' => "$ugly_word->word", 'callback_data' => $ugly_word."_".$page],
+                ['text' => "$ugly_word->word", 'callback_data' => $ugly_word->id."_".$page],
                 ['text' => "\xE2\x9D\x8C", 'callback_data' => "delete_ugly_word_".$ugly_word->id."_".$page],
             ];
         });
