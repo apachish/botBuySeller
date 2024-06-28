@@ -79,7 +79,7 @@ class TelegramServices
         return $result;
     }
 
-    public function MessageReplyMarkup($telegram, $chat_id, $text, $keyboard,$cache_use=false)
+    public function MessageReplyMarkup($telegram, $chat_id, $text, $keyboard,$cache_use=true)
     {
 //        $keyboard = [
 //            'inline_keyboard' => [
@@ -106,13 +106,13 @@ class TelegramServices
         ]);
         logger("reponse", [$response,$reply_markup]);
 
-        if (data_get($response, "message_id") && $cache_use)
+        if (data_get($response, "message_id") )//&& $cache_use
         {
-            if(cache()->get($this->menu_key.$chat_id))
-            {
-                $result_delete = $this->deleteMessage($chat_id,cache()->get($this->menu_key.$chat_id));
-                logger("result_delete",[$result_delete]);
-            }
+//            if(cache()->get($this->menu_key.$chat_id))
+//            {
+//                $result_delete = $this->deleteMessage($chat_id,cache()->get($this->menu_key.$chat_id));
+//                logger("result_delete",[$result_delete]);
+//            }
             cache()->set($this->menu_key.$chat_id,data_get($response, "message_id"));
             logger("message_id",[cache()->get($this->menu_key.$chat_id),$this->menu_key.$chat_id]);
         }
