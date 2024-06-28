@@ -612,9 +612,12 @@ class TextServices
             if ($message_id)
                 $this->listWorker($page, $message_id);
         } elseif (str_contains($this->getData(), "next_worker_")) {
-            $page = str_replace('next_worker_', '', $this->getData());
+            $page = (int)str_replace('next_worker_', '', $this->getData());
+            logger("page worker",[$page]);
             $data_old = cache()->get("menu_List_worker_" . $this->getUserId());
             $message_id = data_get($data_old, "id", null);
+            logger("message worker",[$message_id]);
+
             if ($message_id)
                 $this->listWorker($page, $message_id);
         } elseif (str_contains($this->data, "request_transfer_"))
