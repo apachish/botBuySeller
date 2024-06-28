@@ -288,11 +288,11 @@ class ActionServices extends TextServices
 
                 logger("limiit", [$user_request, $user_transfer_limit]);
 
-                if (($user_request && $user_request->limit_access) && ($user_transfer_limit && $user_transfer_limit->limit_access))
+                if (($user_request && $user_request->limit_access >=0) && ($user_transfer_limit && $user_transfer_limit->limit_access >=0))
                     $limit_day = min($user_request->limit_access, $user_transfer_limit->limit_access);
-                elseif (($user_transfer_limit && $user_transfer_limit->limit_access))
+                elseif (($user_transfer_limit && $user_transfer_limit->limit_access >=0))
                     $limit_day = $user_transfer_limit->limit_access;
-                elseif (($user_request && $user_request->limit_access))
+                elseif (($user_request && $user_request->limit_access >=0))
                     $limit_day = $user_request->limit_access;
 
                 if ($this->getUser()->role == "customer") {
@@ -321,7 +321,7 @@ class ActionServices extends TextServices
 
                 logger("limit_day", [$limit_day]);
                 logger("limit_day", [$buyer_id, $seller_id]);
-                if ($limit_day !== null) {
+                if ($limit_day >=0) {
                     [$daily_transfer, $num] = $this->performTransaction($seller, $buyer, $num, $limit_day);
                     $transfer->number -= $num;
                     $request_transfer["number"] = $num;
