@@ -1303,14 +1303,24 @@ class ActionServices extends TextServices
     {
         $bot_customer = Bot::where("title", "botCustomer")->first();
         if ($bot_customer) {
-            logger("bot customer", [$bot_customer]);
-            $telegram_customer = new Api($bot_customer->token);
-            $telegram_customer->sendMessage(
-                [
-                    'chat_id' => $chat_id,
-                    'text' => $message,
-                ]
-            );
+            try {
+                logger("bot customer", [$bot_customer]);
+                $telegram_customer = new Api($bot_customer->token);
+                $telegram_customer->sendMessage(
+                    [
+                        'chat_id' => $chat_id,
+                        'text' => $message,
+                    ]
+                );
+            }catch (\Exception $exception){
+                    logger("get error",[
+                        $exception->getMessage(),
+                        $exception->getLine(),
+                        $exception->getCode(),
+                        $exception->getTrace(),
+                        $exception->getFile()
+                    ]);
+                }
         }
     }
 }

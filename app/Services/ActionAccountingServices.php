@@ -86,7 +86,10 @@ class ActionAccountingServices extends TextServices
                  * message for req and head
                  */
                 $message = $this->getStr(1, $transfer, $order, $transaction_party_req);
+                logger("canscle pm",[$message]);
                 $this->sendBotWord(data_get($order, "userRequest.telegram_id"), $message);
+                logger("canscle pm 2",[$message]);
+
                 if (data_get($order, "userRequest.role") == "customer") {
                     $message = $this->getStr(1, $transfer, $order, $transaction_party_reqs);
                     $this->sendBotCustomer(data_get($order, "userRequest.customer.telegram_id"), $message);
@@ -96,6 +99,8 @@ class ActionAccountingServices extends TextServices
              * message for transfer and head
              */
                 $message = $this->getStr(2, $transfer, $order, $transaction_party);
+                logger("canscle pm 2",[$message]);
+
                 $this->sendBotWord(data_get($order, "transferReport.user.telegram_id"), $message);
                 if (data_get($order, "transferReport.user.role") == "customer") {
                     $message = $this->getStr(2, $transfer, $order, $transaction_partys);
@@ -121,14 +126,24 @@ class ActionAccountingServices extends TextServices
     {
         $bot_customer = Bot::where("title", "botCustomer")->first();
         if ($bot_customer) {
-            logger("bot customer", [$bot_customer]);
-            $telegram_customer = new Api($bot_customer->token);
-            $telegram_customer->sendMessage(
-                [
-                    'chat_id' => $chat_id,
-                    'text' => $message,
-                ]
-            );
+            try {
+                logger("bot customer", [$bot_customer]);
+                $telegram_customer = new Api($bot_customer->token);
+                $telegram_customer->sendMessage(
+                    [
+                        'chat_id' => $chat_id,
+                        'text' => $message,
+                    ]
+                );
+            }catch (\Exception $exception){
+                logger("get error",[
+                    $exception->getMessage(),
+                    $exception->getLine(),
+                    $exception->getCode(),
+                    $exception->getTrace(),
+                    $exception->getFile()
+                ]);
+            }
         }
     }
 
@@ -137,13 +152,27 @@ class ActionAccountingServices extends TextServices
         $bot_user = Bot::where("title", "botUser")->first();
         if ($bot_user) {
             logger("bot user", [$bot_user]);
-            $telegram_customer = new Api($bot_user->token);
-            $telegram_customer->sendMessage(
-                [
+            try {
+                $telegram_customer = new Api($bot_user->token);
+                $send_user = $telegram_customer->sendMessage(
+                    [
+                        'chat_id' => $chat_id,
+                        'text' => $message,
+                    ]
+                );
+                logger("send user", [$send_user, [
                     'chat_id' => $chat_id,
                     'text' => $message,
-                ]
-            );
+                ]]);
+            }catch (\Exception $exception){
+                    logger("get error",[
+                        $exception->getMessage(),
+                        $exception->getLine(),
+                        $exception->getCode(),
+                        $exception->getTrace(),
+                        $exception->getFile()
+                    ]);
+                }
         }
     }
 
