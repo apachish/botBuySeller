@@ -485,6 +485,8 @@ class TextServices
             str_contains($this->data, "trade_open_report_") ||
             str_contains($this->data, "trade_open_") ||
             str_contains($this->data, "trade_limit_close_") ||
+            str_contains($this->data, "next_worker_") ||
+            str_contains($this->data, "pre_worker_") ||
             str_contains($this->data, "rule_accept"))
             return true;
         return false;
