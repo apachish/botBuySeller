@@ -607,15 +607,13 @@ class TextServices
             $this->telegram->sendMessage(['chat_id' => $this->user_id, 'text' => 'متن نا معتبر می باشد']);
         elseif (str_contains($this->getData(), "pre_worker_")) {
             $page = str_replace('pre_worker_', '', $this->getData());
-            $data_old = cache()->get("menu_List_worker_" . $this->getUserId());
-            $message_id = data_get($data_old, "id", null);
+            $message_id = cache()->get("menu_List_worker_" . $this->getUserId());
             if ($message_id)
                 $this->listWorker($page, $message_id);
         } elseif (str_contains($this->getData(), "next_worker_")) {
             $page = (int)str_replace('next_worker_', '', $this->getData());
             logger("page worker",[$page]);
-            $data_old = cache()->get("menu_List_worker_" . $this->getUserId());
-            $message_id = data_get($data_old, "id", null);
+            $message_id = cache()->get("menu_List_worker_" . $this->getUserId());
             logger("message worker",[$message_id]);
 
             if ($message_id)
