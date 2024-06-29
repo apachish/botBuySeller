@@ -321,7 +321,7 @@ class ActionServices extends TextServices
 
                 logger("limit_day", [$limit_day]);
                 logger("limit_day", [$buyer_id, $seller_id]);
-                if ($limit_day >=0) {
+                if ($limit_day !== null) {
                     [$daily_transfer, $num] = $this->performTransaction($seller, $buyer, $num, $limit_day);
                     $transfer->number -= $num;
                     $request_transfer["number"] = $num;
