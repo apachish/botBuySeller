@@ -266,7 +266,13 @@ class ActionServices extends TextServices
                 $request_transfer = [];
 
                 if ($this->getUser()->role == "customer")
+                {
                     $head = data_get($this->getUser(), "customer");
+                    if(!$head) {
+                        $this->telegram_services->sendMessage($this->getUserId(), "شما نمی توانید لفظ  دریافت کنید");
+                        return true;
+                    }
+                }
                 else
                     $head = $this->getUser();
 
@@ -1001,6 +1007,14 @@ class ActionServices extends TextServices
             return true;
         }
 
+        if ($this->getUser()->role == "customer")
+        {
+            $head = data_get($this->getUser(), "customer");
+            if(!$head) {
+                $this->telegram_services->sendMessage($this->getUserId(), "شما نمی توانید لفظ  بدهید");
+                return true;
+            }
+        }
         if ($this->getUser()->set_word || ($this->getUser()->customer && $this->getUser()->customer->set_word)) {
             $this->telegram_services->sendMessage($this->getUserId(), "اکانت کاربری شما فقط می تواند لفظ بگیرد ");
             return true;
