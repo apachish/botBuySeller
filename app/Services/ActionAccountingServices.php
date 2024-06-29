@@ -85,25 +85,25 @@ class ActionAccountingServices extends TextServices
                 /*
                  * message for req and head
                  */
-                $message = $this->getStr(1, $transfer, $order, $transaction_party_req);
+                $message = $this->getStr(1, $transfer, $order, $transaction_party);
                 logger("canscle pm",[$message]);
                 $this->sendBotWord(data_get($order, "userRequest.telegram_id"), $message);
                 logger("canscle pm 2",[$message]);
 
                 if (data_get($order, "userRequest.role") == "customer") {
-                    $message = $this->getStr(1, $transfer, $order, $transaction_party_reqs);
+                    $message = $this->getStr(1, $transfer, $order, $transaction_partys);
                     $this->sendBotCustomer(data_get($order, "userRequest.customer.telegram_id"), $message);
                 }
 
                 /*
              * message for transfer and head
              */
-                $message = $this->getStr(2, $transfer, $order, $transaction_party);
+                $message = $this->getStr(2, $transfer, $order, $transaction_party_req);
                 logger("canscle pm 2",[$message]);
 
                 $this->sendBotWord(data_get($order, "transferReport.user.telegram_id"), $message);
                 if (data_get($order, "transferReport.user.role") == "customer") {
-                    $message = $this->getStr(2, $transfer, $order, $transaction_partys);
+                    $message = $this->getStr(2, $transfer, $order, $transaction_party_reqs);
                     $this->sendBotCustomer(data_get($order, "transferReport.user.customer.telegram_id"), $message);
                 }
 
