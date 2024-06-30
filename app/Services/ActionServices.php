@@ -664,7 +664,7 @@ class ActionServices extends TextServices
             ];
             $transfer_new = Transfer::create($order);
             $this->telegram_services->editMessageReplyMarkup($this->getUserId(), $this->getMessageId(), new \stdClass());
-            $this->telegram_services->sendMessage($this->getUserId(), "لفظ شما تایید شد\xE2\x9C\x85	");
+//            $this->telegram_services->sendMessage($this->getUserId(), "لفظ شما تایید شد\xE2\x9C\x85	");
             $message = $transfer_new->message;
             $keyboard = $this->getKeyboardRequest($transfer_new);
 
@@ -672,6 +672,14 @@ class ActionServices extends TextServices
             $message_result = $this->telegram_services->MessageReplyMarkup($this->telegram, $this->bot->chanel_id, $message, $keyboard, false);
             $transfer_new->message_id = $message_result;
             $transfer_new->update();
+            dispatch(new DeactivateTransfer($transfer_new->id))->delay(now()->addMinute(1));
+            $keyboard[0][0] = ['text' => data_get($word,"word")];
+            $keyboard[1] =[
+                ['text' => "منو"],
+                ['text' => "نشد"],
+            ];
+
+            $response = TelegramServices::menu($this->telegram, $keyboard, $this->getUser(), "لفظ شما تایید شد\xE2\x9C\x85	");
             $bot_accounting = Bot::where('title', "botAccounting")->first();
             if($bot_accounting){
                 $telegram_accounting_services = new TelegramServices($bot_accounting->token);
@@ -692,15 +700,8 @@ class ActionServices extends TextServices
                     logger("aco", [$send_accounting]);
                 }
             }
-            dispatch(new DeactivateTransfer($transfer_new->id))->delay(now()->addMinute(1));
-            $keyboard[0][0] = ['text' => $this->getWord()];
-            $keyboard[1] =[
-                ['text' => "منو"],
-                ['text' => "نشد"],
-            ];
 
 
-            $this->menu($keyboard,$this->getUser()->status,$this->getUser());
         } elseif ($check == "false") {
             $word->status = WordTelegram::STATUS_REJECT;
             $word->update();
@@ -1246,6 +1247,7 @@ class ActionServices extends TextServices
                 "number" => (int)$number,
                 "price" => $price,
                 "date" => $date,
+                "word" => $this->getWord(),
                 "message_request" => $message_request,
                 "message_request_me" => $message_request_me,
                 "description" => $this->getDescription()
