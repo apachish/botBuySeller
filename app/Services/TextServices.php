@@ -595,7 +595,8 @@ class TextServices
                 break;
             case "منو":
                 $keyboard_menu = $this->setMenu();
-                $this->menu($keyboard_menu, $this->getUser()->status);
+                $response = TelegramServices::menu($this->telegram, $keyboard_menu, $this->getUser(), null);
+
                 break;
             case "\xF0\x9F\x91\xA5معرفی مشتری":
             case "\xF0\x9F\x93\x88معاملات باز":
