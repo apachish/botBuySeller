@@ -700,7 +700,7 @@ class ActionServices extends TextServices
             ];
 
 
-            $this->menu();
+            $this->menu($keyboard,$this->getUser()->status,$this->getUser());
         } elseif ($check == "false") {
             $word->status = WordTelegram::STATUS_REJECT;
             $word->update();
