@@ -67,6 +67,7 @@ class TextServices
 
     private $key_cache;
     private $contact;
+    private $word;
 
     public function __construct($token)
     {
@@ -245,6 +246,22 @@ class TextServices
         $this->description = $description;
         logger("description" . $this->description);
 
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getWord()
+    {
+        return $this->word;
+    }
+
+    /**
+     * @param mixed $word
+     */
+    public function setWord($word): void
+    {
+        $this->word = $word;
     }
 
     /**
@@ -461,6 +478,7 @@ class TextServices
             $this->setType($matches[2]);
             $optionalNumber = isset($matches[3]) && $matches[3] ? $matches[3] : '1'; // اگر گروه سوم خالی بود، مقدار ۱ قرار داده شود
             $this->setNumberOrder($optionalNumber);
+            $this->setWord($matches[1].$matches[2].$optionalNumber);
             $description = isset($matches[4]) ? substr($matches[4], 1) : ''; // حذف ":" از ابتدای توضیحات
             $this->setDescription($description);
             $this->setPattern();
@@ -572,6 +590,10 @@ class TextServices
             case 'کنسل':
                 if ($this->rejectAll())
                     $this->telegram->sendMessage(['chat_id' => $this->user_id, 'text' => 'لفظ های شما کنسل شد']);
+                break;
+            case "منو":
+                $keyboard_menu = $this->setMenu();
+                $this->menu($keyboard_menu, $this->getUser()->status);
                 break;
             case "\xF0\x9F\x91\xA5معرفی مشتری":
             case "\xF0\x9F\x93\x88معاملات باز":

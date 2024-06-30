@@ -693,6 +693,14 @@ class ActionServices extends TextServices
                 }
             }
             dispatch(new DeactivateTransfer($transfer_new->id))->delay(now()->addMinute(1));
+            $keyboard[0][0] = ['text' => $this->getWord()];
+            $keyboard[1] =[
+                ['text' => "منو"],
+                ['text' => "نشد"],
+            ];
+
+
+            $this->menu();
         } elseif ($check == "false") {
             $word->status = WordTelegram::STATUS_REJECT;
             $word->update();
