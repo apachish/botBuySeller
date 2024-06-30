@@ -285,6 +285,7 @@ class CustomerServices
 //                $response_text = "$fullName اکانت کاربریتان فعال شد\n\n ";
 //                $object->service_user->telegram_services->sendMessage($user_con->id, $response_text);
             $object->service_user->message_menu = "$fullName اکانت کاربریتان فعال شد\n\n ";
+            $user_con->role == "customer"?$this->keyword_customer:$this->keyword_colleague;
             $object->service_user->menu($this->keyword_customer, $user_con->status, $user_con);
             $message_id = cache()->get("menu_List_user_" . $object->getUserId());
             $this->listUser($role,$object,$page, $message_id, $filter);
