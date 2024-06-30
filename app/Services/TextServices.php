@@ -261,6 +261,7 @@ class TextServices
      */
     public function setWord($word): void
     {
+        logger("set word ",[$word]);
         $this->word = $word;
     }
 
