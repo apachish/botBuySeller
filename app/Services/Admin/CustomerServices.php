@@ -721,7 +721,7 @@ class CustomerServices
 
     public function getMessageGroup($object)
     {
-        $message ="پیامی که می خواهید برای کاربان سیستم ارسال کنید وارد کنید";
+        $message ="پیامی که می خواهید برای کاربران سیستم ارسال کنید وارد کنید";
             $object->getTelegramServices()->sendMessage($object->getUserId(), $message);
             cache()->set($object->getKeyCache() . $object->getUserId(), "send_message_group");
 
@@ -737,6 +737,44 @@ class CustomerServices
         cache()->forget($object->getKeyCache() . $object->getUserId());
 
     }
+
+
+    public function getMessageUser($object)
+    {
+        $data = str_replace('get_message_user_', '', $object->getData());
+
+        $array = explode("_", $data);
+        $id = (int)data_get($array, 1);
+        $user_con = UserTelegram::find($id);
+        if($user_con) {
+            $message = "پیامی که می خواهید برای کاربر";
+            $message .=  "\n\n";
+            $message .=  $user_con->fullName;
+            $message .=  "ارسال کنید وارد کنید";
+            $object->getTelegramServices()->sendMessage($object->getUserId(), $message);
+            cache()->set($object->getKeyCache() . $object->getUserId(), "send_message_user_".$user_con->id);
+        }
+
+    }
+
+    public function setMessageUser($object)
+    {
+        $id = str_replace('send_message_user_', '', $object->getMessageCache());
+
+        $user = UserTelegram::find($id);
+        if($user) {
+            $object->service_user->telegram_services->sendMessage($user->telegram_id, $object->getMessage());
+            cache()->forget($object->getKeyCache() . $object->getUserId());
+            $message ="  پیام به کاربر  $user->fullName  ارسال شد  ";
+            $object->getTelegramServices()->sendMessage($object->getUserId(), $message);
+
+        }else{
+            $object->getTelegramServices()->sendMessage($object->getUserId(), "پیام ارسال نشد");
+
+        }
+
+    }
+
 
     /**
      * @return void
@@ -790,6 +828,7 @@ class CustomerServices
                 ['text' => "\xE2\x9C\x8F\xF0\x9F\x91\xA8", 'callback_data' => 'edit_name_' . $key_i],
                 ['text' => "\xE2\x86\x94", 'callback_data' => 'sync_mobile_' . $key_i],
                 ['text' => "\xF0\x9F\x93\x9D", 'callback_data' => 'get_membership_' . $key_i],
+                ['text' => "\xF0\x9F\x92\xAC", 'callback_data' => 'get_message_user_' . $key_i],
             ];
 
             if($user->role == "customer")

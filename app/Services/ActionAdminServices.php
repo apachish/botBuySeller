@@ -146,6 +146,8 @@ class ActionAdminServices extends TextServices
             $this->transaction->setForbiddenDay($this);
         elseif (str_contains($this->getData(), "forbidden_"))
             $this->transaction->setForbidden($this);
+        elseif (str_contains($this->getData(), "get_message_user_"))
+            $this->custromer->getMessageUser($this);
         elseif (str_contains($this->getData(), "set_worker_"))
             $this->custromer->setRole($this);
         elseif (str_contains($this->getData(), "set_head_done_"))
@@ -264,7 +266,7 @@ class ActionAdminServices extends TextServices
             case  "\xE2\x81\x89ویرایش راهنما":
                 $this->setting->getHelp($this);
                 break;
-                case "\xE2\x98\xBAلیست کلمات زشت":
+            case "\xE2\x98\xBAلیست کلمات زشت":
                 $this->setting->getsUglyWord($this);
                 break;
             case  "\xE2\x9E\x95افزودن کلمه زشت":
@@ -343,14 +345,19 @@ class ActionAdminServices extends TextServices
             $key_case = "set_membership_";
         elseif (str_contains($this->getMessageCache(), "say_mobile_new_"))
             $key_case = "say_mobile_new_";
+        elseif (str_contains($this->getMessageCache(), "send_message_user_"))
+            $key_case = "send_message_user_";
 
         logger($key_case);
         switch ($key_case) {
 
+            case "send_message_user_":
+                $this->custromer->setMessageUser($this);
+                break;
             case "send_message_group":
                 $this->custromer->setMessageGroup($this);
                 break;
-                case "set_ugly_word":
+            case "set_ugly_word":
                 $this->setting->setUglyWord($this);
                 break;
             case "say_mobile_new_":
