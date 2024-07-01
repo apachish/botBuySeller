@@ -835,7 +835,8 @@ class CustomerServices
             if($user->role == "customer")
                 $array[] =  ['text' => "\xF0\x9F\x91\xA4", 'callback_data' => 'head_customer_' . $key_i];
 
-
+            $keyboard[$i++] = $array;
+            $array = [];
             if($user->set_word)
                 $array[] = ['text' => "\xE2\x9B\x94", 'callback_data' => 'set_word_only_' . $key_i];
             else
@@ -847,9 +848,8 @@ class CustomerServices
                 $array[] = ['text' => "\xF0\x9F\x9A\xAF", 'callback_data' => 'delete_' . $key_i];
                 if ($user->status) {
                     $array[] = ['text' => "\xE2\x9D\x8C", 'callback_data' => 'reject_' . $key_i];
-                    logger("ssa",[$user,data_get($object,"bot.chanel_id"),$user->telegram_id,$object->getTelegramServices()->checkMember(data_get($object,"bot.chanel_id"),$user->telegram_id)]);
                     if(!$object->getTelegramServices()->checkMember(data_get($object,"bot.chanel_id"),$user->telegram_id))
-                        $array[] = ['text' => "\xE2\x9E\x95	\xF0\x9F\x8C\xB3", 'callback_data' => 'add_chanel_' . $key_i];
+                        $array[] = ['text' => "\xE2\x9E\x95", 'callback_data' => 'add_chanel_' . $key_i];
                 } else
                     $array[] = ['text' => "\xE2\x9C\x85 ", 'callback_data' => 'confirm_' . $key_i];
 
