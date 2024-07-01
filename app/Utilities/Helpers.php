@@ -187,9 +187,9 @@ if (!function_exists('getTypeTransfer')) {
             return "نقدی حاضر";
         elseif (in_array($type, ["خفن", "ففن"]))
             return "نقدی";
-        elseif (in_array($type, [ "فم", "خم"]))
+        elseif (in_array($type, [ "فم", "خم","فپ", "خپ"]))
             return "معکوس روز";
-        elseif (in_array($type, ["ففم", "خفم"]))
+        elseif (in_array($type, ["ففم", "خفم","ففپ", "خفپ"]))
             return "معکوس";
 
     }

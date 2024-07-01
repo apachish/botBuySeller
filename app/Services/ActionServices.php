@@ -231,9 +231,7 @@ class ActionServices extends TextServices
         $info = explode("_", $array);
         $id = data_get($info, 0);
         $num = (int)data_get($info, 1);
-        logger("request", [$num, $id]);
-        logger("verify_two", [$this->getUser()->verify_two]);
-        logger("double", ["double_click_" . $id . "_" . $this->getUserId(), cache()->get("double_click_" . $id . "_" . $this->getUserId())]);
+
         if ($this->getUser()->verify_two && !cache()->get("double_click_" . $id . "_" . $this->getUserId())) {
             logger("injto mondam");
             cache()->set("double_click_" . $id . "_" . $this->getUserId(), 1, now()->addSecond(5));
@@ -249,16 +247,12 @@ class ActionServices extends TextServices
             $this->telegram_services->sendMessage($this->getUserId(), "شما نمی توانید لفظ خود را دریافت کنید");
             return true;
         }
-        logger("Transfer", [$transfer]);
+
         $transfer_type = getTypeOrder($transfer->type);
         if ($transfer) {
             $forbidden = Setting::where("key", "forbidden")->where("value", true)->first();
-
-            logger("forbidden", [$forbidden]);
             try {
-
                 $limit_day = null;
-                $use_day = null;
                 $transaction_party = null;
                 $transaction_party_s = null;
                 $transaction_party_req = null;
@@ -281,8 +275,6 @@ class ActionServices extends TextServices
                 else
                     $colleague = data_get($transfer, "user");
 
-                logger("head", [$head]);
-                logger("colleague", [$colleague]);
 
                 $access_limit_head = data_get($head, 'userTradeAccess');
                 $access_limit_transaction = data_get($colleague, "userTradeAccess");
@@ -291,8 +283,6 @@ class ActionServices extends TextServices
                     $user_request = $access_limit_head->where("user_trade_id", $colleague->id)->first();
                 if ($access_limit_transaction)
                     $user_transfer_limit = $access_limit_transaction->where("user_trade_id", $head->id)->first();
-
-                logger("limiit", [$user_request, $user_transfer_limit]);
 
                 if (($user_request && $user_request->limit_access >=0) && ($user_transfer_limit && $user_transfer_limit->limit_access >=0))
                     $limit_day = min($user_request->limit_access, $user_transfer_limit->limit_access);
@@ -319,30 +309,22 @@ class ActionServices extends TextServices
                         }
                     }
                 }
-                logger("type_t" . $transfer_type, [$transfer->user_id, $this->getUser()->id]);
                 $buyer = $transfer_type == "buy" ? $transfer->user : $this->getUser();
                 $seller = $transfer_type == "sell" ? $transfer->user : $this->getUser();
                 $buyer_id = $transfer_type == "buy" ? $transfer->user_id : $this->getUser()->id;
                 $seller_id = $transfer_type == "sell" ? $transfer->user_id : $this->getUser()->id;
 
-                logger("limit_day", [$limit_day]);
-                logger("limit_day", [$buyer_id, $seller_id]);
                 if ($limit_day !== null) {
                     [$daily_transfer, $num] = $this->performTransaction($seller, $buyer, $num, $limit_day);
                     $transfer->number -= $num;
                     $request_transfer["number"] = $num;
                     $use_day = $num;
-                    logger("use_day", [$use_day]);
-
                     $request_transfer["status"] = $transfer->number == 0 ? "complete" : "half";
                 } else {
-                    logger("check", [$transfer->number, $num, $transfer->number >= $num]);
                     if ($transfer->number >= $num) {
                         $transfer->number -= $num;
                         $request_transfer["number"] = $num;
-
                         $request_transfer["status"] = $num == $transfer->number ? "complete" : "half";
-                        logger("request", [$request_transfer]);
                         $use_day = $num;
                         if (data_get($request_transfer, "number")) {
                             $daily_transfer = DailyRequestTransfer::updateOrCreate([
@@ -357,9 +339,6 @@ class ActionServices extends TextServices
 
 
                 if (data_get($request_transfer, "number")) {
-                    logger("number" . data_get($request_transfer, "number"));
-
-
                     $keyboard = self::getKeyboardRequest($transfer);
 
                     $trade_message = $transfer->message;
@@ -372,7 +351,6 @@ class ActionServices extends TextServices
                     $this->telegram_services->editMessageTextAndInlineKeyboard($this->bot->chanel_id, $transfer->message_id, $trade_message, $keyboard);
                     $transfer->update();
 
-//                    $request_transfer["remittance_number"] = generateUniqueSixDigitCode();
                     $request_transfer["request_id"] = $this->getUser()->id;
                     $request_transfer["transfer_id"] = $transfer->id;
                     $request_transfer["price"] = $transfer->price;

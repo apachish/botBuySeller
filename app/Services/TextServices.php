@@ -21,10 +21,10 @@ class TextServices
     protected $list_type_sell_tommarow = ["فف", "ففش", "ففن", "ففم"];
     protected $list_type_buy_tommarow = ["خف", "خفش", "خفن", "خفم"];
     protected $list_type_today = ["خش", "خم", "فش","خن", "فن", "فم","خ", "ف"];
-    protected $list_type_today_r_f = ["خش", "خم", "فش", "فم"];
+    protected $list_type_today_r_f = ["خش", "خم", "فش", "فم","خپ","فپ"];
     protected $list_type_today_normal = ["خ", "ف"];
     protected $list_type_today_cache = ["خن", "فن"];
-    protected $list_type_tommarow = ["خف", "خفش", "خفن", "خفم", "فف", "ففش", "ففن", "ففم"];
+    protected $list_type_tommarow = ["خف", "خفش", "خفن", "خفم", "فف", "ففش", "ففن", "ففم","خفپ", "ففپ"];
     protected $list_type_normal = ["فف", "خف", "خ", "ف"];
     protected $list_type_floating = ["خفش", "ففش", "خش", "فش"];
     protected $list_type_cash = ["خفن", "ففن", "خن", "فن"];
