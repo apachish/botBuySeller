@@ -847,6 +847,7 @@ class CustomerServices
                 $array[] = ['text' => "\xF0\x9F\x9A\xAF", 'callback_data' => 'delete_' . $key_i];
                 if ($user->status) {
                     $array[] = ['text' => "\xE2\x9D\x8C", 'callback_data' => 'reject_' . $key_i];
+                    logger("ssa",[$user,data_get($object,"bot.chanel_id"),$user->telegram_id,$object->getTelegramServices()->checkMember(data_get($object,"bot.chanel_id"),$user->telegram_id)]);
                     if(!$object->getTelegramServices()->checkMember(data_get($object,"bot.chanel_id"),$user->telegram_id))
                         $array[] = ['text' => "\xE2\x9E\x95	\xF0\x9F\x8C\xB3", 'callback_data' => 'add_chanel_' . $key_i];
                 } else
