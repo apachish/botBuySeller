@@ -673,7 +673,9 @@ class ActionServices extends TextServices
             $transfer_new->message_id = $message_result;
             $transfer_new->update();
             dispatch(new DeactivateTransfer($transfer_new->id))->delay(now()->addMinute(1));
-            $keyboard[0][0] = ['text' => data_get($word,"word")];
+            $keyboard = [];
+            $copy = data_get($word,"word").":".data_get($word,"description");
+            $keyboard[0][0] = ['text' => $copy];
             $keyboard[1] =[
                 ['text' => "منو"],
                 ['text' => "نشد"],
