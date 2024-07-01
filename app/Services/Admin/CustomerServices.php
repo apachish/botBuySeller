@@ -849,7 +849,7 @@ class CustomerServices
                 if ($user->status) {
                     $array[] = ['text' => "\xE2\x9D\x8C", 'callback_data' => 'reject_' . $key_i];
                     if(!$object->getTelegramServices()->checkMember(data_get($object,"bot.chanel_id"),$user->telegram_id))
-                        $array[] = ['text' => "\xE2\x9E\x95", 'callback_data' => 'add_chanel_' . $key_i];
+                        $array[] = ['text' => "\xE2\x9E\x95🍇", 'callback_data' => 'add_chanel_' . $key_i];
                 } else
                     $array[] = ['text' => "\xE2\x9C\x85 ", 'callback_data' => 'confirm_' . $key_i];
 
