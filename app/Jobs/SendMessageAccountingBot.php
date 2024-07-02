@@ -2,22 +2,26 @@
 
 namespace App\Jobs;
 
+use App\Models\Bot;
+use App\Models\RequestTransfer;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Telegram\Bot\Api;
 
 class SendMessageAccountingBot implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
+    private $order_id;
     /**
      * Create a new job instance.
      */
-    public function __construct()
+    public function __construct($order_id)
     {
-        //
+        $this->order_id = $order_id;
     }
 
     /**
@@ -25,6 +29,70 @@ class SendMessageAccountingBot implements ShouldQueue
      */
     public function handle(): void
     {
-        //
+        $bot_accounting = Bot::where("title", "botAccounting")->first();
+        if ($bot_accounting) {
+            try {
+                logger("bot accounting", [$bot_accounting]);
+                $telegram_accounting = new Api($bot_accounting->token);
+                $order_buy = RequestTransfer::with(["userRequest.customer", "transferReport"])->find($this->order_id);
+                $message = $this->getfactor($order_buy);
+                $admins = $bot_accounting->accessBot;
+                foreach ($admins as $admin) {
+                    logger("send", [$admin]);
+                    $send_accounting = $telegram_accounting->sendMessage(
+                        [
+                            'chat_id' => $admin->user_id,
+                            'text' => $message,
+                        ]);
+
+                    logger("aco", [$send_accounting]);
+                }
+            } catch (\Exception $exception) {
+                logger("get error", [
+                    $exception->getMessage(),
+                    $exception->getLine(),
+                    $exception->getCode(),
+                    $exception->getTrace(),
+                    $exception->getFile()
+                ]);
+            }
+        }
+    }
+
+    private function getfactor(\Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection|\Illuminate\Database\Eloquent\Builder|array $order_buy): string
+    {
+        $message = "شماره حواله:" . data_get($order_buy, 'id');
+        $message .= "\n\n";
+        $message .= "فی:";
+        $message .= number_format(data_get($order_buy, 'price'), 0);
+        $message .= "\n\n";
+        $type = data_get($order_buy, "type");
+        if ($type == "sell") {
+            $title_request = "فروشنده";
+            $title_mal = "خریدار";
+        } else {
+            $title_request = "خریدار";
+            $title_mal = "فروشنده";
+
+        }
+        $transfer = $order_buy->transferReport;
+        if (data_get($order_buy, "userRequest.role") == "customer")
+            $message .= "  $title_request: " . data_get($order_buy, "userRequest.fullName") . "(" . data_get($order_buy, "userRequest.customer.fullName") . ")";
+        else
+            $message .= "  $title_request: " . data_get($order_buy, "userRequest.fullName");
+        $message .= "\n\n";
+        if (data_get($order_buy, "transferReport.user.role") == "customer")
+            $message .= "  $title_mal: " . data_get($order_buy, "transferReport.user.fullName") . "(" . data_get($order_buy, "transferReport.user.customer.fullName") . ")";
+        else
+            $message .= "  $title_mal: " . data_get($order_buy, "transferReport.user.fullName");
+        $message .= "\n\n";
+        $message .= "برای:" . toJalali($transfer->date, "Y/m/d");
+        $message .= "\n\n";
+        $message .= "ساعت:" . toJalali($order_buy->created_at, "H:i:s");
+        $message .= "\n\n";
+        $message .= "مقدار:" . data_get($order_buy, "number") . "کیلو";
+        $message .= "\n\n";
+        $message .= "نوع:" . getTypeTransfer($transfer->type);
+        return $message;
     }
 }
