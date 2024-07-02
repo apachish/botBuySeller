@@ -1,0 +1,24 @@
+<?php
+
+namespace App\Models;
+
+
+use MongoDB\Laravel\Eloquent\Model;
+
+class Message extends Model
+{
+    protected $connection = "mongodb";
+    protected $collection = 'messages_collection';
+
+    protected $fillable = [
+      "telegram_id",
+      "bot_id",
+      "status",
+      "text",
+      "message_id",
+    ];
+    const STATUS_PENDING = "pending";
+    const STATUS_RECEIVE = "receive";
+    const STATUS_FAILED = "failed";
+
+}
