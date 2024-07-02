@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Models\Bot;
+use App\Models\Message;
 use App\Models\RequestTransfer;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -16,6 +17,7 @@ class SendMessageAccountingBot implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     private $order_id;
+    private $send;
     /**
      * Create a new job instance.
      */
@@ -39,12 +41,20 @@ class SendMessageAccountingBot implements ShouldQueue
                 $admins = $bot_accounting->accessBot;
                 foreach ($admins as $admin) {
                     logger("send", [$admin]);
+                    $this->send = Message::create([
+                        "telegram_id"=>$admin->user_id,
+                        "bot_id"=>$bot_accounting->id,
+                        "status"=>Message::STATUS_PENDING,
+                        "text"=>$message
+                    ]);
                     $send_accounting = $telegram_accounting->sendMessage(
                         [
                             'chat_id' => $admin->user_id,
                             'text' => $message,
                         ]);
-
+                    $this->send->message_id = data_get($send_accounting,"message_id");
+                    $this->send->status = Message::STATUS_RECEIVE;
+                    $this->send->update();
                     logger("aco", [$send_accounting]);
                 }
             } catch (\Exception $exception) {
@@ -55,6 +65,8 @@ class SendMessageAccountingBot implements ShouldQueue
                     $exception->getTrace(),
                     $exception->getFile()
                 ]);
+                $this->send->status = Message::STATUS_FAILED;
+                $this->send->update();
             }
         }
     }

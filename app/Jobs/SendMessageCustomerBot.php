@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Models\Bot;
+use App\Models\Message;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -23,6 +24,7 @@ class SendMessageCustomerBot implements ShouldQueue
     private $factor;
     private $user_id;
     private $customer;
+    private $send;
     /**
      * Create a new job instance.
      */
@@ -70,12 +72,23 @@ class SendMessageCustomerBot implements ShouldQueue
                 $message .= "\n\n";
                 $message .= "       شماره حواله:" . $this->factor ;
 
-                $telegram_customer->sendMessage(
+                $this->send = Message::create([
+                    "telegram_id"=>$this->user_id,
+                    "bot_id"=>$bot_customer->id,
+                    "status"=>Message::STATUS_PENDING,
+                    "text"=>$message
+                ]);
+
+                $message_telegram = $telegram_customer->sendMessage(
                     [
                         'chat_id' => $this->user_id,
                         'text' => $message,
                     ]);
+                $this->send->message_id = data_get($message_telegram,"message_id");
+                $this->send->status = Message::STATUS_RECEIVE;
+                $this->send->update();
             } catch (\Exception $exception) {
+
                 logger("get error", [
                     $exception->getMessage(),
                     $exception->getLine(),
@@ -83,6 +96,8 @@ class SendMessageCustomerBot implements ShouldQueue
                     $exception->getTrace(),
                     $exception->getFile()
                 ]);
+                $this->send->status = Message::STATUS_FAILED;
+                $this->send->update();
             }
         }
     }
