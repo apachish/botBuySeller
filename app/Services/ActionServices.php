@@ -1043,7 +1043,7 @@ class ActionServices extends TextServices
                 }
             }
         }
-        if ($this->getDescription() && !in_array($this->getType(), $this->list_type_cash)) {
+        if ($this->getDescription() && !in_array($this->getType(), $this->list_type_reverse_floating_cache)) {
             $this->telegram_services->sendMessage($this->getUserId(), "توضیحات برای معاملات نقدی می باشد");
             return true;
         }
