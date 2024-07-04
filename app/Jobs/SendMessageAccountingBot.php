@@ -45,7 +45,8 @@ class SendMessageAccountingBot implements ShouldQueue
                         "telegram_id"=>$admin->user_id,
                         "bot_id"=>$bot_accounting->id,
                         "status"=>Message::STATUS_PENDING,
-                        "text"=>$message
+                        "text"=>$message,
+                        "request_id"=>$this->order_id
                     ]);
                     $send_accounting = $telegram_accounting->sendMessage(
                         [

@@ -76,7 +76,9 @@ class SendMessageCustomerBot implements ShouldQueue
                     "telegram_id"=>$this->user_id,
                     "bot_id"=>$bot_customer->id,
                     "status"=>Message::STATUS_PENDING,
-                    "text"=>$message
+                    "text"=>$message,
+                    "request_id"=>$this->factor
+
                 ]);
 
                 $message_telegram = $telegram_customer->sendMessage(

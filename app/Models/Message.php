@@ -16,6 +16,7 @@ class Message extends Model
       "status",
       "text",
       "message_id",
+      "request_id",
     ];
     const STATUS_PENDING = "pending";
     const STATUS_RECEIVE = "receive";
