@@ -38,6 +38,6 @@ class Bot extends Model
 
     public function accessBot()
     {
-        return $this->hasMany(AccessBot::class,"bot_id","id");
+        return $this->hasMany(AccessBot::class,"id","bot_id");
     }
 }
