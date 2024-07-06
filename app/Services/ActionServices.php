@@ -4,6 +4,8 @@ namespace App\Services;
 
 
 use App\Jobs\DeactivateTransfer;
+use App\Jobs\PartiesToTheTransaction;
+use App\Jobs\SendMessageAccountingBot;
 use App\Models\AccessBot;
 use App\Models\Bot;
 use App\Models\CustomerUser;
@@ -137,7 +139,7 @@ class ActionServices extends TextServices
             $text = " کاربر  ";
             $text .= $this->getUser()->fullName;
             $text .= " می خواهد وارد سیستم شود ";
-            $admins = AccessBot::all();
+            $admins = AccessBot::where("type","admin")->get();
             foreach ($admins as $admin) {
                 $message_admin = $this->getBotAdmin()->sendMessage(
                     [
@@ -231,9 +233,7 @@ class ActionServices extends TextServices
         $info = explode("_", $array);
         $id = data_get($info, 0);
         $num = (int)data_get($info, 1);
-        logger("request", [$num, $id]);
-        logger("verify_two", [$this->getUser()->verify_two]);
-        logger("double", ["double_click_" . $id . "_" . $this->getUserId(), cache()->get("double_click_" . $id . "_" . $this->getUserId())]);
+
         if ($this->getUser()->verify_two && !cache()->get("double_click_" . $id . "_" . $this->getUserId())) {
             logger("injto mondam");
             cache()->set("double_click_" . $id . "_" . $this->getUserId(), 1, now()->addSecond(5));
@@ -249,16 +249,12 @@ class ActionServices extends TextServices
             $this->telegram_services->sendMessage($this->getUserId(), "شما نمی توانید لفظ خود را دریافت کنید");
             return true;
         }
-        logger("Transfer", [$transfer]);
+
         $transfer_type = getTypeOrder($transfer->type);
         if ($transfer) {
             $forbidden = Setting::where("key", "forbidden")->where("value", true)->first();
-
-            logger("forbidden", [$forbidden]);
             try {
-
                 $limit_day = null;
-                $use_day = null;
                 $transaction_party = null;
                 $transaction_party_s = null;
                 $transaction_party_req = null;
@@ -281,8 +277,6 @@ class ActionServices extends TextServices
                 else
                     $colleague = data_get($transfer, "user");
 
-                logger("head", [$head]);
-                logger("colleague", [$colleague]);
 
                 $access_limit_head = data_get($head, 'userTradeAccess');
                 $access_limit_transaction = data_get($colleague, "userTradeAccess");
@@ -291,8 +285,6 @@ class ActionServices extends TextServices
                     $user_request = $access_limit_head->where("user_trade_id", $colleague->id)->first();
                 if ($access_limit_transaction)
                     $user_transfer_limit = $access_limit_transaction->where("user_trade_id", $head->id)->first();
-
-                logger("limiit", [$user_request, $user_transfer_limit]);
 
                 if (($user_request && $user_request->limit_access >=0) && ($user_transfer_limit && $user_transfer_limit->limit_access >=0))
                     $limit_day = min($user_request->limit_access, $user_transfer_limit->limit_access);
@@ -319,30 +311,22 @@ class ActionServices extends TextServices
                         }
                     }
                 }
-                logger("type_t" . $transfer_type, [$transfer->user_id, $this->getUser()->id]);
                 $buyer = $transfer_type == "buy" ? $transfer->user : $this->getUser();
                 $seller = $transfer_type == "sell" ? $transfer->user : $this->getUser();
                 $buyer_id = $transfer_type == "buy" ? $transfer->user_id : $this->getUser()->id;
                 $seller_id = $transfer_type == "sell" ? $transfer->user_id : $this->getUser()->id;
 
-                logger("limit_day", [$limit_day]);
-                logger("limit_day", [$buyer_id, $seller_id]);
                 if ($limit_day !== null) {
                     [$daily_transfer, $num] = $this->performTransaction($seller, $buyer, $num, $limit_day);
                     $transfer->number -= $num;
                     $request_transfer["number"] = $num;
                     $use_day = $num;
-                    logger("use_day", [$use_day]);
-
                     $request_transfer["status"] = $transfer->number == 0 ? "complete" : "half";
                 } else {
-                    logger("check", [$transfer->number, $num, $transfer->number >= $num]);
                     if ($transfer->number >= $num) {
                         $transfer->number -= $num;
                         $request_transfer["number"] = $num;
-
-                        $request_transfer["status"] = $num == $transfer->number ? "complete" : "half";
-                        logger("request", [$request_transfer]);
+                        $request_transfer["status"] =  $transfer->number == 0 ? "complete" : "half";
                         $use_day = $num;
                         if (data_get($request_transfer, "number")) {
                             $daily_transfer = DailyRequestTransfer::updateOrCreate([
@@ -357,9 +341,6 @@ class ActionServices extends TextServices
 
 
                 if (data_get($request_transfer, "number")) {
-                    logger("number" . data_get($request_transfer, "number"));
-
-
                     $keyboard = self::getKeyboardRequest($transfer);
 
                     $trade_message = $transfer->message;
@@ -372,7 +353,6 @@ class ActionServices extends TextServices
                     $this->telegram_services->editMessageTextAndInlineKeyboard($this->bot->chanel_id, $transfer->message_id, $trade_message, $keyboard);
                     $transfer->update();
 
-//                    $request_transfer["remittance_number"] = generateUniqueSixDigitCode();
                     $request_transfer["request_id"] = $this->getUser()->id;
                     $request_transfer["transfer_id"] = $transfer->id;
                     $request_transfer["price"] = $transfer->price;
@@ -382,127 +362,11 @@ class ActionServices extends TextServices
                     $daily_transfer->request_id = $order_buy->id;
                     $daily_transfer->update();
 
-                    if ($transfer->user->role == "customer" && $this->getUser()->role == "customer") {
-                        $transaction_party_req = "مشاهده فقط برای سرگروه";
-                        if (data_get($transfer, 'user.customer')) {
-                            $transaction_party_req_s = data_get($transfer, 'user.fullName');
-                            $transaction_party_req_s .= "(" . data_get($colleague, 'fullName') . ")";
-                        } else
-                            $transaction_party_req_s = data_get($transfer, 'user.fullName');
 
-                        $transaction_party = "مشاهده فقط برای سرگروه";
-                        if (data_get($this->getUser(), 'customer')) {
-                            $transaction_party_s = data_get($this->getUser(), 'fullName');
-                            $transaction_party_s .= "(" . data_get($head, 'fullName') . ")";
-                        } else
-                            $transaction_party_s = data_get($transfer, 'user.fullName');
-
-                    } elseif ($transfer->user->role == "colleague" && $this->getUser()->role == "customer") {
-                        $transaction_party_req = "مشاهده فقط برای سرگروه";
-                        if (data_get($transfer, 'user'))
-                            $transaction_party_req_s = data_get($transfer, 'user.fullName');
-                        if (data_get($this->getUser(), 'customer')) {
-                            $transaction_party = data_get($this->getUser(), 'fullName');
-                            $transaction_party .= "(" . data_get($head, 'fullName') . ")";
-                        } else
-                            $transaction_party = data_get($this->getUser(), 'fullName');
-                    } elseif ($transfer->user->role == "customer" && $this->getUser()->role == "colleague") {
-                        if (data_get($transfer, 'user.customer')) {
-                            $transaction_party_req = data_get($transfer, 'user.fullName');
-                            $transaction_party_req .= "(" . data_get($colleague, 'fullName') . ")";
-                        } else
-                            $transaction_party_req = data_get($transfer, 'user.fullName');
-
-                        $transaction_party = "مشاهده فقط برای سرگروه";
-                        $transaction_party_s = data_get($this->getUser(), 'fullName');
-                    } elseif ($transfer->user->role == "colleague" && $this->getUser()->role == "colleague") {
-                        $transaction_party_req = data_get($transfer, 'user.fullName');
-                        $transaction_party = $this->getUser()->fullName;
-                    }
-
-                    /*
-                     * send for request
-                     */
-                    $message = $transfer->message_request_me;
-                    $message .= "\n\n";
-                    $message .= "مقدار:" . data_get($request_transfer, "number") . "کیلو";
-                    $message .= "\n\n";
-                    $message .= "نوع:" . getTypeTransfer($transfer->type);
-                    if ($transfer->description) {
-                        $message .= "\n\n";
-                        $message .= "توضیحات";
-                        $message .= "\xE2\x9D\x97 : \n\n" . $transfer->description;
-                    }
-                    $message .= "\n\n";
-                    $message .= "طرف معامله:" . $transaction_party_req;
-                    $message .= "\n\n";
-                    $message .= "برای:" . toJalali($transfer->date, "Y/m/d");
-                    $message .= "\n\n";
-                    $message .= "       شماره حواله:" . data_get($order_buy, 'id');
-                    logger("message1", [$message]);
-                    $this->telegram_services->sendMessage($this->getUserId(), $message);
-                    if ($this->getUser()->role == "customer" && data_get($this->getUser(), 'customer')) {
-                        $message_head = "نام مشتری:";
-                        $message_head .= data_get($this->getUser(), 'fullName');
-                        $message_head .= "\n\n";
-                        $message = str_replace($transaction_party_req, $transaction_party_req_s, $message);
-                        $message_head .= $message;
-                        logger("message2", [
-                            'chat_id' => data_get($this->getUser(), 'customer.telegram_id'),
-                            'text' => $message_head,
-                        ]);
-                        $this->sendBotCustomer(data_get($this->getUser(), 'customer.telegram_id'), $message_head);
-
-                    }
-
-                    /*
-                    * send for  owner
-                    */
-                    $message = $transfer->message_request;
-                    $message .= "\n\n";
-                    $message .= "مقدار:" . data_get($request_transfer, "number") . "کیلو";
-                    $message .= "\n\n";
-                    $message .= "نوع:" . getTypeTransfer($transfer->type);
-                    if ($transfer->description) {
-                        $message .= "\n\n";
-                        $message .= "توضیحات";
-                        $message .= "\xE2\x9D\x97 : \n\n" . $transfer->description;
-                    }
-                    $message .= "\n\n";
-                    $message .= "طرف معامله:" . $transaction_party;
-                    $message .= "\n\n";
-                    $message .= "برای:" . toJalali($transfer->date, "Y/m/d");
-                    $message .= "\n\n";
-                    $message .= "       شماره حواله:" . data_get($order_buy, 'id');
-
-                    logger("message3", [$message]);
-                    $this->telegram_services->sendMessage($transfer->user->telegram_id, $message);
-                    if ($transfer->user->role == "customer" && data_get($transfer, 'user.customer')) {
-                        $message_head = "نام مشتری:";
-                        $message_head .= data_get($transfer, 'user.fullName');
-                        $message_head .= "\n\n";
-                        $message = str_replace($transaction_party, $transaction_party_s, $message);
-                        $message_head .= $message;
-                        logger("message4", [data_get($transfer, 'user.customer.telegram_id'), $message_head]);
-                        $this->sendBotCustomer(data_get($transfer, 'user.customer.telegram_id'), $message_head);
-
-                    }
-                    $bot_accounting = Bot::where('title', "botAccounting")
-                        ->first();
-                    logger("accounting", [$bot_accounting]);
-                    if ($bot_accounting) {
-                        $telegram_accounting = new Api($bot_accounting->token);
-                        $telegram_accounting_services = new TelegramServices($bot_accounting->token);
-                        $admins = $bot_accounting->accessBot;
-                        $order_buy = RequestTransfer::with(["userRequest.customer", "transferReport"])->find(data_get($order_buy, 'id'));
-                        $message = $this->getfactor($order_buy);
-                        foreach ($admins as $admin) {
-                            logger("send", [$admin]);
-                            $send_accounting = $telegram_accounting_services->sendMessage($admin->user_id, $message);
-                            logger("aco", [$send_accounting]);
-                        }
-                    }
-
+                    dispatch(new PartiesToTheTransaction($order_buy->id));
+                    logger("end send user message");
+                    dispatch(new SendMessageAccountingBot($order_buy->id));
+                    logger("end send accconting message");
 
                 } else {
 //                    $this->telegram_services->sendMessage($this->getUserId(), "متأسفانه امکان دریافت حواله برای شما در این معامله نمی باشد");
@@ -510,50 +374,13 @@ class ActionServices extends TextServices
                 }
             } catch (\Exception $exception) {
 
-                logger("exp", [$exception->getMessage(),
+                logger("exp send request", [$exception->getMessage(),
                     $exception->getLine(),
                     $exception->getCode(),
                     $exception->getTrace(),
                     $exception->getFile()]);
             }
         }
-    }
-
-    private function getfactor(\Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection|\Illuminate\Database\Eloquent\Builder|array $order_buy): string
-    {
-        $message = "شماره حواله:" . data_get($order_buy, 'id');
-        $message .= "\n\n";
-        $message .= "فی:";
-        $message .= number_format(data_get($order_buy, 'price'), 0);
-        $message .= "\n\n";
-        $type = data_get($order_buy, "type");
-        if ($type == "sell") {
-            $title_request = "فروشنده";
-            $title_mal = "خریدار";
-        } else {
-            $title_request = "خریدار";
-            $title_mal = "فروشنده";
-
-        }
-        $transfer = $order_buy->transferReport;
-        if (data_get($order_buy, "userRequest.role") == "customer")
-            $message .= "  $title_request: " . data_get($order_buy, "userRequest.fullName") . "(" . data_get($order_buy, "userRequest.customer.fullName") . ")";
-        else
-            $message .= "  $title_request: " . data_get($order_buy, "userRequest.fullName");
-        $message .= "\n\n";
-        if (data_get($order_buy, "transferReport.user.role") == "customer")
-            $message .= "  $title_mal: " . data_get($order_buy, "transferReport.user.fullName") . "(" . data_get($order_buy, "transferReport.user.customer.fullName") . ")";
-        else
-            $message .= "  $title_mal: " . data_get($order_buy, "transferReport.user.fullName");
-        $message .= "\n\n";
-        $message .= "برای:" . toJalali($transfer->date, "Y/m/d");
-        $message .= "\n\n";
-        $message .= "ساعت:" . toJalali($order_buy->created_at, "H:i:s");
-        $message .= "\n\n";
-        $message .= "مقدار:" . data_get($order_buy, "number") . "کیلو";
-        $message .= "\n\n";
-        $message .= "نوع:" . getTypeTransfer($transfer->type);
-        return $message;
     }
 
 
@@ -642,6 +469,7 @@ class ActionServices extends TextServices
         if ($check == "true") {
             $transfer_olds = Transfer::where("user_id", $this->getUser()->id)
                 ->where("type", data_get($word, "type"))
+                ->whereIn("status",[Transfer::STATUS_ACTIVE,Transfer::STATUS_ACTIVE_DO])
                 ->get();
             foreach ($transfer_olds as $row_delet) {
                 $message = $row_delet->message . "\xE2\x9D\x8C	";
@@ -1328,33 +1156,4 @@ class ActionServices extends TextServices
         return $price;
     }
 
-    /**
-     * @param array|string $message
-     * @return void
-     * @throws \Telegram\Bot\Exceptions\TelegramSDKException
-     */
-    private function sendBotCustomer($chat_id, array|string $message): void
-    {
-        $bot_customer = Bot::where("title", "botCustomer")->first();
-        if ($bot_customer) {
-            try {
-                logger("bot customer", [$bot_customer]);
-                $telegram_customer = new Api($bot_customer->token);
-                $telegram_customer->sendMessage(
-                    [
-                        'chat_id' => $chat_id,
-                        'text' => $message,
-                    ]
-                );
-            }catch (\Exception $exception){
-                    logger("get error",[
-                        $exception->getMessage(),
-                        $exception->getLine(),
-                        $exception->getCode(),
-                        $exception->getTrace(),
-                        $exception->getFile()
-                    ]);
-                }
-        }
-    }
 }
