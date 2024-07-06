@@ -39,8 +39,10 @@ class SendMessageAccountingBot implements ShouldQueue
                 logger("bot accounting job", [$bot_accounting]);
                 $telegram_accounting = new Api($bot_accounting->token);
                 $order_buy = RequestTransfer::with(["userRequest.customer", "transferReport"])->find($this->order_id);
+                logger("order buy",[$order_buy]);
                 $message = $this->getfactor($order_buy);
                 $admins = $bot_accounting->accessBot;
+                logger("aaa",[$admins]);
                 foreach ($admins as $admin) {
                     logger("send job", [$admin]);
                     $this->send = Message::create([
@@ -109,6 +111,7 @@ class SendMessageAccountingBot implements ShouldQueue
         $message .= "مقدار:" . data_get($order_buy, "number") . "کیلو";
         $message .= "\n\n";
         $message .= "نوع:" . getTypeTransfer($transfer->type);
+        logger("mesage acco",[$message]);
         return $message;
     }
 }
