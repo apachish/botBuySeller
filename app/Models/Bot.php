@@ -3,14 +3,13 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use MongoDB\Laravel\Eloquent\HybridRelations;
 use MongoDB\Laravel\Eloquent\Model;
 
 class Bot extends Model
 {
 
     use HasFactory;
-    use HybridRelations;
+
 
     protected $connection = "mongodb";
     protected $collection = 'bot_collection';
@@ -38,6 +37,6 @@ class Bot extends Model
 
     public function accessBot()
     {
-        return $this->hasMany(AccessBot::class,"id","bot_id");
+        return $this->hasMany(AccessBot::class,"bot_id");
     }
 }
