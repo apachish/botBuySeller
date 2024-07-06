@@ -469,6 +469,7 @@ class ActionServices extends TextServices
         if ($check == "true") {
             $transfer_olds = Transfer::where("user_id", $this->getUser()->id)
                 ->where("type", data_get($word, "type"))
+                ->whereIn("status",[Transfer::STATUS_ACTIVE,Transfer::STATUS_ACTIVE_DO])
                 ->get();
             foreach ($transfer_olds as $row_delet) {
                 $message = $row_delet->message . "\xE2\x9D\x8C	";
