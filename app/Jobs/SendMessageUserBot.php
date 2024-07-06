@@ -100,7 +100,7 @@ $this->user_id ]);
                     $exception->getTrace(),
                     $exception->getFile()
                 ]);
-
+                $this->send->error_text = $exception->getMessage();
                 $this->send->status = Message::STATUS_FAILED;
                 $this->send->update();
             }

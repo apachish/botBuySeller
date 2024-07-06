@@ -99,6 +99,7 @@ class SendMessageCustomerBot implements ShouldQueue
                     $exception->getFile()
                 ]);
                 $this->send->status = Message::STATUS_FAILED;
+                $this->send->error_text = $exception->getMessage();
                 $this->send->update();
             }
         }

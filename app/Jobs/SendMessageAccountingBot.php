@@ -34,13 +34,13 @@ class SendMessageAccountingBot implements ShouldQueue
         $bot_accounting = Bot::where("title", "botAccounting")->first();
         if ($bot_accounting) {
             try {
-                logger("bot accounting", [$bot_accounting]);
+                logger("bot accounting job", [$bot_accounting]);
                 $telegram_accounting = new Api($bot_accounting->token);
                 $order_buy = RequestTransfer::with(["userRequest.customer", "transferReport"])->find($this->order_id);
                 $message = $this->getfactor($order_buy);
                 $admins = $bot_accounting->accessBot;
                 foreach ($admins as $admin) {
-                    logger("send", [$admin]);
+                    logger("send job", [$admin]);
                     $this->send = Message::create([
                         "telegram_id"=>$admin->user_id,
                         "bot_id"=>$bot_accounting->id,
@@ -56,7 +56,7 @@ class SendMessageAccountingBot implements ShouldQueue
                     $this->send->message_id = data_get($send_accounting,"message_id");
                     $this->send->status = Message::STATUS_RECEIVE;
                     $this->send->update();
-                    logger("aco", [$send_accounting]);
+                    logger("aco job", [$send_accounting]);
                 }
             } catch (\Exception $exception) {
                 logger("get error", [
@@ -66,6 +66,7 @@ class SendMessageAccountingBot implements ShouldQueue
                     $exception->getTrace(),
                     $exception->getFile()
                 ]);
+                $this->send->error_text = $exception->getMessage();
                 $this->send->status = Message::STATUS_FAILED;
                 $this->send->update();
             }
