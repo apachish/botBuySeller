@@ -29,6 +29,7 @@ class PartiesToTheTransaction implements ShouldQueue
     {
         $order_buy = RequestTransfer::with(["userRequest.customer", "transferReport.user.customer"])->find($this->order_id);
 
+        logger("PartiesToTheTransaction",[$order_buy,$this->order_id]);
         if(!$order_buy) {
             $transfer = $order_buy->transferReport;
             $user = data_get($order_buy,"userRequest");

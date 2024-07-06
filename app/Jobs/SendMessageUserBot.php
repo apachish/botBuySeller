@@ -45,6 +45,14 @@ class SendMessageUserBot implements ShouldQueue
     public function handle(): void
     {
         $bot_user = Bot::where("title", "botUser")->first();
+        logger("user",[$bot_user,$this->title ,
+$this->number ,
+$this->type ,
+$this->description ,
+$this->parties ,
+$this->date ,
+$this->factor ,
+$this->user_id ]);
         if ($bot_user) {
             try {
                 logger("bot user", [$bot_user]);

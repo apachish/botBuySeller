@@ -326,7 +326,7 @@ class ActionServices extends TextServices
                     if ($transfer->number >= $num) {
                         $transfer->number -= $num;
                         $request_transfer["number"] = $num;
-                        $request_transfer["status"] = $num == $transfer->number ? "complete" : "half";
+                        $request_transfer["status"] =  $transfer->number == 0 ? "complete" : "half";
                         $use_day = $num;
                         if (data_get($request_transfer, "number")) {
                             $daily_transfer = DailyRequestTransfer::updateOrCreate([
