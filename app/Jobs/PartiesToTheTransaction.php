@@ -99,10 +99,10 @@ class PartiesToTheTransaction implements ShouldQueue
                 $factor,
                 $user_id,
             ));
-            if ($this->getUser()->role == "customer" && data_get($this->getUser(), 'customer')) {
+            if ($user->role == "customer" && data_get($user, 'customer')) {
                 $customer = data_get($user, 'fullName');
                 $parties =  $transaction_party_req_s;
-                $user_id = data_get($this->getUser(), 'customer.telegram_id');
+                $user_id = data_get($user, 'customer.telegram_id');
                 dispatch(new SendMessageCustomerBot(
                     $title,
                     $number,
