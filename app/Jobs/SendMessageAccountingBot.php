@@ -31,7 +31,7 @@ class SendMessageAccountingBot implements ShouldQueue
      */
     public function handle(): void
     {
-        $bot_accounting = Bot::where("title", "botAccounting")->first();
+        $bot_accounting = Bot::where("title", "botAccounting","accessBot")->first();
         logger("ghazal", [$bot_accounting,$this->order_id]);
 
         if ($bot_accounting) {
