@@ -139,7 +139,7 @@ class ActionServices extends TextServices
             $text = " کاربر  ";
             $text .= $this->getUser()->fullName;
             $text .= " می خواهد وارد سیستم شود ";
-            $admins = AccessBot::all();
+            $admins = AccessBot::where("type","admin")->all();
             foreach ($admins as $admin) {
                 $message_admin = $this->getBotAdmin()->sendMessage(
                     [
