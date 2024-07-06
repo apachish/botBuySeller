@@ -364,7 +364,9 @@ class ActionServices extends TextServices
 
 
                     dispatch(new PartiesToTheTransaction($order_buy->id));
+                    logger("end send user message");
                     dispatch(new SendMessageAccountingBot($order_buy->id));
+                    logger("end send accconting message");
 
                 } else {
 //                    $this->telegram_services->sendMessage($this->getUserId(), "متأسفانه امکان دریافت حواله برای شما در این معامله نمی باشد");
@@ -372,7 +374,7 @@ class ActionServices extends TextServices
                 }
             } catch (\Exception $exception) {
 
-                logger("exp", [$exception->getMessage(),
+                logger("exp send request", [$exception->getMessage(),
                     $exception->getLine(),
                     $exception->getCode(),
                     $exception->getTrace(),
