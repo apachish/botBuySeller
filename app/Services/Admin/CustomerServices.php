@@ -895,9 +895,9 @@ class CustomerServices
             else
                 $array[] = ['text' => "\xE2\x98\x91", 'callback_data' => 'free_activity_' . $key_i];
             if($user->special)
-                $array[] = ['text' => "\xE2\xAD\x90", 'callback_data' => 'set_special_' . $key_i];
+                $array[] = ['text' => "\xE2\xAD\x90", 'callback_data' => 'unset_special_' . $key_i];
             else
-                $array[] = ['text' => "\xE2\xAD\x95", 'callback_data' => 'unset_special_' . $key_i];
+                $array[] = ['text' => "\xE2\xAD\x95", 'callback_data' => 'set_special_' . $key_i];
 
             if ($user->deleted_at)
                 $array[] = ['text' => "\xF0\x9F\x86\x97", 'callback_data' => 'active_' . $key_i];
