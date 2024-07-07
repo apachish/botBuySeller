@@ -33,23 +33,26 @@ class Message3 extends Command
         if(data_get($message,"value")){
             $bot_user = Bot::where("title", "botUser")->first();
 
-            $users = UserTelegram::get();
-            $telegram_user = new Api($bot_user->token);
-            $telegram_user->sendMessage( [
-                'chat_id' => $bot_user->channel_id,
-                'text' => data_get($message,"value"),
-            ]);
-            foreach ($users as $user) {
-                try {
-                    $telegram_user->sendMessage( [
-                        'chat_id' => $user->telegram_id,
-                        'text' => data_get($message,"value"),
-                    ]);
-                }catch (\Exception $exception){
-                    logger("user ".$user->telegram_id.":".$exception->getMessage());
+            if($bot_user) {
+                $users = UserTelegram::get();
+                $telegram_user = new Api($bot_user->token);
+                $telegram_user->sendMessage([
+                    'chat_id' => data_get($bot_user,"chanel_id"),
+                    'text' => data_get($message, "value"),
+                ]);
+                foreach ($users as $user) {
+                    try {
+                        if(data_get($user,"telegram_id"))
+                        $telegram_user->sendMessage([
+                            'chat_id' => data_get($user,"telegram_id"),
+                            'text' => data_get($message, "value"),
+                        ]);
+                    } catch (\Exception $exception) {
+                        logger("user " . $user->telegram_id . ":" . $exception->getMessage());
+                    }
+
+
                 }
-
-
             }
 
 
