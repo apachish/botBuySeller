@@ -131,6 +131,12 @@ class ActionAdminServices extends TextServices
             $this->custromer->setGetWordOnly($this);
         elseif (str_contains($this->getData(), "free_activity_"))
             $this->custromer->setFreeActivity($this);
+
+        if (str_contains($this->getData(), "unset_special_"))
+            $this->custromer->unSetSpecial($this);
+        elseif (str_contains($this->getData(), "set_special_"))
+            $this->custromer->setSpecial($this);
+
         elseif (str_contains($this->getData(), "pre_ugly_word_"))
             $this->setting->pre($this);
         elseif (str_contains($this->getData(), "next_ugly_word_"))
@@ -276,6 +282,9 @@ class ActionAdminServices extends TextServices
                 break;
             case  "\xF0\x9F\x92\xB3\xF0\x9F\x8C\xB3ویرایش حق اشتراک":
                 $this->setting->getMembership($this);
+                break;
+                case  "\xF0\x9F\x95\x92ٌپیام ساعت ۳":
+                $this->setting->getMessage3($this);
                 break;
             case  "\xF0\x9F\x92\xB1کیف پول":
                 $this->setting->getWalletMembership($this);

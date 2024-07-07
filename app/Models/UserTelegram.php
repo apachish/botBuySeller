@@ -31,7 +31,8 @@ class UserTelegram extends Model
         "role",
         "change_menu",
         "link_invite",
-        "accept_rule"
+        "accept_rule",
+        "special"
     ];
 
 

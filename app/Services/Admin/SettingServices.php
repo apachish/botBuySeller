@@ -20,7 +20,7 @@ class SettingServices
                 ],
                 [
                     ['text' => "\xF0\x9F\x92\xB3\xF0\x9F\x8C\xB3ویرایش حق اشتراک"],
-//                    ['text' => "\xF0\x9F\x92\xB1کیف پول"]
+                    ['text' => "\xF0\x9F\x95\x92ٌپیام ساعت ۳"]
                 ],
                 [
                     ['text' => "\xE2\x86\xA9منو"]
@@ -76,7 +76,7 @@ class SettingServices
             $response_text = $rule->value;
 
             $response_text .= "\n\n";
-            $response_text .= "متن بالا متنن قبلی می  باشد ویرایش کنید";
+            $response_text .= "متن بالا متن قبلی می باشد ویرایش کنید";
         } else
             $response_text = "متن راهنما وارد کنید";
 
@@ -220,6 +220,38 @@ class SettingServices
         cache()->forget($object->getKeyCache() . $object->getUserId());
     }
 
+
+    public function getMessage3($object)
+    {
+        $message = Setting::where("key", "message_3")->first();
+
+        if ($message) {
+            $response_text = $message->value;
+
+            $response_text .= "\n\n";
+            $response_text .= "متن بالا متن قبلی ساعت ۳ می باشد ویرایش کنید";
+        } else
+            $response_text = "متن ساعت ۳ وارد کنید";
+
+        cache()->set($object->getKeyCache() . $object->getUserId(), "help");
+
+        $object->getTelegramServices()->sendMessage($object->getUserId(), $response_text);
+    }
+
+    public function setMessage3($object)
+    {
+        $message = Setting::updateOrCreate(
+            ["key" => "message_3"],
+            ["value" => $object->getMessage()]
+        );
+
+
+        $response_text = "متن پیام ۳  بروزرسانی شد:";
+        $response_text .= "\n\n";
+        $response_text .= $message->value;
+        $object->getTelegramServices()->sendMessage($object->getUserId(), $response_text);
+        cache()->forget($object->getKeyCache() . $object->getUserId());
+    }
     private function listUglyWord($object,$page = 1, $message_id = null)
     {
 
