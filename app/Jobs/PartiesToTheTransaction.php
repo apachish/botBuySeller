@@ -14,6 +14,7 @@ class PartiesToTheTransaction implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     private $order_id;
+
     /**
      * Create a new job instance.
      */
@@ -29,45 +30,61 @@ class PartiesToTheTransaction implements ShouldQueue
     {
         $order_buy = RequestTransfer::with(["userRequest.customer", "transferReport.user.customer"])->find($this->order_id);
 
-        logger("PartiesToTheTransaction",[$order_buy,$this->order_id]);
-        if($order_buy) {
+        logger("PartiesToTheTransaction", [$order_buy, $this->order_id]);
+        if ($order_buy) {
             $transfer = $order_buy->transferReport;
-            $user = data_get($order_buy,"userRequest");
+            $user = data_get($order_buy, "userRequest");
             if (data_get($transfer, "user.role") == "customer")
                 $colleague = data_get($transfer, "user.customer");
             else
                 $colleague = data_get($transfer, "user");
-            if (data_get($order_buy,"userRequest.role") == "customer")
-            {
+            if (data_get($order_buy, "userRequest.role") == "customer") {
                 $head = data_get($order_buy, "userRequest.customer");
-            }
-            else
-                $head =$user;
+            } else
+                $head = $user;
             if ($transfer->user->role == "customer" && $user->role == "customer") {
-                $transaction_party_req = "مشاهده فقط برای سرگروه";
+
                 if (data_get($transfer, 'user.customer')) {
                     $transaction_party_req_s = data_get($transfer, 'user.fullName');
                     $transaction_party_req_s .= "(" . data_get($colleague, 'fullName') . ")";
                 } else
                     $transaction_party_req_s = data_get($transfer, 'user.fullName');
 
-                $transaction_party = "مشاهده فقط برای سرگروه";
+                if ($user->special)
+                    $transaction_party_req = $transaction_party_req_s;
+                else
+                    $transaction_party_req = "مشاهده فقط برای سرگروه";
+
+
+//                $transaction_party = "مشاهده فقط برای سرگروه";
                 if (data_get($user, 'customer')) {
                     $transaction_party_s = data_get($user, 'fullName');
                     $transaction_party_s .= "(" . data_get($head, 'fullName') . ")";
                 } else
-                    $transaction_party_s = data_get($transfer, 'user.fullName');
+                    $transaction_party_s = data_get($user, 'user.fullName');
 
-            } elseif ($transfer->user->role == "colleague" &&$user->role == "customer") {
-                $transaction_party_req = "مشاهده فقط برای سرگروه";
+                if (data_get($transfer,"user.special"))
+                    $transaction_party = $transaction_party_s;
+                else
+                    $transaction_party = "مشاهده فقط برای سرگروه";
+
+            } elseif ($transfer->user->role == "colleague" && $user->role == "customer") {
+//                $transaction_party_req = "مشاهده فقط برای سرگروه";
                 if (data_get($transfer, 'user'))
                     $transaction_party_req_s = data_get($transfer, 'user.fullName');
+
+                if ($user->special)
+                    $transaction_party_req = $transaction_party_req_s;
+                else
+                    $transaction_party_req = "مشاهده فقط برای سرگروه";
+
                 if (data_get($user, 'customer')) {
                     $transaction_party = data_get($user, 'fullName');
                     $transaction_party .= "(" . data_get($head, 'fullName') . ")";
                 } else
                     $transaction_party = data_get($user, 'fullName');
-            } elseif ($transfer->user->role == "customer" &&$user->role == "colleague") {
+
+            } elseif ($transfer->user->role == "customer" && $user->role == "colleague") {
                 if (data_get($transfer, 'user.customer')) {
                     $transaction_party_req = data_get($transfer, 'user.fullName');
                     $transaction_party_req .= "(" . data_get($colleague, 'fullName') . ")";
@@ -76,19 +93,24 @@ class PartiesToTheTransaction implements ShouldQueue
 
                 $transaction_party = "مشاهده فقط برای سرگروه";
                 $transaction_party_s = data_get($user, 'fullName');
-            } elseif ($transfer->user->role == "colleague" &&$user->role == "colleague") {
+
+                if (data_get($transfer,"user.special"))
+                    $transaction_party = $transaction_party_s;
+                else
+                    $transaction_party = "مشاهده فقط برای سرگروه";
+            } elseif ($transfer->user->role == "colleague" && $user->role == "colleague") {
                 $transaction_party_req = data_get($transfer, 'user.fullName');
-                $transaction_party =$user->fullName;
+                $transaction_party = $user->fullName;
             }
 
             $title = $transfer->message_request_me;
             $number = data_get($order_buy, "number");
             $type = $transfer->type;
             $description = $transfer->description;
-            $parties =  $transaction_party_req;
-            $date =  $transfer->date;
-            $factor =  data_get($order_buy, 'id');
-            $user_id =  data_get($user, 'telegram_id');
+            $parties = $transaction_party_req;
+            $date = $transfer->date;
+            $factor = data_get($order_buy, 'id');
+            $user_id = data_get($user, 'telegram_id');
             dispatch(new SendMessageUserBot(
                 $title,
                 $number,
@@ -101,7 +123,7 @@ class PartiesToTheTransaction implements ShouldQueue
             ));
             if ($user->role == "customer" && data_get($user, 'customer')) {
                 $customer = data_get($user, 'fullName');
-                $parties =  $transaction_party_req_s;
+                $parties = $transaction_party_req_s;
                 $user_id = data_get($user, 'customer.telegram_id');
                 dispatch(new SendMessageCustomerBot(
                     $title,
@@ -130,7 +152,7 @@ class PartiesToTheTransaction implements ShouldQueue
             ));
             if ($transfer->user->role == "customer" && data_get($transfer, 'user.customer')) {
                 $customer = data_get($transfer, 'user.fullName');
-                $parties =  $transaction_party_s;
+                $parties = $transaction_party_s;
                 $user_id = data_get($transfer, 'user.customer.telegram_id');
                 dispatch(new SendMessageCustomerBot(
                     $title,
