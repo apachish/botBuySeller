@@ -13,7 +13,6 @@ return new class extends Migration
     {
         Schema::table('user_telegram', function (Blueprint $table) {
             $table->boolean("special")->nullable();
-
         });
     }
 
