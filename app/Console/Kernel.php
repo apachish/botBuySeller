@@ -16,7 +16,7 @@ class Kernel extends ConsoleKernel
          $schedule->command('app:delete-message-chanel')->everyFifteenMinutes();
          $schedule->command('app:set-date-tomorrow')->dailyAt('23:00');;
          $schedule->command('app:message3')->dailyAt('15:00');;
-         $schedule->command('app:message3')->dailyAt('20:00');
+         $schedule->command('app:message3')->dailyAt('21:10');
     }
 
     /**
