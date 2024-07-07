@@ -20,7 +20,7 @@ class SettingServices
                 ],
                 [
                     ['text' => "\xF0\x9F\x92\xB3\xF0\x9F\x8C\xB3ویرایش حق اشتراک"],
-                    ['text' => "\xF0\x9F\x95\x92پیام ساعت ۳"]
+                    ['text' => "\xF0\x9F\x95\x92پیام ساعت"]
                 ],
                 [
                     ['text' => "\xE2\x86\xA9منو"]

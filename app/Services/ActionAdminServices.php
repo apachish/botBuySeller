@@ -283,7 +283,7 @@ class ActionAdminServices extends TextServices
             case  "\xF0\x9F\x92\xB3\xF0\x9F\x8C\xB3ویرایش حق اشتراک":
                 $this->setting->getMembership($this);
                 break;
-                case  "\xF0\x9F\x95\x92پیام ساعت ۳":
+                case  "\xF0\x9F\x95\x92پیام ساعت":
                 $this->setting->getMessage3($this);
                 break;
             case  "\xF0\x9F\x92\xB1کیف پول":
