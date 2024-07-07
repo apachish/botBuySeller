@@ -35,18 +35,23 @@ class Message3 extends Command
 
             $users = UserTelegram::get();
             $telegram_user = new Api($bot_user->token);
-
-            foreach ($users as $user) {
-                $telegram_user->sendMessage( [
-                    'chat_id' => $user->telegram_id,
-                    'text' => data_get($message,"value"),
-                ]);
-
-            }
             $telegram_user->sendMessage( [
                 'chat_id' => $bot_user->channel_id,
                 'text' => data_get($message,"value"),
             ]);
+            foreach ($users as $user) {
+                try {
+                    $telegram_user->sendMessage( [
+                        'chat_id' => $user->telegram_id,
+                        'text' => data_get($message,"value"),
+                    ]);
+                }catch (\Exception $exception){
+                    logger("user ".$user->telegram_id.":".$exception->getMessage());
+                }
+
+
+            }
+
 
         }
     }
