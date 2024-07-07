@@ -20,7 +20,7 @@ class SettingServices
                 ],
                 [
                     ['text' => "\xF0\x9F\x92\xB3\xF0\x9F\x8C\xB3ویرایش حق اشتراک"],
-                    ['text' => "\xF0\x9F\x95\x92ٌپیام ساعت ۳"]
+                    ['text' => "\xF0\x9F\x95\x92پیام ساعت ۳"]
                 ],
                 [
                     ['text' => "\xE2\x86\xA9منو"]
@@ -233,7 +233,7 @@ class SettingServices
         } else
             $response_text = "متن ساعت ۳ وارد کنید";
 
-        cache()->set($object->getKeyCache() . $object->getUserId(), "help");
+        cache()->set($object->getKeyCache() . $object->getUserId(), "message_3");
 
         $object->getTelegramServices()->sendMessage($object->getUserId(), $response_text);
     }
@@ -252,6 +252,7 @@ class SettingServices
         $object->getTelegramServices()->sendMessage($object->getUserId(), $response_text);
         cache()->forget($object->getKeyCache() . $object->getUserId());
     }
+
     private function listUglyWord($object,$page = 1, $message_id = null)
     {
 
