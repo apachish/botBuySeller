@@ -97,26 +97,36 @@ class SendMessageAccountingBot implements ShouldQueue
         }
         $transfer = $order_buy->transferReport;
         if (data_get($order_buy, "userRequest.role") == "customer")
-            $message .= "  $title_request: " . data_get($order_buy, "userRequest.fullName") . "(" . data_get($order_buy, "userRequest.customer.fullName") . ")";
+            $message .= "  $title_request: " . $this->getBlue(data_get($order_buy, "userRequest.fullName") . "(" . data_get($order_buy, "userRequest.customer.fullName") . ")");
         else
-            $message .= "  $title_request: " . data_get($order_buy, "userRequest.fullName");
+            $message .= "  $title_request: " . $this->getBlue(data_get($order_buy, "userRequest.fullName"));
         $message .= "\n";
         if (data_get($order_buy, "transferReport.user.role") == "customer")
-            $message .= "  $title_mal: " . data_get($order_buy, "transferReport.user.fullName") . "(" . data_get($order_buy, "transferReport.user.customer.fullName") . ")";
+            $message .= "  $title_mal: " . $this->getBlue(data_get($order_buy, "transferReport.user.fullName") . "(" . data_get($order_buy, "transferReport.user.customer.fullName") . ")");
         else
-            $message .= "  $title_mal: " . data_get($order_buy, "transferReport.user.fullName");
+            $message .= "  $title_mal: " . $this->getBlue(data_get($order_buy, "transferReport.user.fullName"));
         $message .= "\n";
         $message .= "برای:" . toJalali($transfer->date, "Y/m/d");
         $message .= "\n";
         $message .= "ساعت:" . toJalali($order_buy->created_at, "H:i:s");
         $message .= "\n";
-        $message .= "مقدار:" ;
-        $message .= "[" ;
-        $message .= data_get($order_buy, "number") . "کیلو" ;
-        $message .= "](https://#)" ;
+        $message .= "مقدار:";
+        $message .= "[ **";
+        $message .= data_get($order_buy, "number");
+        $message .= " کیلو ";
+        $message .= " ** ]";
+        $message .= "(https://example.com)";
         $message .= "\n";
         $message .= "نوع:" . getTypeTransfer($transfer->type);
         logger("mesage acco",[$message]);
         return $message;
     }
+}
+ private function getBlue($text)
+{
+    $message = "[ **";
+    $message .= $text;
+    $message .= " ** ]";
+    $message .= "(https://example.com)";
+    return $message;
 }

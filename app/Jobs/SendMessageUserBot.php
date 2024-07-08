@@ -62,7 +62,7 @@ $this->user_id ]);
 
                 $message = $this->title;
                 $message .= "\n";
-                $message .= "مقدار: ";
+                $message .= "مقدار:";
                 $message .= "[ **";
                 $message .= $this->number;
                 $message .= " کیلو ";
