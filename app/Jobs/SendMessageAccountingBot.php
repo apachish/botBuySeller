@@ -101,7 +101,7 @@ class SendMessageAccountingBot implements ShouldQueue
         if (data_get($order_buy, "userRequest.role") == "customer")
         {
             $message .= "$title_request:";
-            $message .= $this->getBlue(data_get($order_buy, "userRequest.fullName") . "(" . data_get($order_buy, "userRequest.customer.fullName") . ")");
+            $message .= $this->getBlue(data_get($order_buy, "userRequest.fullName") . "\(" . data_get($order_buy, "userRequest.customer.fullName") . "\)");
         }
         else
         {
@@ -113,7 +113,7 @@ class SendMessageAccountingBot implements ShouldQueue
         if (data_get($order_buy, "transferReport.user.role") == "customer")
         {
             $message .= "$title_mal:";
-            $message .= $this->getBlue(data_get($order_buy, "transferReport.user.fullName") . "(" . data_get($order_buy, "transferReport.user.customer.fullName") . ")");
+            $message .= $this->getBlue(data_get($order_buy, "transferReport.user.fullName") . "\(" . data_get($order_buy, "transferReport.user.customer.fullName") . "\)");
         }
         else
         {
