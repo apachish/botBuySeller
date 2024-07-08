@@ -57,7 +57,7 @@ class SendMessageCustomerBot implements ShouldQueue
                 $message .= "\n";
                 $message .= $this->title;
                 $message .= "\n";
-                $message .= "مقدار: [$this->number کیلو ](https://#) ";
+                $message .= "مقدار: [$this->number کیلو ](https://example.com) ";
                 $message .= "\n";
                 $message .= "نوع:" . getTypeTransfer($this->type);
                 if ($this->description) {
@@ -66,7 +66,7 @@ class SendMessageCustomerBot implements ShouldQueue
                     $message .= "\xE2\x9D\x97 : \n" . $this->description;
                 }
                 $message .= "\n";
-                $message .= "طرف معامله: [$this->parties](https://#) " ;
+                $message .= "طرف معامله: [$this->parties](https://example.com) " ;
 
                 $message .= "\n";
                 $message .= "برای:" . toJalali($this->date, "Y/m/d");
