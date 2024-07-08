@@ -140,6 +140,7 @@ class TelegramServices
         $result = curl_exec($ch);
         curl_close($ch);
 
+        logger("delete re",[json_decode($result, true)]);
         return json_decode($result, true);
     }
 
