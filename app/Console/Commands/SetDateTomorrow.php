@@ -2,12 +2,14 @@
 
 namespace App\Console\Commands;
 
+use App\Models\Bot;
 use App\Models\Setting;
 use Balea\Holiday\Models\Holiday as HolidayModels;
 use DiDom\Document;
 use Illuminate\Console\Command;
 use Illuminate\Support\Str;
 use Morilog\Jalali\Jalalian;
+use Telegram\Bot\Api;
 
 class SetDateTomorrow extends Command
 {
@@ -92,6 +94,20 @@ class SetDateTomorrow extends Command
         Setting::updateOrCreate(["key"=>"tomorrow"],[
             "value"=>$date
         ]);
+        $bot_manage = Bot::where("title", "botManage")->first();
+        $telegram_manage = new Api($bot_manage->token);
+        $message ="تاریخ فردا تنظیم شد";
+        $message .="\n";
+        $message .= toJalali($date,"Y/m/d");
+        $admins = $bot_manage->accessBot;
+        foreach ($admins as $admin) {
+            $message_telegram = $telegram_manage->sendMessage(
+                [
+                    'chat_id' =>  $admin->user_id,
+                    'text' => $message,
+                    'parse_mode' => 'MarkdownV2'
+                ]);
+        }
         cache()->forget("set_tomorrow_date");
 
     }
