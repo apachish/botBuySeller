@@ -82,7 +82,9 @@ class SendMessageAccountingBot implements ShouldQueue
     private function getfactor(\Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection|\Illuminate\Database\Eloquent\Builder|array $order_buy): string
     {
         $message = "   شماره حواله:";
-//        $message .= "**". data_get($order_buy, 'id')."**";
+
+        $message .= "**". data_get($order_buy, 'id')."**";
+        return $message;
         $message .= "\n";
         $message .= "فی:";
         $message .= number_format(data_get($order_buy, 'price'), 0);
