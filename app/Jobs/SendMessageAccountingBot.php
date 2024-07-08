@@ -84,7 +84,6 @@ class SendMessageAccountingBot implements ShouldQueue
         $message = "   شماره حواله:";
 
         $message .= "**". data_get($order_buy, 'id')."**";
-        return $message;
         $message .= "\n";
         $message .= "فی:";
         $message .= number_format(data_get($order_buy, 'price'), 0);
@@ -110,6 +109,8 @@ class SendMessageAccountingBot implements ShouldQueue
             $message .= $this->getBlue(data_get($order_buy, "userRequest.fullName"));
         }
         $message .= "\n";
+        return $message;
+
         if (data_get($order_buy, "transferReport.user.role") == "customer")
         {
             $message .= "$title_mal:";
