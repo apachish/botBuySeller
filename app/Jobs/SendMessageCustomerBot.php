@@ -70,8 +70,8 @@ class SendMessageCustomerBot implements ShouldQueue
                 $message .= "\n\n";
                 $message .= "برای:" . toJalali($this->date, "Y/m/d");
                 $message .= "\n\n";
-                $message .= "       شماره حواله:" . $this->factor ;
-
+                $message .= "   شماره حواله:"  ;
+                $message .= "*\*$this->factor\**"   ;
                 $this->send = Message::create([
                     "telegram_id"=>$this->user_id,
                     "bot_id"=>$bot_customer->id,
@@ -85,6 +85,7 @@ class SendMessageCustomerBot implements ShouldQueue
                     [
                         'chat_id' => $this->user_id,
                         'text' => $message,
+                        'parse_mode' => 'MarkdownV2'
                     ]);
                 $this->send->message_id = data_get($message_telegram,"message_id");
                 $this->send->status = Message::STATUS_RECEIVE;

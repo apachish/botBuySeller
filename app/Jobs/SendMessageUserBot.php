@@ -59,21 +59,22 @@ $this->user_id ]);
                 $telegram_user = new Api($bot_user->token);
 
                 $message = $this->title;
-                $message .= "\n\n";
-                $message .= "مقدار:" . $this->number . "کیلو";
-                $message .= "\n\n";
+                $message .= "\n";
+                $message .= "مقدار: [$this->number](#) کیلو";
+                $message .= "\n";
                 $message .= "نوع:" . getTypeTransfer($this->type);
                 if ($this->description) {
-                    $message .= "\n\n";
+                    $message .= "\n";
                     $message .= "توضیحات";
-                    $message .= "\xE2\x9D\x97 : \n\n" . $this->description;
+                    $message .= "\xE2\x9D\x97 : \n" . $this->description;
                 }
-                $message .= "\n\n";
-                $message .= "طرف معامله:" . $this->parties;
-                $message .= "\n\n";
+                $message .= "\n";
+                $message .= "طرف معامله: [$this->parties](#) " ;
+                $message .= "\n";
                 $message .= "برای:" . toJalali($this->date, "Y/m/d");
-                $message .= "\n\n";
-                $message .= "       شماره حواله:" . $this->factor ;
+                $message .= "\n";
+                $message .= "   شماره حواله:"  ;
+                $message .= "*\*$this->factor\**"   ;
 
                 $this->send = Message::create([
                     "telegram_id"=>$this->user_id,
@@ -87,6 +88,7 @@ $this->user_id ]);
                     [
                         'chat_id' => $this->user_id,
                         'text' => $message,
+                        'parse_mode' => 'MarkdownV2'
                     ]);
                 $this->send->message_id = data_get($message_telegram,"message_id");
                 $this->send->status = Message::STATUS_RECEIVE;

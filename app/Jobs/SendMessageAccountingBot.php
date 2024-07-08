@@ -56,6 +56,7 @@ class SendMessageAccountingBot implements ShouldQueue
                         [
                             'chat_id' => $admin->user_id,
                             'text' => $message,
+                            'parse_mode' => 'MarkdownV2'
                         ]);
                     $this->send->message_id = data_get($send_accounting,"message_id");
                     $this->send->status = Message::STATUS_RECEIVE;
@@ -79,7 +80,8 @@ class SendMessageAccountingBot implements ShouldQueue
 
     private function getfactor(\Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection|\Illuminate\Database\Eloquent\Builder|array $order_buy): string
     {
-        $message = "شماره حواله:" . data_get($order_buy, 'id');
+        $message = "   شماره حواله:"  ;
+        $message .= "*\*".data_get($order_buy, 'id')."\**"   ;
         $message .= "\n\n";
         $message .= "فی:";
         $message .= number_format(data_get($order_buy, 'price'), 0);
