@@ -507,8 +507,8 @@ class ActionServices extends TextServices
                 $copy .=":".data_get($word,"description");
             $keyboard[0][0] = ['text' => $copy];
             $keyboard[1] =[
-                ['text' => "منو"],
                 ['text' => "نشد"],
+                ['text' => "منو"],
             ];
 
             $response = TelegramServices::menu($this->telegram, $keyboard, $this->getUser(), "لفظ شما تایید شد\xE2\x9C\x85	");
