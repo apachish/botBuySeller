@@ -101,11 +101,15 @@ class SetDateTomorrow extends Command
         $message .= toJalali($date,"Y/m/d");
         $admins = $bot_manage->accessBot;
         foreach ($admins as $admin) {
+            logger("data set ",[
+                'chat_id' =>  $admin->user_id,
+                'text' => $message,
+                'parse_mode' => 'MarkdownV2'
+            ]);
             $message_telegram = $telegram_manage->sendMessage(
                 [
                     'chat_id' =>  $admin->user_id,
                     'text' => $message,
-                    'parse_mode' => 'MarkdownV2'
                 ]);
         }
         cache()->forget("set_tomorrow_date");
