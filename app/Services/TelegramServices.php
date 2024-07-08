@@ -276,8 +276,10 @@ class TelegramServices
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $post_fields);
-        curl_exec($ch);
+        $result = curl_exec($ch);
         curl_close($ch);
+        $response = json_decode($result, true);
+        return data_get($response, "message_id");
     }
 
     //برای ایجاد یک منوی دائمی در ربات تلگرام خود که تمام یا برخی از دستورات ربات را نشان می دهد
