@@ -18,6 +18,7 @@ class SendMessageAccountingBot implements ShouldQueue
 
     private $order_id;
     private $send;
+
     /**
      * Create a new job instance.
      */
@@ -32,25 +33,25 @@ class SendMessageAccountingBot implements ShouldQueue
     public function handle(): void
     {
         $bot_accounting = Bot::where("title", "botAccounting")->with("accessBot")->first();
-        logger("ghazal", [$bot_accounting,$this->order_id]);
+        logger("ghazal", [$bot_accounting, $this->order_id]);
 
         if ($bot_accounting) {
             try {
                 logger("bot accounting job", [$bot_accounting]);
                 $telegram_accounting = new Api($bot_accounting->token);
                 $order_buy = RequestTransfer::with(["userRequest.customer", "transferReport"])->find($this->order_id);
-                logger("order buy",[$order_buy]);
+                logger("order buy", [$order_buy]);
                 $message = $this->getfactor($order_buy);
                 $admins = $bot_accounting->accessBot;
-                logger("aaa",[$admins]);
+                logger("aaa", [$admins]);
                 foreach ($admins as $admin) {
                     logger("send job", [$admin]);
                     $this->send = Message::create([
-                        "telegram_id"=>$admin->user_id,
-                        "bot_id"=>$bot_accounting->id,
-                        "status"=>Message::STATUS_PENDING,
-                        "text"=>$message,
-                        "request_id"=>$this->order_id
+                        "telegram_id" => $admin->user_id,
+                        "bot_id" => $bot_accounting->id,
+                        "status" => Message::STATUS_PENDING,
+                        "text" => $message,
+                        "request_id" => $this->order_id
                     ]);
                     $send_accounting = $telegram_accounting->sendMessage(
                         [
@@ -58,7 +59,7 @@ class SendMessageAccountingBot implements ShouldQueue
                             'text' => $message,
                             'parse_mode' => 'MarkdownV2'
                         ]);
-                    $this->send->message_id = data_get($send_accounting,"message_id");
+                    $this->send->message_id = data_get($send_accounting, "message_id");
                     $this->send->status = Message::STATUS_RECEIVE;
                     $this->send->update();
                     logger("aco job", [$send_accounting]);
@@ -80,8 +81,8 @@ class SendMessageAccountingBot implements ShouldQueue
 
     private function getfactor(\Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection|\Illuminate\Database\Eloquent\Builder|array $order_buy): string
     {
-        $message = "   شماره حواله:"  ;
-        $message .= "**".data_get($order_buy, 'id')."**"   ;
+        $message = "   شماره حواله:";
+        $message .= "**" . data_get($order_buy, 'id') . "**";
         $message .= "\n";
         $message .= "فی:";
         $message .= number_format(data_get($order_buy, 'price'), 0);
@@ -111,22 +112,23 @@ class SendMessageAccountingBot implements ShouldQueue
         $message .= "ساعت:" . toJalali($order_buy->created_at, "H:i:s");
         $message .= "\n";
         $message .= "مقدار:";
-        $message .= "[ **";
+        $message .= "[**";
         $message .= data_get($order_buy, "number");
         $message .= " کیلو ";
-        $message .= " ** ]";
+        $message .= " **]";
         $message .= "(https://example.com)";
         $message .= "\n";
         $message .= "نوع:" . getTypeTransfer($transfer->type);
-        logger("mesage acco",[$message]);
+        logger("mesage acco", [$message]);
         return $message;
     }
-}
- private function getBlue($text)
-{
-    $message = "[ **";
-    $message .= $text;
-    $message .= " ** ]";
-    $message .= "(https://example.com)";
-    return $message;
+
+    private function getBlue($text)
+    {
+        $message = "[ **";
+        $message .= $text;
+        $message .= " ** ]";
+        $message .= "(https://example.com)";
+        return $message;
+    }
 }
