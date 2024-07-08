@@ -109,7 +109,6 @@ class SendMessageAccountingBot implements ShouldQueue
             $message .= $this->getBlue(data_get($order_buy, "userRequest.fullName"));
         }
         $message .= "\n";
-        return $message;
 
         if (data_get($order_buy, "transferReport.user.role") == "customer")
         {
@@ -122,6 +121,8 @@ class SendMessageAccountingBot implements ShouldQueue
             $message .= $this->getBlue(data_get($order_buy, "transferReport.user.fullName"));
         }
         $message .= "\n";
+        return $message;
+
         $message .= "برای:" . toJalali($transfer->date, "Y/m/d");
         $message .= "\n";
         $message .= "ساعت:" . toJalali($order_buy->created_at, "H:i:s");
