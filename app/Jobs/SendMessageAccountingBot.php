@@ -81,11 +81,11 @@ class SendMessageAccountingBot implements ShouldQueue
     private function getfactor(\Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection|\Illuminate\Database\Eloquent\Builder|array $order_buy): string
     {
         $message = "   شماره حواله:"  ;
-        $message .= "*\*".data_get($order_buy, 'id')."\**"   ;
-        $message .= "\n\n";
+        $message .= "**".data_get($order_buy, 'id')."**"   ;
+        $message .= "\n";
         $message .= "فی:";
         $message .= number_format(data_get($order_buy, 'price'), 0);
-        $message .= "\n\n";
+        $message .= "\n";
         $type = data_get($order_buy, "type");
         if ($type == "sell") {
             $title_request = "فروشنده";
@@ -100,18 +100,21 @@ class SendMessageAccountingBot implements ShouldQueue
             $message .= "  $title_request: " . data_get($order_buy, "userRequest.fullName") . "(" . data_get($order_buy, "userRequest.customer.fullName") . ")";
         else
             $message .= "  $title_request: " . data_get($order_buy, "userRequest.fullName");
-        $message .= "\n\n";
+        $message .= "\n";
         if (data_get($order_buy, "transferReport.user.role") == "customer")
             $message .= "  $title_mal: " . data_get($order_buy, "transferReport.user.fullName") . "(" . data_get($order_buy, "transferReport.user.customer.fullName") . ")";
         else
             $message .= "  $title_mal: " . data_get($order_buy, "transferReport.user.fullName");
-        $message .= "\n\n";
+        $message .= "\n";
         $message .= "برای:" . toJalali($transfer->date, "Y/m/d");
-        $message .= "\n\n";
+        $message .= "\n";
         $message .= "ساعت:" . toJalali($order_buy->created_at, "H:i:s");
-        $message .= "\n\n";
-        $message .= "مقدار:" . data_get($order_buy, "number") . "کیلو";
-        $message .= "\n\n";
+        $message .= "\n";
+        $message .= "مقدار:" ;
+        $message .= "[" ;
+        $message .= data_get($order_buy, "number") . "کیلو" ;
+        $message .= "](https://#)" ;
+        $message .= "\n";
         $message .= "نوع:" . getTypeTransfer($transfer->type);
         logger("mesage acco",[$message]);
         return $message;

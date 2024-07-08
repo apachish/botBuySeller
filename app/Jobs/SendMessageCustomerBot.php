@@ -54,23 +54,23 @@ class SendMessageCustomerBot implements ShouldQueue
                 $telegram_customer = new Api($bot_customer->token);
                 $message = "نام مشتری:";
                 $message .= $this->customer;
-                $message .= "\n\n";
+                $message .= "\n";
                 $message .= $this->title;
-                $message .= "\n\n";
-                $message .= "مقدار: [$this->number](https://apachish.ir) کیلو";
-                $message .= "\n\n";
+                $message .= "\n";
+                $message .= "مقدار: [$this->number کیلو ](https://#) ";
+                $message .= "\n";
                 $message .= "نوع:" . getTypeTransfer($this->type);
                 if ($this->description) {
-                    $message .= "\n\n";
+                    $message .= "\n";
                     $message .= "توضیحات";
-                    $message .= "\xE2\x9D\x97 : \n\n" . $this->description;
+                    $message .= "\xE2\x9D\x97 : \n" . $this->description;
                 }
-                $message .= "\n\n";
-                $message .= "طرف معامله: [$this->parties](https://apachish.ir) " ;
+                $message .= "\n";
+                $message .= "طرف معامله: [$this->parties](https://#) " ;
 
-                $message .= "\n\n";
+                $message .= "\n";
                 $message .= "برای:" . toJalali($this->date, "Y/m/d");
-                $message .= "\n\n";
+                $message .= "\n";
                 $message .= "   شماره حواله:"  ;
                 $message .= "**$this->factor**"   ;
                 $this->send = Message::create([

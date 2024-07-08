@@ -60,7 +60,7 @@ $this->user_id ]);
 
                 $message = $this->title;
                 $message .= "\n";
-                $message .= "مقدار: [$this->number](https://apachish.ir) کیلو";
+                $message .= "مقدار: [$this->number](https://#) کیلو";
                 $message .= "\n";
                 $message .= "نوع:" . getTypeTransfer($this->type);
                 if ($this->description) {
@@ -69,7 +69,7 @@ $this->user_id ]);
                     $message .= "\xE2\x9D\x97 : \n" . $this->description;
                 }
                 $message .= "\n";
-                $message .= "طرف معامله: [$this->parties](https://apachish.ir) " ;
+                $message .= "طرف معامله: [$this->parties](https://#) " ;
                 $message .= "\n";
                 $message .= "برای:" . toJalali($this->date, "Y/m/d");
                 $message .= "\n";
