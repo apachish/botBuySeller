@@ -57,14 +57,16 @@ $this->user_id ]);
             try {
                 logger("bot user", [$bot_user]);
                 $telegram_user = new Api($bot_user->token);
+                $this->parties = str_replace("(","\(",$this->parties);
+                $this->parties = str_replace(")","\)",$this->parties);
 
                 $message = $this->title;
                 $message .= "\n";
                 $message .= "مقدار: ";
-                $message .= "[";
+                $message .= "[**";
                 $message .= $this->number;
                 $message .= " کیلو ";
-                $message .= " ] ";
+                $message .= " **] ";
                 $message .= "(https://example.com)";
                 $message .= "\n";
                 $message .= "نوع:" . getTypeTransfer($this->type);
