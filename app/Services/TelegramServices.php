@@ -124,6 +124,7 @@ class TelegramServices
 
 // تابع برای حذف پیام
     function deleteMessage($chat_id, $message_id) {
+        logger("delete",[$chat_id, $message_id]);
         $url = "https://api.telegram.org/bot$this->access_token/deleteMessage";
 
         $post_fields = [
