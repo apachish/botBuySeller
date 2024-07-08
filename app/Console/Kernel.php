@@ -26,7 +26,7 @@ class Kernel extends ConsoleKernel
         if($array_time_s) {
             $start_time = Carbon::createFromTime(data_get($array_time_s, 0), data_get($array_time_s, 1), 0)->subMinute("15")->format("H:i");
             logger("start_time", [$start_time]);
-            $schedule->command('app:message3')->dailyAt($start_time);
+            $schedule->command('app:message-start')->dailyAt($start_time);
         }
         if($array_time_e) {
             $end_time = Carbon::createFromTime(data_get($array_time_e, 0), data_get($array_time_e, 1), 0)->subMinute("15")->format("H:i");

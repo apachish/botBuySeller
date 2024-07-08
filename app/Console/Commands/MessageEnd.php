@@ -29,7 +29,7 @@ class MessageEnd extends Command
      */
     public function handle()
     {
-        $message = Setting::where("key", "message_start")->first();
+        $message = Setting::where("key", "message_end")->first();
         if(data_get($message,"value")){
             $bot_user = Bot::where("title", "botUser")->first();
 
