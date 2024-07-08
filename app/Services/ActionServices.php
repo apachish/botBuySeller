@@ -1006,16 +1006,17 @@ class ActionServices extends TextServices
                 $this->telegram_services->sendMessage($this->getUserId(), "تمام معاملات برای اولین روز کاری می باشد و امکان معامله روز در حال حاظر وجود ندارد");
                 return true;
             }
-            if (!$time->between($morning, $none_13_30, true) && in_array($this->getType(), $this->list_type_today_r_f)) {
-                $this->telegram_services->sendMessage($this->getUserId(), "\xE2\x9D\x8C	زمان معامله شرایطی برای امروز به پایان رسیده است\xE2\x9D\x8C	");
-                return true;
-            } elseif (!$time->between($morning, $none, true) && in_array($this->getType(), $this->list_type_today_normal)) {
-                $this->telegram_services->sendMessage($this->getUserId(), "\xE2\x9D\x8C	زمان معامله روز به پایان رسیده است\xE2\x9D\x8C		");
-                return true;
-            } elseif (!$time->between($morning, $none, true) && in_array($this->getType(), $this->list_type_today_cache)) {
-                $this->telegram_services->sendMessage($this->getUserId(), "\xE2\x9D\x8C	زمان معامله نقدی حاضر به پایان رسیده است\xE2\x9D\x8C		");
-                return true;
-            } else if ($time->between($morning, $none_13_30, true) && in_array($this->getType(), $this->list_type_today_r_f)) {
+//            if (!$time->between($morning, $none_13_30, true) && in_array($this->getType(), $this->list_type_today_r_f)) {
+//                $this->telegram_services->sendMessage($this->getUserId(), "\xE2\x9D\x8C	زمان معامله شرایطی برای امروز به پایان رسیده است\xE2\x9D\x8C	");
+//                return true;
+//            } elseif (!$time->between($morning, $none, true) && in_array($this->getType(), $this->list_type_today_normal)) {
+//                $this->telegram_services->sendMessage($this->getUserId(), "\xE2\x9D\x8C	زمان معامله روز به پایان رسیده است\xE2\x9D\x8C		");
+//                return true;
+//            } elseif (!$time->between($morning, $none, true) && in_array($this->getType(), $this->list_type_today_cache)) {
+//                $this->telegram_services->sendMessage($this->getUserId(), "\xE2\x9D\x8C	زمان معامله نقدی حاضر به پایان رسیده است\xE2\x9D\x8C		");
+//                return true;
+//            } else
+                if ($time->between($morning, $none_13_30, true) && in_array($this->getType(), $this->list_type_today_r_f)) {
                 $message .= " \xE2\x98\x80	";
                 $message_request .= " \xE2\x98\x80	";
                 $message_request_me .= " \xE2\x98\x80	";

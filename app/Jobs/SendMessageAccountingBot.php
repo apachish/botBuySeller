@@ -121,18 +121,16 @@ class SendMessageAccountingBot implements ShouldQueue
             $message .= $this->getBlue(data_get($order_buy, "transferReport.user.fullName"));
         }
         $message .= "\n";
-        return $message;
-
         $message .= "برای:" . toJalali($transfer->date, "Y/m/d");
         $message .= "\n";
         $message .= "ساعت:" . toJalali($order_buy->created_at, "H:i:s");
         $message .= "\n";
-//        $message .= "مقدار:";
-//        $message .= "[**";
-//        $message .= data_get($order_buy, "number");
-//        $message .= " کیلو ";
-//        $message .= "**]";
-//        $message .= "(https://example.com)";
+        $message .= "مقدار:";
+        $message .= "[**";
+        $message .= data_get($order_buy, "number");
+        $message .= " کیلو ";
+        $message .= "**]";
+        $message .= "(https://example.com)";
         $message .= "\n";
         $message .= "نوع:" . getTypeTransfer($transfer->type);
         logger("mesage acco", [$message]);
