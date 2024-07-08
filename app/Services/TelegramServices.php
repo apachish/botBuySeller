@@ -280,7 +280,7 @@ class TelegramServices
         curl_close($ch);
         $response = json_decode($result, true);
         logger("response",[$response]);
-        return data_get($response, "message_id");
+        return data_get($response, "result.message_id");
     }
 
     //برای ایجاد یک منوی دائمی در ربات تلگرام خود که تمام یا برخی از دستورات ربات را نشان می دهد
