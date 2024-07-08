@@ -98,14 +98,26 @@ class SendMessageAccountingBot implements ShouldQueue
         }
         $transfer = $order_buy->transferReport;
         if (data_get($order_buy, "userRequest.role") == "customer")
-            $message .= "$title_request:" . $this->getBlue(data_get($order_buy, "userRequest.fullName") . "(" . data_get($order_buy, "userRequest.customer.fullName") . ")");
+        {
+            $message .= "$title_request:";
+            $message .= $this->getBlue(data_get($order_buy, "userRequest.fullName") . "(" . data_get($order_buy, "userRequest.customer.fullName") . ")");
+        }
         else
-            $message .= "$title_request:" . $this->getBlue(data_get($order_buy, "userRequest.fullName"));
+        {
+            $message .= "$title_request:";
+            $message .= $this->getBlue(data_get($order_buy, "userRequest.fullName"));
+        }
         $message .= "\n";
         if (data_get($order_buy, "transferReport.user.role") == "customer")
-            $message .= "$title_mal:" . $this->getBlue(data_get($order_buy, "transferReport.user.fullName") . "(" . data_get($order_buy, "transferReport.user.customer.fullName") . ")");
+        {
+            $message .= "$title_mal:";
+            $message .= $this->getBlue(data_get($order_buy, "transferReport.user.fullName") . "(" . data_get($order_buy, "transferReport.user.customer.fullName") . ")");
+        }
         else
-            $message .= "$title_mal:" . $this->getBlue(data_get($order_buy, "transferReport.user.fullName"));
+        {
+            $message .= "$title_mal:";
+            $message .= $this->getBlue(data_get($order_buy, "transferReport.user.fullName"));
+        }
         $message .= "\n";
         $message .= "برای:" . toJalali($transfer->date, "Y/m/d");
         $message .= "\n";
