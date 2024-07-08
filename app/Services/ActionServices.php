@@ -1066,7 +1066,7 @@ class ActionServices extends TextServices
 
 
             if ($this->getDescription()) {
-                $message .= "\n ";
+                $message .= "\n";
                 $message .= "توضیحات ";
                 $message .= "\xE2\x9D\x97 : ";
                 $message .= $this->getDescription();
