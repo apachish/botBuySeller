@@ -45,15 +45,15 @@ class ActionServices extends TextServices
             $customer->limit = (int)$this->getMessage();
             $customer->update();
             $message = "اطلاعات مشتری ثبت شد";
-            $message .= "\n\n";
+            $message .= "\n";
             $message .= "نام و نام خانوادگی:";
             $message .= $customer->fullName;
-            $message .= "\n\n";
+            $message .= "\n";
             $message .= "شماره همراه:";
             $message .= $customer->mobile;
-            $message .= "\n\n";
+            $message .= "\n";
             $message .= "حد مجاز معامله ";
-            $message .= "\n\n";
+            $message .= "\n";
             $message .= $customer->limit;
 
             $this->telegram_services->sendMessage($this->getUserId(), $message);
@@ -79,9 +79,9 @@ class ActionServices extends TextServices
                     "fullName" => $fullName,
                 ]);
             $message = $fullName;
-            $message .= "\n\n";
+            $message .= "\n";
             $message = "پس از تایید مدیریت به لیست مشتریان شما اضافه خواهد شد ";
-            $message .= "\n\n";
+            $message .= "\n";
             $this->telegram_services->sendMessage($this->getUserId(), $message);
             cache()->forget($this->getKeyCache() . $this->getUserId());
 
@@ -520,11 +520,11 @@ class ActionServices extends TextServices
                 foreach ($admins as $admin) {
                     logger("send", [$admin]);
                     $message_accounting = $transfer_new->user->fullName;
-                    $message_accounting .= "\n\n";
+                    $message_accounting .= "\n";
                     if(data_get($transfer_new,"user.customer"))
                     {
                         $message_accounting .= " مشتری :".data_get($transfer_new,"user.customer.fullName");
-                        $message_accounting .= "\n\n";
+                        $message_accounting .= "\n";
 
                     }
                     $message_accounting .= data_get($word, "message");
@@ -629,7 +629,7 @@ class ActionServices extends TextServices
             $keyboard[0][] = ['text' => "\xF0\x9F\x93\x9C	گزارش", 'callback_data' => "trade_open_report_$customer_id"];
 
             $message = "یکی از گزینه های زیر برای مشتری ";
-            $message .= "\n\n ";
+            $message .= "\n ";
             $message .= $customer ? $customer->fullName : $customer->first_name . " " . $customer->last_name;
             $this->telegram_services->editMessageTextAndInlineKeyboard($this->getUserId(), $message_id, $message, $keyboard);
         }
@@ -645,7 +645,7 @@ class ActionServices extends TextServices
             logger("customer", [$customer, $customer_id, $message_id]);
             if ($customer) {
                 $message = "حد مجاز برای مشتری ";
-                $message .= "\n\n ";
+                $message .= "\n ";
                 $message .= $customer->fullName;
                 $this->telegram_services->editMessageTextAndInlineKeyboard($this->getUserId(), $message_id, $message);
                 cache()->set($this->getKeyCache() . $this->getUserId(), $this->getData());
@@ -674,9 +674,9 @@ class ActionServices extends TextServices
             ];
             $message = ' گزارش ';
             $message .= $customer ? $customer->fullName : $customer->first_name . " " . $customer->last_name;
-            $message .= "\n\n ";
+            $message .= "\n ";
             $message .= "تاریخ های زیر را انتخاب کنید";
-            $message .= "\n\n ";
+            $message .= "\n ";
             $this->telegram_services->editMessageTextAndInlineKeyboard($this->getUserId(), $message_id, $message, $keyboard);
         }
 
@@ -696,7 +696,7 @@ class ActionServices extends TextServices
             $message = ' گزارش ';
             $message .= $customer ? $customer->fullName : $customer->first_name . " " . $customer->last_name;
             $message .= "  تاریخ   " . toJalali($date, "Y/m/d");
-            $message .= "\n\n ";
+            $message .= "\n ";
             $this->telegram_services->editMessageTextAndInlineKeyboard($this->getUserId(), $message_id, $message);
             $me = RequestTransfer::with(["transferReport" => function ($query) use ($customer_id, $date) {
                 $query->where("user_id", $customer_id);
@@ -933,11 +933,11 @@ class ActionServices extends TextServices
 
             if ($price < $start_trade_s || $price > $end_trade_s) {
                 $message = "مبلغ وارد شده باید در بازه";
-                $message .= "\n\n";
+                $message .= "\n";
                 $message .= $start_trade_s;
-                $message .= "\n\n";
+                $message .= "\n";
                 $message .= "تا";
-                $message .= "\n\n";
+                $message .= "\n";
                 $message .= $end_trade_s;
 
                 $this->telegram_services->sendMessage($this->getUserId(), $message);
@@ -969,7 +969,7 @@ class ActionServices extends TextServices
 //            $message .= "لطف اگر پیشنهاد بهتری دارید مجددا لفظ دهید یا \n\n";
 //            $message .= "حداکثر با تلرانس ۲۰۰۰ تومان لفظ دهید \n\n";
             $message = "لفظ پیشنهادی بهتر در کانال : \n\n";
-            $message .= " \n\n";
+            $message .= " \n";
             $message .= number_format($check_transfer->price, 0);
             $this->telegram_services->sendMessage($this->getUserId(), $message);
         } else {
@@ -1039,10 +1039,10 @@ class ActionServices extends TextServices
                     $date = now()->addDay(1)->format("Y-m-d");
             }
 
-            $message_request .= "\n\n";
+            $message_request .= "\n";
             $message_request .= "فی:";
             $message_request .= number_format($price, 0);
-            $message_request_me .= "\n\n";
+            $message_request_me .= "\n";
             $message_request_me .= "فی:";
             $message_request_me .= number_format($price, 0);
             if (in_array($this->getType(), $this->list_type_cash)) {
@@ -1066,7 +1066,7 @@ class ActionServices extends TextServices
 
 
             if ($this->getDescription()) {
-                $message .= "\n\n ";
+                $message .= "\n ";
                 $message .= "توضیحات ";
                 $message .= "\xE2\x9D\x97 : ";
                 $message .= $this->getDescription();

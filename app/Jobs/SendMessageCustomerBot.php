@@ -57,7 +57,7 @@ class SendMessageCustomerBot implements ShouldQueue
                 $message .= "\n\n";
                 $message .= $this->title;
                 $message .= "\n\n";
-                $message .= "مقدار:" . $this->number . "کیلو";
+                $message .= "مقدار: [$this->number](https://apachish.ir) کیلو";
                 $message .= "\n\n";
                 $message .= "نوع:" . getTypeTransfer($this->type);
                 if ($this->description) {
@@ -66,12 +66,13 @@ class SendMessageCustomerBot implements ShouldQueue
                     $message .= "\xE2\x9D\x97 : \n\n" . $this->description;
                 }
                 $message .= "\n\n";
-                $message .= "طرف معامله:" . $this->parties;
+                $message .= "طرف معامله: [$this->parties](https://apachish.ir) " ;
+
                 $message .= "\n\n";
                 $message .= "برای:" . toJalali($this->date, "Y/m/d");
                 $message .= "\n\n";
                 $message .= "   شماره حواله:"  ;
-                $message .= "*\*$this->factor\**"   ;
+                $message .= "**$this->factor**"   ;
                 $this->send = Message::create([
                     "telegram_id"=>$this->user_id,
                     "bot_id"=>$bot_customer->id,
