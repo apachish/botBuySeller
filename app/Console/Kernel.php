@@ -16,7 +16,7 @@ class Kernel extends ConsoleKernel
     {
         // $schedule->command('inspire')->hourly();
          $schedule->command('app:delete-message-chanel')->everyFifteenMinutes();
-         $schedule->command('app:set-date-tomorrow')->dailyAt('00:40');
+         $schedule->command('app:set-date-tomorrow')->dailyAt('01:00');
          $schedule->command('app:message3')->dailyAt('15:00');
         $parameter = cache()->remember("parameter_need", now()->setTime(23, 59), function () {
             return Setting::whereIn("key", ["start_hours_of_operation", "end_hours_of_operation"])->get()->keyBy("key");
