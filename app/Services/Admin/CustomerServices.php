@@ -3,6 +3,7 @@
 namespace App\Services\Admin;
 
 
+use App\Models\MessageAdmin;
 use App\Models\Setting;
 use App\Models\UserTelegram;
 use App\Services\TelegramServices;
@@ -785,8 +786,12 @@ class CustomerServices
     {
         $users = UserTelegram::get();
         foreach ($users as $user) {
-            $object->service_user->telegram_services->sendMessage($user->telegram_id, $object->getMessage());
-
+            try {
+                $message_id = $object->service_user->telegram_services->sendMessage($user->telegram_id, $object->getMessage());
+                MessageAdmin::create(["user_id" => $user->telegram_id, "text" => $object->getMessage(), "message_id" => $message_id]);
+            }catch (\Exception $exception) {
+                logger("message send admin " . $user->telegram_id . ":" . $exception->getMessage());
+            }
         }
         cache()->forget($object->getKeyCache() . $object->getUserId());
 
