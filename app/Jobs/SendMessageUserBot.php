@@ -60,7 +60,12 @@ $this->user_id ]);
 
                 $message = $this->title;
                 $message .= "\n";
-                $message .= "مقدار: [$this->number](https://example.com) کیلو";
+                $message .= "مقدار: ";
+                $message .= "[";
+                $message .= $this->number;
+                $message .= " کیلو ";
+                $message .= " ] ";
+                $message .= "(https://example.com)";
                 $message .= "\n";
                 $message .= "نوع:" . getTypeTransfer($this->type);
                 if ($this->description) {
@@ -69,7 +74,11 @@ $this->user_id ]);
                     $message .= "\xE2\x9D\x97 : \n" . $this->description;
                 }
                 $message .= "\n";
-                $message .= "طرف معامله: [$this->parties](https://example.com) " ;
+                $message .= "طرف معامله:" ;
+                $message .= "[" ;
+                $message .= $this->parties ;
+                $message .= "]" ;
+                $message .= "(https://example.com)" ;
                 $message .= "\n";
                 $message .= "برای:" . toJalali($this->date, "Y/m/d");
                 $message .= "\n";
