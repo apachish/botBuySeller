@@ -32,9 +32,10 @@ class DeleteMessage extends Command
         $bot_user = Bot::where("title", "botUser")->first();
         if ($bot_user) {
             $telegram_services = new TelegramServices($bot_user->tokrn);
+            logger("$bot_user->tokrn");
             $message = MessageAdmin::where("message_id", $message_id)->first();
             if ($message)
-                $telegram_services->deleteMessage((int)data_get($message,"user_id"), $message_id);
+                $telegram_services->deleteMessage(data_get($message,"user_id"), $message_id);
         }
 
     }
