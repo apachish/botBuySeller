@@ -82,7 +82,7 @@ class SendMessageAccountingBot implements ShouldQueue
     private function getfactor(\Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection|\Illuminate\Database\Eloquent\Builder|array $order_buy): string
     {
         $message = "   شماره حواله:";
-        $message .= "**". data_get($order_buy, 'id')."**";
+//        $message .= "**". data_get($order_buy, 'id')."**";
         $message .= "\n";
         $message .= "فی:";
         $message .= number_format(data_get($order_buy, 'price'), 0);
@@ -123,12 +123,12 @@ class SendMessageAccountingBot implements ShouldQueue
         $message .= "\n";
         $message .= "ساعت:" . toJalali($order_buy->created_at, "H:i:s");
         $message .= "\n";
-        $message .= "مقدار:";
-        $message .= "[**";
-        $message .= data_get($order_buy, "number");
-        $message .= " کیلو ";
-        $message .= "**]";
-        $message .= "(https://example.com)";
+//        $message .= "مقدار:";
+//        $message .= "[**";
+//        $message .= data_get($order_buy, "number");
+//        $message .= " کیلو ";
+//        $message .= "**]";
+//        $message .= "(https://example.com)";
         $message .= "\n";
         $message .= "نوع:" . getTypeTransfer($transfer->type);
         logger("mesage acco", [$message]);
