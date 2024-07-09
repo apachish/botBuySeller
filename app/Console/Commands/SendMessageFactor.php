@@ -34,9 +34,10 @@ class SendMessageFactor extends Command
             if($bot){
                 $telegram = new Api($bot->token);
 
-                $text = str_replace("(https://example.com)","",$message->text);
-                $text = str_replace("(","",$text);
-                $text = str_replace(")","\-",$text);
+                $text = str_replace("(","\(",$message->text);
+                $text = str_replace(")","\)",$text);
+                $text = str_replace("\(https://example.com\)","(https://example.com)",$text);
+
                 logger($text);
                 $send_accounting = $telegram->sendMessage(
                     [
