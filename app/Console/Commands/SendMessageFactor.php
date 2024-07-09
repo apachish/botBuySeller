@@ -39,6 +39,7 @@ class SendMessageFactor extends Command
                         'text' => $message->text,
                         'parse_mode' => 'MarkdownV2'
                     ]);
+                logger("message",[$message]);
                 if($send_accounting){
                     $message->status = "receive";
                     $message->update();
