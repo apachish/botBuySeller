@@ -146,7 +146,7 @@ class SendMessageAccountingBot implements ShouldQueue
     private function getBlue($text)
     {
         $message = " [**";
-        $message = $text;
+        $message .= $text;
         $message .= "**]";
         $message .= "(https://example.com)";
         return $message;
