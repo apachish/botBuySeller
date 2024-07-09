@@ -28,7 +28,8 @@ class SendMessageFactor extends Command
      */
     public function handle()
     {
-        Message::whereDate("created_at",now()->format("Y-m-d"))->where("status","failed")->get()->each(function ($message) {
+        $messages = Message::whereDate("created_at",now()->format("Y-m-d"))->where("status","failed")->get();
+        $messages->each(function ($message) {
             $bot = Bot::find($message->bot_id);
             if($bot){
                 $telegram = new Api($bot->token);
@@ -49,6 +50,6 @@ class SendMessageFactor extends Command
                     $message->update();
                 }
             }
-        })();
+        });
     }
 }
