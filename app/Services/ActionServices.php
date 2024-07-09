@@ -243,7 +243,7 @@ class ActionServices extends TextServices
         $transfer = Transfer::with(["user" => function ($query) {
             $query->with("customer.userTradeAccess");
             $query->with("customerUser");
-        }])->find($id);
+        }])->where("number",">",0)->find($id);
 
         if ($transfer->user_id == $this->getUser()->id) {
             $this->telegram_services->sendMessage($this->getUserId(), "شما نمی توانید لفظ خود را دریافت کنید");
@@ -340,7 +340,7 @@ class ActionServices extends TextServices
                 }
 
 
-                if (data_get($request_transfer, "number")) {
+                if (data_get($request_transfer, "number") > 0) {
                     $keyboard = self::getKeyboardRequest($transfer);
 
                     $trade_message = $transfer->message;
