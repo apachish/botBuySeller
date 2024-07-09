@@ -51,8 +51,6 @@ class SendMessageCustomerBot implements ShouldQueue
         if ($bot_customer) {
             try {
                 logger("bot customer", [$bot_customer]);
-                $this->parties = str_replace("(","\(",$this->parties);
-                $this->parties = str_replace(")","\)",$this->parties);
                 $telegram_customer = new Api($bot_customer->token);
                 $message = "نام مشتری:";
                 $message .= $this->customer;

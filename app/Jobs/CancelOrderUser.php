@@ -3,7 +3,7 @@
 namespace App\Jobs;
 
 use App\Models\Bot;
-use App\Models\Message;
+use App\Models\MessageCancelOrder;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -11,9 +11,10 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Telegram\Bot\Api;
 
-class SendMessageUserBot implements ShouldQueue
+class CancelOrderUser implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+
 
     private $title;
     private $number;
@@ -38,7 +39,6 @@ class SendMessageUserBot implements ShouldQueue
         $this->factor = $factor;
         $this->user_id = $user_id;
     }
-
     /**
      * Execute the job.
      */
@@ -46,18 +46,22 @@ class SendMessageUserBot implements ShouldQueue
     {
         $bot_user = Bot::where("title", "botUser")->first();
         logger("user",[$bot_user,$this->title ,
-$this->number ,
-$this->type ,
-$this->description ,
-$this->parties ,
-$this->date ,
-$this->factor ,
-$this->user_id ]);
+            $this->number ,
+            $this->type ,
+            $this->description ,
+            $this->parties ,
+            $this->date ,
+            $this->factor ,
+            $this->user_id ]);
         if ($bot_user) {
             try {
                 logger("bot user", [$bot_user]);
                 $telegram_user = new Api($bot_user->token);
-                $message = $this->title;
+                $message = "\xE2\x9D\x8C\xE2\x9D\x97";
+                $message .= "حذف معامله زیر توسط ادمین به درخواست طرفبن معامله";
+                $message .= "\xE2\x9D\x8C\xE2\x9D\x97";
+                $message .= "\n\n";
+                $message .= $this->title;
                 $message .= "\n";
                 $message .= "مقدار:";
                 $message .= "[**";
@@ -90,10 +94,10 @@ $this->user_id ]);
                 $message = str_replace("-","\-",$message);
                 $message = str_replace("_","\_",$message);
                 $message = str_replace("\(https://example.com\)","(https://example.com)",$message);
-                $this->send = Message::create([
+                $this->send = MessageCancelOrder::create([
                     "telegram_id"=>$this->user_id,
                     "bot_id"=>$bot_user->id,
-                    "status"=>Message::STATUS_PENDING,
+                    "status"=>MessageCancelOrder::STATUS_PENDING,
                     "text"=>$message,
                     "request_id"=>$this->factor
 
@@ -105,7 +109,7 @@ $this->user_id ]);
                         'parse_mode' => 'MarkdownV2'
                     ]);
                 $this->send->message_id = data_get($message_telegram,"message_id");
-                $this->send->status = Message::STATUS_RECEIVE;
+                $this->send->status = MessageCancelOrder::STATUS_RECEIVE;
                 $this->send->update();
 
             } catch (\Exception $exception) {
@@ -117,9 +121,10 @@ $this->user_id ]);
                     $exception->getFile()
                 ]);
                 $this->send->error_text = $exception->getMessage();
-                $this->send->status = Message::STATUS_FAILED;
+                $this->send->status = MessageCancelOrder::STATUS_FAILED;
                 $this->send->update();
             }
         }
+
     }
 }

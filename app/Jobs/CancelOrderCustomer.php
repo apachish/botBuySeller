@@ -3,7 +3,7 @@
 namespace App\Jobs;
 
 use App\Models\Bot;
-use App\Models\Message;
+use App\Models\MessageCancelOrder;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -11,7 +11,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Telegram\Bot\Api;
 
-class SendMessageUserBot implements ShouldQueue
+class CancelOrderCustomer implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
@@ -23,11 +23,12 @@ class SendMessageUserBot implements ShouldQueue
     private $date;
     private $factor;
     private $user_id;
+    private $customer;
     private $send;
     /**
      * Create a new job instance.
      */
-    public function __construct($title,$number,$type,$description,$parties,$date,$factor,$user_id)
+    public function __construct($title,$number,$type,$description,$parties,$date,$factor,$user_id,$customer)
     {
         $this->title = $title;
         $this->number = $number;
@@ -37,6 +38,7 @@ class SendMessageUserBot implements ShouldQueue
         $this->date = $date;
         $this->factor = $factor;
         $this->user_id = $user_id;
+        $this->customer = $customer;
     }
 
     /**
@@ -44,26 +46,27 @@ class SendMessageUserBot implements ShouldQueue
      */
     public function handle(): void
     {
-        $bot_user = Bot::where("title", "botUser")->first();
-        logger("user",[$bot_user,$this->title ,
-$this->number ,
-$this->type ,
-$this->description ,
-$this->parties ,
-$this->date ,
-$this->factor ,
-$this->user_id ]);
-        if ($bot_user) {
+        $bot_customer = Bot::where("title", "botCustomer")->first();
+        if ($bot_customer) {
             try {
-                logger("bot user", [$bot_user]);
-                $telegram_user = new Api($bot_user->token);
-                $message = $this->title;
+                logger("bot customer", [$bot_customer]);
+                $this->parties = str_replace("(","\(",$this->parties);
+                $this->parties = str_replace(")","\)",$this->parties);
+                $telegram_customer = new Api($bot_customer->token);
+                $message = "\xE2\x9D\x8C\xE2\x9D\x97";
+                $message .= "حذف معامله زیر توسط ادمین به درخواست طرفبن معامله";
+                $message .= "\xE2\x9D\x8C\xE2\x9D\x97";
+                $message .= "\n\n";
+                $message .= "نام مشتری:";
+                $message .= $this->customer;
                 $message .= "\n";
-                $message .= "مقدار:";
-                $message .= "[**";
+                $message .= $this->title;
+                $message .= "\n";
+                $message .= "مقدار: ";
+                $message .= "[ **";
                 $message .= $this->number;
                 $message .= " کیلو ";
-                $message .= " **]";
+                $message .= " ** ]";
                 $message .= "(https://example.com)";
                 $message .= "\n";
                 $message .= "نوع:" . getTypeTransfer($this->type);
@@ -78,6 +81,7 @@ $this->user_id ]);
                 $message .= $this->parties ;
                 $message .= "]" ;
                 $message .= "(https://example.com)" ;
+
                 $message .= "\n";
                 $message .= "برای:" . toJalali($this->date, "Y/m/d");
                 $message .= "\n";
@@ -90,25 +94,26 @@ $this->user_id ]);
                 $message = str_replace("-","\-",$message);
                 $message = str_replace("_","\_",$message);
                 $message = str_replace("\(https://example.com\)","(https://example.com)",$message);
-                $this->send = Message::create([
+                $this->send = MessageCancelOrder::create([
                     "telegram_id"=>$this->user_id,
-                    "bot_id"=>$bot_user->id,
-                    "status"=>Message::STATUS_PENDING,
+                    "bot_id"=>$bot_customer->id,
+                    "status"=>MessageCancelOrder::STATUS_PENDING,
                     "text"=>$message,
                     "request_id"=>$this->factor
 
                 ]);
-                $message_telegram = $telegram_user->sendMessage(
+
+                $message_telegram = $telegram_customer->sendMessage(
                     [
                         'chat_id' => $this->user_id,
                         'text' => $message,
                         'parse_mode' => 'MarkdownV2'
                     ]);
                 $this->send->message_id = data_get($message_telegram,"message_id");
-                $this->send->status = Message::STATUS_RECEIVE;
+                $this->send->status = MessageCancelOrder::STATUS_RECEIVE;
                 $this->send->update();
-
             } catch (\Exception $exception) {
+
                 logger("get error", [
                     $exception->getMessage(),
                     $exception->getLine(),
@@ -116,8 +121,8 @@ $this->user_id ]);
                     $exception->getTrace(),
                     $exception->getFile()
                 ]);
+                $this->send->status = MessageCancelOrder::STATUS_FAILED;
                 $this->send->error_text = $exception->getMessage();
-                $this->send->status = Message::STATUS_FAILED;
                 $this->send->update();
             }
         }

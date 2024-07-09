@@ -3,6 +3,8 @@
 namespace App\Services;
 
 
+use App\Jobs\CancelOrder;
+use App\Jobs\CancelOrderAccounting;
 use App\Models\Bot;
 use App\Models\BotMenuUser;
 use App\Models\RequestTransfer;
@@ -65,52 +67,56 @@ class ActionAccountingServices extends TextServices
             $this->telegram_services->editMessageReplyMarkup($this->getUserId(), $message_id, new \stdClass());
         } elseif (str_contains($this->getData(), "cancel_request_transfer_")) {
             $id = str_replace('cancel_request_transfer_', '', $this->getData());
+
             $order = RequestTransfer::with(["userRequest.customer", "transferReport", "dailyRequest"])->find($id);
             if ($order) {
-                $transfer = $order->transferReport;
+                dispatch(new CancelOrder($id));
+                dispatch(new CancelOrderAccounting($id));
 
-                if (data_get($order, "userRequest.role") == "customer") {
-                    $transaction_party_req = "مشاهده فقط برای سرگروه";
-                    $transaction_party_reqs = data_get($order, "userRequest.fullName") . "(" . data_get($order, "userRequest.customer.fullName") . ")";
-                } else
-                    $transaction_party_req = data_get($order, "userRequest.fullName");
-
-                if (data_get($order, "transferReport.user.role") == "customer") {
-                    $transaction_party = "مشاهده فقط برای سرگروه";
-                    $transaction_partys = data_get($order, "transferReport.user.fullName") . "(" . data_get($order, "transferReport.user.customer.fullName") . ")";
-                } else
-                    $transaction_party = data_get($order, "transferReport.user.fullName");
-
-
-                /*
-                 * message for req and head
-                 */
-                $message = $this->getStr(1, $transfer, $order, $transaction_party);
-                logger("canscle pm",[$message]);
-                $this->sendBotWord(data_get($order, "userRequest.telegram_id"), $message);
-                logger("canscle pm 2",[$message]);
-
-                if (data_get($order, "userRequest.role") == "customer") {
-                    $message = $this->getStr(1, $transfer, $order, $transaction_partys);
-                    $this->sendBotCustomer(data_get($order, "userRequest.customer.telegram_id"), $message);
-                }
-
-                /*
-             * message for transfer and head
-             */
-                $message = $this->getStr(2, $transfer, $order, $transaction_party_req);
-                logger("canscle pm 2",[$message]);
-
-                $this->sendBotWord(data_get($order, "transferReport.user.telegram_id"), $message);
-                if (data_get($order, "transferReport.user.role") == "customer") {
-                    $message = $this->getStr(2, $transfer, $order, $transaction_party_reqs);
-                    $this->sendBotCustomer(data_get($order, "transferReport.user.customer.telegram_id"), $message);
-                }
+//                $transfer = $order->transferReport;
+//
+//                if (data_get($order, "userRequest.role") == "customer") {
+//                    $transaction_party_req = "مشاهده فقط برای سرگروه";
+//                    $transaction_party_reqs = data_get($order, "userRequest.fullName") . "(" . data_get($order, "userRequest.customer.fullName") . ")";
+//                } else
+//                    $transaction_party_req = data_get($order, "userRequest.fullName");
+//
+//                if (data_get($order, "transferReport.user.role") == "customer") {
+//                    $transaction_party = "مشاهده فقط برای سرگروه";
+//                    $transaction_partys = data_get($order, "transferReport.user.fullName") . "(" . data_get($order, "transferReport.user.customer.fullName") . ")";
+//                } else
+//                    $transaction_party = data_get($order, "transferReport.user.fullName");
+//
+//
+//                /*
+//                 * message for req and head
+//                 */
+//                $message = $this->getStr(1, $transfer, $order, $transaction_party);
+//                logger("canscle pm",[$message]);
+//                $this->sendBotWord(data_get($order, "userRequest.telegram_id"), $message);
+//                logger("canscle pm 2",[$message]);
+//
+//                if (data_get($order, "userRequest.role") == "customer") {
+//                    $message = $this->getStr(1, $transfer, $order, $transaction_partys);
+//                    $this->sendBotCustomer(data_get($order, "userRequest.customer.telegram_id"), $message);
+//                }
+//
+//                /*
+//             * message for transfer and head
+//             */
+//                $message = $this->getStr(2, $transfer, $order, $transaction_party_req);
+//                logger("canscle pm 2",[$message]);
+//
+//                $this->sendBotWord(data_get($order, "transferReport.user.telegram_id"), $message);
+//                if (data_get($order, "transferReport.user.role") == "customer") {
+//                    $message = $this->getStr(2, $transfer, $order, $transaction_party_reqs);
+//                    $this->sendBotCustomer(data_get($order, "transferReport.user.customer.telegram_id"), $message);
+//                }
 
                 $this->getTelegramServices()->sendMessage($this->getUserId(), "کنسل شد پیغام برای مشتریان و سرگروه ارسال شد");
-
-                $order->dailyRequest->delete();
-                $order->delete();
+//
+//                $order->dailyRequest->delete();
+//                $order->delete();
                 $message_id = cache()->get("cancel_number_transaction_" . $order->id);
                 $this->telegram_services->editMessageReplyMarkup($this->getUserId(), $message_id, new \stdClass());
 
@@ -147,7 +153,7 @@ class ActionAccountingServices extends TextServices
         }
     }
 
-    private function sendBotWord($chat_id, array|string $message): void
+    private function qsendBotWord($chat_id, array|string $message): void
     {
         $bot_user = Bot::where("title", "botUser")->first();
         if ($bot_user) {
