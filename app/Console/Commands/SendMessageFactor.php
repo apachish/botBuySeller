@@ -35,7 +35,7 @@ class SendMessageFactor extends Command
 
                 $text = str_replace("(https://example.com)","",$message->text);
                 $text = str_replace("(","",$message->text);
-                $text = str_replace(")","",$message->text);
+                $text = str_replace(")","-",$message->text);
                 logger($text);
                 $send_accounting = $telegram->sendMessage(
                     [
