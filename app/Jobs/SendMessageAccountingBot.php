@@ -109,7 +109,7 @@ class SendMessageAccountingBot implements ShouldQueue
             $message .= $this->getBlue(data_get($order_buy, "userRequest.fullName"));
         }
         $message .= "\n";
-
+  
         if (data_get($order_buy, "transferReport.user.role") == "customer")
         {
             $message .= "$title_mal:";

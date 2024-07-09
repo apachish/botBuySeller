@@ -175,20 +175,32 @@ if (!function_exists('generateUniqueSixDigitCode')) {
 if (!function_exists('getTypeTransfer')) {
     function getTypeTransfer($type)
     {
-        if (in_array($type, [ "خ", "ف"]))
+        $time = Carbon::now();
+        $morning = Carbon::create($time->year, $time->month, $time->day, 9, 0, 0); //set time to 08:00
+        $none = Carbon::create($time->year, $time->month, $time->day, 15, 30, 0); //set time to 18:00
+        $none_13_30 = Carbon::create($time->year, $time->month, $time->day, 13, 30, 0); //set time to 18:00
+        if ($time->between($morning, $none, true) && in_array($type, [ "خ", "ف"]))
             return "عادی روز";
+        elseif ( in_array($type, [ "خ", "ف"]))
+            return "با حواله عادی";
         elseif (in_array($type, ["فف", "خف"]))
             return "با حواله عادی";
-        elseif (in_array($type, [ "خش", "فش"]))
+        elseif ($time->between($morning, $none_13_30, true) && in_array($type, [ "خش", "فش"]))
             return "شنا روز";
+        elseif ( in_array($type, [ "خش", "فش"]))
+            return "شنا";
         elseif (in_array($type, ["خفش", "ففش"]))
             return "شنا";
-        elseif (in_array($type, [ "خن", "فن"]))
+        elseif ($time->between($morning, $none, true) && in_array($type, [ "خن", "فن"]))
             return "نقدی حاضر";
+        elseif ( in_array($type, [ "خن", "فن"]))
+            return "نقدی";
         elseif (in_array($type, ["خفن", "ففن"]))
             return "نقدی";
-        elseif (in_array($type, [ "فم", "خم","فپ", "خپ"]))
+        elseif ($time->between($morning, $none_13_30, true)  && in_array($type, [ "فم", "خم","فپ", "خپ"]))
             return "معکوس روز";
+        elseif ($time->between($morning, $none_13_30, true)  && in_array($type, [ "فم", "خم","فپ", "خپ"]))
+            return "معکوس";
         elseif (in_array($type, ["ففم", "خفم","ففپ", "خفپ"]))
             return "معکوس";
 
