@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Models\Bot;
 use App\Models\Message;
 use Illuminate\Console\Command;
+use Telegram\Bot\Api;
 
 class SendMessageFactor extends Command
 {
@@ -30,7 +31,18 @@ class SendMessageFactor extends Command
         Message::whereDate("created_at",now()->format("Y-m-d"))->where("status","failed")->get()->each(function ($message) {
             $bot = Bot::find($message->bot_id);
             if($bot){
+                $telegram = new Api($bot->token);
 
+                $send_accounting = $telegram->sendMessage(
+                    [
+                        'chat_id' => $message->telegram_id,
+                        'text' => $message->text,
+                        'parse_mode' => 'MarkdownV2'
+                    ]);
+                if($send_accounting){
+                    $message->status = "receive";
+                    $message->update();
+                }
             }
         })();
     }
