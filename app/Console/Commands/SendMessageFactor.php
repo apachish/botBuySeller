@@ -33,7 +33,8 @@ class SendMessageFactor extends Command
             $bot = Bot::find($message->bot_id);
             if($bot){
                 $telegram = new Api($bot->token);
-
+                $text = str_replace("\(","(",$message->text);
+                $text = str_replace("\)",")",$text);
                 $text = str_replace("(","\(",$message->text);
                 $text = str_replace(")","\)",$text);
                 $text = str_replace("\(https://example.com\)","(https://example.com)",$text);
