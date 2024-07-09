@@ -54,7 +54,7 @@ class CancelOrderCustomer implements ShouldQueue
                 $this->parties = str_replace(")","\)",$this->parties);
                 $telegram_customer = new Api($bot_customer->token);
                 $message = "\xE2\x9D\x8C\xE2\x9D\x97";
-                $message .= "حذف معامله زیر توسط ادمین به درخواست طرفبن معامله";
+                $message .= "حذف معامله زیر توسط ادمین به درخواست طرفین معامله";
                 $message .= "\xE2\x9D\x8C\xE2\x9D\x97";
                 $message .= "\n\n";
                 $message .= "نام مشتری:";

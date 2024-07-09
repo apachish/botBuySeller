@@ -58,7 +58,7 @@ class CancelOrderUser implements ShouldQueue
                 logger("bot user", [$bot_user]);
                 $telegram_user = new Api($bot_user->token);
                 $message = "\xE2\x9D\x8C\xE2\x9D\x97";
-                $message .= "حذف معامله زیر توسط ادمین به درخواست طرفبن معامله";
+                $message .= "حذف معامله زیر توسط ادمین به درخواست طرفین معامله";
                 $message .= "\xE2\x9D\x8C\xE2\x9D\x97";
                 $message .= "\n\n";
                 $message .= $this->title;

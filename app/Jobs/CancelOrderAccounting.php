@@ -39,7 +39,7 @@ class CancelOrderAccounting implements ShouldQueue
             try {
                 logger("bot accounting job", [$bot_accounting]);
                 $telegram_accounting = new Api($bot_accounting->token);
-                $order_buy = RequestTransfer::with(["userRequest.customer", "transferReport"])->find($this->order_id);
+                $order_buy = RequestTransfer::with(["userRequest.customer", "transferReport"])->withTrashed()->find($this->order_id);
                 logger("order buy", [$order_buy]);
                 $message = $this->getfactor($order_buy);
                 $admins = $bot_accounting->accessBot;
@@ -82,7 +82,7 @@ class CancelOrderAccounting implements ShouldQueue
     private function getfactor(\Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection|\Illuminate\Database\Eloquent\Builder|array $order_buy): string
     {
         $message = "\xE2\x9D\x8C\xE2\x9D\x97";
-        $message .= "حذف معامله زیر توسط ادمین به درخواست طرفبن معامله";
+        $message .= "حذف معامله زیر توسط ادمین به درخواست طرفین معامله";
         $message .= "\xE2\x9D\x8C\xE2\x9D\x97";
         $message .= "\n\n";
         $message .= "   شماره حواله:";
