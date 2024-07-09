@@ -86,7 +86,13 @@ $this->user_id ]);
                 $message .= "\n";
                 $message .= "   شماره حواله:"  ;
                 $message .= "**$this->factor**"   ;
-
+                $message = str_replace("\(","(",$message);
+                $message = str_replace("\)",")",$message);
+                $message = str_replace("(","\(",$message);
+                $message = str_replace(")","\)",$message);
+                $message = str_replace("-","\-",$message);
+                $message = str_replace("_","\_",$message);
+                $message = str_replace("\(https://example.com\)","(https://example.com)",$message);
                 $this->send = Message::create([
                     "telegram_id"=>$this->user_id,
                     "bot_id"=>$bot_user->id,

@@ -109,7 +109,7 @@ class SendMessageAccountingBot implements ShouldQueue
             $message .= $this->getBlue(data_get($order_buy, "userRequest.fullName"));
         }
         $message .= "\n";
-  
+
         if (data_get($order_buy, "transferReport.user.role") == "customer")
         {
             $message .= "$title_mal:";
@@ -134,15 +134,21 @@ class SendMessageAccountingBot implements ShouldQueue
         $message .= "\n";
         $message .= "نوع:" . getTypeTransfer($transfer->type);
         logger("mesage acco", [$message]);
+        $message = str_replace("\(","(",$message);
+        $message = str_replace("\)",")",$message);
+        $message = str_replace("(","\(",$message);
+        $message = str_replace(")","\)",$message);
+        $message = str_replace("-","\-",$message);
+        $message = str_replace("\(https://example.com\)","(https://example.com)",$message);
         return $message;
     }
 
     private function getBlue($text)
     {
-//        $message = " [**";
+        $message = " [**";
         $message = $text;
-//        $message .= "**]";
-//        $message .= "(https://example.com)";
+        $message .= "**]";
+        $message .= "(https://example.com)";
         return $message;
     }
 }
