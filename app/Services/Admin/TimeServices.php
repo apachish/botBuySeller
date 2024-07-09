@@ -197,7 +197,7 @@ class TimeServices
         $response_text = "تاریخ فردا معاملات:";
         $response_text .= "\n\n";
         if($tomorrow)
-            $response_text .= toJalali($tomorrow, "Y/m/d");
+            $response_text .= toJalali(data_get($tomorrow,"value"), "Y/m/d");
         else
             $response_text .= toJalali(now()->addDay(), "Y/m/d");
         $response_text .= "\n\n";
