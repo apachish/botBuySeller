@@ -1033,9 +1033,9 @@ class ActionServices extends TextServices
                 $message_request_me .= " \xE2\x98\x80	";
                 $date = data_get($forbidden_day, "value")?$tomorrow:now()->format("Y-m-d");
             } else {
-                $message .= " 🕰️	";
-                $message_request .= " 🕰️	";
-                $message_request_me .= " 🕰️	";
+                $message .= " \xE2\x8F\xB3️	";
+                $message_request .= " \xE2\x8F\xB3️	";
+                $message_request_me .= " \xE2\x8F\xB3️	";
                 if ($tomorrow)
                     $date = $tomorrow;
                 else
