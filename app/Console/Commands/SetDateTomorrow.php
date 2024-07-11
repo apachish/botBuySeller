@@ -91,28 +91,38 @@ class SetDateTomorrow extends Command
         }while(!$date_sh);
 
         $date = toGregorian($date_sh, "Y/m/d");
-        Setting::updateOrCreate(["key"=>"tomorrow"],[
-            "value"=>$date
-        ]);
-        $bot_manage = Bot::where("title", "botManage")->first();
-        $telegram_manage = new Api($bot_manage->token);
-        $message ="تاریخ فردا تنظیم شد";
-        $message .="\n";
-        $message .= toJalali($date,"Y/m/d");
-        $admins = $bot_manage->accessBot;
-        foreach ($admins as $admin) {
-            logger("data set ",[
-                'chat_id' =>  $admin->user_id,
-                'text' => $message,
-                'parse_mode' => 'MarkdownV2'
-            ]);
-            $message_telegram = $telegram_manage->sendMessage(
-                [
-                    'chat_id' =>  $admin->user_id,
-                    'text' => $message,
-                ]);
+        $tomorrow = Setting::where("key", "tomorrow")->first();
+        if ($tomorrow) {
+            $tdate = $tomorrow->value;
+            $datetime1 = new \DateTime($date);
+            $datetime2 = new \DateTime($tdate);
+            $interval = $datetime1->diff($datetime2);
+            $days = $interval->format('%a');
         }
-        cache()->forget("set_tomorrow_date");
+        if(($tomorrow &&  $interval->invert) || !$tomorrow) {
+            Setting::updateOrCreate(["key" => "tomorrow"], [
+                "value" => $date
+            ]);
+            $bot_manage = Bot::where("title", "botManage")->first();
+            $telegram_manage = new Api($bot_manage->token);
+            $message = "تاریخ فردا تنظیم شد";
+            $message .= "\n";
+            $message .= toJalali($date, "Y/m/d");
+            $admins = $bot_manage->accessBot;
+            foreach ($admins as $admin) {
+                logger("data set ", [
+                    'chat_id' => $admin->user_id,
+                    'text' => $message,
+                    'parse_mode' => 'MarkdownV2'
+                ]);
+                $message_telegram = $telegram_manage->sendMessage(
+                    [
+                        'chat_id' => $admin->user_id,
+                        'text' => $message,
+                    ]);
+            }
+            cache()->forget("set_tomorrow_date");
+        }
 
     }
 }

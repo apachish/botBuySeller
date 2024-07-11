@@ -1002,10 +1002,10 @@ class ActionServices extends TextServices
                 return Setting::where("key", "forbidden_day")->first();
             });
             logger("forbidden_day", [$forbidden_day, $forbidden_day->value]);
-            if ($forbidden_day && data_get($forbidden_day, "value") && in_array($this->getType(), $this->list_type_today)) {
-                $this->telegram_services->sendMessage($this->getUserId(), "تمام معاملات برای اولین روز کاری می باشد و امکان معامله روز در حال حاظر وجود ندارد");
-                return true;
-            }
+//            if ($forbidden_day && data_get($forbidden_day, "value") && in_array($this->getType(), $this->list_type_today)) {
+//                $this->telegram_services->sendMessage($this->getUserId(), "تمام معاملات برای اولین روز کاری می باشد و امکان معامله روز در حال حاظر وجود ندارد");
+//                return true;
+//            }
 //            if (!$time->between($morning, $none_13_30, true) && in_array($this->getType(), $this->list_type_today_r_f)) {
 //                $this->telegram_services->sendMessage($this->getUserId(), "\xE2\x9D\x8C	زمان معامله شرایطی برای امروز به پایان رسیده است\xE2\x9D\x8C	");
 //                return true;
@@ -1016,28 +1016,31 @@ class ActionServices extends TextServices
 //                $this->telegram_services->sendMessage($this->getUserId(), "\xE2\x9D\x8C	زمان معامله نقدی حاضر به پایان رسیده است\xE2\x9D\x8C		");
 //                return true;
 //            } else
-                if ($time->between($morning, $none_13_30, true) && in_array($this->getType(), $this->list_type_today_r_f)) {
+            $tomorrow = cache()->remember("set_tomorrow_date", now()->setTime(22, 59), function () {
+                $tomorrow = Setting::where("key", "tomorrow")->first();
+                if ($tomorrow)
+                    return $tomorrow->value;
+            });
+            if ($time->between($morning, $none_13_30, true) && in_array($this->getType(), $this->list_type_today_r_f)) {
                 $message .= " \xE2\x98\x80	";
                 $message_request .= " \xE2\x98\x80	";
                 $message_request_me .= " \xE2\x98\x80	";
-                $date = now()->format("Y-m-d");
+                $date = data_get($forbidden_day, "value")?$tomorrow:now()->format("Y-m-d");
             } else if ($time->between($morning, $none, true) && (in_array($this->getType(), $this->list_type_today_normal) ||
                     in_array($this->getType(), $this->list_type_today_cache))) {
                 $message .= " \xE2\x98\x80	";
                 $message_request .= " \xE2\x98\x80	";
                 $message_request_me .= " \xE2\x98\x80	";
-                $date = now()->format("Y-m-d");
+                $date = data_get($forbidden_day, "value")?$tomorrow:now()->format("Y-m-d");
             } else {
                 $message .= " 🕰️	";
                 $message_request .= " 🕰️	";
                 $message_request_me .= " 🕰️	";
-                $date = cache()->remember("set_tomorrow_date", now()->setTime(22, 59), function () {
-                    $tomorrow = Setting::where("key", "tomorrow")->first();
-                    if ($tomorrow)
-                        return $tomorrow->value;
-                });
-                if (!$date)
+                if ($tomorrow)
+                    $date = $tomorrow;
+                else
                     $date = now()->addDay(1)->format("Y-m-d");
+
             }
 
             $message_request .= "\n";

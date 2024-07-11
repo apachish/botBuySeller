@@ -29,8 +29,8 @@ class Message3 extends Command
      */
     public function handle()
     {
-        $message = Setting::where("key", "message_3")->first();
-        if(data_get($message,"value")){
+        $message = Setting::whereIn("key", ["message_3","forbidden_day"])->get()->keyBy('key');
+        if(data_get($message,"message_3.value") && !data_get($message,"forbidden_day.value")){
             $bot_user = Bot::where("title", "botUser")->first();
 
             if($bot_user) {
