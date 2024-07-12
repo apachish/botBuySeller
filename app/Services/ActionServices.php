@@ -998,6 +998,7 @@ class ActionServices extends TextServices
                     !in_array($this->getType(), $this->list_type_sell_tommarow)
                 )
             ]);
+            cache()->forget("forbidden_day");
             $forbidden_day = cache()->remember("forbidden_day", now()->setTime(23, 59), function () {
                 return Setting::where("key", "forbidden_day")->first();
             });
@@ -1049,8 +1050,8 @@ class ActionServices extends TextServices
             $message_request_me .= "\n";
             $message_request_me .= "فی:";
             $message_request_me .= number_format($price, 0);
-            if (in_array($this->getType(), $this->list_type_cash)) {
-                if ($time->between($morning, $none, true) && in_array($this->getType(), $this->list_type_cash_n))
+            if ( in_array($this->getType(), $this->list_type_cash)) {
+                if (!data_get($forbidden_day, "value") && $time->between($morning, $none, true) && in_array($this->getType(), $this->list_type_cash_n))
                     $message .= " نقدی حاضر ";
                 else
                     $message .= "   بی حواله فردا ";
