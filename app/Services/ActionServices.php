@@ -1000,9 +1000,12 @@ class ActionServices extends TextServices
             ]);
             cache()->forget("forbidden_day");
             $forbidden_day = cache()->remember("forbidden_day", now()->setTime(23, 59), function () {
-                return Setting::where("key", "forbidden_day")->first();
+                $item = Setting::where("key", "forbidden_day")->first();
+                return data_get($item,"value");
             });
-            logger("forbidden_day", [$forbidden_day, $forbidden_day->value]);
+            if(!$forbidden_day)
+                $forbidden_day = $time->isThursday() || $time->isFriday()?true:false;
+            logger("forbidden_day", [$forbidden_day, $forbidden_day]);
 //            if ($forbidden_day && data_get($forbidden_day, "value") && in_array($this->getType(), $this->list_type_today)) {
 //                $this->telegram_services->sendMessage($this->getUserId(), "تمام معاملات برای اولین روز کاری می باشد و امکان معامله روز در حال حاظر وجود ندارد");
 //                return true;
@@ -1022,12 +1025,12 @@ class ActionServices extends TextServices
                 if ($tomorrow)
                     return $tomorrow->value;
             });
-            if (!data_get($forbidden_day, "value") && $time->between($morning, $none_13_30, true) && in_array($this->getType(), $this->list_type_today_r_f)) {
+            if (!$forbidden_day && $time->between($morning, $none_13_30, true) && in_array($this->getType(), $this->list_type_today_r_f)) {
                 $message .= " \xE2\x98\x80	";
                 $message_request .= " \xE2\x98\x80	";
                 $message_request_me .= " \xE2\x98\x80	";
                 $date = now()->format("Y-m-d");
-            } else if ( !data_get($forbidden_day, "value") && data_get($forbidden_day, "value") && $time->between($morning, $none, true) && (in_array($this->getType(), $this->list_type_today_normal) ||
+            } else if ( !$forbidden_day && $time->between($morning, $none, true) && (in_array($this->getType(), $this->list_type_today_normal) ||
                     in_array($this->getType(), $this->list_type_today_cache))) {
                 $message .= " \xE2\x98\x80	";
                 $message_request .= " \xE2\x98\x80	";
@@ -1051,14 +1054,14 @@ class ActionServices extends TextServices
             $message_request_me .= "فی:";
             $message_request_me .= number_format($price, 0);
             if ( in_array($this->getType(), $this->list_type_cash)) {
-                if (!data_get($forbidden_day, "value") && $time->between($morning, $none, true) && in_array($this->getType(), $this->list_type_cash_n))
+                if (!$forbidden_day && $time->between($morning, $none, true) && in_array($this->getType(), $this->list_type_cash_n))
                     $message .= " نقدی حاضر ";
                 else
                     $message .= "   بی حواله فردا ";
 
                 $message .= "\xF0\x9F\x92\xB0	";
 
-            } elseif ( !data_get($forbidden_day, "value") && $time->between($morning, $none, true) && (in_array($this->getType(), $this->list_type_today)))
+            } elseif ( !$forbidden_day && $time->between($morning, $none, true) && (in_array($this->getType(), $this->list_type_today)))
                 $message .= " روز   ";
             else
                 $message .= "  با حواله  ";
