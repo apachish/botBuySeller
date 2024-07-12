@@ -110,6 +110,7 @@ class CancelOrder implements ShouldQueue
             $date = $transfer->date;
             $factor = data_get($order_buy, 'id');
             $user_id = data_get($user, 'telegram_id');
+            $type_title = data_get($order_buy, 'type_title');
             dispatch(new CancelOrderUser(
                 $title,
                 $number,
@@ -119,6 +120,7 @@ class CancelOrder implements ShouldQueue
                 $date,
                 $factor,
                 $user_id,
+                $type_title
             ));
             if ($user->role == "customer" && data_get($user, 'customer')) {
                 $customer = data_get($user, 'fullName');
@@ -133,7 +135,8 @@ class CancelOrder implements ShouldQueue
                     $date,
                     $factor,
                     $user_id,
-                    $customer
+                    $customer,
+                    $type_title
                 ));
             }
             $user_id = $transfer->user->telegram_id;
@@ -148,6 +151,7 @@ class CancelOrder implements ShouldQueue
                 $date,
                 $factor,
                 $user_id,
+                $type_title
             ));
             if ($transfer->user->role == "customer" && data_get($transfer, 'user.customer')) {
                 $customer = data_get($transfer, 'user.fullName');
@@ -162,7 +166,8 @@ class CancelOrder implements ShouldQueue
                     $date,
                     $factor,
                     $user_id,
-                    $customer
+                    $customer,
+                    $type_title
                 ));
             }
             $order_buy->dailyRequest->delete();

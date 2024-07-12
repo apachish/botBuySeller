@@ -24,11 +24,12 @@ class SendMessageCustomerBot implements ShouldQueue
     private $factor;
     private $user_id;
     private $customer;
+    private $type_title;
     private $send;
     /**
      * Create a new job instance.
      */
-    public function __construct($title,$number,$type,$description,$parties,$date,$factor,$user_id,$customer)
+    public function __construct($title,$number,$type,$description,$parties,$date,$factor,$user_id,$customer,$type_title)
     {
         $this->title = $title;
         $this->number = $number;
@@ -39,6 +40,7 @@ class SendMessageCustomerBot implements ShouldQueue
         $this->factor = $factor;
         $this->user_id = $user_id;
         $this->customer = $customer;
+        $this->type_title = $type_title;
     }
 
 
@@ -64,7 +66,7 @@ class SendMessageCustomerBot implements ShouldQueue
                 $message .= " ** ]";
                 $message .= "(https://example.com)";
                 $message .= "\n";
-                $message .= "نوع:" . getTypeTransfer($this->type);
+                $message .= "نوع:" . $this->type_title?:getTypeTransfer($this->type);
                 if ($this->description) {
                     $message .= "\n";
                     $message .= "توضیحات";

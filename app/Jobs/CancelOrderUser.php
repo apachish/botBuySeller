@@ -24,11 +24,12 @@ class CancelOrderUser implements ShouldQueue
     private $date;
     private $factor;
     private $user_id;
+    private $type_title;
     private $send;
     /**
      * Create a new job instance.
      */
-    public function __construct($title,$number,$type,$description,$parties,$date,$factor,$user_id)
+    public function __construct($title,$number,$type,$description,$parties,$date,$factor,$user_id,$type_title)
     {
         $this->title = $title;
         $this->number = $number;
@@ -38,6 +39,7 @@ class CancelOrderUser implements ShouldQueue
         $this->date = $date;
         $this->factor = $factor;
         $this->user_id = $user_id;
+        $this->type_title = $type_title;
     }
     /**
      * Execute the job.
@@ -70,7 +72,7 @@ class CancelOrderUser implements ShouldQueue
                 $message .= " **]";
                 $message .= "(https://example.com)";
                 $message .= "\n";
-                $message .= "نوع:" . getTypeTransfer($this->type);
+                $message .= "نوع:" . $this->type_title?:getTypeTransfer($this->type);
                 if ($this->description) {
                     $message .= "\n";
                     $message .= "توضیحات";

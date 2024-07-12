@@ -22,7 +22,8 @@ class RequestTransfer extends Model
         "number",
         "price",
         "status",
-        "type"
+        "type",
+        "type_title"
     ];
 
     public function transfer()

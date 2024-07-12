@@ -356,6 +356,7 @@ class ActionServices extends TextServices
                     $request_transfer["request_id"] = $this->getUser()->id;
                     $request_transfer["transfer_id"] = $transfer->id;
                     $request_transfer["price"] = $transfer->price;
+                    $request_transfer["type_title"] = getTypeTransfer($transfer->type);
                     $request_transfer["type"] = getTypeOrder(data_get($transfer, "type")) == "buy" ? "sell" : "buy";
 
                     $order_buy = RequestTransfer::create($request_transfer);
@@ -1054,7 +1055,7 @@ class ActionServices extends TextServices
             $message_request_me .= "فی:";
             $message_request_me .= number_format($price, 0);
             if ( in_array($this->getType(), $this->list_type_cash)) {
-                if (!$forbidden_day && $time->between($morning, $none, true) && in_array($this->getType(), $this->list_type_cash_n))
+                if (!$forbidden_day && $time->between($morning, $none_13_30, true) && in_array($this->getType(), $this->list_type_cash_n))
                     $message .= " نقدی حاضر ";
                 else
                     $message .= "   بی حواله فردا ";

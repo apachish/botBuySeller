@@ -132,7 +132,7 @@ class SendMessageAccountingBot implements ShouldQueue
         $message .= "**]";
         $message .= "(https://example.com)";
         $message .= "\n";
-        $message .= "نوع:" . getTypeTransfer($transfer->type);
+        $message .= "نوع:" . $order_buy->type_title?:getTypeTransfer($transfer->type);
         logger("mesage acco", [$message]);
         $message = str_replace("\(","(",$message);
         $message = str_replace("\)",")",$message);
