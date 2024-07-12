@@ -1038,7 +1038,7 @@ class ActionServices extends TextServices
                 $message_request .= " \xE2\x8F\xB3️	";
                 $message_request_me .= " \xE2\x8F\xB3️	";
                 if ($tomorrow)
-                    $date = data_get($tomorrow, "value");
+                    $date = $tomorrow;
                 else
                     $date = now()->addDay(1)->format("Y-m-d");
 
