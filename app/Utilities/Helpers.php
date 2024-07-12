@@ -176,33 +176,38 @@ if (!function_exists('generateUniqueSixDigitCode')) {
 if (!function_exists('getTypeTransfer')) {
     function getTypeTransfer($type)
     {
-        $forbidden_day = cache()->remember("forbidden_day", now()->setTime(23, 59), function () {
-            return Setting::where("key", "forbidden_day")->first();
-        });
         $time = Carbon::now();
+
+        cache()->forget("forbidden_day");
+        $forbidden_day = cache()->remember("forbidden_day", now()->setTime(23, 59), function () {
+            $item = Setting::where("key", "forbidden_day")->first();
+            return data_get($item,"value");
+        });
+        if(!$forbidden_day)
+            $forbidden_day = $time->isThursday() || $time->isFriday()?true:false;
         $morning = Carbon::create($time->year, $time->month, $time->day, 9, 0, 0); //set time to 08:00
         $none = Carbon::create($time->year, $time->month, $time->day, 15, 30, 0); //set time to 18:00
         $none_13_30 = Carbon::create($time->year, $time->month, $time->day, 13, 30, 0); //set time to 18:00
         logger("time",[$morning,$none,$none_13_30]);
-        if (!data_get($forbidden_day, "value") && $time->between($morning, $none, true) && in_array($type, [ "خ", "ف"]))
+        if (!$forbidden_day && $time->between($morning, $none, true) && in_array($type, [ "خ", "ف"]))
             return "عادی روز";
         elseif ( in_array($type, [ "خ", "ف"]))
             return "با حواله عادی";
         elseif (in_array($type, ["فف", "خف"]))
             return "با حواله عادی";
-        elseif ( !data_get($forbidden_day, "value") && $time->between($morning, $none_13_30, true) && in_array($type, [ "خش", "فش"]))
+        elseif ( !$forbidden_day && $time->between($morning, $none_13_30, true) && in_array($type, [ "خش", "فش"]))
             return "شنا روز";
         elseif ( in_array($type, [ "خش", "فش"]))
             return "شنا";
         elseif (in_array($type, ["خفش", "ففش"]))
             return "شنا";
-        elseif (!data_get($forbidden_day, "value") && $time->between($morning, $none, true) && in_array($type, [ "خن", "فن"]))
+        elseif (!$forbidden_day && $time->between($morning, $none, true) && in_array($type, [ "خن", "فن"]))
             return "نقدی حاضر";
         elseif ( in_array($type, [ "خن", "فن"]))
             return "نقدی";
         elseif (in_array($type, ["خفن", "ففن"]))
             return "نقدی";
-        elseif (!data_get($forbidden_day, "value") && $time->between($morning, $none_13_30, true)  && in_array($type, [ "فم", "خم","فپ", "خپ"]))
+        elseif (!$forbidden_day && $time->between($morning, $none_13_30, true)  && in_array($type, [ "فم", "خم","فپ", "خپ"]))
             return "معکوس روز";
         elseif ($time->between($morning, $none_13_30, true)  && in_array($type, [ "فم", "خم","فپ", "خپ"]))
             return "معکوس";
