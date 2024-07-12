@@ -183,8 +183,8 @@ if (!function_exists('getTypeTransfer')) {
             $item = Setting::where("key", "forbidden_day")->first();
             return data_get($item,"value");
         });
-//        if(!$forbidden_day)
-//            $forbidden_day = $time->isThursday() || $time->isFriday()?true:false;
+        if(!$forbidden_day)
+            $forbidden_day = $time->isThursday() || $time->isFriday()?true:false;
         $morning = Carbon::create($time->year, $time->month, $time->day, 9, 0, 0); //set time to 08:00
         $none = Carbon::create($time->year, $time->month, $time->day, env("NONE_HOUR","15"), env("NONE_MIN","30"), 0); //set time to 18:00
         $none_13_30 = Carbon::create($time->year, $time->month, $time->day, env("NONE_M_HOUR","13"), env("NONE_M_MIN","30"), 0); //set time to 18:00

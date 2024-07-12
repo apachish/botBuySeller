@@ -29,8 +29,14 @@ class Message3 extends Command
      */
     public function handle()
     {
+        $time = Carbon::now();
+
         $message = Setting::whereIn("key", ["message_3", "forbidden_day"])->get()->keyBy('key');
-        if (data_get($message, "message_3.value") && !data_get($message, "forbidden_day.value")) {
+
+        $forbidden_day = data_get($message, "forbidden_day.value");
+        if(!$forbidden_day)
+            $forbidden_day = $time->isThursday() || $time->isFriday()?true:false;
+        if (data_get($message, "message_3.value") && !$forbidden_day) {
             $bot_user = Bot::where("title", "botUser")->first();
 
             if ($bot_user) {
