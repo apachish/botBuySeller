@@ -44,13 +44,12 @@ class DeleteMessageChanel extends Command
             foreach ($updates as $update) {
 
                         // حذف پیام
-                        logger("aaaaa",[$bot,$update,$bot->token, ]);
                         $result = $this->deleteMessage($bot->token, $bot->chanel_id, $update->message_id);
-                        logger("result",[$result]);
-                        if ($result['ok']) {
+                        logger("result",[$update->message_id,$result]);
+                        if (data_get($result,'ok')) {
                             echo "پیام با شناسه $update->message_id حذف شد.\n";
                         } else {
-                            echo "خطا در حذف پیام با شناسه $update->message_id: " . $result['description'] . "\n";
+                            echo "خطا در حذف پیام با شناسه $update->message_id: " .data_get($result,'description') . "\n";
                         }
 
             }
