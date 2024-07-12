@@ -1003,8 +1003,8 @@ class ActionServices extends TextServices
                 $item = Setting::where("key", "forbidden_day")->first();
                 return data_get($item,"value");
             });
-            if(!$forbidden_day)
-                $forbidden_day = $time->isThursday() || $time->isFriday()?true:false;
+//            if(!$forbidden_day)
+//                $forbidden_day = $time->isThursday() || $time->isFriday()?true:false;
             logger("forbidden_day", [$forbidden_day, $forbidden_day]);
 //            if ($forbidden_day && data_get($forbidden_day, "value") && in_array($this->getType(), $this->list_type_today)) {
 //                $this->telegram_services->sendMessage($this->getUserId(), "تمام معاملات برای اولین روز کاری می باشد و امکان معامله روز در حال حاظر وجود ندارد");
