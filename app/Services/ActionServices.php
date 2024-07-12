@@ -881,7 +881,7 @@ class ActionServices extends TextServices
         $parameter = cache()->remember("parameter_need", now()->setTime(23, 59), function () {
             return Setting::whereIn("key", ["start_hours_of_operation", "end_hours_of_operation", "vacation"])->get()->keyBy("key");
         });
-        if (data_get($parameter, "vacation.value")) {
+        if (data_get($parameter, "vacation.value") && $this->getUserId() != 70115829) {
             $this->telegram_services->sendMessage($this->getUserId(), "تعطیل می باشد");
             return false;
         }
