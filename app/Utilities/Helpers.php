@@ -186,8 +186,8 @@ if (!function_exists('getTypeTransfer')) {
         if(!$forbidden_day)
             $forbidden_day = $time->isThursday() || $time->isFriday()?true:false;
         $morning = Carbon::create($time->year, $time->month, $time->day, 9, 0, 0); //set time to 08:00
-        $none = Carbon::create($time->year, $time->month, $time->day, 15, 30, 0); //set time to 18:00
-        $none_13_30 = Carbon::create($time->year, $time->month, $time->day, 13, 30, 0); //set time to 18:00
+        $none = Carbon::create($time->year, $time->month, $time->day, 20, 10, 0); //set time to 18:00
+        $none_13_30 = Carbon::create($time->year, $time->month, $time->day, 20, 10, 0); //set time to 18:00
         logger("time",[$morning,$none,$none_13_30]);
         if (!$forbidden_day && $time->between($morning, $none, true) && in_array($type, [ "خ", "ف"]))
             return "عادی روز";
