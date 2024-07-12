@@ -43,7 +43,6 @@ class SettingServices
         $page = (int)data_get($array, 0);
 
         $message_id = cache()->get("menu_List_ugly_word_" . $object->getUserId());
-        logger("aa", [ $message_id, $page]);
         if ($message_id)
             $this->listUglyWord($object,$page, $message_id);
     }
@@ -171,7 +170,6 @@ class SettingServices
         $data = explode("_",$data);
         $id = data_get($data,0);
         $page = data_get($data,1);
-        logger("ss",[$data,$id,$page]);
         $ugly = UglyWord::find($id);
 
         if($ugly) {
@@ -262,7 +260,6 @@ class SettingServices
         $ugly_words = UglyWord::query();
 
         $ugly_words = $ugly_words->simplePaginate(10, ['*'], 'page', $page);
-        logger("ugly words",[$ugly_words]);
         $page = $ugly_words->currentPage();
         $next = $ugly_words->nextPageUrl() ? (int)str_replace("?page=", "", strstr($ugly_words->nextPageUrl(), "?page=")) : null;
         $pre = $ugly_words->previousPageUrl() ? (int)str_replace("?page=", "", strstr($ugly_words->previousPageUrl(), "?page=")) : null;
@@ -281,7 +278,6 @@ class SettingServices
         if ($next)
             $keyboard[$i][] = ['text' => "بعدی", "callback_data" => "next_ugly_word" . $next ];
 
-        logger("ugli key",$keyboard);
         if ($message_id)
             $object->getTelegramServices()->editMessageTextAndInlineKeyboard($object->getUserId(), $message_id, $text, $keyboard);
         else {

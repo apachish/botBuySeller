@@ -50,7 +50,6 @@ class ActionAccountingServices extends TextServices
 
     public function actionData()
     {
-//        logger("actionText", [$this->getData()]);
         if (str_contains($this->getData(), "get_report_")) {
             $id = str_replace('get_report_', '', $this->getData());
             if ($id) {
@@ -92,9 +91,7 @@ class ActionAccountingServices extends TextServices
 //                 * message for req and head
 //                 */
 //                $message = $this->getStr(1, $transfer, $order, $transaction_party);
-//                logger("canscle pm",[$message]);
 //                $this->sendBotWord(data_get($order, "userRequest.telegram_id"), $message);
-//                logger("canscle pm 2",[$message]);
 //
 //                if (data_get($order, "userRequest.role") == "customer") {
 //                    $message = $this->getStr(1, $transfer, $order, $transaction_partys);
@@ -105,7 +102,6 @@ class ActionAccountingServices extends TextServices
 //             * message for transfer and head
 //             */
 //                $message = $this->getStr(2, $transfer, $order, $transaction_party_req);
-//                logger("canscle pm 2",[$message]);
 //
 //                $this->sendBotWord(data_get($order, "transferReport.user.telegram_id"), $message);
 //                if (data_get($order, "transferReport.user.role") == "customer") {
@@ -133,7 +129,6 @@ class ActionAccountingServices extends TextServices
         $bot_customer = Bot::where("title", "botCustomer")->first();
         if ($bot_customer) {
             try {
-                logger("bot customer", [$bot_customer]);
                 $telegram_customer = new Api($bot_customer->token);
                 $telegram_customer->sendMessage(
                     [
@@ -157,7 +152,6 @@ class ActionAccountingServices extends TextServices
     {
         $bot_user = Bot::where("title", "botUser")->first();
         if ($bot_user) {
-            logger("bot user", [$bot_user]);
             try {
                 $telegram_customer = new Api($bot_user->token);
                 $send_user = $telegram_customer->sendMessage(
@@ -166,10 +160,7 @@ class ActionAccountingServices extends TextServices
                         'text' => $message,
                     ]
                 );
-                logger("send user", [$send_user, [
-                    'chat_id' => $chat_id,
-                    'text' => $message,
-                ]]);
+
             }catch (\Exception $exception){
                     logger("get error",[
                         $exception->getMessage(),
@@ -185,7 +176,6 @@ class ActionAccountingServices extends TextServices
     public function actionText()
     {
         cache()->forget($this->getKeyCache() . $this->getUserId());
-        logger("actionText", [$this->getMessage()]);
         switch ($this->getMessage()) {
             case "\xF0\x9F\x94\x8D\xF0\x9F\x93\x83جستجو با حواله":
                 $this->getTelegramServices()->sendMessage($this->getUserId(), "شماره حواله مربوطه را وارد کنید");
@@ -206,19 +196,16 @@ class ActionAccountingServices extends TextServices
     public function actionTextCache()
     {
         $key_case = $this->getMessageCache();
-        logger("cache", [$this->getMessageCache()]);
         if (str_contains($this->getMessageCache(), "get_report_"))
             $key_case = "get_report_";
 
 
-        logger($key_case);
         switch ($key_case) {
 
             case "set_number_transaction":
                 $order_buy = RequestTransfer::with(["userRequest.customer", "transferReport"])->find($this->getMessage());
                 if ($order_buy) {
                     $message = $this->getfactor($order_buy);
-                    logger("message accounting", [$message]);
                     $keyboard[0][0] = [
                         'text' => "کنسل کردن",
                         'callback_data' => "cancel_request_transfer_" . $order_buy->id,
@@ -258,7 +245,6 @@ class ActionAccountingServices extends TextServices
                 break;
             case "get_report_":
                 $id = str_replace('get_report_', '', $this->getMessageCache());
-                logger("iddd" . $id);
                 $customer = UserTelegram::find($id);
                 if (!isValidShamsiDate($this->getMessage()))
                     $this->getTelegramServices()->sendMessage($this->getUserId(), "فرمت تاریخ دست نمی باشد");
@@ -361,9 +347,7 @@ class ActionAccountingServices extends TextServices
         $id = (int)data_get($array, 2);
         $page = (int)data_get($array, 3);
         $filter = data_get($array, 4, null);
-        logger("data", [$array]);
         $user_con = UserTelegram::find($id);
-        logger("data", [$user_con]);
 
         if ($user_con) {
             $user_con["agent_id"] = $parent;

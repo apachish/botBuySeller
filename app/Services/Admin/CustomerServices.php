@@ -80,7 +80,6 @@ class CustomerServices
             $keyboard[0][0] = ['text' => "قوانین را خواندم و آنها را پذیرفتم"];
             $object->service_user->telegram_services::menu($object->service_user->telegram, $keyboard, $user, $text);
             $message_admin = cache()->get("message_admin_" . $object->getUserId());
-            logger("message_admin", [$message_admin]);
             if ($message_admin) {
                 $object->telegram_services->deleteMessage($object->getUserId(), data_get($message_admin, "message_id"));
                 $text_a = "کاربر";
@@ -122,7 +121,6 @@ class CustomerServices
         $role = data_get($array, 1, null);
         $filter = data_get($array, 2, null);
         $message_id = cache()->get("menu_List_user_" . $object->getUserId());
-        logger("aa", [$message_id, $page]);
         if ($message_id)
             $this->listUser($role, $object, $page, $message_id, $filter);
     }
@@ -135,7 +133,6 @@ class CustomerServices
         $page = (int)data_get($array, 1);
         $filter = data_get($array, 2, null);
         $user_con = UserTelegram::find($id);
-        logger("con", [$user_con, $id]);
         if ($user_con) {
             $fullName = $user_con->fullName ?: $user_con->first_name . " " . $user_con->last_name;
             $user_con->role = "colleague";
@@ -161,7 +158,6 @@ class CustomerServices
         $page = (int)data_get($array, 2);
         $filter = data_get($array, 3, null);
         $user_con = UserTelegram::find($id);
-        logger("con", [$user_con, $id]);
         if ($user_con) {
             $fullName = $user_con->fullName ?: $user_con->first_name . " " . $user_con->last_name;
             if ($role == "colleague")
@@ -200,15 +196,8 @@ class CustomerServices
         $id = (int)data_get($array, 1);
         $page = (int)data_get($array, 2);
         $filter = data_get($array, 3, null);
-        logger("data", [$data]);
         $user_con = UserTelegram::with("customerUsers")->find($id);
         if ($user_con) {
-            logger("link", [
-                'chat_id' => data_get($object, "bot.chanel_id"),
-                'name' => Str::slug($user_con->fullName, "_"),
-                'expire_date' => time() + 150, // لینک به مدت 24 ساعت معتبر است
-                'member_limit' => 1, // تعداد اعضای جدیدی که با این لینک می‌توانند بپیوندند
-            ]);
             $response = $object->telegram->createChatInviteLink([
                 'chat_id' => data_get($object, "bot.chanel_id"),
                 'name' => Str::slug($user_con->fullName, "_"),
@@ -241,7 +230,6 @@ class CustomerServices
         $page = (int)data_get($array, 2);
         $filter = data_get($array, 3, null);
         $user_con = UserTelegram::find($id);
-        logger("con", [$user_con, $id, $data]);
         if ($user_con) {
             $fullName = $user_con->fullName ?: $user_con->first_name . " " . $user_con->last_name;
             $user_con->status = true;
@@ -269,7 +257,6 @@ class CustomerServices
         $page = (int)data_get($array, 2);
         $filter = data_get($array, 3, null);
         $user_con = UserTelegram::withTrashed()->find($id);
-        logger("con", [$user_con, $id, UserTelegram::withTrashed()->where("id", $id)->getQuery()]);
         if ($user_con) {
             $fullName = $user_con->fullName ?: $user_con->first_name . " " . $user_con->last_name;
             $user_con->status = true;
@@ -300,7 +287,6 @@ class CustomerServices
         $filter = data_get($array, 3, null);
 
         $user_con = UserTelegram::find($id);
-        logger("rej", [$user_con, $id]);
 
         if ($user_con) {
             $fullName = $user_con->fullName ?: $user_con->first_name . " " . $user_con->last_name;
@@ -329,7 +315,6 @@ class CustomerServices
         $filter = data_get($array, 3, null);
 
         $user_con = UserTelegram::find($id);
-        logger("rej", [$user_con, $id]);
 
         if ($user_con) {
             $fullName = $user_con->fullName ?: $user_con->first_name . " " . $user_con->last_name;
@@ -374,7 +359,6 @@ class CustomerServices
         $filter = data_get($array, 3, null);
 
         $user_con = UserTelegram::find($id);
-        logger("rej", [$user_con, $id]);
 
         if ($user_con) {
             $fullName = $user_con->fullName ?: $user_con->first_name . " " . $user_con->last_name;
@@ -394,7 +378,6 @@ class CustomerServices
         $id = (int)data_get($array, 1);
 
         $user_con = UserTelegram::find($id);
-        logger("edit_mobile_done_", [$user_con, $id]);
 
         if ($user_con) {
             $message = "";
@@ -445,9 +428,7 @@ class CustomerServices
         $id = (int)data_get($array, 2);
         $page = (int)data_get($array, 3);
         $filter = data_get($array, 4, null);
-        logger("data", [$array]);
         $user_con = UserTelegram::find($id);
-        logger("data", [$user_con]);
 
         if ($user_con) {
             $user_con["agent_id"] = $parent;
@@ -496,7 +477,6 @@ class CustomerServices
         $data = str_replace('set_membership_', '', $object->getMessageCache());
 
         $array = explode("_", $data);
-        logger("data", [$array]);
         $role = data_get($array, 0);
         $id = (int)data_get($array, 1);
         $page = (int)data_get($array, 2);
@@ -530,7 +510,6 @@ class CustomerServices
     {
         $data = str_replace('set_word_only_', '', $object->getData());
         $array = explode("_", $data);
-        logger("data", [$array]);
         $role = data_get($array, 0);
         $id = (int)data_get($array, 1);
         $page = (int)data_get($array, 2);
@@ -555,7 +534,6 @@ class CustomerServices
     {
         $data = str_replace('free_activity_', '', $object->getData());
         $array = explode("_", $data);
-        logger("data", [$array]);
         $role = data_get($array, 0);
         $id = (int)data_get($array, 1);
         $page = (int)data_get($array, 2);
@@ -581,7 +559,6 @@ class CustomerServices
     {
         $data = str_replace('set_special_', '', $object->getData());
         $array = explode("_", $data);
-        logger("data", [$array]);
         $role = data_get($array, 0);
         $id = (int)data_get($array, 1);
         $page = (int)data_get($array, 2);
@@ -606,7 +583,6 @@ class CustomerServices
     {
         $data = str_replace('unset_special_', '', $object->getData());
         $array = explode("_", $data);
-        logger("data", [$array]);
         $role = data_get($array, 0);
         $id = (int)data_get($array, 1);
         $page = (int)data_get($array, 2);
@@ -635,7 +611,6 @@ class CustomerServices
         $id = (int)data_get($array, 1);
 
         $user_con = UserTelegram::find($id);
-        logger("edit_mobile_done_", [$user_con, $id]);
 
         if ($user_con) {
             $message = "شماره تلفن فعلی شما";
@@ -654,7 +629,6 @@ class CustomerServices
         $id = (int)data_get($array, 1);
         $user_con = UserTelegram::find($id);
         $user_search = UserTelegram::where("mobile", "like", "%" . $object->getMessage() . "%")->first();
-        logger("edit_mobile_done_", [$user_search, $id]);
 
         if ($user_search && $user_con) {
             $message = "می خواهید شما شماره تلفن";
@@ -728,14 +702,12 @@ class CustomerServices
     {
         $data = str_replace('edit_name_done_', '', $object->getMessageCache());
         $array = explode("_", $data);
-        logger("array", [$array]);
         $role = data_get($array, 0);
         $id = (int)data_get($array, 1);
         $page = (int)data_get($array, 2);
         $filter = data_get($array, 3, null);
 
         $user_con = UserTelegram::find($id);
-        logger("rej", [$user_con, $id]);
 
         if ($user_con) {
             $user_con->fullName = $object->getMessage();
@@ -862,7 +834,6 @@ class CustomerServices
             });
         }
         $users = $users->simplePaginate(4, ['*'], 'page', $page);
-        logger("users", [$users]);
         $page = $users->currentPage();
         $next = $users->nextPageUrl() ? (int)str_replace("?page=", "", strstr($users->nextPageUrl(), "?page=")) : null;
         $pre = $users->previousPageUrl() ? (int)str_replace("?page=", "", strstr($users->previousPageUrl(), "?page=")) : null;

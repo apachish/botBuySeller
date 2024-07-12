@@ -77,9 +77,7 @@ class TextServices
             return Bot::where('token', $this->token)
                 ->first();
         });
-        logger("bot check ", [$this->bot]);
         $this->telegram = new Api($this->bot->token);
-        logger("trl check ", [$this->telegram]);
 
         $this->telegram_services = new TelegramServices($this->token);
         /*
@@ -88,7 +86,6 @@ class TextServices
         //        $update = json_decode($input, true);
          */
         $this->update = $this->telegram->getWebhookUpdate();
-        logger("bot user", [$this->update]);
     }
 
     /**
@@ -165,7 +162,6 @@ class TextServices
             $type = "message";
 
         $this->type_message = $type;
-        logger("type_messager", [$this->type_message]);
     }
 
 
@@ -182,10 +178,7 @@ class TextServices
      */
     public function setUserId(): void
     {
-        logger("user_id set", [$this->type_message . '.from.id']);
-
         $this->user_id = data_get($this->update, $this->type_message . '.from.id');;
-        logger("user_id", [$this->user_id]);
     }
 
     /**
@@ -210,7 +203,6 @@ class TextServices
     public function setPrice($price): void
     {
         $this->price = $price;
-        logger("price" . $this->price);
 
     }
 
@@ -228,7 +220,6 @@ class TextServices
     public function setNumberOrder($number_order): void
     {
         $this->number_order = $number_order;
-        logger("number order" . $this->number_order);
     }
 
     /**
@@ -245,8 +236,6 @@ class TextServices
     public function setDescription($description): void
     {
         $this->description = $description;
-        logger("description" . $this->description);
-
     }
 
     /**
@@ -262,7 +251,6 @@ class TextServices
      */
     public function setWord($word): void
     {
-        logger("set word ",[$word]);
         $this->word = $word;
     }
 
@@ -318,7 +306,6 @@ class TextServices
         if (isset($this->update[$this->type_message]['message']['message_id']))
             $this->message_id = $this->update[$this->type_message]['message']['message_id']; // چت‌آیدی کاربر
 
-        logger("messgae_id", [$this->message_id]);
     }
 
     /**
@@ -335,7 +322,6 @@ class TextServices
     public function setMessage(): void
     {
         $this->message = isset($this->update['message']['text']) ? cleanInput($this->convertNumber($this->update['message']['text'])) : null;
-        logger("message", [$this->message]);
     }
 
     /**
@@ -352,7 +338,6 @@ class TextServices
     public function setData(): void
     {
         $this->data = data_get($this->update, $this->type_message . ".data");
-        logger('data', [$this->data]);
     }
 
     /**
@@ -369,7 +354,6 @@ class TextServices
     public function setMessageCache(): void
     {
         $this->message_cache = cache()->get($this->key_cache . $this->user_id);
-        logger("message_cache", [$this->message_cache, $this->key_cache . $this->user_id]);
 
         // data_get($cache_data, "title")
     }
@@ -412,7 +396,6 @@ class TextServices
 //        $this->pattern = "/^\d{3,5}" . $this->type . "\d{1}$/";
 //        $this->pattern = "/^([0-9]{3}|[0-9]{5})$this->type([1-3]?)$/";
         $this->pattern = "/^([0-9]{3}|[0-9]{5})$this->type([1-3]?)(:.*)?$/u";
-        logger("pattern", [$this->pattern, $this->type]);
     }
 
     /**
@@ -465,7 +448,6 @@ class TextServices
         $pattern_un = "/^([0-9]{3}|[0-9]{5})($im)([4-9]?)(:.*)?$/u";
         if (preg_match($pattern_un, $this->message, $matches)) {
             $optionalNumber = isset($matches[3]) && $matches[3] ? $matches[3] : '1'; // اگر گروه سوم خالی بود، مقدار ۱ قرار داده شود
-            logger("aa", [$optionalNumber, $optionalNumber < 1, $optionalNumber > 3]);
 
             if ($optionalNumber < 1 || $optionalNumber > 3) {
                 $this->telegram_services->sendMessage($this->getUserId(), "❌ حداکثر تعداد برای هر لفظ ۳ تا میباشد ❌");
@@ -474,9 +456,7 @@ class TextServices
         }
         $pattern = "/^([0-9]{3}|[0-9]{5})($im)([1-3]?)(:.*)?$/u";
 
-        logger($pattern, [preg_match($pattern, $this->message, $matches), $this->message]);
         if (preg_match($pattern, $this->message, $matches)) {
-            logger("matches", [$matches]);
             $this->setPrice($matches[1]);
             $this->setType($matches[2]);
             $optionalNumber = isset($matches[3]) && $matches[3] ? $matches[3] : '1'; // اگر گروه سوم خالی بود، مقدار ۱ قرار داده شود
@@ -485,8 +465,6 @@ class TextServices
             $description = isset($matches[4]) ? substr($matches[4], 1) : ''; // حذف ":" از ابتدای توضیحات
             $this->setDescription($description);
             $this->setPattern();
-            logger("aa", [$this->pattern]);
-            logger("aa", [preg_match($this->pattern, $this->message)]);
             if ($this->pattern && preg_match($this->pattern, $this->message))
                 return true;
         }
@@ -569,10 +547,8 @@ class TextServices
         /*
        * check message
        */
-        logger("check message", [$this->checkText()]);
-        logger("cache", [$this->message_cache]);
+
         cache()->forget($this->key_cache . $this->user_id);
-        logger("cache", [$this->message_cache]);
 
         if (!$this->checkText())
             return $this->telegram->sendMessage(['chat_id' => $this->user_id, 'text' => 'متن نا معتبر می باشد']);
@@ -638,9 +614,7 @@ class TextServices
                 $this->listWorker($page, $message_id);
         } elseif (str_contains($this->getData(), "next_worker_")) {
             $page = (int)str_replace('next_worker_', '', $this->getData());
-            logger("page worker",[$page]);
             $message_id = cache()->get("menu_List_worker_" . $this->getUserId());
-            logger("message worker",[$message_id]);
 
             if ($message_id)
                 $this->listWorker($page, $message_id);
@@ -716,7 +690,6 @@ class TextServices
                 $worker = UserTelegram::where("agent_id", $this->getUser()->id)->get();
                 $keyboard = [];
                 $i = 0;
-                logger("woker", [$worker]);
                 $keyboard[$i++] = [
                     ['text' => "خودم", 'callback_data' => "trade_open_" . $this->getUser()->id],
                 ];
@@ -725,7 +698,6 @@ class TextServices
                         ['text' => $row->fullName, 'callback_data' => "trade_open_" . $row->id],
                     ];
                 });
-                logger("woker key", [$keyboard]);
                 $message_id = $this->telegram_services->MessageReplyMarkup($this->telegram, $this->user_id, "شخص مورد نظر را انتخاب کنید", $keyboard);
                 cache()->set("trade_open_" . $this->user_id, $message_id);
                 break;
@@ -861,7 +833,6 @@ class TextServices
     public function menu($keyboard, $show, $user = null)
     {
 
-        logger("menu", [$keyboard, $show, $user]);
         $user = $user ? $user : $this->getUser();
         if ($show) {
             if ($user && $user->change_menu) {
@@ -911,20 +882,17 @@ class TextServices
             ->where("role", "colleague")
             ->with("userTraderAccess")
             ->simplePaginate(5, ['*'], 'page', $page);
-        logger("users", [$users]);
         $page = $users->currentPage();
         $next = $users->nextPageUrl() ? (int)str_replace("?page=", "", strstr($users->nextPageUrl(), "?page=")) : null;
         $pre = $users->previousPageUrl() ? (int)str_replace("?page=", "", strstr($users->previousPageUrl(), "?page=")) : null;
         $keyboard = [];
         $i = 0;
 //        $userTradeAccess = $this->user->userTradeAccess;
-//        logger("userTradeAccess", [$userTradeAccess]);
         $users->each(function ($user) use (&$keyboard, &$i, $page) {
             $text = $user->fullName ?: $user->first_name . " " . $user->last_name;
             $limit_trade = $user->userTraderAccess->where("user_id", $this->getUser()->id)->first();
 
 
-            logger('limit_trade', [$limit_trade, data_get($limit_trade, "limit_access")]);
 
             if ($limit_trade)
                 $keyboard[$i] = [
@@ -944,7 +912,6 @@ class TextServices
                 ];
             $i++;
         });
-        logger("keyboard", [$keyboard]);
         if ($pre)
             $keyboard[$i][] = ['text' => "قبلی", "callback_data" => "pre_worker_" . $pre];
         if ($next)
@@ -952,13 +919,11 @@ class TextServices
 
         if ($message_id)
         {
-            logger("update list menu ",[$message_id]);
             $this->getTelegramServices()->editMessageTextAndInlineKeyboard($this->getUserId(), $message_id, $text, $keyboard);
         }
         else {
             $this->getTelegramServices()->menu_key = "menu_List_worker_";
             $menu = $this->getTelegramServices()->MessageReplyMarkup($this->getTelegram(), $this->getUserId(), $text, $keyboard);
-            logger("create list menu",[$menu]);
         }
     }
 

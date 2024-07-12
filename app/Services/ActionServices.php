@@ -72,7 +72,6 @@ class ActionServices extends TextServices
         $mobile = str_replace('add_customer_name_', '', $this->getMessageCache());
         $fullName = $this->getMessage();
 
-        logger("data add customer", [$mobile, $fullName]);
         if ($fullName && $mobile) {
             CustomerUser::updateOrCreate(["user_id" => $this->getUserId(), "mobile" => $mobile],
                 [
@@ -122,7 +121,6 @@ class ActionServices extends TextServices
     {
 
         $mobile = $this->getContact();
-        logger("mobile", [$mobile]);
         if ($mobile) {
             $this->getUser()->mobile = $mobile;
             $this->getUser()->update();
@@ -149,7 +147,6 @@ class ActionServices extends TextServices
 
                     ]
                 );
-                logger("send admin ", [$admin->user_id, $message_admin]);
                 cache()->set("message_admin_" . $admin->user_id, $message_admin);
             }
             if (!$this->getUser()->fullName) {
@@ -191,7 +188,6 @@ class ActionServices extends TextServices
 
     public function ruleAccept()
     {
-        logger("accept rule");
         $this->getUser()->update(["accept_rule" => now()->format("Y-m-d H:i")]);
         $text = "لطفا راهنما را مطالعه فرمایید";
         $help = Setting::where("key", "help")->first();
@@ -207,7 +203,6 @@ class ActionServices extends TextServices
 
     public function helpAccept()
     {
-        logger("accept help");
 //        $text = "اطلاعات شما برای مدیر سیستم ارسال شد پس از تایید شما در گروه اضافه می شوید";
         $this->getUser()->update(["accept_help" => now()->format("Y-m-d H:i")]);
 //        cache()->set($this->getKeyCache() . $this->getUserId(), "pending_accept");
@@ -235,7 +230,6 @@ class ActionServices extends TextServices
         $num = (int)data_get($info, 1);
 
         if ($this->getUser()->verify_two && !cache()->get("double_click_" . $id . "_" . $this->getUserId())) {
-            logger("injto mondam");
             cache()->set("double_click_" . $id . "_" . $this->getUserId(), 1, now()->addSecond(5));
             return true;
         } elseif ($this->getUser()->verify_two && cache()->get("double_click_" . $id . "_" . $this->getUserId()))
@@ -297,7 +291,6 @@ class ActionServices extends TextServices
                     if ($forbidden && data_get($transfer, "user.role") == "colleague") {
                         $list_worker = $head->customerUsers->pluck("id")->toArray();
                         $list_worker[] = data_get($head, "id");
-                        logger("head cus", [$head, data_get($this->getUser(), "customer")]);
                         if (in_array($this->getUser()->id, $list_worker)) {
                             $this->telegram_services->sendMessage($this->getUserId(), "\xE2\x9D\x8C	استثنائا در این دقایق خاص بصورت موقت امکان گرفتن لفظ سرگروه و زیر مجموعه خودش امکان پذیر نمی باشد\xE2\x9D\x8C	");
                             return true;
@@ -365,9 +358,7 @@ class ActionServices extends TextServices
 
 
                     dispatch(new PartiesToTheTransaction($order_buy->id));
-                    logger("end send user message");
                     dispatch(new SendMessageAccountingBot($order_buy->id));
-                    logger("end send accconting message");
 
                 } else {
 //                    $this->telegram_services->sendMessage($this->getUserId(), "متأسفانه امکان دریافت حواله برای شما در این معامله نمی باشد");
@@ -392,11 +383,8 @@ class ActionServices extends TextServices
         }
 
         $seller_head = $seller->customer;
-        logger("1", [$seller_head, $seller->customerUsers]);
         $seller_customer = $seller->customerUser ? $seller->customerUsers->pluck("id")->toArray() : [];
-        logger("2", [$seller_customer]);
         $seller_ids[] = $seller->id;
-        logger("23", [$seller_ids]);
 
         if ($seller_head)
             $seller_ids[] = $seller_head->id;
@@ -404,10 +392,8 @@ class ActionServices extends TextServices
             $seller_ids = array_merge($seller_ids, $seller_customer);
 
         $buyer_head = $buyer->customer;
-        logger("12", [$buyer_head, $buyer->customerUsers]);
 
         $buyer_customer = $buyer->customerUser ? $buyer->customerUsers->pluck("id")->toArray() : [];
-        logger("22", [$buyer_customer]);
 
         $buyer_ids[] = $buyer->id;
         if ($buyer_head)
@@ -416,10 +402,8 @@ class ActionServices extends TextServices
             $buyer_ids = array_merge($buyer_ids, $buyer_customer);
         $total_sold_by_seller = 0;
         $total_sold_by_buyer = 0;
-        logger("aaaakk", [$seller_ids, $buyer_ids]);
         foreach ($seller_ids as $seller_id) {
             foreach ($buyer_ids as $buyer_id) {
-                logger("idss", [$seller_id, $buyer_id]);
                 $total_sold_by_seller += DailyRequestTransfer::where('seller_id', $seller_id)
                     ->whereDate("created_at", now())
                     ->where('buyer_id', $buyer_id)->sum('use_day');
@@ -427,18 +411,13 @@ class ActionServices extends TextServices
                 $total_sold_by_buyer += DailyRequestTransfer::where('seller_id', $buyer_id)
                     ->whereDate("created_at", now())
                     ->where('buyer_id', $seller_id)->sum('use_day');
-                logger("errr", [$total_sold_by_seller, $total_sold_by_buyer]);
-
             }
         }
-        logger("total_sold_by_buyer", [$total_sold_by_seller, $total_sold_by_buyer]);
 
         $available_to_sell = $max_trade_limit - $total_sold_by_seller + $total_sold_by_buyer;
-        logger("available_to_sell", [$available_to_sell]);
 
         $new_quantity = min($quantity, $available_to_sell);
 
-        logger("new_quantity", [$new_quantity]);
 
         if ($new_quantity > 0) {
             $daily_transfer = DailyRequestTransfer::create([
@@ -459,11 +438,9 @@ class ActionServices extends TextServices
         $array = explode("_", $data);
         $check = data_get($array, 0);
         $word_id = data_get($array, 1);
-        logger("data", [$check, $word_id]);
         if (!$check && !$word_id)
             return false;
         $word = WordTelegram::find($word_id);
-        logger("word", [$word]);
 
         if ($word == null) return false;
 
@@ -497,7 +474,6 @@ class ActionServices extends TextServices
             $message = $transfer_new->message;
             $keyboard = $this->getKeyboardRequest($transfer_new);
 
-            logger("test", [$this->bot->chanel_id, $message, $keyboard]);
             $message_result = $this->telegram_services->MessageReplyMarkup($this->telegram, $this->bot->chanel_id, $message, $keyboard, false);
             $transfer_new->message_id = $message_result;
             $transfer_new->update();
@@ -517,9 +493,7 @@ class ActionServices extends TextServices
             if($bot_accounting){
                 $telegram_accounting_services = new TelegramServices($bot_accounting->token);
                 $admins = $bot_accounting->accessBot;
-                logger("message accounting", [$message]);
                 foreach ($admins as $admin) {
-                    logger("send", [$admin]);
                     $message_accounting = $transfer_new->user->fullName;
                     $message_accounting .= "\n";
                     if(data_get($transfer_new,"user.customer"))
@@ -530,7 +504,6 @@ class ActionServices extends TextServices
                     }
                     $message_accounting .= data_get($word, "message");
                     $send_accounting = $telegram_accounting_services->sendMessage($admin->user_id,$message_accounting);
-                    logger("aco", [$send_accounting]);
                 }
             }
 
@@ -551,7 +524,6 @@ class ActionServices extends TextServices
         $page = (int)data_get($array, 1);
 
         $worker = UserTelegram::find($worker_id);
-        logger("worker", [$worker_id, $worker, $page]);
         if ($worker) {
             $limit_access = UserTradeAccess::where("user_id", $this->getUser()->id)
                 ->where("user_trade_id", $worker->id)->first();
@@ -560,7 +532,6 @@ class ActionServices extends TextServices
 
 
                 $message_id = cache()->get("menu_List_worker_" . $this->getUserId());
-                logger("menu_List_worker_", [$message_id]);
                 $limit_access->delete();
                 $this->listWorker($page, $message_id);
                 $this->telegram->sendMessage([
@@ -578,11 +549,9 @@ class ActionServices extends TextServices
         $page = (int)data_get($array, 1);
 
         $worker = UserTelegram::find($worker_id);
-        logger("worker", [$worker_id, $worker, $page]);
         if ($worker) {
             $name_worker = $worker->fullName ?: $worker->first_name . " " . $worker->last_name;
             $message_id = cache()->get("menu_List_worker_" . $this->getUserId());
-            logger("message id open limit", [$message_id]);
             UserTradeAccess::updateOrCreate([
                 "user_id" => $this->getUser()->id,
                 "user_trade_id" => $worker_id
@@ -607,7 +576,6 @@ class ActionServices extends TextServices
         $worker_id = (int)data_get($data, 0);
         $page = (int)data_get($data, 1);
         $worker = UserTelegram::find($worker_id);
-        logger("worker", [$worker]);
         if ($worker) {
             $name_worker = $worker->fullName ?: $worker->first_name . " " . $worker->last_name;
 
@@ -643,7 +611,6 @@ class ActionServices extends TextServices
         $message_id = cache()->get("trade_open_" . $this->getUserId());
         if ($customer_id && $message_id) {
             $customer = CustomerUser::find($customer_id);
-            logger("customer", [$customer, $customer_id, $message_id]);
             if ($customer) {
                 $message = "حد مجاز برای مشتری ";
                 $message .= "\n ";
@@ -829,14 +796,12 @@ class ActionServices extends TextServices
         foreach ($transfers as $transfer) {
             $message = $transfer->message . "\xF0\x9F\x9A\xAB";
 
-            logger("tran" . $message);
             $this->telegram_services->editMessageTextAndInlineKeyboard($this->bot->chanel_id, $transfer->message_id, $message);
             $transfer->status = Transfer::STATUS_DEACTIVATE;
             $transfer->update();
             $transfer->delete();
             $i++;
         }
-        logger("w", [$transfers->count(), $i == $transfers->count()]);
         if ($transfers->count() && $i == $transfers->count())
             return true;
         return $result;
@@ -896,7 +861,6 @@ class ActionServices extends TextServices
         $end_time = Carbon::createFromTime(data_get($array_time_e, 0), data_get($array_time_e, 1), 0);
 
 // چک کردن اینکه آیا زمان فعلی قبل یا بعد از 09:00 است
-        logger("start time", [$start_time, $end_time, $now->lessThan($start_time), $now->greaterThan($end_time)]);
         if ($now->lessThan($start_time)) {
             $message_s = " زمان شروع بازار ";
             $message_s .= data_get($parameter, "start_hours_of_operation.value", "09:00");
@@ -911,7 +875,6 @@ class ActionServices extends TextServices
         $last_transfer = Transfer::where("type", $this->getType())
             ->whereIn("status", [Transfer::STATUS_ACTIVE_DO, Transfer::STATUS_ACTIVE_DONE])
             ->orderBy("updated_at", "DESC")->first();
-        logger("old", [$last_transfer]);
         if (!$last_transfer) {
             $start_trade_s = (int)cache()->remember("start_price_trade", now()->addDay(1), function () {
                 $value = 14000000;
@@ -927,10 +890,7 @@ class ActionServices extends TextServices
                     $value = data_get($setting, "value");
                 return (int)$value;
             });
-            logger("start", [$start_trade_s]);
-            logger("end", [$end_trade_s]);
             $price = $this->getPriceTrade($suggest_price, $start_trade_s);
-            logger("end", [$price, $price < $start_trade_s, $price > $end_trade_s]);
 
             if ($price < $start_trade_s || $price > $end_trade_s) {
                 $message = "مبلغ وارد شده باید در بازه";
@@ -992,13 +952,7 @@ class ActionServices extends TextServices
             $morning = Carbon::create($time->year, $time->month, $time->day, 9, 0, 0); //set time to 08:00
             $none = Carbon::create($time->year, $time->month, $time->day, env("NONE_HOUR","15"), env("NONE_MIN","30"), 0); //set time to 18:00
             $none_13_30 = Carbon::create($time->year, $time->month, $time->day, env("NONE_M_HOUR","13"), env("NONE_M_MIN","30"), 0); //set time to 18:00
-            logger("check day", [
-                $time->between($morning, $none, true),
-                (
-                    !in_array($this->getType(), $this->list_type_buy_tommarow) ||
-                    !in_array($this->getType(), $this->list_type_sell_tommarow)
-                )
-            ]);
+
             cache()->forget("forbidden_day");
             $forbidden_day = cache()->remember("forbidden_day", now()->setTime(23, 59), function () {
                 $item = Setting::where("key", "forbidden_day")->first();
@@ -1006,7 +960,6 @@ class ActionServices extends TextServices
             });
 //            if(!$forbidden_day)
 //                $forbidden_day = $time->isThursday() || $time->isFriday()?true:false;
-            logger("forbidden_day", [$forbidden_day, $forbidden_day]);
 //            if ($forbidden_day && data_get($forbidden_day, "value") && in_array($this->getType(), $this->list_type_today)) {
 //                $this->telegram_services->sendMessage($this->getUserId(), "تمام معاملات برای اولین روز کاری می باشد و امکان معامله روز در حال حاظر وجود ندارد");
 //                return true;
@@ -1093,15 +1046,12 @@ class ActionServices extends TextServices
                 "message_request_me" => $message_request_me,
                 "description" => $this->getDescription()
             ]);
-            logger("word", [$word_telegram]);
             $keyboard[0] = [
                 ['text' => "\xE2\x9C\x85	تایید", 'callback_data' => "transfer_buy_true_$word_telegram->id"],
                 ['text' => "\xE2\x9D\x8C	رد", 'callback_data' => "transfer_buy_false_$word_telegram->id"],
             ];
-            logger("ke", [$this->getUserId(), $message, $keyboard]);
             $result_word = $this->telegram_services->MessageReplyMarkup($this->telegram, $this->getUserId(), $message, $keyboard, false);
             if ($result_word) {
-                logger("send word", [$result_word]);
                 $word_telegram->message_id = $result_word;
                 $word_telegram->update();
             } else {
@@ -1134,7 +1084,6 @@ class ActionServices extends TextServices
         }
         if (!$keyboard)
             $keyboard = null;
-        logger("key", [$keyboard]);
         return $keyboard;
     }
 

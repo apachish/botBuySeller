@@ -110,7 +110,6 @@ class ActionAdminServices extends TextServices
 //                ->first();
 //        });
         if ($this->bot_user) {
-            logger("bot user active", [$this->bot_user]);
 //            $this->service_telgram_user = new TelegramServices($this->bot_user->token);
             $this->service_user = new ActionServices($this->bot_user->token);
             $this->bot_title = $this->bot_user->title;
@@ -122,7 +121,6 @@ class ActionAdminServices extends TextServices
     {
         cache()->forget($this->getKeyCache() . $this->getUserId());
         $this->removeMessageCache();
-        logger("actionText", [$this->getData()]);
         if (str_contains($this->getData(), "ok_user_"))
             $this->custromer->AcceptUser($this);
         elseif (str_contains($this->getData(), "reject_user_"))
@@ -183,7 +181,6 @@ class ActionAdminServices extends TextServices
     public function actionText()
     {
         cache()->forget($this->getKeyCache() . $this->getUserId());
-        logger("actionText", [$this->getMessage()]);
         switch ($this->getMessage()) {
             case "\xE2\x86\xA9منو":
                 TelegramServices::menu($this->telegram, $this->keyboard_menu, $this->getUser(), "بازگشت");
@@ -224,7 +221,6 @@ class ActionAdminServices extends TextServices
                 whereNotNull("message_id");
 
                 if ($targetDate) {
-                    logger($targetDate->format("Y-m-d H:i"));
                     $updates->where("created_at", ">=", $targetDate);
                 }
 
@@ -234,7 +230,6 @@ class ActionAdminServices extends TextServices
 
                         // حذف پیام
                         $result = $this->telegram_services->deleteMessage($this->bot->chanel_id, $update->message_id);
-                        logger("result delete message", [$result]);
                         if ($result['ok']) {
                             logger("پیام با شناسه $update->message_id حذف شد.\n");
                         } else {
@@ -314,24 +309,20 @@ class ActionAdminServices extends TextServices
 
                 break;
             case "کانال":
-                logger($this->bot->chanel_link);
 
                 $this->getTelegramServices()->sendMessage($this->getUserId(), $this->bot->chanel_link);
 
                 break;
             case "حسابداری":
-                logger("@" . $this->bot->accounting);
 
                 $this->getTelegramServices()->sendMessage($this->getUserId(), "@" . $this->bot->accounting);
 
                 break;
             case "لفظ":
-                logger("@" . $this->bot->word);
                 $this->getTelegramServices()->sendMessage($this->getUserId(), "@" . $this->bot->word);
 
                 break;
             case "دفترچه":
-                logger("@" . $this->bot->contact);
 
                 $this->getTelegramServices()->sendMessage($this->getUserId(), "@" . $this->bot->contact);
 
@@ -343,7 +334,6 @@ class ActionAdminServices extends TextServices
     public function actionTextCache()
     {
         $key_case = $this->getMessageCache();
-        logger("cache", [$this->getMessageCache()]);
         if (str_contains($this->getMessageCache(), "edit_name_done_"))
             $key_case = "edit_name_done_";
         elseif (str_contains($this->getMessageCache(), "edit_mobile_done_"))
@@ -357,7 +347,6 @@ class ActionAdminServices extends TextServices
         elseif (str_contains($this->getMessageCache(), "send_message_user_"))
             $key_case = "send_message_user_";
 
-        logger($key_case);
         switch ($key_case) {
 
             case "send_message_user_":
@@ -425,7 +414,6 @@ class ActionAdminServices extends TextServices
     public function changeMenu($user_con): void
     {
         $menu_bot = BotMenuUser::where("user_id", $user_con->id)->where("bot_id", $this->bot_user->id)->first();
-        logger("menu bot", [$menu_bot]);
         if ($menu_bot) {
             $key = $user_con->role == "colleague" ? $this->keyword_colleague : $this->keyword_customer;
             if (!$user_con->status)
