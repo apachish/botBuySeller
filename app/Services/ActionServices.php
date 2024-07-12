@@ -989,8 +989,8 @@ class ActionServices extends TextServices
             }
             $time = Carbon::now();
             $morning = Carbon::create($time->year, $time->month, $time->day, 9, 0, 0); //set time to 08:00
-            $none = Carbon::create($time->year, $time->month, $time->day, 20, 10, 0); //set time to 18:00
-            $none_13_30 = Carbon::create($time->year, $time->month, $time->day, 20, 10, 0); //set time to 18:00
+            $none = Carbon::create($time->year, $time->month, $time->day, 20, 30, 0); //set time to 18:00
+            $none_13_30 = Carbon::create($time->year, $time->month, $time->day, 20, 30, 0); //set time to 18:00
             logger("check day", [
                 $time->between($morning, $none, true),
                 (
