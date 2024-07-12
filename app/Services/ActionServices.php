@@ -1021,23 +1021,23 @@ class ActionServices extends TextServices
                 if ($tomorrow)
                     return $tomorrow->value;
             });
-            if ($time->between($morning, $none_13_30, true) && in_array($this->getType(), $this->list_type_today_r_f)) {
+            if (!data_get($forbidden_day, "value") && $time->between($morning, $none_13_30, true) && in_array($this->getType(), $this->list_type_today_r_f)) {
                 $message .= " \xE2\x98\x80	";
                 $message_request .= " \xE2\x98\x80	";
                 $message_request_me .= " \xE2\x98\x80	";
-                $date = data_get($forbidden_day, "value")?$tomorrow:now()->format("Y-m-d");
-            } else if ($time->between($morning, $none, true) && (in_array($this->getType(), $this->list_type_today_normal) ||
+                $date = now()->format("Y-m-d");
+            } else if ( !data_get($forbidden_day, "value") && data_get($forbidden_day, "value") && $time->between($morning, $none, true) && (in_array($this->getType(), $this->list_type_today_normal) ||
                     in_array($this->getType(), $this->list_type_today_cache))) {
                 $message .= " \xE2\x98\x80	";
                 $message_request .= " \xE2\x98\x80	";
                 $message_request_me .= " \xE2\x98\x80	";
-                $date = data_get($forbidden_day, "value")?$tomorrow:now()->format("Y-m-d");
+                $date = now()->format("Y-m-d");
             } else {
                 $message .= " \xE2\x8F\xB3️	";
                 $message_request .= " \xE2\x8F\xB3️	";
                 $message_request_me .= " \xE2\x8F\xB3️	";
                 if ($tomorrow)
-                    $date = $tomorrow;
+                    $date = data_get($tomorrow, "value");
                 else
                     $date = now()->addDay(1)->format("Y-m-d");
 
