@@ -1058,7 +1058,7 @@ class ActionServices extends TextServices
 
                 $message .= "\xF0\x9F\x92\xB0	";
 
-            } elseif ($time->between($morning, $none, true) && (in_array($this->getType(), $this->list_type_today)))
+            } elseif ( !data_get($forbidden_day, "value") && $time->between($morning, $none, true) && (in_array($this->getType(), $this->list_type_today)))
                 $message .= " روز   ";
             else
                 $message .= "  با حواله  ";
