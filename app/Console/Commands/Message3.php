@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Models\Bot;
 use App\Models\Setting;
 use App\Models\UserTelegram;
+use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Telegram\Bot\Api;
 
@@ -37,6 +38,7 @@ class Message3 extends Command
         if(!$forbidden_day)
             $forbidden_day = $time->isThursday() || $time->isFriday()?true:false;
         if (data_get($message, "message_3.value") && !$forbidden_day) {
+
             $bot_user = Bot::where("title", "botUser")->first();
 
             if ($bot_user) {
