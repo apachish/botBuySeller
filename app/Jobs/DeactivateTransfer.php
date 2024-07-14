@@ -36,15 +36,30 @@ class DeactivateTransfer implements ShouldQueue
             $token = $bot->token;
             $text_services = new TextServices($token);
 
-            $transfer = Transfer::where("number",">",0)
-                ->whereIn("status",[Transfer::STATUS_ACTIVE,Transfer::STATUS_ACTIVE_DO])
-                ->find($this->transfer_id);
-            logger("transfer deactive",[$transfer]);
-            if($transfer) {
-                $message = $transfer->message."\xF0\x9F\x95\x9B	";
-                $edit_message = $text_services->getTelegramServices()->editMessageTextAndInlineKeyboard($bot->chanel_id, $transfer->message_id, $message);
-                logger("edit_message",[$edit_message]);
-                $transfer->delete();
+            try {
+                $transfer = Transfer::where("number", ">", 0)
+                    ->whereIn("status", [Transfer::STATUS_ACTIVE, Transfer::STATUS_ACTIVE_DO])
+                    ->find($this->transfer_id);
+                logger("transfer deactive", [$transfer, $this->transfer_id]);
+                if ($transfer) {
+                    $message = $transfer->message . "\xF0\x9F\x95\x9B	";
+                    $edit_message = $text_services->getTelegramServices()->editMessageTextAndInlineKeyboard($bot->chanel_id, $transfer->message_id, $message);
+                    logger("edit_message", [$edit_message]);
+                    if (data_get($edit_message, "ok")) {
+                        $transfer->delete();
+                    } else {
+                        logger("edit block message", [$transfer]);
+
+                    }
+                }
+            }catch (\Exception $exception) {
+                logger("get error", [
+                    $exception->getMessage(),
+                    $exception->getLine(),
+                    $exception->getCode(),
+                    $exception->getTrace(),
+                    $exception->getFile()
+                ]);
             }
 
         }
