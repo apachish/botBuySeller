@@ -42,7 +42,8 @@ class DeactivateTransfer implements ShouldQueue
             logger("transfer deactive",[$transfer]);
             if($transfer) {
                 $message = $transfer->message."\xF0\x9F\x95\x9B	";
-                $text_services->getTelegramServices()->editMessageTextAndInlineKeyboard($bot->chanel_id, $transfer->message_id, $message);
+                $edit_message = $text_services->getTelegramServices()->editMessageTextAndInlineKeyboard($bot->chanel_id, $transfer->message_id, $message);
+                logger("edit_message",[$edit_message]);
                 $transfer->delete();
             }
 

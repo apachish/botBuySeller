@@ -15,7 +15,7 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule): void
     {
         // $schedule->command('inspire')->hourly();
-        $schedule->command('app:delete-message-chanel')->everyFifteenMinutes();
+//        $schedule->command('app:delete-message-chanel')->everyFifteenMinutes();
         $schedule->command('app:set-date-tomorrow')->dailyAt('07:00');
         $time_message_none = env("NONE_HOUR", "15") . ":" . env("NONE_MIN", "30");
         $schedule->command('app:message3')->dailyAt($time_message_none);
