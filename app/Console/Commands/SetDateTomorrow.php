@@ -78,6 +78,13 @@ class SetDateTomorrow extends Command
         do {
 
             $day = convertNumber(toJalali(now()->addDay($i), "d"));
+
+
+            if(now()->format("d") > $day)
+            {
+                $month = $month != 12?$month+1:01;
+                $month = $month<10?"0".$month:$month;
+            }
             logger($day);
             $friday = (new Jalalian($year, $month, $day))->isFriday();
             logger("friday:".$friday);

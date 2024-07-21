@@ -29,8 +29,8 @@ class MessageEnd extends Command
      */
     public function handle()
     {
-        $message = Setting::where("key", "message_end")->first();
-        if(data_get($message,"value")){
+        $message = Setting::whereIn("key", ["message_end","vacation"])->get()->keyBy("key");
+        if(data_get($message,"message_end.value") && !data_get($message, "vacation.value")){
             $bot_user = Bot::where("title", "botUser")->first();
 
             if($bot_user) {
@@ -38,14 +38,14 @@ class MessageEnd extends Command
                 $telegram_user = new Api($bot_user->token);
                 $telegram_user->sendMessage([
                     'chat_id' => data_get($bot_user,"chanel_id"),
-                    'text' => data_get($message, "value"),
+                    'text' => data_get($message, "message_end.value"),
                 ]);
                 foreach ($users as $user) {
                     try {
                         if(data_get($user,"telegram_id"))
                             $telegram_user->sendMessage([
                                 'chat_id' => data_get($user,"telegram_id"),
-                                'text' => data_get($message, "value"),
+                                'text' => data_get($message, "message_end.value"),
                             ]);
                     } catch (\Exception $exception) {
                         logger("user " . $user->telegram_id . ":" . $exception->getMessage());
