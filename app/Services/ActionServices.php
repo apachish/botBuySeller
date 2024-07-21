@@ -4,6 +4,7 @@ namespace App\Services;
 
 
 use App\Jobs\DeactivateTransfer;
+use App\Jobs\DeactivateWord;
 use App\Jobs\PartiesToTheTransaction;
 use App\Jobs\SendMessageAccountingBot;
 use App\Models\AccessBot;
@@ -1054,6 +1055,7 @@ class ActionServices extends TextServices
             if ($result_word) {
                 $word_telegram->message_id = $result_word;
                 $word_telegram->update();
+                dispatch(new DeactivateWord($word_telegram->id))->delay(now()->addMinute(1));
             } else {
                 $word_telegram->delete();
             }
