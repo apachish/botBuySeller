@@ -980,6 +980,17 @@ class ActionServices extends TextServices
                 if ($tomorrow)
                     return $tomorrow->value;
             });
+            logger("forbidden_day",[$forbidden_day,
+                $none_13_30,
+                $time->between($morning, $none_13_30, true),
+                $none,
+                $time->between($morning, $none, true),
+                    in_array($this->getType(), $this->list_type_today_r_f),
+                    in_array($this->getType(), $this->list_type_today_normal),
+                    in_array($this->getType(), $this->list_type_today_cache)
+                ]
+
+            );
             if (!$forbidden_day && $time->between($morning, $none_13_30, true) && in_array($this->getType(), $this->list_type_today_r_f)) {
                 $message .= " \xE2\x98\x80	";
                 $message_request .= " \xE2\x98\x80	";
