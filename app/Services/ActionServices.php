@@ -992,7 +992,6 @@ class ActionServices extends TextServices
                 ]
 
             );
-            [false,"2024-07-21 13:30:00",false,"2024-07-21 15:30:00",false,false,true,false]
             if (!$forbidden_day && $time->between($morning, $none_13_30, true) && in_array($this->getType(), $this->list_type_today_r_f)) {
                 $message .= " \xE2\x98\x80	";
                 $message_request .= " \xE2\x98\x80	";
