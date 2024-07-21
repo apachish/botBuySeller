@@ -38,7 +38,8 @@ class DeactivateTransfer implements ShouldQueue
             if(cache()->get("bot_chanel_edit") != $key)
                 $times = 1;
             logger("edit message chanel ",[$key.".token"]);
-            $token = data_get($bot,$key.".token");
+            $bot = data_get($bot,$key);
+            $token = data_get($bot,"token");
             cache()->set("bot_chanel_edit",$key,now()->addMinutes(3));
             cache()->set("bot_chanel_edit_time",$times);
             $text_services = new TextServices($token);
