@@ -917,6 +917,7 @@ class ActionServices extends TextServices
         $type_transaction = in_array($this->getType(), $this->list_type_buy) ? "buy" : "sell";
         $check_transfer = Transfer::where("price", $type_transaction == "buy" ? ">" : "<", $price)
             ->where("status", Transfer::STATUS_ACTIVE)
+            ->whereDate("created_at", now())
             ->where("type", $this->getType())
 //            ->orWhere(function ($query) {
 //                $query->whereIn("status", [
