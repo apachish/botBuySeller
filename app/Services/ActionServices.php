@@ -950,7 +950,7 @@ class ActionServices extends TextServices
 
             }
             $time = Carbon::now();
-            $morning = Carbon::create($time->year, $time->month, $time->day, 9, 0, 0); //set time to 08:00
+            $morning = Carbon::create($time->year, $time->month, $time->day,  data_get($array_time_s, 0),  data_get($array_time_s, 1), 0); //set time to 08:00
             $none = Carbon::create($time->year, $time->month, $time->day, env("NONE_HOUR","15"), env("NONE_MIN","30"), 0); //set time to 18:00
             $none_13_30 = Carbon::create($time->year, $time->month, $time->day, env("NONE_M_HOUR","13"), env("NONE_M_MIN","30"), 0); //set time to 18:00
 
@@ -982,6 +982,7 @@ class ActionServices extends TextServices
             });
             logger("forbidden_day",[$forbidden_day,
                 $none_13_30,
+                $morning,
                 $time->between($morning, $none_13_30, true),
                 $none,
                 $time->between($morning, $none, true),
@@ -991,6 +992,7 @@ class ActionServices extends TextServices
                 ]
 
             );
+            [false,"2024-07-21 13:30:00",false,"2024-07-21 15:30:00",false,false,true,false]
             if (!$forbidden_day && $time->between($morning, $none_13_30, true) && in_array($this->getType(), $this->list_type_today_r_f)) {
                 $message .= " \xE2\x98\x80	";
                 $message_request .= " \xE2\x98\x80	";
