@@ -253,8 +253,10 @@ class ActionServices extends TextServices
             $now = Carbon::now();
             $diffInSeconds = $now->diffInSeconds($createdAt);
             if ($diffInSeconds > 60) {
+                $message = $transfer->message . "\xF0\x9F\x95\x9B	";
+                $edit_message = $this->getTelegramServices()->editMessageTextAndInlineKeyboard($this->bot->chanel_id, $transfer->message_id, $message);
+                $transfer->delete();
                 $this->telegram_services->sendMessage($this->getUserId(), "زمان دریافت لفظ تمام شده");
-
                 return true;
             }
             $forbidden = Setting::where("key", "forbidden")->where("value", true)->first();
