@@ -247,6 +247,16 @@ class ActionServices extends TextServices
 
         $transfer_type = getTypeOrder($transfer->type);
         if ($transfer) {
+
+            $createdAt = $transfer->created_at;
+
+            $now = Carbon::now();
+            $diffInSeconds = $now->diffInSeconds($createdAt);
+            if ($diffInSeconds > 60) {
+                $this->telegram_services->sendMessage($this->getUserId(), "زمان دریافت لفظ تمام شده");
+
+                return true;
+            }
             $forbidden = Setting::where("key", "forbidden")->where("value", true)->first();
             try {
                 $limit_day = null;
