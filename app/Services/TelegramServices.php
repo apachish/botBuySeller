@@ -29,18 +29,13 @@ class TelegramServices
 
     public static function menu($telegram, $keyboard, $user, $text)
     {
-        logger("w",[$telegram, $keyboard, $user, $text]);
         $reply_markup = Keyboard::make([
             'keyboard' => $keyboard,
             'resize_keyboard' => true,
             'one_time_keyboard' => false
         ]);
 
-        logger("menuuuuuuu",[
-            'chat_id' => $user->telegram_id,
-            'text' => $text,
-            'reply_markup' => $reply_markup
-        ]);
+
         $response = $telegram->sendMessage([
             'chat_id' => $user->telegram_id,
             'text' => $text,
@@ -91,7 +86,6 @@ class TelegramServices
 //                ]
 //            ]
 //        ];
-        logger("keyword", [$keyboard]);
         $reply_markup = Keyboard::make([
             'inline_keyboard' => $keyboard,
             'resize_keyboard' => true,
@@ -104,7 +98,6 @@ class TelegramServices
             'reply_markup' => $reply_markup,
 
         ]);
-        logger("reponse", [$response,$reply_markup]);
 
         if (data_get($response, "message_id") )//&& $cache_use
         {
@@ -124,7 +117,6 @@ class TelegramServices
 
 // تابع برای حذف پیام
     function deleteMessage($chat_id, $message_id) {
-        logger("delete",[$chat_id, $message_id]);
         $url = "https://api.telegram.org/bot$this->access_token/deleteMessage";
 
         $post_fields = [
@@ -140,7 +132,6 @@ class TelegramServices
         $result = curl_exec($ch);
         curl_close($ch);
 
-        logger("delete re",[json_decode($result, true)]);
         return json_decode($result, true);
     }
 
@@ -173,7 +164,6 @@ class TelegramServices
 
     // تابع ویرایش کیبورد شیشه‌ای
     public function editMessageReplyMarkup($chat_id, $message_id, $keyboard) {
-        logger("aa",[$chat_id, $message_id, $keyboard]);
         $url = "https://api.telegram.org/bot$this->access_token/editMessageReplyMarkup";
         $post_fields = [
             'chat_id' => $chat_id,
@@ -188,7 +178,6 @@ class TelegramServices
         curl_setopt($ch, CURLOPT_POSTFIELDS, $post_fields);
         $r = curl_exec($ch);
         curl_close($ch);
-        logger("rrr",[$r]);
     }
 
     function editCustomKeyboard($chat_id, $message_id, $text, $keyboard_menu)
@@ -219,7 +208,6 @@ class TelegramServices
         $result = curl_exec($ch);
         curl_close($ch);
 
-        logger("edit menu", [json_decode($result, true)]);
         return json_decode($result, true);
     }
 
@@ -250,8 +238,6 @@ class TelegramServices
         $result = curl_exec($ch);
         curl_close($ch);
 
-        logger("edit menu",[json_decode($result, true)]);
-
         return json_decode($result, true);
     }
 
@@ -277,7 +263,6 @@ class TelegramServices
         $result = curl_exec($ch);
         curl_close($ch);
         $response = json_decode($result, true);
-        logger("response",[$response]);
         return data_get($response, "result.message_id");
     }
 
