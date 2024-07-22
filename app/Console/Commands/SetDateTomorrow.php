@@ -75,12 +75,12 @@ class SetDateTomorrow extends Command
 
         $i = 1;
         $date_sh = null;
+        $day_now = convertNumber(toJalali(now(), "d"));
         do {
 
             $day = convertNumber(toJalali(now()->addDay($i), "d"));
 
-
-            if(now()->format("d") > $day)
+            if($day_now > $day)
             {
                 $month = $month != 12?$month+1:01;
                 $month = $month<10?"0".$month:$month;
@@ -94,6 +94,7 @@ class SetDateTomorrow extends Command
 
             if(!$friday && !$thursday && !in_array($day,$events))
                 $date_sh = $year . "/" . $month . "/" . $day;
+            $this->info($date_sh);
             $i++;
         }while(!$date_sh);
 
