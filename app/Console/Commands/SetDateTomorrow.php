@@ -94,7 +94,7 @@ class SetDateTomorrow extends Command
 
             if(!$friday && !$thursday && !in_array($day,$events))
                 $date_sh = $year . "/" . $month . "/" . $day;
-            $this->info($date_sh);
+
             $i++;
         }while(!$date_sh);
 
