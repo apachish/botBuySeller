@@ -230,6 +230,7 @@ class TelegramServices
             'reply_markup' => json_encode($keyboard)
         ];
 
+        logger("post field",$post_fields);
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_HTTPHEADER, array("Content-Type:application/json"));
         curl_setopt($ch, CURLOPT_URL, $url);
@@ -238,6 +239,7 @@ class TelegramServices
         $result = curl_exec($ch);
         curl_close($ch);
 
+        logger("edit message request",[json_decode($result, true)]);
         return json_decode($result, true);
     }
 

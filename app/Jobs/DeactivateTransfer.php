@@ -31,6 +31,7 @@ class DeactivateTransfer implements ShouldQueue
      */
     public function handle(): void
     {
+        sleep(1);
         $bot = Bot::whereIn("title",["botUser","botManage"])->get()->keyBy('title');
         logger("change message");
         if($bot->count()){
