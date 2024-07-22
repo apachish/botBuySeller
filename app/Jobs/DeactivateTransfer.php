@@ -32,6 +32,7 @@ class DeactivateTransfer implements ShouldQueue
     public function handle(): void
     {
         $bot = Bot::whereIn("title",["botUser","botManage"])->get()->keyBy('title');
+        logger("change message");
         if($bot->count()){
             $times = cache()->get("bot_chanel_edit_time",1);
             $key =  cache()->get("bot_chanel_edit") =="botUser" && $times >=3?"botManage":"botUser";

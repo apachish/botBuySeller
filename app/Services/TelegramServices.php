@@ -225,9 +225,6 @@ class TelegramServices
 
     function editMessageTextAndInlineKeyboard($channel_chat_id, $message_id, $message, $keyboard = null)
     {
-        logger("editMessageTextAndInlineKeyboard",[
-            $channel_chat_id, $message_id, $message, $keyboard
-        ]);
         $url = "https://api.telegram.org/bot$this->access_token/editMessageText";
 
         // تنظیم کیبورد شیشه‌ای جدید
@@ -245,7 +242,6 @@ class TelegramServices
             'reply_markup' => json_encode($keyboard)
         ];
 
-        logger("post_fiels",[$post_fields]);
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_HTTPHEADER, array("Content-Type:application/json"));
         curl_setopt($ch, CURLOPT_URL, $url);
