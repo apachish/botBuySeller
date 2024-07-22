@@ -247,6 +247,18 @@ class ActionServices extends TextServices
 
         $transfer_type = getTypeOrder($transfer->type);
         if ($transfer) {
+
+            $createdAt = $transfer->created_at;
+
+            $now = Carbon::now();
+            $diffInSeconds = $now->diffInSeconds($createdAt);
+            if ($diffInSeconds > 60) {
+                $message = $transfer->message . "\xF0\x9F\x95\x9B	";
+                $edit_message = $this->getTelegramServices()->editMessageTextAndInlineKeyboard($this->bot->chanel_id, $transfer->message_id, $message);
+                $transfer->delete();
+                $this->telegram_services->sendMessage($this->getUserId(), "زمان دریافت لفظ تمام شده");
+                return true;
+            }
             $forbidden = Setting::where("key", "forbidden")->where("value", true)->first();
             try {
                 $limit_day = null;
@@ -918,6 +930,7 @@ class ActionServices extends TextServices
         $type_transaction = in_array($this->getType(), $this->list_type_buy) ? "buy" : "sell";
         $check_transfer = Transfer::where("price", $type_transaction == "buy" ? ">" : "<", $price)
             ->where("status", Transfer::STATUS_ACTIVE)
+            ->whereDate("created_at", now())
             ->where("type", $this->getType())
 //            ->orWhere(function ($query) {
 //                $query->whereIn("status", [
