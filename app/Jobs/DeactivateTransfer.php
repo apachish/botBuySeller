@@ -32,18 +32,10 @@ class DeactivateTransfer implements ShouldQueue
     public function handle(): void
     {
         sleep(1);
-        $bot = Bot::whereIn("title",["botUser","botManage"])->get()->keyBy('title');
+        $bot = Bot::where("title","botUser")->first();
         logger("change message");
-        if($bot->count()){
-            $times = cache()->get("bot_chanel_edit_time",1);
-            $key =  cache()->get("bot_chanel_edit") =="botUser" && $times >=3?"botManage":"botUser";
-            if(cache()->get("bot_chanel_edit") != $key)
-                $times = 1;
-            logger("edit message chanel ",[$key.".token"]);
-            $bot = data_get($bot,$key);
+        if($bot){
             $token = data_get($bot,"token");
-            cache()->set("bot_chanel_edit",$key,now()->addMinutes(3));
-            cache()->set("bot_chanel_edit_time",++$times);
             $text_services = new TextServices($token);
 
             try {
@@ -59,7 +51,7 @@ class DeactivateTransfer implements ShouldQueue
                         $transfer->delete();
                     } else {
                         logger("edit block message", [$transfer]);
-
+                        dispatch(new DeactivateTransfer($this->transfer_id))->delay(now()->addSecond(4));
                     }
                 }
             }catch (\Exception $exception) {
@@ -72,6 +64,8 @@ class DeactivateTransfer implements ShouldQueue
                 ]);
             }
 
+        }else{
+            logger("get error because can not delete button", []);
         }
     }
 }
