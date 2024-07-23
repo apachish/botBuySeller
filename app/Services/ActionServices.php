@@ -475,6 +475,7 @@ class ActionServices extends TextServices
                 $message .= " \n";
                 $message .= number_format($check_transfer->price, 0);
                 $this->telegram_services->sendMessage($this->getUserId(), $message);
+                return true;
             }
             $transfer_olds = Transfer::where("user_id", $this->getUser()->id)
                 ->where("type", data_get($word, "type"))
