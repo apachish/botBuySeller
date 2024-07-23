@@ -460,6 +460,22 @@ class ActionServices extends TextServices
         if ($word == null) return false;
 
         if ($check == "true") {
+            /*
+             * check not exist
+             */
+
+            $type_transaction = in_array($word->type, $this->list_type_buy) ? "buy" : "sell";
+            $check_transfer = Transfer::where("price", $type_transaction == "buy" ? ">" : "<", $word->price)
+                ->where("status", Transfer::STATUS_ACTIVE)
+                ->whereDate("created_at", now())
+                ->where("type", $word->type)
+                ->first();
+            if($check_transfer){
+                $message = "لفظ پیشنهادی بهتر در کانال : \n\n";
+                $message .= " \n";
+                $message .= number_format($check_transfer->price, 0);
+                $this->telegram_services->sendMessage($this->getUserId(), $message);
+            }
             $transfer_olds = Transfer::where("user_id", $this->getUser()->id)
                 ->where("type", data_get($word, "type"))
                 ->whereIn("status",[Transfer::STATUS_ACTIVE,Transfer::STATUS_ACTIVE_DO])
