@@ -324,6 +324,8 @@ class ActionServices extends TextServices
 
                 if ($limit_day !== null) {
                     [$daily_transfer, $num] = $this->performTransaction($seller, $buyer, $num, $limit_day);
+                    if(!$num)
+                        return true;
                     $transfer->number -= $num;
                     $request_transfer["number"] = $num;
                     $use_day = $num;
