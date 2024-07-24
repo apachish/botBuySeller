@@ -112,9 +112,9 @@ class checkBuySellLimit extends Command
             $buyer_ids = array_merge($buyer_ids, $buyer_customer);
         $total_sold_by_seller = 0;
         $total_sold_by_buyer = 0;
-        foreach ($seller_ids as $seller_id) {
+        foreach (array_unique($seller_ids) as $seller_id) {
             $this->info($seller_id);
-            foreach ($buyer_ids as $buyer_id) {
+            foreach (array_unique($buyer_ids) as $buyer_id) {
                 $this->info($buyer_id);
                 $total_sold_by_seller += DailyRequestTransfer::where('seller_id', $seller_id)
                     ->whereDate("created_at", now()->subDay(1))
