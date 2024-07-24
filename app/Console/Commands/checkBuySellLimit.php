@@ -30,9 +30,9 @@ class checkBuySellLimit extends Command
 
         $limit_day = null;
 
-        $user = UserTelegram::with("userTradeAccess")->find(34);
-        $user_transaction = UserTelegram::with("userTradeAccess")->find(200);
-        $transfer_type = "sell";//sell
+        $user = UserTelegram::with("userTradeAccess")->find(200);
+        $user_transaction = UserTelegram::with("userTradeAccess")->find(228);
+        $transfer_type = "buy";//sell
         $quantity = 1;
 
         if ($user->role == "customer")
@@ -105,11 +105,11 @@ class checkBuySellLimit extends Command
         foreach ($seller_ids as $seller_id) {
             foreach ($buyer_ids as $buyer_id) {
                 $total_sold_by_seller += DailyRequestTransfer::where('seller_id', $seller_id)
-                    ->whereDate("created_at", now()->subDay(1))
+                    ->whereDate("created_at", now())
                     ->where('buyer_id', $buyer_id)->sum('use_day');
 
                 $total_sold_by_buyer += DailyRequestTransfer::where('seller_id', $buyer_id)
-                    ->whereDate("created_at", now()->subDay(1))
+                    ->whereDate("created_at", now())
                     ->where('buyer_id', $seller_id)->sum('use_day');
             }
         }
