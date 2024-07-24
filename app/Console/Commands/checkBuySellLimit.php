@@ -87,7 +87,12 @@ class checkBuySellLimit extends Command
         $seller_ids[] = $seller->id;
 
         if ($seller_head)
+        {
             $seller_ids[] = $seller_head->id;
+            $seller_customer_head = $seller_head->customerUser ? $seller_head->customerUsers->pluck("id")->toArray() : [];
+            $seller_customer = array_merge($seller_customer_head, $seller_customer);
+
+        }
         if ($seller_customer)
             $seller_ids = array_merge($seller_ids, $seller_customer);
 
@@ -97,19 +102,26 @@ class checkBuySellLimit extends Command
 
         $buyer_ids[] = $buyer->id;
         if ($buyer_head)
+        {
             $buyer_ids[] = $buyer_head->id;
+            $buyer_customer_head = $buyer_head->customerUser ? $buyer_head->customerUsers->pluck("id")->toArray() : [];
+            $buyer_customer = array_merge($buyer_customer_head, $buyer_customer);
+
+        }
         if ($buyer_customer)
             $buyer_ids = array_merge($buyer_ids, $buyer_customer);
         $total_sold_by_seller = 0;
         $total_sold_by_buyer = 0;
         foreach ($seller_ids as $seller_id) {
+            $this->info($seller_id);
             foreach ($buyer_ids as $buyer_id) {
+                $this->info($buyer_id);
                 $total_sold_by_seller += DailyRequestTransfer::where('seller_id', $seller_id)
-                    ->whereDate("created_at", now())
+                    ->whereDate("created_at", now()->subDay(1))
                     ->where('buyer_id', $buyer_id)->sum('use_day');
 
                 $total_sold_by_buyer += DailyRequestTransfer::where('seller_id', $buyer_id)
-                    ->whereDate("created_at", now())
+                    ->whereDate("created_at", now()->subDay(1))
                     ->where('buyer_id', $seller_id)->sum('use_day');
             }
         }
