@@ -976,6 +976,19 @@ class ActionServices extends TextServices
         $number = $this->getNumberOrder();
 
         $type_transaction = in_array($this->getType(), $this->list_type_buy) ? "buy" : "sell";
+        $word_active = WordTelegram::where("user_id" , $this->getUserId())
+            ->where("status" , WordTelegram::STATUS_PENDING)
+            ->where("type" , $this->getType())
+            ->where("number" , (int)$number)
+            ->where("price" , $price)
+            ->where("word" , $this->getWord())->first();
+        if($word_active)
+        {
+            $message = "لفظ مشابه فعال  برای ارسال به کانال وجود دارد ";
+            $this->telegram_services->sendMessage($this->getUserId(), $message);
+            return true;
+        }
+
         $check_transfer = Transfer::where("price", $type_transaction == "buy" ? ">" : "<", $price)
             ->where("status", Transfer::STATUS_ACTIVE)
             ->whereDate("created_at", now())
@@ -987,18 +1000,6 @@ class ActionServices extends TextServices
 //                ])->where("updated", ">", now()->subMinute(1));
 //            })
             ->first();
-        $word_active = WordTelegram::where("user_id" , $this->getUserId())
-        ->where("status" , WordTelegram::STATUS_PENDING)
-        ->where("type" , $this->getType())
-                ->where("number" , (int)$number)
-                ->where("price" , $price)
-                ->where("word" , $this->getWord())->first();
-        if($word_active)
-        {
-            $message = "لفظ مشابه فعال  برای ارسال به کانال وجود دارد ";
-            $this->telegram_services->sendMessage($this->getUserId(), $message);
-            return true;
-        }
 
         if ($check_transfer) {
 //            $message = "قیمت پیشنهادی بهتری از لفظ شمادر کانال میباشد\n\n";
