@@ -240,7 +240,7 @@ class ActionServices extends TextServices
             $query->with("customerUser");
         }])->where("number",">",0)->find($id);
 
-        if ($transfer->user_id == $this->getUser()->id) {
+        if ($transfer && $transfer->user_id == $this->getUser()->id) {
             $this->telegram_services->sendMessage($this->getUserId(), "شما نمی توانید لفظ خود را دریافت کنید");
             return true;
         }
@@ -455,7 +455,7 @@ class ActionServices extends TextServices
         $word_id = data_get($array, 1);
         if (!$check && !$word_id)
             return false;
-        $word = WordTelegram::find($word_id);
+        $word = WordTelegram::where("status",WordTelegram::STATUS_PENDING)->find($word_id);
 
         if ($word == null) return false;
 
@@ -463,7 +463,8 @@ class ActionServices extends TextServices
             /*
              * check not exist
              */
-
+            $word->status = WordTelegram::STATUS_ACCEPT;
+            $word->update();
             $type_transaction = in_array($word->type, $this->list_type_buy) ? "buy" : "sell";
             $check_transfer = Transfer::where("price", $type_transaction == "buy" ? ">" : "<", $word->price)
                 ->where("status", Transfer::STATUS_ACTIVE)
@@ -486,8 +487,7 @@ class ActionServices extends TextServices
                 $this->telegram_services->editMessageTextAndInlineKeyboard($this->bot->chanel_id, $row_delet->message_id, $message);
                 $row_delet->delete();
             }
-            $word->status = WordTelegram::STATUS_ACCEPT;
-            $word->update();
+
             $order = [
                 "status" => Transfer::STATUS_ACTIVE,
                 "user_id" => $this->getUser()->id,
@@ -509,7 +509,7 @@ class ActionServices extends TextServices
             $message_result = $this->telegram_services->MessageReplyMarkup($this->telegram, $this->bot->chanel_id, $message, $keyboard, false);
             $transfer_new->message_id = $message_result;
             $transfer_new->update();
-            dispatch(new DeactivateTransfer($transfer_new->id))->delay(now()->addMinute(1));
+            dispatch(new DeactivateTransfer($transfer_new->id))->delay(now()->addSecond(54));
             $keyboard = [];
             $copy = data_get($word,"word");
             if(data_get($word,"description"))
@@ -841,6 +841,7 @@ class ActionServices extends TextServices
 
     public function checkWord()
     {
+
         if (!$this->getUser()->status) {
             $this->telegram_services->sendMessage($this->getUserId(), "اکانت کاربری شما غیر فعال می باشد");
             return true;
@@ -882,6 +883,25 @@ class ActionServices extends TextServices
         if (data_get($parameter, "vacation.value")) {
             $this->telegram_services->sendMessage($this->getUserId(), "تعطیل می باشد");
             return false;
+        }
+        $word_old = WordTelegram::where("status",WordTelegram::STATUS_PENDING)->where("user_id",$this->getUser()->id)->get();
+
+        if ($word_old->count()) {
+            foreach ($word_old as $word) {
+                try {
+                    $word->status = WordTelegram::STATUS_REJECT;
+                    $word->update();
+                    $this->getTelegramServices()->editMessageReplyMarkup($word->user_id, $word->message_id, new \stdClass());
+                } catch (\Exception $exception) {
+                    logger("get error", [
+                        $exception->getMessage(),
+                        $exception->getLine(),
+                        $exception->getCode(),
+                        $exception->getTrace(),
+                        $exception->getFile()
+                    ]);
+                }
+            }
         }
         // گرفتن زمان فعلی
         $now = Carbon::now();
@@ -958,6 +978,19 @@ class ActionServices extends TextServices
 //                ])->where("updated", ">", now()->subMinute(1));
 //            })
             ->first();
+        $word_active = WordTelegram::where("user_id" , $this->getUserId())
+        ->where("status" , WordTelegram::STATUS_PENDING)
+        ->where("type" , $this->getType())
+                ->where("number" , (int)$number)
+                ->where("price" , $price)
+                ->where("word" , $this->getWord())->first();
+        if($word_active)
+        {
+            $message = "لفظ مشابه فعال  برای ارسال به کانال وجود دارد ";
+            $this->telegram_services->sendMessage($this->getUserId(), $message);
+            return true;
+        }
+
         if ($check_transfer) {
 //            $message = "قیمت پیشنهادی بهتری از لفظ شمادر کانال میباشد\n\n";
 //            $message .= "لطف اگر پیشنهاد بهتری دارید مجددا لفظ دهید یا \n\n";
