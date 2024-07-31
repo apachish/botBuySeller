@@ -31,7 +31,7 @@ class DeactivateTransfer implements ShouldQueue
      */
     public function handle(): void
     {
-        sleep(1);
+        sleep(6);
         $bot = Bot::where("title","botUser")->first();
         logger("change message");
         if($bot){
@@ -51,7 +51,7 @@ class DeactivateTransfer implements ShouldQueue
                         $transfer->delete();
                     } else {
                         logger("edit block message", [$transfer]);
-                        dispatch(new DeactivateTransfer($this->transfer_id))->delay(now()->addSecond(4));
+                        dispatch(new DeactivateTransfer($this->transfer_id))->delay(now()->addSecond(6));
                     }
                 }
             }catch (\Exception $exception) {
