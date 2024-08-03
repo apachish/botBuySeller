@@ -880,7 +880,7 @@ class ActionServices extends TextServices
             }
         }
         if ($this->getDescription() && !in_array($this->getType(), $this->list_type_reverse_floating_cache)) {
-            $this->telegram_services->sendMessage($this->getUserId(), "توضیحات برای معاملات نقدی می باشد");
+            $this->telegram_services->sendMessage($this->getUserId(), "توضیحات برای معاملات نقدی و شنا و معکوس می باشد");
             return true;
         }
 
@@ -979,7 +979,7 @@ class ActionServices extends TextServices
         $type_transaction = in_array($this->getType(), $this->list_type_buy) ? "buy" : "sell";
         $word_active = WordTelegram::where("user_id" , $this->getUserId())
             ->where("status" , WordTelegram::STATUS_PENDING)
-            ->where("type" , getTypeSimilar($this->getType()))
+            ->whereIn("type" , getTypeSimilar($this->getType()))
             ->where("number" , (int)$number)
             ->where("price" , $price)
             ->where("word" , $this->getWord())->first();
@@ -993,7 +993,7 @@ class ActionServices extends TextServices
         $check_transfer = Transfer::where("price", $type_transaction == "buy" ? ">" : "<", $price)
             ->where("status", Transfer::STATUS_ACTIVE)
             ->whereDate("created_at", now())
-            ->where("type", getTypeSimilar($this->getType()))
+            ->whereIn("type", getTypeSimilar($this->getType()))
             ->first();
 
         if ($check_transfer) {
