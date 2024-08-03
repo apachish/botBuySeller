@@ -893,7 +893,7 @@ class ActionServices extends TextServices
             $this->telegram_services->sendMessage($this->getUserId(), "تعطیل می باشد");
             return false;
         }
-        $word_old = WordTelegram::where("status",WordTelegram::STATUS_PENDING)->where("user_id",$this->getUser()->id)->get();
+        $word_old = WordTelegram::where("status",WordTelegram::STATUS_PENDING)->where("user_id",$this->getUserId())->get();
 
         if ($word_old->count()) {
             foreach ($word_old as $word) {
