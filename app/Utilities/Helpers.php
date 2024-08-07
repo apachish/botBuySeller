@@ -181,38 +181,102 @@ if (!function_exists('getTypeTransfer')) {
         cache()->forget("forbidden_day");
         $forbidden_day = cache()->remember("forbidden_day", now()->setTime(23, 59), function () {
             $item = Setting::where("key", "forbidden_day")->first();
-            return data_get($item,"value");
+            return data_get($item, "value");
         });
-        if(!$forbidden_day)
-            $forbidden_day = $time->isThursday() || $time->isFriday()?true:false;
+        if (!$forbidden_day)
+            $forbidden_day = $time->isThursday() || $time->isFriday() ? true : false;
         $morning = Carbon::create($time->year, $time->month, $time->day, 9, 0, 0); //set time to 08:00
-        $none = Carbon::create($time->year, $time->month, $time->day, env("NONE_HOUR","15"), env("NONE_MIN","30"), 0); //set time to 18:00
-        $none_13_30 = Carbon::create($time->year, $time->month, $time->day, env("NONE_M_HOUR","13"), env("NONE_M_MIN","30"), 0); //set time to 18:00
-        logger("time",[$morning,$none,$none_13_30,!$forbidden_day , $time->between($morning, $none, true) , in_array($type, [ "خ", "ف"])]);
-        if (!$forbidden_day && $time->between($morning, $none, true) && in_array($type, [ "خ", "ف"]))
+        $none = Carbon::create($time->year, $time->month, $time->day, env("NONE_HOUR", "15"), env("NONE_MIN", "30"), 0); //set time to 18:00
+        $none_13_30 = Carbon::create($time->year, $time->month, $time->day, env("NONE_M_HOUR", "13"), env("NONE_M_MIN", "30"), 0); //set time to 18:00
+        logger("time", [$morning, $none, $none_13_30, !$forbidden_day, $time->between($morning, $none, true), in_array($type, ["خ", "ف"])]);
+        if (!$forbidden_day && $time->between($morning, $none, true) && in_array($type, ["خ", "ف"]))
             return "عادی روز";
-        elseif ( in_array($type, [ "خ", "ف"]))
+        elseif (in_array($type, ["خ", "ف"]))
             return "با حواله عادی";
         elseif (in_array($type, ["فف", "خف"]))
             return "با حواله عادی";
-        elseif ( !$forbidden_day && $time->between($morning, $none_13_30, true) && in_array($type, [ "خش", "فش"]))
+        elseif (!$forbidden_day && $time->between($morning, $none_13_30, true) && in_array($type, ["خش", "فش"]))
             return "شنا روز";
-        elseif ( in_array($type, [ "خش", "فش"]))
+        elseif (in_array($type, ["خش", "فش"]))
             return "شنا";
         elseif (in_array($type, ["خفش", "ففش"]))
             return "شنا";
-        elseif (!$forbidden_day && $time->between($morning, $none, true) && in_array($type, [ "خن", "فن"]))
+        elseif (!$forbidden_day && $time->between($morning, $none, true) && in_array($type, ["خن", "فن"]))
             return "نقدی حاضر";
-        elseif ( in_array($type, [ "خن", "فن"]))
+        elseif (in_array($type, ["خن", "فن"]))
             return "نقدی";
         elseif (in_array($type, ["خفن", "ففن"]))
             return "نقدی";
-        elseif (!$forbidden_day && $time->between($morning, $none_13_30, true)  && in_array($type, [ "فم", "خم","فپ", "خپ"]))
+        elseif (!$forbidden_day && $time->between($morning, $none_13_30, true) && in_array($type, ["فم", "خم", "فپ", "خپ"]))
             return "معکوس روز";
-        elseif ($time->between($morning, $none_13_30, true)  && in_array($type, [ "فم", "خم","فپ", "خپ"]))
+        elseif ($time->between($morning, $none_13_30, true) && in_array($type, ["فم", "خم", "فپ", "خپ"]))
             return "معکوس";
-        elseif (in_array($type, ["ففم", "خفم","ففپ", "خفپ"]))
+        elseif (in_array($type, ["ففم", "خفم", "ففپ", "خفپ"]))
             return "معکوس";
+
+    }
+}
+
+
+if (!function_exists('getTypeSimilar')) {
+    function getTypeSimilar($type)
+    {
+        $time = Carbon::now();
+
+        cache()->forget("forbidden_day");
+        $forbidden_day = cache()->remember("forbidden_day", now()->setTime(23, 59), function () {
+            $item = Setting::where("key", "forbidden_day")->first();
+            return data_get($item, "value");
+        });
+        if (!$forbidden_day)
+            $forbidden_day = $time->isThursday() || $time->isFriday() ? true : false;
+        $morning = Carbon::create($time->year, $time->month, $time->day, 9, 0, 0); //set time to 08:00
+        $none = Carbon::create($time->year, $time->month, $time->day, env("NONE_HOUR", "15"), env("NONE_MIN", "30"), 0); //set time to 18:00
+        $none_13_30 = Carbon::create($time->year, $time->month, $time->day, env("NONE_M_HOUR", "13"), env("NONE_M_MIN", "30"), 0); //set time to 18:00
+        $list_type_today_r_f = ["خش", "خم", "فش", "فم", "خپ", "فپ"];
+        $list_type_today_normal_cache = ["خ", "ف", "خن", "فن"];
+        if (!$forbidden_day && $time->between($morning, $none_13_30, true) && in_array($type, $list_type_today_r_f))
+            $array =  [
+                "خش" => ["خش"],
+                "فش" => ["فش"],
+                "خم" => ["خم", "خپ"],
+                "فم" => ["فم", "فپ"],
+                "خپ" => ["خپ", "خم"],
+                "فپ" => ["فپ", "فم"],
+            ];
+        if (!$forbidden_day && $time->between($morning, $none, true) && in_array($type, $list_type_today_normal_cache))
+            $array = [
+                "خ" => ["خ"],
+                "ف" => ["ف"],
+                "خن" => ["خن"],
+                "فن" => ["فن"],
+            ];
+        else
+            $array = [
+                "خ" => ["خ", "خف"],
+                "ف" => ["ف", "فف"],
+                "خش" => ["خش", "خفش"],
+                "فش" => ["فش", "ففش"],
+                "خن" => ["خن", "خفن"],
+                "فن" => ["فن", "ففن"],
+                "خم" => ["خم", "خپ", "خفم", "خفپ"],
+                "فم" => ["فم", "فپ", "ففم", "ففپ"],
+                "خپ" => ["خپ", "خم", "خفم", "خفپ"],
+                "فپ" => ["فپ", "فم", "ففم", "ففپ"],
+                "خف" => ["خف", "خ"],
+                "فف" => ["فف", "ف"],
+                "خفش" => ["خفش", "خش"],
+                "خفن" => ["خفن", "خن"],
+                "ففش" => ["ففش", "فش"],
+                "ففن" => ["ففن", "فن"],
+                "خفم" => ["خفم", "خفپ", "خم", "خپ"],
+                "ففم" => ["ففم", "ففپ", "فم", "فپ"],
+                "خفپ" => ["خفپ", "خفم", "خپ", "خم"],
+                "ففپ" => ["ففپ", "ففم", "فپ", "فم"],
+            ];
+
+        return data_get($array,$type);
+
 
     }
 }

@@ -478,7 +478,7 @@ class ActionServices extends TextServices
             $check_transfer = Transfer::where("price", $type_transaction == "buy" ? ">" : "<", $word->price)
                 ->where("status", Transfer::STATUS_ACTIVE)
                 ->whereDate("created_at", now())
-                ->where("type", $word->type)
+                ->whereIn("type", getTypeSimilar($word->type))
                 ->first();
             if($check_transfer){
                 $message = "لفظ پیشنهادی بهتر در کانال : \n\n";
@@ -488,7 +488,7 @@ class ActionServices extends TextServices
                 return true;
             }
             $transfer_olds = Transfer::where("user_id", $this->getUser()->id)
-                ->where("type", data_get($word, "type"))
+                ->whereIn("type", getTypeSimilar(data_get($word, "type")))
                 ->whereIn("status",[Transfer::STATUS_ACTIVE,Transfer::STATUS_ACTIVE_DO])
                 ->get();
             foreach ($transfer_olds as $row_delet) {
@@ -880,7 +880,7 @@ class ActionServices extends TextServices
             }
         }
         if ($this->getDescription() && !in_array($this->getType(), $this->list_type_reverse_floating_cache)) {
-            $this->telegram_services->sendMessage($this->getUserId(), "توضیحات برای معاملات نقدی می باشد");
+            $this->telegram_services->sendMessage($this->getUserId(), "توضیحات برای معاملات نقدی و شنا و معکوس می باشد");
             return true;
         }
 
@@ -893,7 +893,7 @@ class ActionServices extends TextServices
             $this->telegram_services->sendMessage($this->getUserId(), "تعطیل می باشد");
             return false;
         }
-        $word_old = WordTelegram::where("status",WordTelegram::STATUS_PENDING)->where("user_id",$this->getUser()->id)->get();
+        $word_old = WordTelegram::where("status",WordTelegram::STATUS_PENDING)->where("user_id",$this->getUserId())->get();
 
         if ($word_old->count()) {
             foreach ($word_old as $word) {
@@ -933,7 +933,7 @@ class ActionServices extends TextServices
             return false;
         }
 
-        $last_transfer = Transfer::where("type", $this->getType())
+        $last_transfer = Transfer::whereIn("type", getTypeSimilar($this->getType()))
             ->whereIn("status", [Transfer::STATUS_ACTIVE_DO, Transfer::STATUS_ACTIVE_DONE])
             ->whereDate("created_at",now())
             ->orderBy("updated_at", "DESC")->first();
@@ -979,7 +979,7 @@ class ActionServices extends TextServices
         $type_transaction = in_array($this->getType(), $this->list_type_buy) ? "buy" : "sell";
         $word_active = WordTelegram::where("user_id" , $this->getUserId())
             ->where("status" , WordTelegram::STATUS_PENDING)
-            ->where("type" , $this->getType())
+            ->whereIn("type" , getTypeSimilar($this->getType()))
             ->where("number" , (int)$number)
             ->where("price" , $price)
             ->where("word" , $this->getWord())->first();
@@ -993,13 +993,7 @@ class ActionServices extends TextServices
         $check_transfer = Transfer::where("price", $type_transaction == "buy" ? ">" : "<", $price)
             ->where("status", Transfer::STATUS_ACTIVE)
             ->whereDate("created_at", now())
-            ->where("type", $this->getType())
-//            ->orWhere(function ($query) {
-//                $query->whereIn("status", [
-//                    Transfer::STATUS_ACTIVE_DO,
-//                    Transfer::STATUS_ACTIVE_DONE
-//                ])->where("updated", ">", now()->subMinute(1));
-//            })
+            ->whereIn("type", getTypeSimilar($this->getType()))
             ->first();
 
         if ($check_transfer) {
