@@ -233,8 +233,8 @@ if (!function_exists('getTypeSimilar')) {
         $morning = Carbon::create($time->year, $time->month, $time->day, 9, 0, 0); //set time to 08:00
         $none = Carbon::create($time->year, $time->month, $time->day, env("NONE_HOUR", "15"), env("NONE_MIN", "30"), 0); //set time to 18:00
         $none_13_30 = Carbon::create($time->year, $time->month, $time->day, env("NONE_M_HOUR", "13"), env("NONE_M_MIN", "30"), 0); //set time to 18:00
-        $list_type_today_r_f = ["خش", "خم", "فش", "فم", "خپ", "فپ"];
-        $list_type_today_normal_cache = ["خ", "ف", "خن", "فن"];
+        $list_type_today_r_f = ["خش", "خم", "فش", "فم", "خپ", "فپ","خفش", "ففش", "خفم","ففم","خفپ","ففپ"];
+        $list_type_today_normal_cache = ["خ", "ف", "خن", "فن","خف","فف","ففن","خفن"];
         if (!$forbidden_day && $time->between($morning, $none_13_30, true) && in_array($type, $list_type_today_r_f))
             $array =  [
                 "خش" => ["خش"],
@@ -243,6 +243,12 @@ if (!function_exists('getTypeSimilar')) {
                 "فم" => ["فم", "فپ"],
                 "خپ" => ["خپ", "خم"],
                 "فپ" => ["فپ", "فم"],
+                "خفش" => ["خفش"],
+                "ففش" => ["ففش"],
+                "خفم" => ["خفم", "خفپ"],
+                "ففم" => ["ففم", "ففپ"],
+                "خفپ" => ["خفپ", "خفم",],
+                "ففپ" => ["ففپ", "ففم"],
             ];
         elseif (!$forbidden_day && $time->between($morning, $none, true) && in_array($type, $list_type_today_normal_cache))
             $array = [
@@ -250,6 +256,11 @@ if (!function_exists('getTypeSimilar')) {
                 "ف" => ["ف"],
                 "خن" => ["خن"],
                 "فن" => ["فن"],
+                "خف" => ["خف"],
+                "فف" => ["فف"],
+                "ففن" => ["ففن"],
+                "خفن" => ["خفن"],
+
             ];
         else
             $array = [
