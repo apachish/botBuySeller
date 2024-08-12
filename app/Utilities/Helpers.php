@@ -244,7 +244,7 @@ if (!function_exists('getTypeSimilar')) {
                 "خپ" => ["خپ", "خم"],
                 "فپ" => ["فپ", "فم"],
             ];
-        if (!$forbidden_day && $time->between($morning, $none, true) && in_array($type, $list_type_today_normal_cache))
+        elseif (!$forbidden_day && $time->between($morning, $none, true) && in_array($type, $list_type_today_normal_cache))
             $array = [
                 "خ" => ["خ"],
                 "ف" => ["ف"],
