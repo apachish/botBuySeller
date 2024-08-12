@@ -275,6 +275,7 @@ if (!function_exists('getTypeSimilar')) {
                 "ففپ" => ["ففپ", "ففم", "فپ", "فم"],
             ];
 
+        logger("test type",[$array,data_get($array,$type)]);
         return data_get($array,$type);
 
 
