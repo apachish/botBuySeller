@@ -275,7 +275,11 @@ if (!function_exists('getTypeSimilar')) {
                 "ففپ" => ["ففپ", "ففم", "فپ", "فم"],
             ];
 
-        logger("test type",[$array,data_get($array,$type)]);
+        logger("test type",[$array,data_get($array,$type)
+        ,!$forbidden_day , $time->between($morning, $none, true) , in_array($type, $list_type_today_normal_cache),
+            !$forbidden_day && $time->between($morning, $none, true) && in_array($type, $list_type_today_normal_cache),
+            $time->between($morning, $none_13_30, true) , in_array($type, $list_type_today_r_f)
+        ]);
         return data_get($array,$type);
 
 
