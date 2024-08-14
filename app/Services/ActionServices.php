@@ -1214,13 +1214,16 @@ class ActionServices extends TextServices
      * @param \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection|\Illuminate\Database\Eloquent\Builder|array $transfer
      * @return void
      */
-    public function checkTransaction(\Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection|\Illuminate\Database\Eloquent\Builder|array $transfer): void
+    public function checkTransaction(Transfer $transfer): void
     {
         $transfer = $transfer->refresh();
         logger("transaction check",[$transfer]);
         if ($transfer->number > 0) {
             $transfer->status_transaction = false;
             $transfer->update();
+            $transfer = $transfer->refresh();
+            logger("transaction check",[$transfer]);
+
         }
     }
 
