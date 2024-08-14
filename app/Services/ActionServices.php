@@ -21,6 +21,7 @@ use App\Models\UserTradeAccess;
 use App\Models\WordTelegram;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 use Telegram\Bot\Api;
 use Telegram\Bot\FileUpload\InputFile;
 use Telegram\Bot\Keyboard\Keyboard;
@@ -242,15 +243,15 @@ class ActionServices extends TextServices
 
 
         if ($transfer) {
+
             if ( $transfer->user_id == $this->getUser()->id) {
                 $this->telegram_services->sendMessage($this->getUserId(), "شما نمی توانید لفظ خود را دریافت کنید");
                 return true;
             }
             $transfer_type = getTypeOrder($transfer->type);
+            $createdAt = $transfer->created_at;
             $transfer->status_transaction = true;
             $transfer->save();
-            $createdAt = $transfer->created_at;
-
             $now = Carbon::now();
             $diffInSeconds = $now->diffInSeconds($createdAt);
             if ($diffInSeconds > 60) {
@@ -261,6 +262,7 @@ class ActionServices extends TextServices
                 return true;
             }
             $forbidden = Setting::where("key", "forbidden")->where("value", true)->first();
+            DB::beginTransaction();
             try {
                 $limit_day = null;
                 $transaction_party = null;
@@ -273,6 +275,7 @@ class ActionServices extends TextServices
                 {
                     $head = data_get($this->getUser(), "customer");
                     if(!$head) {
+                        $this->checkTransaction($transfer);
                         $this->telegram_services->sendMessage($this->getUserId(), "شما نمی توانید لفظ  دریافت کنید");
                         return true;
                     }
@@ -306,6 +309,7 @@ class ActionServices extends TextServices
                         $list_worker = $head->customerUsers->pluck("id")->toArray();
                         $list_worker[] = data_get($head, "id");
                         if (in_array($this->getUser()->id, $list_worker)) {
+                            $this->checkTransaction($transfer);
                             $this->telegram_services->sendMessage($this->getUserId(), "\xE2\x9D\x8C	استثنائا در این دقایق خاص بصورت موقت امکان گرفتن لفظ سرگروه و زیر مجموعه خودش امکان پذیر نمی باشد\xE2\x9D\x8C	");
                             return true;
                         }
@@ -313,6 +317,7 @@ class ActionServices extends TextServices
                 } elseif ($this->getUser()->role == "colleague") {
                     if ($forbidden && data_get($transfer, "user.role") == "customer") {
                         if (in_array($this->getUserId(), $this->getUser()->customerUsers)) {
+                            $this->checkTransaction($transfer);
                             $this->telegram_services->sendMessage($this->getUserId(), "\xE2\x9D\x8C	استثنائا در این دقایق خاص بصورت موقت امکان گرفتن لفظ سرگروه و زیر مجموعه خودش امکان پذیر نمی باشد\xE2\x9D\x8C	");
                             return true;
                         }
@@ -346,6 +351,7 @@ class ActionServices extends TextServices
                             ]);
                         }
                     }
+                    $this->checkTransaction($transfer);
                 }
 
 
@@ -369,24 +375,21 @@ class ActionServices extends TextServices
                     $request_transfer["type"] = getTypeOrder(data_get($transfer, "type")) == "buy" ? "sell" : "buy";
 
                     $order_buy = RequestTransfer::create($request_transfer);
-                    $transfer = $transfer->refresh();
-                    if($transfer->number > 0)
-                    {
-                        $transfer->status_transaction = false;
-                        $transfer->update();
-                    }
+                    $this->checkTransaction($transfer);
                     $daily_transfer->request_id = $order_buy->id;
                     $daily_transfer->update();
 
 
                     dispatch(new PartiesToTheTransaction($order_buy->id));
                     dispatch(new SendMessageAccountingBot($order_buy->id));
+                    DB::commit();
 
                 } else {
 //                    $this->telegram_services->sendMessage($this->getUserId(), "متأسفانه امکان دریافت حواله برای شما در این معامله نمی باشد");
                     return true;
                 }
             } catch (\Exception $exception) {
+                DB::rollback();
 
                 logger("exp send request", [$exception->getMessage(),
                     $exception->getLine(),
@@ -1202,6 +1205,19 @@ class ActionServices extends TextServices
 
         $price = $start_trade + ($suggest_price * 1000);
         return $price;
+    }
+
+    /**
+     * @param \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection|\Illuminate\Database\Eloquent\Builder|array $transfer
+     * @return void
+     */
+    public function checkTransaction(\Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection|\Illuminate\Database\Eloquent\Builder|array $transfer): void
+    {
+        $transfer = $transfer->refresh();
+        if ($transfer->number > 0) {
+            $transfer->status_transaction = false;
+            $transfer->update();
+        }
     }
 
 }
