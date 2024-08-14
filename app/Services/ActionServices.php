@@ -369,6 +369,12 @@ class ActionServices extends TextServices
                     $request_transfer["type"] = getTypeOrder(data_get($transfer, "type")) == "buy" ? "sell" : "buy";
 
                     $order_buy = RequestTransfer::create($request_transfer);
+                    $transfer = $transfer->refresh();
+                    if($transfer->number > 0)
+                    {
+                        $transfer->status_transaction = false;
+                        $transfer->update();
+                    }
                     $daily_transfer->request_id = $order_buy->id;
                     $daily_transfer->update();
 
