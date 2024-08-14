@@ -40,29 +40,33 @@ class SendMessageAccountingBot implements ShouldQueue
                 logger("bot accounting job", [$bot_accounting]);
                 $telegram_accounting = new Api($bot_accounting->token);
                 $order_buy = RequestTransfer::with(["userRequest.customer", "transferReport"])->find($this->order_id);
-                logger("order buy", [$order_buy]);
-                $message = $this->getfactor($order_buy);
-                $admins = $bot_accounting->accessBot;
-                logger("aaa", [$admins]);
-                foreach ($admins as $admin) {
-                    logger("send job", [$admin]);
-                    $this->send = Message::create([
-                        "telegram_id" => $admin->user_id,
-                        "bot_id" => $bot_accounting->id,
-                        "status" => Message::STATUS_PENDING,
-                        "text" => $message,
-                        "request_id" => $this->order_id
-                    ]);
-                    $send_accounting = $telegram_accounting->sendMessage(
-                        [
-                            'chat_id' => $admin->user_id,
-                            'text' => $message,
-                            'parse_mode' => 'MarkdownV2'
+                if($order_buy) {
+                    logger("order buy", [$order_buy]);
+                    $message = $this->getfactor($order_buy);
+                    $admins = $bot_accounting->accessBot;
+                    logger("aaa", [$admins]);
+                    foreach ($admins as $admin) {
+                        logger("send job", [$admin]);
+                        $this->send = Message::create([
+                            "telegram_id" => $admin->user_id,
+                            "bot_id" => $bot_accounting->id,
+                            "status" => Message::STATUS_PENDING,
+                            "text" => $message,
+                            "request_id" => $this->order_id
                         ]);
-                    $this->send->message_id = data_get($send_accounting, "message_id");
-                    $this->send->status = Message::STATUS_RECEIVE;
-                    $this->send->update();
-                    logger("aco job", [$send_accounting]);
+                        $send_accounting = $telegram_accounting->sendMessage(
+                            [
+                                'chat_id' => $admin->user_id,
+                                'text' => $message,
+                                'parse_mode' => 'MarkdownV2'
+                            ]);
+                        $this->send->message_id = data_get($send_accounting, "message_id");
+                        $this->send->status = Message::STATUS_RECEIVE;
+                        $this->send->update();
+                        logger("aco job", [$send_accounting]);
+                    }
+                }else{
+                    logger("order buy can not found send accounting", [$this->order_id]);
                 }
             } catch (\Exception $exception) {
                 logger("get error", [
