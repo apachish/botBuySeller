@@ -240,13 +240,13 @@ class ActionServices extends TextServices
             $query->with("customerUser");
         }])->where("status_transaction",false)->where("number",">",0)->find($id);
 
-        if ($transfer && $transfer->user_id == $this->getUser()->id) {
-            $this->telegram_services->sendMessage($this->getUserId(), "شما نمی توانید لفظ خود را دریافت کنید");
-            return true;
-        }
 
-        $transfer_type = getTypeOrder($transfer->type);
         if ($transfer) {
+            if ( $transfer->user_id == $this->getUser()->id) {
+                $this->telegram_services->sendMessage($this->getUserId(), "شما نمی توانید لفظ خود را دریافت کنید");
+                return true;
+            }
+            $transfer_type = getTypeOrder($transfer->type);
             $transfer->status_transaction = true;
             $transfer->save();
             $createdAt = $transfer->created_at;
