@@ -1223,6 +1223,8 @@ class ActionServices extends TextServices
             $transfer->update();
             $transfer = $transfer->refresh();
             logger("transaction check",[$transfer]);
+            DB::commit();
+
 
         }
     }
