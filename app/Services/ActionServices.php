@@ -1217,6 +1217,7 @@ class ActionServices extends TextServices
     public function checkTransaction(\Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection|\Illuminate\Database\Eloquent\Builder|array $transfer): void
     {
         $transfer = $transfer->refresh();
+        logger("transaction check",[$transfer]);
         if ($transfer->number > 0) {
             $transfer->status_transaction = false;
             $transfer->update();
