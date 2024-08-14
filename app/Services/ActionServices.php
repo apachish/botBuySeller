@@ -354,11 +354,9 @@ class ActionServices extends TextServices
                             ]);
                         }
                     }
-                    $this->checkTransaction($transfer);
                 }
 
-
-                if (data_get($request_transfer, "number") > 0) {
+                if (data_get($request_transfer, "number") > 0 ) {
                     $keyboard = self::getKeyboardRequest($transfer);
 
                     $trade_message = $transfer->message;
