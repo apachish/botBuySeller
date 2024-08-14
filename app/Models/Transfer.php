@@ -36,6 +36,7 @@ class Transfer extends Model
         "status",
         "message",
         "description",
+        "status_transaction",
         "message_id",
         "date",
         "message_request",

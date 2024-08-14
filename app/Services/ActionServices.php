@@ -238,7 +238,7 @@ class ActionServices extends TextServices
         $transfer = Transfer::with(["user" => function ($query) {
             $query->with("customer.userTradeAccess");
             $query->with("customerUser");
-        }])->where("number",">",0)->find($id);
+        }])->where("status_transaction",false)->where("number",">",0)->find($id);
 
         if ($transfer && $transfer->user_id == $this->getUser()->id) {
             $this->telegram_services->sendMessage($this->getUserId(), "شما نمی توانید لفظ خود را دریافت کنید");
@@ -247,7 +247,8 @@ class ActionServices extends TextServices
 
         $transfer_type = getTypeOrder($transfer->type);
         if ($transfer) {
-
+            $transfer->status_transaction = true;
+            $transfer->save();
             $createdAt = $transfer->created_at;
 
             $now = Carbon::now();
