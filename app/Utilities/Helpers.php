@@ -189,30 +189,34 @@ if (!function_exists('getTypeTransfer')) {
         $none = Carbon::create($time->year, $time->month, $time->day, env("NONE_HOUR", "15"), env("NONE_MIN", "30"), 0); //set time to 18:00
         $none_13_30 = Carbon::create($time->year, $time->month, $time->day, env("NONE_M_HOUR", "13"), env("NONE_M_MIN", "30"), 0); //set time to 18:00
         logger("time", [$morning, $none, $none_13_30, !$forbidden_day, $time->between($morning, $none, true), in_array($type, ["خ", "ف"])]);
-        if (!$forbidden_day && $time->between($morning, $none, true) && in_array($type, ["خ", "ف"]))
-            return "عادی روز";
-        elseif (in_array($type, ["خ", "ف"]))
-            return "با حواله عادی";
-        elseif (in_array($type, ["فف", "خف"]))
-            return "با حواله عادی";
-        elseif (!$forbidden_day && $time->between($morning, $none_13_30, true) && in_array($type, ["خش", "فش"]))
-            return "شنا روز";
-        elseif (in_array($type, ["خش", "فش"]))
-            return "شنا";
-        elseif (in_array($type, ["خفش", "ففش"]))
-            return "شنا";
-        elseif (!$forbidden_day && $time->between($morning, $none, true) && in_array($type, ["خن", "فن"]))
-            return "نقدی حاضر";
-        elseif (in_array($type, ["خن", "فن"]))
-            return "نقدی";
-        elseif (in_array($type, ["خفن", "ففن"]))
-            return "نقدی";
-        elseif (!$forbidden_day && $time->between($morning, $none_13_30, true) && in_array($type, ["فم", "خم", "فپ", "خپ"]))
-            return "معکوس روز";
-        elseif ($time->between($morning, $none_13_30, true) && in_array($type, ["فم", "خم", "فپ", "خپ"]))
-            return "معکوس";
-        elseif (in_array($type, ["ففم", "خفم", "ففپ", "خفپ"]))
-            return "معکوس";
+        if($forbidden_day){
+            if (in_array($type, ["خ", "ف","فف", "خف"]))
+                return "با حواله عادی";
+            elseif (in_array($type, ["خش", "فش","خفش", "ففش"]))
+                return "شنا";
+            elseif (in_array($type, ["خن", "فن","خفن", "ففن"]))
+                return "نقدی";
+            elseif (in_array($type, ["فم", "خم", "فپ", "خپ","ففم", "خفم", "ففپ", "خفپ"]))
+                return "معکوس";
+        }else{
+            if ($time->between($morning, $none, true) && in_array($type, ["خ", "ف"]))
+                return "عادی روز";
+            elseif (in_array($type, ["خ", "ف","فف", "خف"]))
+                return "با حواله عادی";
+            elseif ($time->between($morning, $none_13_30, true) && in_array($type, ["خش", "فش"]))
+                return "شنا روز";
+            elseif (in_array($type, ["خش", "فش","خفش", "ففش"]))
+                return "شنا";
+            elseif ($time->between($morning, $none, true) && in_array($type, ["خن", "فن"]))
+                return "نقدی حاضر";
+            elseif (in_array($type, ["خفن", "ففن","خن", "فن"]))
+                return "نقدی";
+            elseif ( $time->between($morning, $none_13_30, true) && in_array($type, ["فم", "خم", "فپ", "خپ"]))
+                return "معکوس روز";
+            elseif (in_array($type, ["ففم", "خفم", "ففپ", "خفپ","فم", "خم", "فپ", "خپ"]))
+                return "معکوس";
+        }
+
 
     }
 }

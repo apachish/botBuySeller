@@ -843,6 +843,7 @@ class ActionServices extends TextServices
         $result = false;
         $transfers = Transfer::where("user_id", $this->getUser()->id)
             ->whereIn("status", [Transfer::STATUS_ACTIVE, Transfer::STATUS_ACTIVE_DO])
+            ->where("number",">",0 )
             ->get();
         $i = 0;
         foreach ($transfers as $transfer) {
