@@ -341,6 +341,7 @@ class ActionServices extends TextServices
                     [$daily_transfer, $num] = $this->performTransaction($seller, $buyer, $num, $limit_day);
                     if(!$num)
                     {
+                        $this->sendAlert("امکان دریافت ندارید محدودیت توسط طرفین اعمال گردید است.\xE2\x9A\xA0	");
                         $this->checkTransaction($transfer);
                         return true;
                     }
