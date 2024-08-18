@@ -853,6 +853,7 @@ class ActionServices extends TextServices
             {
                 $msg = $transfer->message ."[ امکان کنسلی نمی باشد چون کاربر در حال گرفتنش است  ]";
                 $this->telegram->sendMessage(['chat_id' => $this->getUserId(), 'text' => $msg]);
+                continue;
             }
 
             $this->telegram_services->editMessageTextAndInlineKeyboard($this->bot->chanel_id, $transfer->message_id, $message);
