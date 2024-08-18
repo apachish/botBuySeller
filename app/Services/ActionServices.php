@@ -239,19 +239,19 @@ class ActionServices extends TextServices
         $transfer = Transfer::with(["user" => function ($query) {
             $query->with("customer.userTradeAccess");
             $query->with("customerUser");
-        }])->where("status_transaction",false)->where("number",">",0)->find($id);
+        }])->where("number",">",0)->find($id);
 
 
         if ($transfer) {
 
+            if($transfer->status_transaction)
+            {
+                $this->sendAlert("درحال ارائه به شخص دیگر می باشد  ... \xE2\x9A\xA0	");
+                return  true;
+            }
             if ( $transfer->user_id == $this->getUser()->id) {
                 $alert_text = "شما نمی توانید لفظ خود را دریافت کنید";
-                $callback_query = $this->update[$this->getTypeMessage()];
-                $callback_id = data_get($callback_query,'id');
-                if($callback_query) {
-                    $url = "https://api.telegram.org/bot" . $this->bot->token . "/answerCallbackQuery?callback_query_id=$callback_id&text=" . urlencode($alert_text) . "&show_alert=true";
-                    file_get_contents($url);
-                }
+                $this->sendAlert($alert_text);
 //                $this->telegram_services->sendMessage($this->getUserId(), "شما نمی توانید لفظ خود را دریافت کنید");
                 return true;
             }
@@ -265,7 +265,9 @@ class ActionServices extends TextServices
                 $message = $transfer->message . "\xF0\x9F\x95\x9B	";
                 $edit_message = $this->getTelegramServices()->editMessageTextAndInlineKeyboard($this->bot->chanel_id, $transfer->message_id, $message);
                 $transfer->delete();
-                $this->telegram_services->sendMessage($this->getUserId(), "زمان دریافت لفظ تمام شده");
+//                $this->telegram_services->sendMessage($this->getUserId(), "زمان دریافت لفظ تمام شده");
+                $this->sendAlert("زمان دریافت لفظ تمام شده");
+
                 return true;
             }
             $forbidden = Setting::where("key", "forbidden")->where("value", true)->first();
@@ -1239,6 +1241,20 @@ class ActionServices extends TextServices
             DB::commit();
 
 
+        }
+    }
+
+    /**
+     * @param string $alert_text
+     * @return void
+     */
+    public function sendAlert(string $alert_text): void
+    {
+        $callback_query = $this->update[$this->getTypeMessage()];
+        $callback_id = data_get($callback_query, 'id');
+        if ($callback_query) {
+            $url = "https://api.telegram.org/bot" . $this->bot->token . "/answerCallbackQuery?callback_query_id=$callback_id&text=" . urlencode($alert_text) . "&show_alert=true";
+            file_get_contents($url);
         }
     }
 
