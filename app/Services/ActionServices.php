@@ -849,6 +849,12 @@ class ActionServices extends TextServices
         foreach ($transfers as $transfer) {
             $message = $transfer->message . "\xF0\x9F\x9A\xAB";
 
+            if($transfer->status_transaction)
+            {
+                $msg = $transfer->message ."[ امکان کنسلی نمی باشد چون کاربر در حال گرفتنش است  ]";
+                $this->telegram->sendMessage(['chat_id' => $this->getUserId(), 'text' => $msg]);
+            }
+
             $this->telegram_services->editMessageTextAndInlineKeyboard($this->bot->chanel_id, $transfer->message_id, $message);
             $transfer->status = Transfer::STATUS_DEACTIVATE;
             $transfer->update();
