@@ -245,7 +245,14 @@ class ActionServices extends TextServices
         if ($transfer) {
 
             if ( $transfer->user_id == $this->getUser()->id) {
-                $this->telegram_services->sendMessage($this->getUserId(), "شما نمی توانید لفظ خود را دریافت کنید");
+                $alert_text = "شما نمی توانید لفظ خود را دریافت کنید";
+                $callback_query = $this->update[$this->getTypeMessage()];
+                $callback_id = data_get($callback_query,'id');
+                if($callback_query) {
+                    $url = "https://api.telegram.org/bot" . $this->bot->token . "/answerCallbackQuery?callback_query_id=$callback_id&text=" . urlencode($alert_text) . "&show_alert=true";
+                    file_get_contents($url);
+                }
+//                $this->telegram_services->sendMessage($this->getUserId(), "شما نمی توانید لفظ خود را دریافت کنید");
                 return true;
             }
             $transfer_type = getTypeOrder($transfer->type);
