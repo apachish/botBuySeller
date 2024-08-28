@@ -409,7 +409,7 @@ class ActionServices extends TextServices
                     $exception->getFile()]);
             }
         }else{
-            $this->sendAlert("زمان دریافت لفظ تمام شده");
+//            $this->sendAlert("زمان دریافت لفظ تمام شده");
 
             return true;
         }
