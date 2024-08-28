@@ -262,8 +262,8 @@ class ActionServices extends TextServices
             $now = Carbon::now();
             $diffInSeconds = $now->diffInSeconds($createdAt);
             if ($diffInSeconds > 60) {
-                $message = $transfer->message ;
-                $edit_message = $this->getTelegramServices()->editMessageTextAndInlineKeyboard($this->bot->chanel_id, $transfer->message_id, $message);
+//                $message = $transfer->message ;
+//                $edit_message = $this->getTelegramServices()->editMessageTextAndInlineKeyboard($this->bot->chanel_id, $transfer->message_id, $message);
                 $transfer->delete();
 //                $this->telegram_services->sendMessage($this->getUserId(), "زمان دریافت لفظ تمام شده");
                 $this->sendAlert("زمان دریافت لفظ تمام شده");
