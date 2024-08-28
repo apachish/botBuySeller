@@ -262,7 +262,7 @@ class ActionServices extends TextServices
             $now = Carbon::now();
             $diffInSeconds = $now->diffInSeconds($createdAt);
             if ($diffInSeconds > 60) {
-                $message = $transfer->message . "\xF0\x9F\x95\x9B	";
+                $message = $transfer->message ;
                 $edit_message = $this->getTelegramServices()->editMessageTextAndInlineKeyboard($this->bot->chanel_id, $transfer->message_id, $message);
                 $transfer->delete();
 //                $this->telegram_services->sendMessage($this->getUserId(), "زمان دریافت لفظ تمام شده");
@@ -539,7 +539,7 @@ class ActionServices extends TextServices
             $message_result = $this->telegram_services->MessageReplyMarkup($this->telegram, $this->bot->chanel_id, $message, $keyboard, false);
             $transfer_new->message_id = $message_result;
             $transfer_new->update();
-            dispatch(new DeactivateTransfer($transfer_new->id))->delay(now()->addSecond(54));
+//            dispatch(new DeactivateTransfer($transfer_new->id))->delay(now()->addSecond(54));
             $keyboard = [];
             $copy = data_get($word,"word");
             if(data_get($word,"description"))
