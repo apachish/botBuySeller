@@ -543,7 +543,7 @@ class ActionServices extends TextServices
             $message_result = $this->telegram_services->MessageReplyMarkup($this->telegram, $this->bot->chanel_id, $message, $keyboard, false);
             $transfer_new->message_id = $message_result;
             $transfer_new->update();
-//            dispatch(new DeactivateTransfer($transfer_new->id))->delay(now()->addSecond(54));
+            dispatch(new DeactivateTransfer($transfer_new->id))->delay(now()->addSecond(54));
             $keyboard = [];
             $copy = data_get($word,"word");
             if(data_get($word,"description"))

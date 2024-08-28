@@ -31,7 +31,7 @@ class DeactivateTransfer implements ShouldQueue
      */
     public function handle(): void
     {
-        sleep(6);
+//        sleep(6);
         $bot = Bot::where("title","botUser")->first();
         logger("change message");
         if($bot){
@@ -44,15 +44,17 @@ class DeactivateTransfer implements ShouldQueue
                     ->find($this->transfer_id);
                 logger("transfer deactive", [$transfer, $this->transfer_id]);
                 if ($transfer) {
-                    $message = $transfer->message . "\xF0\x9F\x95\x9B	";
-                    $edit_message = $text_services->getTelegramServices()->editMessageTextAndInlineKeyboard($bot->chanel_id, $transfer->message_id, $message);
-                    logger("edit_message", [$edit_message]);
-                    if (data_get($edit_message, "ok")) {
-                        $transfer->delete();
-                    } else {
-                        logger("edit block message", [$transfer]);
-                        dispatch(new DeactivateTransfer($this->transfer_id))->delay(now()->addSecond(6));
-                    }
+                    $transfer->delete();
+
+//                    $message = $transfer->message . "\xF0\x9F\x95\x9B	";
+//                    $edit_message = $text_services->getTelegramServices()->editMessageTextAndInlineKeyboard($bot->chanel_id, $transfer->message_id, $message);
+//                    logger("edit_message", [$edit_message]);
+//                    if (data_get($edit_message, "ok")) {
+//                        $transfer->delete();
+//                    } else {
+//                        logger("edit block message", [$transfer]);
+//                        dispatch(new DeactivateTransfer($this->transfer_id))->delay(now()->addSecond(6));
+//                    }
                 }
             }catch (\Exception $exception) {
                 logger("get error", [
