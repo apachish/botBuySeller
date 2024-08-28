@@ -408,6 +408,10 @@ class ActionServices extends TextServices
                     $exception->getTrace(),
                     $exception->getFile()]);
             }
+        }else{
+            $this->sendAlert("زمان دریافت لفظ تمام شده");
+
+            return true;
         }
     }
 
