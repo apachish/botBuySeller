@@ -6,6 +6,7 @@ namespace App\Services;
 use App\Jobs\DeactivateTransfer;
 use App\Jobs\DeactivateWord;
 use App\Jobs\PartiesToTheTransaction;
+use App\Jobs\SendAcceptWordAccounting;
 use App\Jobs\SendMessageAccountingBot;
 use App\Models\AccessBot;
 use App\Models\Bot;
@@ -374,6 +375,10 @@ class ActionServices extends TextServices
                         $trade_message .= "\xE2\x9C\x85	🤝🏼";
                         $transfer->status = Transfer::STATUS_ACTIVE_DONE;
                         $transfer->update();
+                    }else{
+                        $trade_message .= "(".$transfer->number." مانده )";
+                        $transfer->status = Transfer::STATUS_ACTIVE_DO;
+                        $transfer->update();
                     }
 
                     $this->telegram_services->editMessageTextAndInlineKeyboard($this->bot->chanel_id, $transfer->message_id, $trade_message, $keyboard);
@@ -555,23 +560,26 @@ class ActionServices extends TextServices
             ];
 
             $response = TelegramServices::menu($this->telegram, $keyboard, $this->getUser(), "لفظ شما تایید شد\xE2\x9C\x85	");
-            $bot_accounting = Bot::where('title', "botAccounting")->first();
-            if($bot_accounting){
-                $telegram_accounting_services = new TelegramServices($bot_accounting->token);
-                $admins = $bot_accounting->accessBot;
-                foreach ($admins as $admin) {
-                    $message_accounting = $transfer_new->user->fullName;
-                    $message_accounting .= "\n";
-                    if(data_get($transfer_new,"user.customer"))
-                    {
-                        $message_accounting .= " مشتری :".data_get($transfer_new,"user.customer.fullName");
-                        $message_accounting .= "\n";
+//            $bot_accounting = Bot::where('title', "botAccounting")->first();
+//            if($bot_accounting){
+//                $telegram_accounting_services = new TelegramServices($bot_accounting->token);
+//                $admins = $bot_accounting->accessBot;
+//                foreach ($admins as $admin) {
+//                    $message_accounting = $transfer_new->user->fullName;
+//                    $message_accounting .= "\n";
+//                    if(data_get($transfer_new,"user.customer"))
+//                    {
+//                        $message_accounting .= " مشتری :".data_get($transfer_new,"user.customer.fullName");
+//                        $message_accounting .= "\n";
+//
+//                    }
+//                    $message_accounting .= data_get($word, "message");
+//                    $send_accounting = $telegram_accounting_services->sendMessage($admin->user_id,$message_accounting);
+//                }
+//            }
+            dispatch(new SendAcceptWordAccounting($transfer_new->id,$word->id));
+            dispatch(new SendAcceptWordAccounting($transfer_new->id,$word->id));
 
-                    }
-                    $message_accounting .= data_get($word, "message");
-                    $send_accounting = $telegram_accounting_services->sendMessage($admin->user_id,$message_accounting);
-                }
-            }
 
 
         } elseif ($check == "false") {
@@ -861,7 +869,8 @@ class ActionServices extends TextServices
             ->get();
         $i = 0;
         foreach ($transfers as $transfer) {
-            $message = $transfer->message . "\xF0\x9F\x9A\xAB";
+            $message = $transfer->message . "\xE2\x9D\x8C";
+//            $message = $transfer->message . "\xF0\x9F\x9A\xAB";
 
             if($transfer->status_transaction)
             {
@@ -1095,20 +1104,20 @@ class ActionServices extends TextServices
 
             );
             if (!$forbidden_day && $time->between($morning, $none_13_30, true) && in_array($this->getType(), $this->list_type_today_r_f)) {
-                $message .= " \xE2\x98\x80	";
-                $message_request .= " \xE2\x98\x80	";
-                $message_request_me .= " \xE2\x98\x80	";
+                $message .= "\xE2\x98\x80";
+                $message_request .= "\xE2\x98\x80";
+                $message_request_me .= "\xE2\x98\x80";
                 $date = now()->format("Y-m-d");
             } else if ( !$forbidden_day && $time->between($morning, $none, true) && (in_array($this->getType(), $this->list_type_today_normal) ||
                     in_array($this->getType(), $this->list_type_today_cache))) {
-                $message .= " \xE2\x98\x80	";
-                $message_request .= " \xE2\x98\x80	";
-                $message_request_me .= " \xE2\x98\x80	";
+                $message .= "\xE2\x98\x80";
+                $message_request .= "\xE2\x98\x80";
+                $message_request_me .= "\xE2\x98\x80";
                 $date = now()->format("Y-m-d");
             } else {
-                $message .= " \xE2\x8F\xB3️	";
-                $message_request .= " \xE2\x8F\xB3️	";
-                $message_request_me .= " \xE2\x8F\xB3️	";
+                $message .= "\xE2\x8F\xB3️";
+                $message_request .= "\xE2\x8F\xB3️";
+                $message_request_me .= "\xE2\x8F\xB3️";
                 if ($tomorrow)
                     $date = $tomorrow;
                 else
@@ -1128,7 +1137,7 @@ class ActionServices extends TextServices
                 else
                     $message .= "   بی حواله فردا ";
 
-                $message .= "\xF0\x9F\x92\xB0	";
+                $message .= "\xF0\x9F\x92\xB0";
 
             } elseif ( !$forbidden_day && $time->between($morning, $none, true) && (in_array($this->getType(), $this->list_type_today)))
                 $message .= " روز   ";
@@ -1137,15 +1146,15 @@ class ActionServices extends TextServices
             $message .= $number;
             $message .= " تا ";
             if (in_array($this->getType(), $this->list_type_floating))
-                $message .= "\xE2\xAC\x86	 شنا ";
+                $message .= "\xE2\xAC\x86 شنا ";
             elseif (in_array($this->getType(), $this->list_type_reverse))
-                $message .= "\xE2\xAC\x87	 معکوس ";
+                $message .= "\xE2\xAC\x87 معکوس ";
 
 
             if ($this->getDescription()) {
                 $message .= "\n";
-                $message .= "توضیحات ";
-                $message .= "\xE2\x9D\x97 : ";
+                $message .= " توضیحات ";
+                $message .= "\xE2\x9D\x97: ";
                 $message .= $this->getDescription();
             }
             $word_telegram = WordTelegram::create([
