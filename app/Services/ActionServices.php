@@ -376,7 +376,7 @@ class ActionServices extends TextServices
                         $transfer->status = Transfer::STATUS_ACTIVE_DONE;
                         $transfer->update();
                     }else{
-                        $trade_message .= "(".$transfer->number." مانده )";
+                        $trade_message .= "(".$transfer->number." مانده )	🤝🏼";
                         $transfer->status = Transfer::STATUS_ACTIVE_DO;
                         $transfer->update();
                     }
