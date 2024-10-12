@@ -23,6 +23,7 @@ class ActionAdminServices extends TextServices
     public $service_user;
     public $bot_title;
     public $bot_user;
+    private $service_telgram_user;
     public $key_cache_user = "text_user_";
 
     private $transaction;
@@ -110,7 +111,7 @@ class ActionAdminServices extends TextServices
 //                ->first();
 //        });
         if ($this->bot_user) {
-//            $this->service_telgram_user = new TelegramServices($this->bot_user->token);
+            $this->service_telgram_user = new TelegramServices($this->bot_user->token);
             $this->service_user = new ActionServices($this->bot_user->token);
             $this->bot_title = $this->bot_user->title;
         }
@@ -421,6 +422,16 @@ class ActionAdminServices extends TextServices
             $this->service_user->telegram_services->editCustomKeyboard($user_con->id, $menu_bot->menu_id, "تغییر منو", $key);
             cache()->forget("keyword_menu" . $this->getKeyCache() . $user_con->id);
         }
+    }
+
+    public function getServiceTelgramUser(): TelegramServices
+    {
+        return $this->service_telgram_user;
+    }
+
+    public function setServiceTelgramUser(TelegramServices $service_telgram_user): void
+    {
+        $this->service_telgram_user = $service_telgram_user;
     }
 
 }
