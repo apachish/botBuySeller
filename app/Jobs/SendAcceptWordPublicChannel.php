@@ -5,6 +5,7 @@ namespace App\Jobs;
 use App\Models\Bot;
 use App\Models\Message;
 use App\Models\MessageWordAccounting;
+use App\Models\MessageWordPublic;
 use App\Models\Transfer;
 use App\Models\WordTelegram;
 use App\Services\TelegramServices;
@@ -47,20 +48,22 @@ class SendAcceptWordPublicChannel implements ShouldQueue
                         $telegram_accounting_services = new TelegramServices($bot_user->token);
 
                         $message_accounting = data_get($word, "message");
-                        $this->send = [
+                        $this->send = MessageWordPublic::create([
                             "bot_id" => $bot_user->id,
                             "status" => Message::STATUS_PENDING,
                             "text" => $message_accounting,
                             "transfer_id" => $this->transfer_id,
                             "word_id" => $this->word_id
 
-                        ];
+                        ]);
                         $send_accounting = $telegram_accounting_services->sendMessage($channel, $message_accounting);
-                        $this->send->message_id = $send_accounting;
-                        if ($this->send->message_id)
+                        $this->send->message_id  = $send_accounting;
+                        if ($this->send->message_id )
                             $this->send->status = Message::STATUS_RECEIVE;
                         else
                             $this->send->status = Message::STATUS_FAILED;
+                        $this->send->update();
+
 
                     } catch (\Exception $exception) {
 

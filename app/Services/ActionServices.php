@@ -14,6 +14,7 @@ use App\Models\Bot;
 use App\Models\CustomerUser;
 use App\Models\DailyRequestTransfer;
 use App\Models\MessageTelegram;
+use App\Models\MessageWordPublic;
 use App\Models\RequestTransfer;
 use App\Models\Setting;
 use App\Models\Transfer;
@@ -889,6 +890,9 @@ class ActionServices extends TextServices
             $transfer->status = Transfer::STATUS_DEACTIVATE;
             $transfer->update();
             $transfer->delete();
+            $message_public = MessageWordPublic::where("transfer_id",$transfer->id)->first();
+            if($message_public && $message_public->message_id && env("CHANEL_ID_PUBLIC"))
+                $this->telegram_services->deleteMessage(env("CHANEL_ID_PUBLIC"),$message_public->message_id);
             $i++;
         }
         if ($transfers->count() && $i == $transfers->count())
