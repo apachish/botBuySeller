@@ -414,8 +414,13 @@ class ActionServices extends TextServices
                     $exception->getFile()]);
             }
         }else{
-//            $this->sendAlert("زمان دریافت لفظ تمام شده");
-
+            $transfer = Transfer::with(["user" => function ($query) {
+                $query->with("customer.userTradeAccess");
+                $query->with("customerUser");
+            }])->where("number",">",0)->withTrashed()->find($id);
+            if($transfer) {
+                $this->sendAlert("زمان دریافت لفظ تمام شده");
+            }
             return true;
         }
     }
