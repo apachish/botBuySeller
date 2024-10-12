@@ -7,6 +7,7 @@ use App\Jobs\DeactivateTransfer;
 use App\Jobs\DeactivateWord;
 use App\Jobs\PartiesToTheTransaction;
 use App\Jobs\SendAcceptWordAccounting;
+use App\Jobs\SendAcceptWordPublicChannel;
 use App\Jobs\SendMessageAccountingBot;
 use App\Models\AccessBot;
 use App\Models\Bot;
@@ -583,7 +584,7 @@ class ActionServices extends TextServices
 //                }
 //            }
             dispatch(new SendAcceptWordAccounting($transfer_new->id,$word->id));
-            dispatch(new SendAcceptWordAccounting($transfer_new->id,$word->id));
+            dispatch(new SendAcceptWordPublicChannel($transfer_new->id,$word->id));
 
 
 
