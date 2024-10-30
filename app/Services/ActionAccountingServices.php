@@ -406,6 +406,12 @@ class ActionAccountingServices extends TextServices
         $message .= "مقدار:" . data_get($order_buy, "number") . "کیلو";
         $message .= "\n\n";
         $message .= "نوع:" . getTypeTransfer($transfer->type);
+
+        if (data_get($transfer,'description')) {
+            $message .= "\n";
+            $message .= "توضیحات";
+            $message .= "\xE2\x9D\x97 : \n" . data_get($transfer,'description');
+        }
         return $message;
     }
 
