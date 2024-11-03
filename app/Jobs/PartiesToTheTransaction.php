@@ -2,7 +2,9 @@
 
 namespace App\Jobs;
 
+use App\Models\Bot;
 use App\Models\RequestTransfer;
+use App\Services\TelegramServices;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -170,6 +172,16 @@ class PartiesToTheTransaction implements ShouldQueue
                     $customer,
                     $type_title
                 ));
+            }
+
+        }else{
+            dispatch(new PartiesToTheTransaction($this->order_id));
+            try {
+                $bot = Bot::where("title", "botUser")->first();
+                $telegram_services = new TelegramServices($bot->token);
+                $telegram_services->sendMessage(env("USER_DEV"), "  فیش برای مشریان ارسال نشد ".$this->order_id);
+            }catch (\Exception $e){
+                logger("shahriar".$e->getMessage());
             }
 
         }
