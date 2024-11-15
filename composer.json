@@ -9,6 +9,7 @@
     ],
     "require": {
         "php": "^8.1",
+        "balea/holiday": "dev-master",
         "barryvdh/laravel-dompdf": "^2.2",
         "danog/madelineproto": "*",
         "guzzlehttp/guzzle": "^7.2",
@@ -19,7 +20,8 @@
         "mongodb/laravel-mongodb": "^4.3",
         "morilog/jalali": "^3.4",
         "mpdf/mpdf": "^8.2",
-        "balea/holiday": "dev-master"
+        "orchid/platform": "^14.43",
+        "predis/predis": "^2.2"
     },
     "require-dev": {
         "fakerphp/faker": "^1.9.1",
