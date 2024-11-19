@@ -379,12 +379,12 @@ class TextServices
     {
         if(in_array($type,$this->list_type_floating) && $description)
             $this->type = $type."ط";//شنا شرطی
-        if(in_array($type,$this->list_type_reverse) && $description)
+        elseif(in_array($type,$this->list_type_reverse) && $description)
             $this->type = $type."ط";//معکوس شرطی
         else
         $this->type = $type;
 
-        logger("type",[in_array($type,$this->list_type_floating),in_array($type,$this->list_type_reverse),$this->type]);
+        logger("type",[in_array($type,$this->list_type_floating),in_array($type,$this->list_type_reverse),$this->type,$description]);
     }
 
     /**
