@@ -375,8 +375,13 @@ class TextServices
     /**
      * @param mixed $type
      */
-    public function setType($type): void
+    public function setType($type,$description=null): void
     {
+        if(in_array($type,$this->list_type_floating) && $description)
+            $this->type = $type."ط";//شنا شرطی
+        if(in_array($type,$this->list_type_reverse) && $description)
+            $this->type = $type."ط";//معکوس شرطی
+        else
         $this->type = $type;
     }
 
@@ -458,11 +463,11 @@ class TextServices
 
         if (preg_match($pattern, $this->message, $matches)) {
             $this->setPrice($matches[1]);
-            $this->setType($matches[2]);
             $optionalNumber = isset($matches[3]) && $matches[3] ? $matches[3] : '1'; // اگر گروه سوم خالی بود، مقدار ۱ قرار داده شود
             $this->setNumberOrder($optionalNumber);
             $this->setWord($matches[1].$matches[2].$optionalNumber);
             $description = isset($matches[4]) ? substr($matches[4], 1) : ''; // حذف ":" از ابتدای توضیحات
+            $this->setType($matches[2],$description);
             $this->setDescription($description);
             $this->setPattern();
             if ($this->pattern && preg_match($this->pattern, $this->message))
