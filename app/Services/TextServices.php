@@ -383,6 +383,8 @@ class TextServices
             $this->type = $type."ط";//معکوس شرطی
         else
         $this->type = $type;
+
+        logger("type",[in_array($type,$this->list_type_floating),in_array($type,$this->list_type_reverse),$this->type]);
     }
 
     /**
