@@ -483,6 +483,9 @@ class TextServices
             $this->setType($matches[2],$description);
             $this->setDescription($description);
             $this->setPattern();
+            $message = $this->getPrice().$this->getType().$this->getNumberOrder();
+            if($description)
+                $message .= ":".$this->getDescription();
             if ($this->pattern && preg_match($this->pattern, $this->message))
                 return true;
         }
