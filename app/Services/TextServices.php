@@ -486,7 +486,9 @@ class TextServices
             $message = $this->getPrice().$this->getType().$this->getNumberOrder();
             if($description)
                 $message .= ":".$this->getDescription();
-            if ($this->pattern && preg_match($this->pattern, $this->message))
+
+            logger("check",[$message,$this->type,$this->pattern,preg_match($this->pattern, $message)]);
+            if ($this->pattern && preg_match($this->pattern, $message))
                 return true;
         }
         if ($this->contact)
