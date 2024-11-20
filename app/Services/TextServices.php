@@ -41,7 +41,10 @@ class TextServices
     protected $list_type_cash = ["خفن", "ففن", "خن", "فن"];
     protected $list_type_cash_n = ["خن", "فن"];
     protected $list_type_reverse = ["خفپ", "ففپ", "ففم", "خفم", "فم", "خم", "خپ", "فپ"];
-    protected $list_type_reverse_floating_cache = ["خفپ", "ففپ", "ففم", "خفم", "فم", "خم", "خپ", "فپ","خفش", "ففش", "خش", "فش","خفن", "ففن", "خن", "فن"];
+    protected $list_type_reverse_floating_cache = [
+        "خفپ", "ففپ", "ففم", "خفم", "فم", "خم", "خپ", "فپ","خفش", "ففش", "خش", "فش","خفن", "ففن", "خن", "فن",
+        "خفپط", "ففپط", "ففمط", "خفمط", "فمط", "خمط", "خپط", "فپط","خفشط", "ففشط", "خشط", "فشط",
+    ];
 
     private $type;
     private $price;
