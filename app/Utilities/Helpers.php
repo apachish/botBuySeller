@@ -194,10 +194,14 @@ if (!function_exists('getTypeTransfer')) {
                 return "با حواله عادی";
             elseif (in_array($type, ["خش", "فش","خفش", "ففش"]))
                 return "شنا";
+            elseif (in_array($type, ["خشط", "فشط","خفشط", "ففشط"]))
+                return "شنا شرطی";
             elseif (in_array($type, ["خن", "فن","خفن", "ففن"]))
                 return "نقدی";
             elseif (in_array($type, ["فم", "خم", "فپ", "خپ","ففم", "خفم", "ففپ", "خفپ"]))
                 return "معکوس";
+            elseif (in_array($type, ["فمط", "خمط", "فپط", "خپط","ففمط", "خفمط", "ففپط", "خفپط"]))
+                return "معکوس شرطی";
         }else{
             if ($time->between($morning, $none, true) && in_array($type, ["خ", "ف"]))
                 return "عادی روز";
@@ -207,6 +211,10 @@ if (!function_exists('getTypeTransfer')) {
                 return "شنا روز";
             elseif (in_array($type, ["خش", "فش","خفش", "ففش"]))
                 return "شنا";
+            elseif ($time->between($morning, $none_13_30, true) && in_array($type, ["خشط", "فشط"]))
+                return " شنا روز شرطی";
+            elseif (in_array($type, ["خشط", "فشط","خفشط", "ففشط"]))
+                return "شنا شرطی";
             elseif ($time->between($morning, $none, true) && in_array($type, ["خن", "فن"]))
                 return "نقدی حاضر";
             elseif (in_array($type, ["خفن", "ففن","خن", "فن"]))
@@ -215,6 +223,10 @@ if (!function_exists('getTypeTransfer')) {
                 return "معکوس روز";
             elseif (in_array($type, ["ففم", "خفم", "ففپ", "خفپ","فم", "خم", "فپ", "خپ"]))
                 return "معکوس";
+            elseif ( $time->between($morning, $none_13_30, true) && in_array($type, ["فمط", "خمط", "فپط", "خپط"]))
+                return "معکوس روز شرطی";
+            elseif (in_array($type, ["ففمط", "خفمط", "ففپط", "خفپط","فمط", "خمط", "فپط", "خپط"]))
+                return "معکوس شرطی";
         }
 
 
