@@ -487,6 +487,7 @@ class TextServices
             if($description)
                 $message .= ":".$this->getDescription();
 
+            $this->message = $message;
             logger("check",[$message,$this->type,$this->pattern,preg_match($this->pattern, $message)]);
             if ($this->pattern && preg_match($this->pattern, $message))
                 return true;
