@@ -278,7 +278,6 @@ if (!function_exists('getTypeSimilar')) {
                 "خفمط" => ["خفمط", "خفپط"],
                 "ففمط" => ["ففمط", "ففپط"],
                 "خفپط" => ["خفپط", "خفمط",],
-                "ففپط" => ["ففپط", "ففمط"],
             ];
         elseif (!$forbidden_day && $time->between($morning, $none, true) && in_array($type, $list_type_today_normal_cache))
             $array = [

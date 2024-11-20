@@ -38,7 +38,7 @@ class TextServices
     protected $list_type_sell_tommarow = ["فف", "ففش", "ففن", "ففم"];
     protected $list_type_buy_tommarow = ["خف", "خفش", "خفن", "خفم"];
     protected $list_type_today = ["خپ", "فپ","خش", "خم", "فش","خن", "فن", "فم","خ", "ف"];
-    protected $list_type_today_r_f = ["خش", "خم", "فش", "فم","خپ","فپ"];
+    protected $list_type_today_r_f = ["خش", "خم", "فش", "فم","خپ","فپ","خشط", "خمط", "فشط", "فمط","خپط","فپط"];
     protected $list_type_today_normal = ["خ", "ف"];
     protected $list_type_today_cache = ["خن", "فن"];
     protected $list_type_tommarow = ["خف", "خفش", "خفن", "خفم", "فف", "ففش", "ففن", "ففم","خفپ", "ففپ"];
