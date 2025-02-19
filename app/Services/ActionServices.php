@@ -242,6 +242,7 @@ class ActionServices extends TextServices
 
         DB::beginTransaction();
         try {
+            logger("transfer".$id."=>".time()." - ".$this->getUserId());
             $transfer = Transfer::with(["user" => function ($query) {
                 $query->with("customer.userTradeAccess");
                 $query->with("customerUser");
@@ -420,6 +421,8 @@ class ActionServices extends TextServices
                 }])->where("number", ">", 0)->withTrashed()->find($id);
                 if ($transfer) {
                     $this->sendAlert("زمان دریافت لفظ تمام شده");
+                }else{
+                    $this->sendAlert("درحال ارائه به شخص دیگر می باشد  ... \xE2\x9A\xA0	");
                 }
                 DB::rollBack();
                 return true;
