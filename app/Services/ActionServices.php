@@ -142,7 +142,7 @@ class ActionServices extends TextServices
             $text = " کاربر  ";
             $text .= $this->getUser()->fullName;
             $text .= " می خواهد وارد سیستم شود ";
-            $admins = AccessBot::where("type","admin")->get();
+            $admins = AccessBot::where("type", "admin")->get();
             foreach ($admins as $admin) {
                 $message_admin = $this->getBotAdmin()->sendMessage(
                     [
@@ -239,43 +239,48 @@ class ActionServices extends TextServices
             return true;
         } elseif ($this->getUser()->verify_two && cache()->get("double_click_" . $id . "_" . $this->getUserId()))
             cache()->forget("double_click_" . $id . "_" . $this->getUserId());
-        $transfer = Transfer::with(["user" => function ($query) {
-            $query->with("customer.userTradeAccess");
-            $query->with("customerUser");
-        }])->where("number",">",0)->find($id);
+
+        DB::beginTransaction();
+        try {
+            $transfer = Transfer::with(["user" => function ($query) {
+                $query->with("customer.userTradeAccess");
+                $query->with("customerUser");
+            }])
+                ->lockForUpdate()
+                ->where("number", ">", 0)->find($id);
 
 
-        if ($transfer) {
+            if ($transfer) {
 
-            if($transfer->status_transaction)
-            {
-                $this->sendAlert("درحال ارائه به شخص دیگر می باشد  ... \xE2\x9A\xA0	");
-                return  true;
-            }
-            if ( $transfer->user_id == $this->getUser()->id) {
-                $alert_text = "شما نمی توانید لفظ خود را دریافت کنید";
-                $this->sendAlert($alert_text);
+                if ($transfer->status_transaction) {
+                    $this->sendAlert("درحال ارائه به شخص دیگر می باشد  ... \xE2\x9A\xA0	");
+                    DB::rollBack();
+                    return true;
+                }
+                if ($transfer->user_id == $this->getUser()->id) {
+                    $alert_text = "شما نمی توانید لفظ خود را دریافت کنید";
+                    $this->sendAlert($alert_text);
 //                $this->telegram_services->sendMessage($this->getUserId(), "شما نمی توانید لفظ خود را دریافت کنید");
-                return true;
-            }
-            $transfer_type = getTypeOrder($transfer->type);
-            $createdAt = $transfer->created_at;
-            $transfer->status_transaction = true;
-            $transfer->save();
-            $now = Carbon::now();
-            $diffInSeconds = $now->diffInSeconds($createdAt);
-            if ($diffInSeconds > 60) {
+                    DB::rollBack();
+                    return true;
+                }
+                $transfer_type = getTypeOrder($transfer->type);
+                $createdAt = $transfer->created_at;
+                $transfer->status_transaction = true;
+                $transfer->save();
+                $now = Carbon::now();
+                $diffInSeconds = $now->diffInSeconds($createdAt);
+                if ($diffInSeconds > 60) {
 //                $message = $transfer->message ;
 //                $edit_message = $this->getTelegramServices()->editMessageTextAndInlineKeyboard($this->bot->chanel_id, $transfer->message_id, $message);
-                $transfer->delete();
+                    $transfer->delete();
 //                $this->telegram_services->sendMessage($this->getUserId(), "زمان دریافت لفظ تمام شده");
-                $this->sendAlert("زمان دریافت لفظ تمام شده");
+                    $this->sendAlert("زمان دریافت لفظ تمام شده");
+                    DB::commit();
+                    return true;
+                }
+                $forbidden = Setting::where("key", "forbidden")->where("value", true)->first();
 
-                return true;
-            }
-            $forbidden = Setting::where("key", "forbidden")->where("value", true)->first();
-            DB::beginTransaction();
-            try {
                 $limit_day = null;
                 $transaction_party = null;
                 $transaction_party_s = null;
@@ -283,16 +288,15 @@ class ActionServices extends TextServices
                 $transaction_party_req_s = null;
                 $request_transfer = [];
 
-                if ($this->getUser()->role == "customer")
-                {
+                if ($this->getUser()->role == "customer") {
                     $head = data_get($this->getUser(), "customer");
-                    if(!$head) {
+                    if (!$head) {
                         $this->checkTransaction($transfer);
                         $this->telegram_services->sendMessage($this->getUserId(), "شما نمی توانید لفظ  دریافت کنید");
+                        DB::rollBack();
                         return true;
                     }
-                }
-                else
+                } else
                     $head = $this->getUser();
 
                 if (data_get($transfer, "user.role") == "customer")
@@ -309,11 +313,11 @@ class ActionServices extends TextServices
                 if ($access_limit_transaction)
                     $user_transfer_limit = $access_limit_transaction->where("user_trade_id", $head->id)->first();
 
-                if (($user_request && $user_request->limit_access >=0) && ($user_transfer_limit && $user_transfer_limit->limit_access >=0))
+                if (($user_request && $user_request->limit_access >= 0) && ($user_transfer_limit && $user_transfer_limit->limit_access >= 0))
                     $limit_day = min($user_request->limit_access, $user_transfer_limit->limit_access);
-                elseif (($user_transfer_limit && $user_transfer_limit->limit_access >=0))
+                elseif (($user_transfer_limit && $user_transfer_limit->limit_access >= 0))
                     $limit_day = $user_transfer_limit->limit_access;
-                elseif (($user_request && $user_request->limit_access >=0))
+                elseif (($user_request && $user_request->limit_access >= 0))
                     $limit_day = $user_request->limit_access;
 
                 if ($this->getUser()->role == "customer") {
@@ -323,6 +327,7 @@ class ActionServices extends TextServices
                         if (in_array($this->getUser()->id, $list_worker)) {
                             $this->checkTransaction($transfer);
                             $this->telegram_services->sendMessage($this->getUserId(), "\xE2\x9D\x8C	استثنائا در این دقایق خاص بصورت موقت امکان گرفتن لفظ سرگروه و زیر مجموعه خودش امکان پذیر نمی باشد\xE2\x9D\x8C	");
+                            DB::rollBack();
                             return true;
                         }
                     }
@@ -331,6 +336,7 @@ class ActionServices extends TextServices
                         if (in_array($this->getUserId(), $this->getUser()->customerUsers)) {
                             $this->checkTransaction($transfer);
                             $this->telegram_services->sendMessage($this->getUserId(), "\xE2\x9D\x8C	استثنائا در این دقایق خاص بصورت موقت امکان گرفتن لفظ سرگروه و زیر مجموعه خودش امکان پذیر نمی باشد\xE2\x9D\x8C	");
+                            DB::rollBack();
                             return true;
                         }
                     }
@@ -342,10 +348,10 @@ class ActionServices extends TextServices
 
                 if ($limit_day !== null) {
                     [$daily_transfer, $num] = $this->performTransaction($seller, $buyer, $num, $limit_day);
-                    if(!$num)
-                    {
+                    if (!$num) {
                         $this->sendAlert("امکان دریافت ندارید محدودیت توسط طرفین اعمال گردید است.\xE2\x9A\xA0	");
                         $this->checkTransaction($transfer);
+                        DB::rollBack();
                         return true;
                     }
                     $transfer->number -= $num;
@@ -356,7 +362,7 @@ class ActionServices extends TextServices
                     if ($transfer->number >= $num) {
                         $transfer->number -= $num;
                         $request_transfer["number"] = $num;
-                        $request_transfer["status"] =  $transfer->number == 0 ? "complete" : "half";
+                        $request_transfer["status"] = $transfer->number == 0 ? "complete" : "half";
                         $use_day = $num;
                         if (data_get($request_transfer, "number")) {
                             $daily_transfer = DailyRequestTransfer::updateOrCreate([
@@ -369,7 +375,7 @@ class ActionServices extends TextServices
                     }
                 }
 
-                if (data_get($request_transfer, "number") > 0 ) {
+                if (data_get($request_transfer, "number") > 0) {
                     $keyboard = self::getKeyboardRequest($transfer);
 
                     $trade_message = $transfer->message;
@@ -377,8 +383,8 @@ class ActionServices extends TextServices
                         $trade_message .= "\xE2\x9C\x85	🤝🏼";
                         $transfer->status = Transfer::STATUS_ACTIVE_DONE;
                         $transfer->update();
-                    }else{
-                        $trade_message .= "(".$transfer->number." مانده )	🤝🏼";
+                    } else {
+                        $trade_message .= "(" . $transfer->number . " مانده )	🤝🏼";
                         $transfer->status = Transfer::STATUS_ACTIVE_DO;
                         $transfer->update();
                     }
@@ -406,24 +412,26 @@ class ActionServices extends TextServices
 //                    $this->telegram_services->sendMessage($this->getUserId(), "متأسفانه امکان دریافت حواله برای شما در این معامله نمی باشد");
                     return true;
                 }
-            } catch (\Exception $exception) {
-                DB::rollback();
 
-                logger("exp send request", [$exception->getMessage(),
-                    $exception->getLine(),
-                    $exception->getCode(),
-                    $exception->getTrace(),
-                    $exception->getFile()]);
+            } else {
+                $transfer = Transfer::with(["user" => function ($query) {
+                    $query->with("customer.userTradeAccess");
+                    $query->with("customerUser");
+                }])->where("number", ">", 0)->withTrashed()->find($id);
+                if ($transfer) {
+                    $this->sendAlert("زمان دریافت لفظ تمام شده");
+                }
+                DB::rollBack();
+                return true;
             }
-        }else{
-            $transfer = Transfer::with(["user" => function ($query) {
-                $query->with("customer.userTradeAccess");
-                $query->with("customerUser");
-            }])->where("number",">",0)->withTrashed()->find($id);
-            if($transfer) {
-                $this->sendAlert("زمان دریافت لفظ تمام شده");
-            }
-            return true;
+        } catch (\Exception $exception) {
+            DB::rollback();
+
+            logger("exp send request", [$exception->getMessage(),
+                $exception->getLine(),
+                $exception->getCode(),
+                $exception->getTrace(),
+                $exception->getFile()]);
         }
     }
 
@@ -438,8 +446,7 @@ class ActionServices extends TextServices
         $seller_customer = $seller->customerUser ? $seller->customerUsers->pluck("id")->toArray() : [];
         $seller_ids[] = $seller->id;
 
-        if ($seller_head)
-        {
+        if ($seller_head) {
             $seller_ids[] = $seller_head->id;
             $seller_customer_head = $seller_head->customerUser ? $seller_head->customerUsers->pluck("id")->toArray() : [];
             $seller_customer = array_merge($seller_customer_head, $seller_customer);
@@ -452,8 +459,7 @@ class ActionServices extends TextServices
         $buyer_customer = $buyer->customerUser ? $buyer->customerUsers->pluck("id")->toArray() : [];
 
         $buyer_ids[] = $buyer->id;
-        if ($buyer_head)
-        {
+        if ($buyer_head) {
             $buyer_ids[] = $buyer_head->id;
             $buyer_customer_head = $buyer_head->customerUser ? $buyer_head->customerUsers->pluck("id")->toArray() : [];
             $buyer_customer = array_merge($buyer_customer_head, $buyer_customer);
@@ -501,7 +507,7 @@ class ActionServices extends TextServices
         $word_id = data_get($array, 1);
         if (!$check && !$word_id)
             return false;
-        $word = WordTelegram::where("status",WordTelegram::STATUS_PENDING)->find($word_id);
+        $word = WordTelegram::where("status", WordTelegram::STATUS_PENDING)->find($word_id);
 
         if ($word == null) return false;
 
@@ -517,7 +523,7 @@ class ActionServices extends TextServices
                 ->whereDate("created_at", now())
                 ->whereIn("type", getTypeSimilar($word->type))
                 ->first();
-            if($check_transfer){
+            if ($check_transfer) {
                 $message = "لفظ پیشنهادی بهتر در کانال : \n\n";
                 $message .= " \n";
                 $message .= number_format($check_transfer->price, 0);
@@ -526,7 +532,7 @@ class ActionServices extends TextServices
             }
             $transfer_olds = Transfer::where("user_id", $this->getUser()->id)
                 ->whereIn("type", getTypeSimilar(data_get($word, "type")))
-                ->whereIn("status",[Transfer::STATUS_ACTIVE,Transfer::STATUS_ACTIVE_DO])
+                ->whereIn("status", [Transfer::STATUS_ACTIVE, Transfer::STATUS_ACTIVE_DO])
                 ->get();
             foreach ($transfer_olds as $row_delet) {
                 $message = $row_delet->message . "\xE2\x9D\x8C	";
@@ -557,11 +563,11 @@ class ActionServices extends TextServices
             $transfer_new->update();
             dispatch(new DeactivateTransfer($transfer_new->id))->delay(now()->addSecond(54));
             $keyboard = [];
-            $copy = data_get($word,"word");
-            if(data_get($word,"description"))
-                $copy .=":".data_get($word,"description");
+            $copy = data_get($word, "word");
+            if (data_get($word, "description"))
+                $copy .= ":" . data_get($word, "description");
             $keyboard[0][0] = ['text' => $copy];
-            $keyboard[1] =[
+            $keyboard[1] = [
                 ['text' => "نشد"],
                 ['text' => "منو"],
             ];
@@ -584,9 +590,8 @@ class ActionServices extends TextServices
 //                    $send_accounting = $telegram_accounting_services->sendMessage($admin->user_id,$message_accounting);
 //                }
 //            }
-            dispatch(new SendAcceptWordAccounting($transfer_new->id,$word->id));
-            dispatch(new SendAcceptWordPublicChannel($transfer_new->id,$word->id));
-
+            dispatch(new SendAcceptWordAccounting($transfer_new->id, $word->id));
+            dispatch(new SendAcceptWordPublicChannel($transfer_new->id, $word->id));
 
 
         } elseif ($check == "false") {
@@ -872,16 +877,15 @@ class ActionServices extends TextServices
         $result = false;
         $transfers = Transfer::where("user_id", $this->getUser()->id)
             ->whereIn("status", [Transfer::STATUS_ACTIVE, Transfer::STATUS_ACTIVE_DO])
-            ->where("number",">",0 )
+            ->where("number", ">", 0)
             ->get();
         $i = 0;
         foreach ($transfers as $transfer) {
             $message = $transfer->message . "\xE2\x9D\x8C";
 //            $message = $transfer->message . "\xF0\x9F\x9A\xAB";
 
-            if($transfer->status_transaction)
-            {
-                $msg = $transfer->message ."[ امکان کنسلی نمی باشد چون کاربر در حال گرفتنش است  ]";
+            if ($transfer->status_transaction) {
+                $msg = $transfer->message . "[ امکان کنسلی نمی باشد چون کاربر در حال گرفتنش است  ]";
                 $this->telegram->sendMessage(['chat_id' => $this->getUserId(), 'text' => $msg]);
                 continue;
             }
@@ -890,9 +894,9 @@ class ActionServices extends TextServices
             $transfer->status = Transfer::STATUS_DEACTIVATE;
             $transfer->update();
             $transfer->delete();
-            $message_public = MessageWordPublic::where("transfer_id",$transfer->id)->first();
-            if($message_public && $message_public->message_id && env("CHANEL_ID_PUBLIC"))
-                $this->telegram_services->deleteMessage(env("CHANEL_ID_PUBLIC"),$message_public->message_id);
+            $message_public = MessageWordPublic::where("transfer_id", $transfer->id)->first();
+            if ($message_public && $message_public->message_id && env("CHANEL_ID_PUBLIC"))
+                $this->telegram_services->deleteMessage(env("CHANEL_ID_PUBLIC"), $message_public->message_id);
             $i++;
         }
         if ($transfers->count() && $i == $transfers->count())
@@ -908,10 +912,9 @@ class ActionServices extends TextServices
             return true;
         }
 
-        if ($this->getUser()->role == "customer")
-        {
+        if ($this->getUser()->role == "customer") {
             $head = data_get($this->getUser(), "customer");
-            if(!$head) {
+            if (!$head) {
                 $this->telegram_services->sendMessage($this->getUserId(), "شما نمی توانید لفظ  بدهید");
                 return true;
             }
@@ -921,10 +924,10 @@ class ActionServices extends TextServices
             return true;
         }
 
-        if($this->getDescription()){
+        if ($this->getDescription()) {
             $ugly_words = UglyWord::get();
-            foreach ($ugly_words as $ugly_word){
-                if(str_contains($this->getDescription(), $ugly_word->word)) {
+            foreach ($ugly_words as $ugly_word) {
+                if (str_contains($this->getDescription(), $ugly_word->word)) {
                     $this->telegram_services->sendMessage($this->getUserId(), "لطفا کلمات نامتعارف در توضیحات به کار نبرید");
 
                     return true;
@@ -945,7 +948,7 @@ class ActionServices extends TextServices
             $this->telegram_services->sendMessage($this->getUserId(), "تعطیل می باشد");
             return false;
         }
-        $word_old = WordTelegram::where("status",WordTelegram::STATUS_PENDING)->where("user_id",$this->getUserId())->get();
+        $word_old = WordTelegram::where("status", WordTelegram::STATUS_PENDING)->where("user_id", $this->getUserId())->get();
 
         if ($word_old->count()) {
             foreach ($word_old as $word) {
@@ -987,9 +990,9 @@ class ActionServices extends TextServices
 
         $last_transfer = Transfer::whereIn("type", getTypeSimilar($this->getType()))
             ->whereIn("status", [Transfer::STATUS_ACTIVE_DO, Transfer::STATUS_ACTIVE_DONE])
-            ->whereDate("created_at",now())
+            ->whereDate("created_at", now())
             ->orderBy("updated_at", "DESC")->first();
-        if (env("BETWEEN_TRADE",true) || !$last_transfer) {
+        if (env("BETWEEN_TRADE", true) || !$last_transfer) {
             $start_trade_s = (int)cache()->remember("start_price_trade", now()->addDay(1), function () {
                 $value = 14000000;
                 $setting = Setting::where("key", "start_price_trade")->first();
@@ -1028,14 +1031,13 @@ class ActionServices extends TextServices
         $number = $this->getNumberOrder();
 
         $type_transaction = in_array($this->getType(), $this->list_type_buy) ? "buy" : "sell";
-        $word_active = WordTelegram::where("user_id" , $this->getUserId())
-            ->where("status" , WordTelegram::STATUS_PENDING)
-            ->whereIn("type" , getTypeSimilar($this->getType()))
-            ->where("number" , (int)$number)
-            ->where("price" , $price)
-            ->where("word" , $this->getWord())->first();
-        if($word_active)
-        {
+        $word_active = WordTelegram::where("user_id", $this->getUserId())
+            ->where("status", WordTelegram::STATUS_PENDING)
+            ->whereIn("type", getTypeSimilar($this->getType()))
+            ->where("number", (int)$number)
+            ->where("price", $price)
+            ->where("word", $this->getWord())->first();
+        if ($word_active) {
             $message = "لفظ مشابه فعال  برای ارسال به کانال وجود دارد ";
             $this->telegram_services->sendMessage($this->getUserId(), $message);
             return true;
@@ -1071,17 +1073,17 @@ class ActionServices extends TextServices
 
             }
             $time = Carbon::now();
-            $morning = Carbon::create($time->year, $time->month, $time->day,  data_get($array_time_s, 0),  data_get($array_time_s, 1), 0); //set time to 08:00
-            $none = Carbon::create($time->year, $time->month, $time->day, env("NONE_HOUR","15"), env("NONE_MIN","30"), 0); //set time to 18:00
-            $none_13_30 = Carbon::create($time->year, $time->month, $time->day, env("NONE_M_HOUR","13"), env("NONE_M_MIN","30"), 0); //set time to 18:00
+            $morning = Carbon::create($time->year, $time->month, $time->day, data_get($array_time_s, 0), data_get($array_time_s, 1), 0); //set time to 08:00
+            $none = Carbon::create($time->year, $time->month, $time->day, env("NONE_HOUR", "15"), env("NONE_MIN", "30"), 0); //set time to 18:00
+            $none_13_30 = Carbon::create($time->year, $time->month, $time->day, env("NONE_M_HOUR", "13"), env("NONE_M_MIN", "30"), 0); //set time to 18:00
 
             cache()->forget("forbidden_day");
             $forbidden_day = cache()->remember("forbidden_day", now()->setTime(23, 59), function () {
                 $item = Setting::where("key", "forbidden_day")->first();
-                return data_get($item,"value");
+                return data_get($item, "value");
             });
-            if(!$forbidden_day)
-                $forbidden_day = $time->isThursday() || $time->isFriday()?true:false;
+            if (!$forbidden_day)
+                $forbidden_day = $time->isThursday() || $time->isFriday() ? true : false;
 //            if ($forbidden_day && data_get($forbidden_day, "value") && in_array($this->getType(), $this->list_type_today)) {
 //                $this->telegram_services->sendMessage($this->getUserId(), "تمام معاملات برای اولین روز کاری می باشد و امکان معامله روز در حال حاظر وجود ندارد");
 //                return true;
@@ -1101,12 +1103,12 @@ class ActionServices extends TextServices
                 if ($tomorrow)
                     return $tomorrow->value;
             });
-            logger("forbidden_day",[$forbidden_day,
-                $none_13_30,
-                $morning,
-                $time->between($morning, $none_13_30, true),
-                $none,
-                $time->between($morning, $none, true),
+            logger("forbidden_day", [$forbidden_day,
+                    $none_13_30,
+                    $morning,
+                    $time->between($morning, $none_13_30, true),
+                    $none,
+                    $time->between($morning, $none, true),
                     in_array($this->getType(), $this->list_type_today_r_f),
                     in_array($this->getType(), $this->list_type_today_normal),
                     in_array($this->getType(), $this->list_type_today_cache)
@@ -1118,7 +1120,7 @@ class ActionServices extends TextServices
                 $message_request .= "\xE2\x98\x80";
                 $message_request_me .= "\xE2\x98\x80";
                 $date = now()->format("Y-m-d");
-            } else if ( !$forbidden_day && $time->between($morning, $none, true) && (in_array($this->getType(), $this->list_type_today_normal) ||
+            } else if (!$forbidden_day && $time->between($morning, $none, true) && (in_array($this->getType(), $this->list_type_today_normal) ||
                     in_array($this->getType(), $this->list_type_today_cache))) {
                 $message .= "\xE2\x98\x80";
                 $message_request .= "\xE2\x98\x80";
@@ -1141,7 +1143,7 @@ class ActionServices extends TextServices
             $message_request_me .= "\n";
             $message_request_me .= "فی:";
             $message_request_me .= number_format($price, 0);
-            if ( in_array($this->getType(), $this->list_type_cash)) {
+            if (in_array($this->getType(), $this->list_type_cash)) {
                 if (!$forbidden_day && $time->between($morning, $none_13_30, true) && in_array($this->getType(), $this->list_type_cash_n))
                     $message .= " نقدی حاضر ";
                 else
@@ -1149,7 +1151,7 @@ class ActionServices extends TextServices
 
                 $message .= "\xF0\x9F\x92\xB0";
 
-            } elseif ( !$forbidden_day && $time->between($morning, $none, true) && (in_array($this->getType(), $this->list_type_today)))
+            } elseif (!$forbidden_day && $time->between($morning, $none, true) && (in_array($this->getType(), $this->list_type_today)))
                 $message .= " روز   ";
             else
                 $message .= "  با حواله  ";
@@ -1256,12 +1258,12 @@ class ActionServices extends TextServices
     public function checkTransaction(Transfer $transfer): void
     {
         $transfer = $transfer->refresh();
-        logger("transaction check",[$transfer]);
+        logger("transaction check", [$transfer]);
         if ($transfer->number > 0) {
             $transfer->status_transaction = false;
             $transfer->update();
             $transfer = $transfer->refresh();
-            logger("transaction check",[$transfer]);
+            logger("transaction check", [$transfer]);
             DB::commit();
 
 
