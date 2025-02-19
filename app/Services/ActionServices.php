@@ -239,6 +239,7 @@ class ActionServices extends TextServices
             return true;
         } elseif ($this->getUser()->verify_two && cache()->get("double_click_" . $id . "_" . $this->getUserId()))
             cache()->forget("double_click_" . $id . "_" . $this->getUserId());
+        logger("transfer".$id."=>".time()." - ".$this->getUserId());
 
         DB::beginTransaction();
         try {
@@ -250,6 +251,7 @@ class ActionServices extends TextServices
                 ->lockForUpdate()
                 ->where("number", ">", 0)->find($id);
 
+            logger("tr",[$transfer]);
 
             if ($transfer) {
 
@@ -429,6 +431,7 @@ class ActionServices extends TextServices
             }
         } catch (\Exception $exception) {
             DB::rollback();
+            $this->sendAlert("درحال ارائه به شخص دیگر می باشد  ... \xE2\x9A\xA0	");
 
             logger("exp send request", [$exception->getMessage(),
                 $exception->getLine(),
@@ -436,6 +439,7 @@ class ActionServices extends TextServices
                 $exception->getTrace(),
                 $exception->getFile()]);
         }
+        return true;
     }
 
 
