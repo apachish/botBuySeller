@@ -10,6 +10,7 @@ class TelegramController extends Controller
     public function setWebhook($token, $replay = [])
     {
         try {
+            if(!$token) return true;
             $text_services = new ActionServices($token);
             $text_services->setTypeMessage();
             $text_services->setUserId();

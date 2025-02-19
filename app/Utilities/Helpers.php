@@ -235,7 +235,7 @@ if (!function_exists('getTypeTransfer')) {
 
 
 if (!function_exists('getTypeSimilar')) {
-    function getTypeSimilar($type)
+    function tmuxgetTypeSimilar($type)
     {
         $time = Carbon::now();
 
@@ -265,6 +265,7 @@ if (!function_exists('getTypeSimilar')) {
                 "ففش" => ["ففش"],
                 "خفم" => ["خفم", "خفپ"],
                 "ففم" => ["ففم", "ففپ"],
+                "ففپ" => ["ففم", "ففپ"],
                 "خفپ" => ["خفپ", "خفم",],
                 "ففپط" => ["ففپط", "ففمط"],
                 "خشط" => ["طخش"],
