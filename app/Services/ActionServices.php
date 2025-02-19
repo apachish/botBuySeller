@@ -431,7 +431,7 @@ class ActionServices extends TextServices
             }
         } catch (\Exception $exception) {
             DB::rollback();
-            $this->sendAlert("درحال ارائه به شخص دیگر می باشد  ... \xE2\x9A\xA0	");
+            $this->sendAlert("امکان ارائه نمی باشد  ... \xE2\x9A\xA0	");
 
             logger("exp send request", [$exception->getMessage(),
                 $exception->getLine(),
