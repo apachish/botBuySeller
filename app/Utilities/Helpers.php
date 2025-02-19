@@ -235,7 +235,7 @@ if (!function_exists('getTypeTransfer')) {
 
 
 if (!function_exists('getTypeSimilar')) {
-    function tmuxgetTypeSimilar($type)
+    function getTypeSimilar($type)
     {
         $time = Carbon::now();
 
