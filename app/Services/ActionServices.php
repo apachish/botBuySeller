@@ -882,33 +882,48 @@ class ActionServices extends TextServices
     public function rejectAll()
     {
         $result = false;
-        $transfers = Transfer::where("user_id", $this->getUser()->id)
-            ->whereIn("status", [Transfer::STATUS_ACTIVE, Transfer::STATUS_ACTIVE_DO])
-            ->where("number", ">", 0)
-            ->get();
-        $i = 0;
-        foreach ($transfers as $transfer) {
-            $message = $transfer->message . "\xE2\x9D\x8C";
+        DB::beginTransaction();
+        try {
+            $transfers = Transfer::where("user_id", $this->getUser()->id)
+                ->whereIn("status", [Transfer::STATUS_ACTIVE, Transfer::STATUS_ACTIVE_DO])
+                ->where("number", ">", 0)
+                ->lockForUpdate()
+                ->get();
+            $i = 0;
+            foreach ($transfers as $transfer) {
+                $message = $transfer->message . "\xE2\x9D\x8C";
 //            $message = $transfer->message . "\xF0\x9F\x9A\xAB";
 
-            if ($transfer->status_transaction) {
-                $msg = $transfer->message . "[ امکان کنسلی نمی باشد چون کاربر در حال گرفتنش است  ]";
-                $this->telegram->sendMessage(['chat_id' => $this->getUserId(), 'text' => $msg]);
-                continue;
-            }
+                if ($transfer->status_transaction) {
+                    $msg = $transfer->message . "[ امکان کنسلی نمی باشد چون کاربر در حال گرفتنش است  ]";
+                    $this->telegram->sendMessage(['chat_id' => $this->getUserId(), 'text' => $msg]);
+                    continue;
+                }
 
-            $this->telegram_services->editMessageTextAndInlineKeyboard($this->bot->chanel_id, $transfer->message_id, $message);
-            $transfer->status = Transfer::STATUS_DEACTIVATE;
-            $transfer->update();
-            $transfer->delete();
-            $message_public = MessageWordPublic::where("transfer_id", $transfer->id)->first();
-            if ($message_public && $message_public->message_id && env("CHANEL_ID_PUBLIC"))
-                $this->telegram_services->deleteMessage(env("CHANEL_ID_PUBLIC"), $message_public->message_id);
-            $i++;
+                $this->telegram_services->editMessageTextAndInlineKeyboard($this->bot->chanel_id, $transfer->message_id, $message);
+                $transfer->status = Transfer::STATUS_DEACTIVATE;
+                $transfer->update();
+                $transfer->delete();
+                $message_public = MessageWordPublic::where("transfer_id", $transfer->id)->first();
+                if ($message_public && $message_public->message_id && env("CHANEL_ID_PUBLIC"))
+                    $this->telegram_services->deleteMessage(env("CHANEL_ID_PUBLIC"), $message_public->message_id);
+                $i++;
+            }
+            DB::commit();
+            if ($transfers->count() && $i == $transfers->count())
+                return true;
+            return $result;
+        }catch (\Exception $exception) {
+            DB::rollback();
+            $this->sendAlert("خطا در کنسلی ... \xE2\x9A\xA0	");
+
+            logger("exp send request", [$exception->getMessage(),
+                $exception->getLine(),
+                $exception->getCode(),
+                $exception->getTrace(),
+                $exception->getFile()]);
         }
-        if ($transfers->count() && $i == $transfers->count())
-            return true;
-        return $result;
+        return false;
     }
 
     public function checkWord()
