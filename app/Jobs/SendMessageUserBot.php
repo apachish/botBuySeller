@@ -85,6 +85,7 @@ $this->user_id ]);
                 $message .= "\n";
                 $message .= "   شماره حواله:"  ;
                 $message .= "**$this->factor**"   ;
+                $message = str_replace(".","\\.",$message);
                 $message = str_replace("\(","(",$message);
                 $message = str_replace("\)",")",$message);
                 $message = str_replace("(","\(",$message);

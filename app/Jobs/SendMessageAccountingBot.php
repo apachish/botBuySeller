@@ -143,6 +143,7 @@ class SendMessageAccountingBot implements ShouldQueue
             $message .= "\xE2\x9D\x97 : \n" . data_get($transfer,'description');
         }
         logger("mesage acco", [$message]);
+        $message = str_replace(".","\\.",$message);
         $message = str_replace("\(","(",$message);
         $message = str_replace("\)",")",$message);
         $message = str_replace("(","\(",$message);
