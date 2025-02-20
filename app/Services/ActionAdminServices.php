@@ -218,6 +218,7 @@ class ActionAdminServices extends TextServices
             case "\xE2\x9D\x8C\xE2\x9D\x97حذف پیام های کانال":
                 $targetDate = cache()->get("date_delete_message_chanel");
                 cache()->forget("date_delete_message_chanel");
+                return false;
                 $updates = Transfer::withTrashed()->
                 whereNotNull("message_id");
 

@@ -28,7 +28,7 @@ class DeleteMessageChanel extends Command
     public function handle()
     {
         $bot = Bot::where("title","botUser")->first();
-
+        exit;
         if($bot) {
             logger("delete Message");
             // تعیین تاریخ مورد نظر
