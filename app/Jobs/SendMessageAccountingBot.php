@@ -33,20 +33,14 @@ class SendMessageAccountingBot implements ShouldQueue
     public function handle(): void
     {
         $bot_accounting = Bot::where("title", "botAccounting")->with("accessBot")->first();
-        logger("ghazal", [$bot_accounting, $this->order_id]);
-
         if ($bot_accounting) {
             try {
-                logger("bot accounting job", [$bot_accounting]);
                 $telegram_accounting = new Api($bot_accounting->token);
                 $order_buy = RequestTransfer::with(["userRequest.customer", "transferReport"])->find($this->order_id);
                 if($order_buy) {
-                    logger("order buy", [$order_buy]);
                     $message = $this->getfactor($order_buy);
                     $admins = $bot_accounting->accessBot;
-                    logger("aaa", [$admins]);
                     foreach ($admins as $admin) {
-                        logger("send job", [$admin]);
                         $this->send = Message::create([
                             "telegram_id" => $admin->user_id,
                             "bot_id" => $bot_accounting->id,
@@ -63,7 +57,6 @@ class SendMessageAccountingBot implements ShouldQueue
                         $this->send->message_id = data_get($send_accounting, "message_id");
                         $this->send->status = Message::STATUS_RECEIVE;
                         $this->send->update();
-                        logger("aco job", [$send_accounting]);
                     }
                 }else{
                     logger("order buy can not found send accounting", [$this->order_id]);
@@ -144,7 +137,6 @@ class SendMessageAccountingBot implements ShouldQueue
             $message .= "توضیحات";
             $message .= "\xE2\x9D\x97 : \n" .$description;
         }
-        logger("mesage acco", [$message]);
         $message = str_replace("\(","(",$message);
         $message = str_replace("\)",")",$message);
         $message = str_replace("(","\(",$message);

@@ -52,7 +52,6 @@ class SendMessageCustomerBot implements ShouldQueue
         $bot_customer = Bot::where("title", "botCustomer")->first();
         if ($bot_customer) {
             try {
-                logger("bot customer", [$bot_customer]);
                 $telegram_customer = new Api($bot_customer->token);
                 $message = "نام مشتری:";
                 $message .= $this->customer;
