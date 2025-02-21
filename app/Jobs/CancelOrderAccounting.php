@@ -138,7 +138,6 @@ class CancelOrderAccounting implements ShouldQueue
         $message .= "\n";
         $message .= "نوع:" . $order_buy->type_title?:getTypeTransfer($transfer->type);
         logger("mesage acco", [$message]);
-        $message = str_replace(".","\\.",$message);
         $message = str_replace("\(","(",$message);
         $message = str_replace("\)",")",$message);
         $message = str_replace("(","\(",$message);

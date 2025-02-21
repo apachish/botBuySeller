@@ -74,6 +74,8 @@ class CancelOrderUser implements ShouldQueue
                 $message .= "\n";
                 $message .= "نوع:" . $this->type_title?:getTypeTransfer($this->type);
                 if ($this->description) {
+                    $this->description = str_replace(".","\\.",$this->description);
+
                     $message .= "\n";
                     $message .= "توضیحات";
                     $message .= "\xE2\x9D\x97 : \n" . $this->description;
@@ -89,7 +91,6 @@ class CancelOrderUser implements ShouldQueue
                 $message .= "\n";
                 $message .= "   شماره حواله:"  ;
                 $message .= "**$this->factor**"   ;
-                $message = str_replace(".","\\.",$message);
                 $message = str_replace("\(","(",$message);
                 $message = str_replace("\)",")",$message);
                 $message = str_replace("(","\(",$message);
