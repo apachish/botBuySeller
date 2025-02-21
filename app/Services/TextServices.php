@@ -404,7 +404,6 @@ class TextServices
         else
         $this->type = $type;
 
-        logger("type",[in_array($type,$this->list_type_floating),in_array($type,$this->list_type_reverse),$this->type,$description]);
     }
 
     /**
@@ -497,7 +496,6 @@ class TextServices
                 $message .= ":".$this->getDescription();
 
             $this->message = $message;
-            logger("check",[$message,$this->type,$this->pattern,preg_match($this->pattern, $message)]);
             if ($this->pattern && preg_match($this->pattern, $message))
                 return true;
         }

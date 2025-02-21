@@ -22,18 +22,7 @@ class TelegramController extends Controller
             $text_services->setContact();
             $text_services->setMessageCache();
             $text_services->setUser();
-            logger("user",[$text_services->getUser()]);
             if($text_services->getUser() == null) return false;
-
-            logger("test scope".$text_services->getUserId(),[
-                $text_services->getData(),
-                $text_services->getContact(),
-                $text_services->getMessageCache() ,
-                $text_services->checkText(),
-                $text_services->getMessage(),
-                $text_services->getUser()->fullName ,
-                $text_services->getUser()->mobile
-            ]);
             if ($text_services->getData())
                 $text_services->actionByData();
 

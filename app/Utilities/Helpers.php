@@ -107,7 +107,6 @@ if (!function_exists('cleanInput')) {
         $input = trim($input);
         $pattern = "/^(\d{3}|\d{5})\s*((?:خف|فف|فپ|فم|خم|خش|فش|خن|فن|خ|ف)\s*){1,3}([1-3]?)\s*(:.*)?$/u";
         if (preg_match($pattern, $input, $matches)) {
-            logger("check", $matches);
             $e = explode(":", $input);
             $a = str_replace(" ", "", data_get($e, 0));
             return $input = $a . (data_get($e, 1) ? ":" . data_get($e, 1) : null);
@@ -188,7 +187,6 @@ if (!function_exists('getTypeTransfer')) {
         $morning = Carbon::create($time->year, $time->month, $time->day, 8, 0, 0); //set time to 08:00
         $none = Carbon::create($time->year, $time->month, $time->day, env("NONE_HOUR", "15"), env("NONE_MIN", "30"), 0); //set time to 18:00
         $none_13_30 = Carbon::create($time->year, $time->month, $time->day, env("NONE_M_HOUR", "13"), env("NONE_M_MIN", "30"), 0); //set time to 18:00
-        logger("time", [$morning, $none, $none_13_30, !$forbidden_day, $time->between($morning, $none, true), in_array($type, ["خ", "ف"])]);
         if($forbidden_day){
             if (in_array($type, ["خ", "ف","فف", "خف"]))
                 return "با حواله عادی";
@@ -328,11 +326,6 @@ if (!function_exists('getTypeSimilar')) {
                 "ففپط" => ["ففپط", "ففمط", "فپط", "فمط"],
             ];
 
-        logger("test type",[$array,data_get($array,$type)
-        ,!$forbidden_day , $time->between($morning, $none, true) , in_array($type, $list_type_today_normal_cache),
-            !$forbidden_day && $time->between($morning, $none, true) && in_array($type, $list_type_today_normal_cache),
-            $time->between($morning, $none_13_30, true) , in_array($type, $list_type_today_r_f)
-        ]);
         return data_get($array,$type);
 
 
