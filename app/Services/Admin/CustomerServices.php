@@ -41,8 +41,8 @@ class CustomerServices
         [
             ['text' => "\xF0\x9F\x93\x9Aقوانین"],
             ['text' => "راهنما\xE2\x81\x89"],
-            ['text' => "\xE2\x8C\x9Bمدت اشتراک"],
-            ['text' => "\xF0\x9F\x92\xB3حق اشتراک"]
+//            ['text' => "\xE2\x8C\x9Bمدت اشتراک"],
+//            ['text' => "\xF0\x9F\x92\xB3حق اشتراک"]
 
         ], [
             ['text' => "\xE2\x9C\x8Cفعال سازی دو مرحله ای"],
@@ -58,8 +58,8 @@ class CustomerServices
 
             ['text' => "\xF0\x9F\x93\x9Aقوانین"],
             ['text' => "راهنما\xE2\x81\x89"],
-            ['text' => "\xE2\x8C\x9Bمدت اشتراک"],
-            ['text' => "\xF0\x9F\x92\xB3حق اشتراک"]
+//            ['text' => "\xE2\x8C\x9Bمدت اشتراک"],
+//            ['text' => "\xF0\x9F\x92\xB3حق اشتراک"]
         ], [
             ['text' => "\xE2\x9C\x8Cفعال سازی دو مرحله ای"],
             ['text' => "\xE2\x9D\x8Cغیر فعال فوری"],

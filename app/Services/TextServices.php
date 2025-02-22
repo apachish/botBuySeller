@@ -836,8 +836,8 @@ class TextServices
         $keyboard_menu[$i++] = [
             ['text' => "\xF0\x9F\x93\x9Aقوانین"],
             ['text' => "راهنما\xE2\x81\x89"],
-            ['text' => "\xE2\x8C\x9Bمدت اشتراک"],
-            ['text' => "\xF0\x9F\x92\xB3حق اشتراک"]
+//            ['text' => "\xE2\x8C\x9Bمدت اشتراک"],
+//            ['text' => "\xF0\x9F\x92\xB3حق اشتراک"]
 
         ];
         $keyboard_menu[$i++] = [
