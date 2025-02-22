@@ -25,6 +25,7 @@ use App\Models\WordTelegram;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Telegram\Bot\Api;
 use Telegram\Bot\FileUpload\InputFile;
 use Telegram\Bot\Keyboard\Keyboard;
@@ -530,7 +531,7 @@ class ActionServices extends TextServices
                 ->whereDate("created_at", now())
                 ->whereIn("type", getTypeSimilar($word->type))
                 ->first();
-            if ($check_transfer) {
+            if ($check_transfer && !Str::of($word->description)->contains(['شب حساب', 'تک فیش'])) {
                 $message = "لفظ پیشنهادی بهتر در کانال : \n\n";
                 $message .= " \n";
                 $message .= number_format($check_transfer->price, 0);
