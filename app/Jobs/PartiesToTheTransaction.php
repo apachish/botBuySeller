@@ -113,6 +113,7 @@ class PartiesToTheTransaction implements ShouldQueue
             $factor = data_get($order_buy, 'id');
             $user_id = data_get($user, 'telegram_id');
             $type_title = data_get($order_buy, 'type_title');
+            $created_at = data_get($order_buy, 'created_at');
             dispatch(new SendMessageUserBot(
                 $title,
                 $number,
@@ -122,7 +123,8 @@ class PartiesToTheTransaction implements ShouldQueue
                 $date,
                 $factor,
                 $user_id,
-                $type_title
+                $type_title,
+                $created_at
             ));
             if ($user->role == "customer" && data_get($user, 'customer')) {
                 $customer = data_get($user, 'fullName');
@@ -138,7 +140,8 @@ class PartiesToTheTransaction implements ShouldQueue
                     $factor,
                     $user_id,
                     $customer,
-                    $type_title
+                    $type_title,
+                    $created_at
                 ));
             }
             $user_id = $transfer->user->telegram_id;
@@ -153,7 +156,8 @@ class PartiesToTheTransaction implements ShouldQueue
                 $date,
                 $factor,
                 $user_id,
-                $type_title
+                $type_title,
+                $created_at
             ));
             if ($transfer->user->role == "customer" && data_get($transfer, 'user.customer')) {
                 $customer = data_get($transfer, 'user.fullName');
@@ -169,7 +173,8 @@ class PartiesToTheTransaction implements ShouldQueue
                     $factor,
                     $user_id,
                     $customer,
-                    $type_title
+                    $type_title,
+                    $created_at
                 ));
             }
 

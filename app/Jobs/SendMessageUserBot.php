@@ -24,11 +24,12 @@ class SendMessageUserBot implements ShouldQueue
     private $factor;
     private $user_id;
     private $type_title;
+    private $created_at;
     private $send;
     /**
      * Create a new job instance.
      */
-    public function __construct($title,$number,$type,$description,$parties,$date,$factor,$user_id,$type_title)
+    public function __construct($title,$number,$type,$description,$parties,$date,$factor,$user_id,$type_title,$created_at)
     {
         $this->title = $title;
         $this->number = $number;
@@ -39,6 +40,7 @@ class SendMessageUserBot implements ShouldQueue
         $this->factor = $factor;
         $this->user_id = $user_id;
         $this->type_title = $type_title;
+        $this->created_at = $created_at;
     }
 
     /**
@@ -50,7 +52,21 @@ class SendMessageUserBot implements ShouldQueue
         if ($bot_user) {
             try {
                 $telegram_user = new Api($bot_user->token);
+                /*
+                 * خرید 🔵⏳
+معامله🤝
+فی : 20,350,000
+مقدار :  1 کیلو
+نوع : عادی
+طرف معامله : وحید سیاوشی ۱(وحید سیاوشی)
+برای : 1403/08/19
+شماره حواله : 3160223
+زمان معامله :
+1403/08/16   11:18:38
+                 */
                 $message = $this->title;
+                $message .= "\n";
+                $message .= "معامله🤝";
                 $message .= "\n";
                 $message .= "مقدار:";
                 $message .= "[**";
@@ -77,6 +93,10 @@ class SendMessageUserBot implements ShouldQueue
                 $message .= "\n";
                 $message .= "   شماره حواله:"  ;
                 $message .= "**$this->factor**"   ;
+                $message .= "\n";
+                $message .= "زمان معامله : ";
+                $message .= "\n";
+                $message .=  toJalali($this->created_at, "Y/m/d  H:i:s");
                 $message = str_replace("\(","(",$message);
                 $message = str_replace("\)",")",$message);
                 $message = str_replace("(","\(",$message);

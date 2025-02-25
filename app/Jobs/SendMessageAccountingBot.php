@@ -78,14 +78,24 @@ class SendMessageAccountingBot implements ShouldQueue
 
     private function getfactor(\Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection|\Illuminate\Database\Eloquent\Builder|array $order_buy): string
     {
-        $message = "   شماره حواله:";
+        $transfer = $order_buy->transferReport;
 
-        $message .= "**". data_get($order_buy, 'id')."**";
+        $message = $transfer->message_request;
+        $message .= "\n";
+        $message .= "معامله🤝";
         $message .= "\n";
         $message .= "فی:";
         $message .= number_format(data_get($order_buy, 'price'), 0);
         $message .= "\n";
         $type = data_get($order_buy, "type");
+        $message .= "مقدار:";
+        $message .= "[**";
+        $message .= data_get($order_buy, "number");
+        $message .= " کیلو ";
+        $message .= "**]";
+        $message .= "(https://example.com)";
+        $message .= "\n";
+        $message .= "نوع:" . $order_buy->type_title?:getTypeTransfer($transfer->type);
         if ($type == "sell") {
             $title_request = "فروشنده";
             $title_mal = "خریدار";
@@ -94,7 +104,6 @@ class SendMessageAccountingBot implements ShouldQueue
             $title_mal = "فروشنده";
 
         }
-        $transfer = $order_buy->transferReport;
         if (data_get($order_buy, "userRequest.role") == "customer")
         {
             $message .= "$title_request:";
@@ -117,19 +126,11 @@ class SendMessageAccountingBot implements ShouldQueue
             $message .= "$title_mal:";
             $message .= $this->getBlue(data_get($order_buy, "transferReport.user.fullName"));
         }
+
         $message .= "\n";
         $message .= "برای:" . toJalali($transfer->date, "Y/m/d");
         $message .= "\n";
-        $message .= "ساعت:" . toJalali($order_buy->created_at, "H:i:s");
-        $message .= "\n";
-        $message .= "مقدار:";
-        $message .= "[**";
-        $message .= data_get($order_buy, "number");
-        $message .= " کیلو ";
-        $message .= "**]";
-        $message .= "(https://example.com)";
-        $message .= "\n";
-        $message .= "نوع:" . $order_buy->type_title?:getTypeTransfer($transfer->type);
+
         if (data_get($transfer,'description')) {
             $description = str_replace(".","\\.",data_get($transfer,'description'));
 
@@ -137,6 +138,14 @@ class SendMessageAccountingBot implements ShouldQueue
             $message .= "توضیحات";
             $message .= "\xE2\x9D\x97 : \n" .$description;
         }
+        $message .= "   شماره حواله:";
+
+        $message .= "**". data_get($order_buy, 'id')."**";
+        $message .= "\n";
+        $message .= "\n";
+        $message .= "زمان معامله : ";
+        $message .= "\n";
+        $message .=  toJalali($order_buy->created_at, "Y/m/d  H:i:s");
         $message = str_replace("\(","(",$message);
         $message = str_replace("\)",")",$message);
         $message = str_replace("(","\(",$message);

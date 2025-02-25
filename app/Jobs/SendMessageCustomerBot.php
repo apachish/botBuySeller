@@ -26,10 +26,11 @@ class SendMessageCustomerBot implements ShouldQueue
     private $customer;
     private $type_title;
     private $send;
+    private $created_at;
     /**
      * Create a new job instance.
      */
-    public function __construct($title,$number,$type,$description,$parties,$date,$factor,$user_id,$customer,$type_title)
+    public function __construct($title,$number,$type,$description,$parties,$date,$factor,$user_id,$customer,$type_title,$created_at)
     {
         $this->title = $title;
         $this->number = $number;
@@ -41,6 +42,7 @@ class SendMessageCustomerBot implements ShouldQueue
         $this->user_id = $user_id;
         $this->customer = $customer;
         $this->type_title = $type_title;
+        $this->created_at = $created_at;
     }
 
 
@@ -57,6 +59,8 @@ class SendMessageCustomerBot implements ShouldQueue
                 $message .= $this->customer;
                 $message .= "\n";
                 $message .= $this->title;
+                $message .= "\n";
+                $message .= "معامله🤝";
                 $message .= "\n";
                 $message .= "مقدار: ";
                 $message .= "[ **";
@@ -84,6 +88,10 @@ class SendMessageCustomerBot implements ShouldQueue
                 $message .= "\n";
                 $message .= "   شماره حواله:"  ;
                 $message .= "**$this->factor**"   ;
+                $message .= "\n";
+                $message .= "زمان معامله : ";
+                $message .= "\n";
+                $message .=  toJalali($this->created_at, "Y/m/d  H:i:s");
                 $message = str_replace("\(","(",$message);
                 $message = str_replace("\)",")",$message);
                 $message = str_replace("(","\(",$message);
