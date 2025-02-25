@@ -138,10 +138,9 @@ class SendMessageAccountingBot implements ShouldQueue
             $message .= "توضیحات";
             $message .= "\xE2\x9D\x97 : \n" .$description;
         }
-        $message .= "   شماره حواله:";
+        $message .= "شماره حواله:";
 
         $message .= "**". data_get($order_buy, 'id')."**";
-        $message .= "\n";
         $message .= "\n";
         $message .= "زمان معامله : ";
         $message .= "\n";

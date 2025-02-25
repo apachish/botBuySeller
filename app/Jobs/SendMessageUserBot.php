@@ -91,7 +91,7 @@ class SendMessageUserBot implements ShouldQueue
                 $message .= "\n";
                 $message .= "برای:" . toJalali($this->date, "Y/m/d");
                 $message .= "\n";
-                $message .= "   شماره حواله:"  ;
+                $message .= "شماره حواله:";
                 $message .= "**$this->factor**"   ;
                 $message .= "\n";
                 $message .= "زمان معامله : ";
