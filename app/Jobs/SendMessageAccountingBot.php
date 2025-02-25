@@ -83,9 +83,9 @@ class SendMessageAccountingBot implements ShouldQueue
         $message = $transfer->message_request;
         $message .= "\n";
         $message .= "معامله🤝";
-        $message .= "\n";
-        $message .= "فی:";
-        $message .= number_format(data_get($order_buy, 'price'), 0);
+//        $message .= "\n";
+//        $message .= "فی:";
+//        $message .= number_format(data_get($order_buy, 'price'), 0);
         $message .= "\n";
         $type = data_get($order_buy, "type");
         $message .= "مقدار:";
