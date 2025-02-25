@@ -96,6 +96,7 @@ class SendMessageAccountingBot implements ShouldQueue
         $message .= "(https://example.com)";
         $message .= "\n";
         $message .= "نوع:" . $order_buy->type_title?:getTypeTransfer($transfer->type);
+        $message .= "\n";
         if ($type == "sell") {
             $title_request = "فروشنده";
             $title_mal = "خریدار";
