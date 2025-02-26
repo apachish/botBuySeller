@@ -76,13 +76,15 @@ class SendMessageUserBot implements ShouldQueue
                 $message .= "(https://example.com)";
                 $message .= "\n";
                 $message .= "نوع:" . $this->type_title?:getTypeTransfer($this->type);
+                $message .= "\n";
                 if ($this->description) {
                     $this->description = str_replace(".","\\.",$this->description);
                     $message .= "\n";
                     $message .= "توضیحات";
                     $message .= "\xE2\x9D\x97 : \n" . $this->description;
+                    $message .= "\n";
+
                 }
-                $message .= "\n";
                 $message .= "طرف معامله:" ;
                 $message .= "[" ;
                 $message .= $this->parties ;
