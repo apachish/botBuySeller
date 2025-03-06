@@ -951,6 +951,16 @@ class ActionServices extends TextServices
             $this->telegram_services->sendMessage($this->getUserId(), "فقط امکان لفظ روز می باشد");
             return true;
         }
+
+        if(env("DISABLE_TOMORROW" ,false) && in_array($this->getType(), $this->list_type_floating)){
+            $this->telegram_services->sendMessage($this->getUserId(), "امکان لفظ شنا نمی باشد");
+            return true;
+        }
+        if(env("DISABLE_TOMORROW" ,false) && in_array($this->getType(), $this->list_type_reverse)){
+            $this->telegram_services->sendMessage($this->getUserId(), "امکان لفظ معکوس نمی باشد");
+            return true;
+        }
+
         if ($this->getDescription()) {
             $ugly_words = UglyWord::get();
             foreach ($ugly_words as $ugly_word) {
