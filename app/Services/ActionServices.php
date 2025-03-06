@@ -1110,7 +1110,7 @@ class ActionServices extends TextServices
                 return data_get($item, "value");
             });
             if (!$forbidden_day)
-                $forbidden_day = ($time->isThursday() || $time->isFriday())|| !env("DISABLE_TOMORROW" ,false) ? true : false;
+                $forbidden_day = ($time->isThursday() || $time->isFriday()) && !env("DISABLE_TOMORROW" ,false)  ? true : false;
 //            if ($forbidden_day && data_get($forbidden_day, "value") && in_array($this->getType(), $this->list_type_today)) {
 //                $this->telegram_services->sendMessage($this->getUserId(), "تمام معاملات برای اولین روز کاری می باشد و امکان معامله روز در حال حاظر وجود ندارد");
 //                return true;
