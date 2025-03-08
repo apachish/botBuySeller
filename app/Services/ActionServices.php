@@ -1028,6 +1028,7 @@ class ActionServices extends TextServices
         $last_transfer = Transfer::whereIn("type", getTypeSimilar($this->getType()))
             ->whereIn("status", [Transfer::STATUS_ACTIVE_DO, Transfer::STATUS_ACTIVE_DONE])
             ->whereDate("created_at", now())
+            ->withTrashed()
             ->orderBy("updated_at", "DESC")->first();
         logger("last",[$last_transfer]);
         if (env("BETWEEN_TRADE", true) == true || !$last_transfer) {
