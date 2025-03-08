@@ -1045,25 +1045,32 @@ class ActionServices extends TextServices
                 return (int)$value;
             });
             $price = $this->getPriceTrade($suggest_price, $start_trade_s);
-            if ($price < $start_trade_s || $price > $end_trade_s) {
-                $message = "مبلغ وارد شده باید در بازه";
-                $message .= "\n";
-                $message .= $start_trade_s;
-                $message .= "\n";
-                $message .= "تا";
-                $message .= "\n";
-                $message .= $end_trade_s;
 
-                $this->telegram_services->sendMessage($this->getUserId(), $message);
-                return false;
-            }
 
         } else {
             $start_trade_s = (int)$last_transfer->price;
             $price = $this->getPriceTrade($suggest_price, $start_trade_s);
-
+            if ($start_trade_s) {
+                // محاسبه قیمت جدید در محدوده ±2٪
+                $start_trade_s = $start_trade_s * 0.99;
+                $end_trade_s = $start_trade_s * 1.01;
+            }
         }
+        if ($price < $start_trade_s || $price > $end_trade_s) {
+            $message = "مبلغ وارد شده باید در بازه";
+            $message .= "\n";
+            $message .= $start_trade_s;
+            $message .= "\n";
+            $message .= "تا";
+            $message .= "\n";
+            $message .= $end_trade_s;
+            $message .=  "\n";
+            $message .=  "اگر لفظ شما 3 رقمی درست نمی باشد ۵ رقمی لفظ دهید";
 
+
+            $this->telegram_services->sendMessage($this->getUserId(), $message);
+            return false;
+        }
 
         $number = $this->getNumberOrder();
 
