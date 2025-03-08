@@ -1058,7 +1058,7 @@ class ActionServices extends TextServices
                 $end_trade_s = $start_trade_s + 500000;
             }
         }
-        logger("price",[$start_trade_s,$end_trade_s]);
+        logger("price",[$start_trade_s,$end_trade_s,$price]);
         if ($price < $start_trade_s || $price > $end_trade_s) {
             $message = "مبلغ وارد شده باید در بازه";
             $message .= "\n";
