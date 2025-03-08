@@ -1050,12 +1050,13 @@ class ActionServices extends TextServices
 
 
         } else {
-            $start_trade_s = (int)$last_transfer->price;
-            $price = $this->getPriceTrade($suggest_price, $start_trade_s);
-            if ($start_trade_s) {
+            $last_trade = (int)$last_transfer->price;
+            $price = $this->getPriceTrade($suggest_price, $last_trade);
+            if ($last_trade) {
                 // محاسبه قیمت جدید در محدوده ±2٪
-                $start_trade_s = $start_trade_s - 500000;
-                $end_trade_s = $start_trade_s + 500000;
+
+                $start_trade_s = $last_trade - 500000;
+                $end_trade_s = $last_trade + 500000;
             }
         }
         logger("price",[$start_trade_s,$end_trade_s,$price]);
