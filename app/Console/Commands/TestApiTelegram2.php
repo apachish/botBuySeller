@@ -536,7 +536,7 @@ class TestApiTelegram2 extends Command
                 $message .= " بی حواله ";
                 if (!$time->between($morning, $none, true) ||
                     in_array($this->getType(), $this->list_type_sell_n_buy_tom))
-                    $message .= " فردا ";
+                    $message .= " اولین روز کاری ";
                 $message .= "\xF0\x9F\x92\xB0	\xF0\x9F\x92\xB5	";
 
             } else
