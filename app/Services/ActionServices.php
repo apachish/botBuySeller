@@ -1029,7 +1029,7 @@ class ActionServices extends TextServices
             ->whereIn("status", [Transfer::STATUS_ACTIVE_DO, Transfer::STATUS_ACTIVE_DONE])
             ->whereDate("created_at", now())
             ->orderBy("updated_at", "DESC")->first();
-
+        logger("last",[$last_transfer]);
         if (env("BETWEEN_TRADE", true) == true || !$last_transfer) {
             $start_trade_s = (int)cache()->remember("start_price_trade", now()->addDay(1), function () {
                 $value = 14000000;
@@ -1057,6 +1057,7 @@ class ActionServices extends TextServices
                 $end_trade_s = $start_trade_s * 1.01;
             }
         }
+        logger("price",[$start_trade_s,$end_trade_s]);
         if ($price < $start_trade_s || $price > $end_trade_s) {
             $message = "مبلغ وارد شده باید در بازه";
             $message .= "\n";
