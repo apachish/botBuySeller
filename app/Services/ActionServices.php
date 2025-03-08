@@ -1029,7 +1029,8 @@ class ActionServices extends TextServices
             ->whereIn("status", [Transfer::STATUS_ACTIVE_DO, Transfer::STATUS_ACTIVE_DONE])
             ->whereDate("created_at", now())
             ->orderBy("updated_at", "DESC")->first();
-        if (env("BETWEEN_TRADE", true) || !$last_transfer) {
+
+        if (env("BETWEEN_TRADE", true) == true || !$last_transfer) {
             $start_trade_s = (int)cache()->remember("start_price_trade", now()->addDay(1), function () {
                 $value = 14000000;
                 $setting = Setting::where("key", "start_price_trade")->first();
