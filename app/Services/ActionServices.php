@@ -1053,8 +1053,8 @@ class ActionServices extends TextServices
             $price = $this->getPriceTrade($suggest_price, $start_trade_s);
             if ($start_trade_s) {
                 // محاسبه قیمت جدید در محدوده ±2٪
-                $start_trade_s = $price * 0.99;
-                $end_trade_s = $price * 1.01;
+                $start_trade_s = $start_trade_s * 0.99;
+                $end_trade_s = $start_trade_s * 1.01;
             }
         }
         if ($price < $start_trade_s || $price > $end_trade_s) {
