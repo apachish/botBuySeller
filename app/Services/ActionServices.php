@@ -1046,18 +1046,19 @@ class ActionServices extends TextServices
                     $value = data_get($setting, "value");
                 return (int)$value;
             });
-            $price = $this->getPriceTrade($suggest_price, $start_trade_s);
+            $price = $this->getPriceTrade($suggest_price, $start_trade_s,$end_trade_s);
 
 
         } else {
             $last_trade = (int)$last_transfer->price;
-            $price = $this->getPriceTrade($suggest_price, $last_trade);
             if ($last_trade) {
                 // محاسبه قیمت جدید در محدوده ±2٪
 
                 $start_trade_s = $last_trade - 500000;
                 $end_trade_s = $last_trade + 500000;
             }
+            $price = $this->getPriceTrade($suggest_price, $start_trade_s,$end_trade_s);
+
         }
         logger("price",[$start_trade_s,$end_trade_s,$price]);
         if ($price < $start_trade_s || $price > $end_trade_s) {
@@ -1266,7 +1267,7 @@ class ActionServices extends TextServices
      * @param mixed $start_trade_s
      * @return float|int
      */
-    private function getPriceTrade(mixed $suggest_price, mixed $start_trade_s): int|float
+    private function getPriceTrade(mixed $suggest_price, mixed $start_trade_s, mixed $end_trade_s): int|float
     {
 // طول رشته عدد را محاسبه کنید
         $length = strlen($suggest_price);
@@ -1275,6 +1276,7 @@ class ActionServices extends TextServices
         if ($length === 3) {
             $start_price = (int)$start_trade_s;
             $unit = getUnitPrice($start_price);
+
         } elseif ($length === 5) {
             $start_price = (int)($suggest_price * 1000);
             $unit = getUnitPrice($start_price);
@@ -1285,6 +1287,9 @@ class ActionServices extends TextServices
 
 
         $price = $start_trade + ($suggest_price * 1000);
+        if (!($price>= $start_price && $price <= $end_trade_s)){
+            $price +=$unit;
+        }
         return $price;
     }
 
