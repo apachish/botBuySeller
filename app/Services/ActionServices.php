@@ -1185,7 +1185,7 @@ class ActionServices extends TextServices
                 if (!$forbidden_day && $time->between($morning, $none_13_30, true) && in_array($this->getType(), $this->list_type_cash_n))
                     $message .= " نقدی حاضر ";
                 else
-                    $message .= "   بی حواله اولین روز کاری ";
+                    $message .= "   بی حواله ".env("TEXT_TOMORROW","فردا");
 
                 $message .= "\xF0\x9F\x92\xB0";
 
