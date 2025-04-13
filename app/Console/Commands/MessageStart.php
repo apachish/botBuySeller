@@ -46,7 +46,8 @@ class MessageStart extends Command
                     $this->sendStickerStart($bot_user->token,data_get($bot_user,"chanel_id"));
                 if(env("SEND_STICKER_DATE",true))
                     $this->sendSticker($bot_user->token,data_get($bot_user,"chanel_id"));
-                foreach ($users as $user) {
+                if(env("SEND_MESSAGE_START_USER",false))
+                    foreach ($users as $user) {
                     try {
                         if(data_get($user,"telegram_id"))
                             $telegram_user->sendMessage([
