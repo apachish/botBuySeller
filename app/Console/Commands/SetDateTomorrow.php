@@ -131,6 +131,7 @@ class SetDateTomorrow extends Command
             }
             cache()->forget("set_tomorrow_date");
         }
+        stikerDay();
 
     }
 }
