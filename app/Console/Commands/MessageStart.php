@@ -64,7 +64,7 @@ class MessageStart extends Command
     {
 
 
-        $sticker_file = new \CURLFile('sticker.webp', 'image/webp');
+        $sticker_file = new \CURLFile(public_path('sticker.webp'), 'image/webp');
 
         $ch = curl_init("https://api.telegram.org/bot$token/sendSticker");
         curl_setopt($ch, CURLOPT_POST, 1);

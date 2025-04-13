@@ -1219,7 +1219,7 @@ if (!function_exists('fagd')) {
             imagettftext($img, 60, 0, 400, 405, $blue, $font, $day_qamari);
 
 // خروجی نهایی
-            imagewebp($img, 'today.webp'); // مناسب برای استیکر
+            imagewebp($img, public_path('today.webp')); // مناسب برای استیکر
             imagedestroy($img);
 
         }
