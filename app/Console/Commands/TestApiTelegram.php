@@ -40,6 +40,8 @@ class TestApiTelegram extends Command
     public function handle()
     {
 
+        stikerDay();
+        exit;
         $customer = UserTelegram::find(8);
         $date = "1403/04/06";
         $date = toGregorian($date, "Y/m/d");

@@ -187,43 +187,43 @@ if (!function_exists('getTypeTransfer')) {
         $morning = Carbon::create($time->year, $time->month, $time->day, 8, 0, 0); //set time to 08:00
         $none = Carbon::create($time->year, $time->month, $time->day, env("NONE_HOUR", "15"), env("NONE_MIN", "30"), 0); //set time to 18:00
         $none_13_30 = Carbon::create($time->year, $time->month, $time->day, env("NONE_M_HOUR", "13"), env("NONE_M_MIN", "30"), 0); //set time to 18:00
-        if($forbidden_day){
-            if (in_array($type, ["خ", "ف","فف", "خف"]))
+        if ($forbidden_day) {
+            if (in_array($type, ["خ", "ف", "فف", "خف"]))
                 return "با حواله عادی";
-            elseif (in_array($type, ["خش", "فش","خفش", "ففش"]))
+            elseif (in_array($type, ["خش", "فش", "خفش", "ففش"]))
                 return "شنا";
-            elseif (in_array($type, ["خشط", "فشط","خفشط", "ففشط"]))
+            elseif (in_array($type, ["خشط", "فشط", "خفشط", "ففشط"]))
                 return "شنا شرطی";
-            elseif (in_array($type, ["خن", "فن","خفن", "ففن"]))
+            elseif (in_array($type, ["خن", "فن", "خفن", "ففن"]))
                 return "نقدی";
-            elseif (in_array($type, ["فم", "خم", "فپ", "خپ","ففم", "خفم", "ففپ", "خفپ"]))
+            elseif (in_array($type, ["فم", "خم", "فپ", "خپ", "ففم", "خفم", "ففپ", "خفپ"]))
                 return "معکوس";
-            elseif (in_array($type, ["فمط", "خمط", "فپط", "خپط","ففمط", "خفمط", "ففپط", "خفپط"]))
+            elseif (in_array($type, ["فمط", "خمط", "فپط", "خپط", "ففمط", "خفمط", "ففپط", "خفپط"]))
                 return "معکوس شرطی";
-        }else{
+        } else {
             if ($time->between($morning, $none, true) && in_array($type, ["خ", "ف"]))
                 return "عادی روز";
-            elseif (in_array($type, ["خ", "ف","فف", "خف"]))
+            elseif (in_array($type, ["خ", "ف", "فف", "خف"]))
                 return "با حواله عادی";
             elseif ($time->between($morning, $none_13_30, true) && in_array($type, ["خش", "فش"]))
                 return "شنا روز";
-            elseif (in_array($type, ["خش", "فش","خفش", "ففش"]))
+            elseif (in_array($type, ["خش", "فش", "خفش", "ففش"]))
                 return "شنا";
             elseif ($time->between($morning, $none_13_30, true) && in_array($type, ["خشط", "فشط"]))
                 return " شنا روز شرطی";
-            elseif (in_array($type, ["خشط", "فشط","خفشط", "ففشط"]))
+            elseif (in_array($type, ["خشط", "فشط", "خفشط", "ففشط"]))
                 return "شنا شرطی";
             elseif ($time->between($morning, $none, true) && in_array($type, ["خن", "فن"]))
                 return "نقدی حاضر";
-            elseif (in_array($type, ["خفن", "ففن","خن", "فن"]))
+            elseif (in_array($type, ["خفن", "ففن", "خن", "فن"]))
                 return "نقدی";
-            elseif ( $time->between($morning, $none_13_30, true) && in_array($type, ["فم", "خم", "فپ", "خپ"]))
+            elseif ($time->between($morning, $none_13_30, true) && in_array($type, ["فم", "خم", "فپ", "خپ"]))
                 return "معکوس روز";
-            elseif (in_array($type, ["ففم", "خفم", "ففپ", "خفپ","فم", "خم", "فپ", "خپ"]))
+            elseif (in_array($type, ["ففم", "خفم", "ففپ", "خفپ", "فم", "خم", "فپ", "خپ"]))
                 return "معکوس";
-            elseif ( $time->between($morning, $none_13_30, true) && in_array($type, ["فمط", "خمط", "فپط", "خپط"]))
+            elseif ($time->between($morning, $none_13_30, true) && in_array($type, ["فمط", "خمط", "فپط", "خپط"]))
                 return "معکوس روز شرطی";
-            elseif (in_array($type, ["ففمط", "خفمط", "ففپط", "خفپط","فمط", "خمط", "فپط", "خپط"]))
+            elseif (in_array($type, ["ففمط", "خفمط", "ففپط", "خفپط", "فمط", "خمط", "فپط", "خپط"]))
                 return "معکوس شرطی";
         }
 
@@ -247,12 +247,12 @@ if (!function_exists('getTypeSimilar')) {
         $morning = Carbon::create($time->year, $time->month, $time->day, 9, 0, 0); //set time to 08:00
         $none = Carbon::create($time->year, $time->month, $time->day, env("NONE_HOUR", "15"), env("NONE_MIN", "30"), 0); //set time to 18:00
         $none_13_30 = Carbon::create($time->year, $time->month, $time->day, env("NONE_M_HOUR", "13"), env("NONE_M_MIN", "30"), 0); //set time to 18:00
-        $list_type_today_r_f = ["خش", "خم", "فش", "فم", "خپ", "فپ","خفش", "ففش", "خفم","ففم","خفپ","ففپ",
-            "خشط", "خمط", "فشط", "فمط", "خپط", "فپط","خفشط", "ففشط", "خفمط","ففمط","خفپط","ففپط"
-            ];
-        $list_type_today_normal_cache = ["خ", "ف", "خن", "فن","خف","فف","ففن","خفن"];
+        $list_type_today_r_f = ["خش", "خم", "فش", "فم", "خپ", "فپ", "خفش", "ففش", "خفم", "ففم", "خفپ", "ففپ",
+            "خشط", "خمط", "فشط", "فمط", "خپط", "فپط", "خفشط", "ففشط", "خفمط", "ففمط", "خفپط", "ففپط"
+        ];
+        $list_type_today_normal_cache = ["خ", "ف", "خن", "فن", "خف", "فف", "ففن", "خفن"];
         if (!$forbidden_day && $time->between($morning, $none_13_30, true) && in_array($type, $list_type_today_r_f))
-            $array =  [
+            $array = [
                 "خش" => ["خش"],
                 "فش" => ["فش"],
                 "خم" => ["خم", "خپ"],
@@ -326,7 +326,7 @@ if (!function_exists('getTypeSimilar')) {
                 "ففپط" => ["ففپط", "ففمط", "فپط", "فمط"],
             ];
 
-        return data_get($array,$type);
+        return data_get($array, $type);
 
 
     }
@@ -1046,6 +1046,13 @@ if (!function_exists('fagd')) {
         return $output;
     }
 
+    if (!function_exists('utf8StrLen')) {
+        function utf8StrLen($str)
+        {
+            return preg_match_all('/[\x00-\x7F\xC0-\xFD]/', $str, $dummy);
+        }
+    }
+
     if (!function_exists('createPassword')) {
         function createPassword()
         {
@@ -1067,7 +1074,197 @@ if (!function_exists('fagd')) {
 
         }
     }
+    if (!function_exists('stikerDay')) {
 
+        function stikerDay()
+        {
+            ini_set("error_reporting", "E_ALL & ~E_NOTICE & ~E_STRICT");
+            header("Content-type: image/webp");
+
+// رنگ‌ها
+//            $bg = imagecolorallocate($img, 200, 240, 220);
+//            $red = imagecolorallocate($img, 200, 0, 0);
+//            $blue = imagecolorallocate($img, 30, 70, 160);
+//            $white = imagecolorallocate($img, 255, 255, 255);
+//            $black = imagecolorallocate($img, 0, 0, 0);
+
+// پس‌زمینه
+            $img = imagecreatetruecolor(512, 512);
+            imagesavealpha($img, true);
+            $transparent = imagecolorallocatealpha($img, 0, 0, 0, 127); // fully transparent
+            imagefill($img, 0, 0, $transparent);
+            $bg = imagecolorallocate($img, 200, 240, 220);
+            $red = imagecolorallocate($img, 200, 0, 0);
+            $blue = imagecolorallocate($img, 30, 70, 160);
+            $white = imagecolorallocate($img, 255, 255, 255);
+            $black = imagecolorallocate($img, 0, 0, 0);
+            $bg_name_day_en = imagecolorallocate($img, 50, 62, 168); //ابی
+
+
+// تاریخ‌ها
+            $weekday_fa = fagd(toJalali(now(), "%A"), 'fa', 'normal');         // شنبه، یکشنبه ...
+
+            $weekday_en = date("l");          // Sunday
+            $day_sh = toJalali(now(), 'd');             // 24
+            $monthname_sh = fagd(toJalali(now(), '%B'), 'fa', 'normal');      // فروردین
+
+            $year_sh = toJalali(now(), 'Y');           // 1404
+
+            $day_en = unConvertNumber(date('d'));             // 13
+            $month_en = date('F');           // April
+            $year_en = unConvertNumber(date('Y'));            // 2025
+
+// این بخش قمری می‌تونه دستی یا از API گرفته بشه، فعلاً نمونه:
+            $response = file_get_contents("https://api.keybit.ir/time/");
+            $data = json_decode($response, true);
+
+            $date_ghamari = data_get($data, ('date.other.ghamari.iso.en'));
+            $array_ghamari = explode('-', $date_ghamari);
+            $day_qamari = unConvertNumber(data_get($array_ghamari, '2'));
+            $array_month_ghamari = [
+                1 => "محرم",
+                2 => "صفر",
+                3 => "ربیع الاول",
+                4 => "ربیع‌الثانی",
+                5 => "جمادی‌الاول",
+                6 => "جمادی‌الثانی",
+                7 => "رجب",
+                8 => "شعبان",
+                9 => "رمضان",
+                10 => "شوال",
+                11 => "ذیقعده",
+                12 => "ذیحجه",
+            ];
+            $month_qamari = fagd($array_month_ghamari[data_get($array_ghamari, '1')], 'fa', 'normal');
+            $year_qamari = unConvertNumber(data_get($array_ghamari, '0'));
+
+// فونت
+            $font = public_path('/fonts/ttf/Vazirmatn-Bold.ttf'); // حتماً قرار بده
+
+// نوشتن اطلاعات
+
+            imageRoundedRectangle($img, 180, 30, 340, 80,20, $bg_name_day_en);
+            $parallelogram = [
+                30, 195,   // نقطه اول (بالا چپ)
+                180, 195,   // نقطه دوم (بالا راست)
+                150, 265,   // نقطه سوم (پایین راست)
+                30,  265    // نقطه چهارم (پایین چپ)
+            ];
+
+// رسم شکل
+            imagefilledpolygon($img, $parallelogram, 4, $blue);
+            $parallelogram = [
+                30, 270,   // نقطه اول (بالا چپ)
+                180, 270,   // نقطه دوم (بالا راست)
+                150, 340,   // نقطه سوم (پایین راست)
+                30,  340    // نقطه چهارم (پایین چپ)
+            ];
+
+// رسم شکل
+            imagefilledpolygon($img, $parallelogram, 4, $blue);
+
+            $parallelogram = [
+                30, 345,   // نقطه اول (بالا چپ)
+                180, 345,   // نقطه دوم (بالا راست)
+                150, 410,   // نقطه سوم (پایین راست)
+                30,  410    // نقطه چهارم (پایین چپ)
+            ];
+
+// رسم شکل
+            imagefilledpolygon($img, $parallelogram, 4, $blue);
+
+            $parallelogram = [
+                185, 195,   // نقطه اول (بالا چپ)
+                380, 195,   // نقطه دوم (بالا راست)
+                370, 265,   // نقطه سوم (پایین راست)
+                155,  265    // نقطه چهارم (پایین چپ)
+            ];
+
+// رسم شکل
+            imagefilledpolygon($img, $parallelogram, 4, $red);
+            $parallelogram = [
+                185, 270,   // نقطه اول (بالا چپ)
+                370, 270,   // نقطه دوم (بالا راست)
+                360, 340,   // نقطه سوم (پایین راست)
+                155,  340    // نقطه چهارم (پایین چپ)
+            ];
+
+// رسم شکل
+            imagefilledpolygon($img, $parallelogram, 4, $red);
+
+            $parallelogram = [
+                185, 345,   // نقطه اول (بالا چپ)
+                360, 345,   // نقطه دوم (بالا راست)
+                350, 410,   // نقطه سوم (پایین راست)
+                155,  410    // نقطه چهارم (پایین چپ)
+            ];
+
+// رسم شکل
+            imagefilledpolygon($img, $parallelogram, 4, $red);
+
+
+            imagettftext($img, 30, 0, 190, 70, $white, $font, $weekday_en);
+            imagettftext($img, 70, 0, 140, 150, $black, $font, $weekday_fa);
+
+            imagettftext($img, 40, 0, 40, 250, $white, $font, $year_sh);
+            imagettftext($img, 30, 0, 200, 240, $white, $font, $monthname_sh);
+            imagettftext($img, 60, 0, 400, 255, $blue, $font, $day_sh);
+
+            imagettftext($img, 40, 0, 40, 320, $white, $font, $year_en);
+            imagettftext($img, 30, 0, 200, 320, $white, $font, $month_en);
+            imagettftext($img, 60, 0, 400, 330, $blue, $font, $day_en);
+
+            imagettftext($img, 40, 0, 40, 392, $white, $font, $year_qamari);
+            imagettftext($img, 30, 0, 200, 392, $white, $font, $month_qamari);
+            imagettftext($img, 60, 0, 400, 405, $blue, $font, $day_qamari);
+
+// خروجی نهایی
+            imagewebp($img, 'today.webp'); // مناسب برای استیکر
+            imagedestroy($img);
+
+        }
+    }
+    if (!function_exists('rtl_text')) {
+
+        function rtl_text($str)
+        {
+            $str = preg_replace('/([اآبپتثجچحخدذرزژسشصضطظعغفقکگلمنوهی]+)/u', '«$1»', $str); // تکه‌تکه برای واژه‌ها
+            $str = implode(" ", array_reverse(explode(" ", $str)));
+            return fixPersianText($str);
+        }
+    }
+    if (!function_exists('fixPersianText')) {
+
+        function fixPersianText($text)
+        {
+            $map = [
+                'ا' => 'ﺍ', 'ب' => 'ﺏ', 'پ' => 'ﭖ', 'ت' => 'ﺕ', 'ث' => 'ﺙ',
+                'ج' => 'ﺝ', 'چ' => 'ﭺ', 'ح' => 'ﺡ', 'خ' => 'ﺥ',
+                'د' => 'ﺩ', 'ذ' => 'ﺫ', 'ر' => 'ﺭ', 'ز' => 'ﺯ', 'ژ' => 'ﮊ',
+                'س' => 'ﺱ', 'ش' => 'ﺵ', 'ص' => 'ﺹ', 'ض' => 'ﺽ',
+                'ط' => 'ﻁ', 'ظ' => 'ﻅ', 'ع' => 'ﻉ', 'غ' => 'ﻍ',
+                'ف' => 'ﻑ', 'ق' => 'ﻕ', 'ک' => 'ﮎ', 'گ' => 'ﮒ',
+                'ل' => 'ﻝ', 'م' => 'ﻡ', 'ن' => 'ﻥ', 'و' => 'ﻭ',
+                'ه' => 'ﻩ', 'ی' => 'ﯼ', 'ئ' => 'ﺉ',
+            ];
+            return strtr($text, $map);
+        }
+    }
+    if (!function_exists('imageRoundedRectangle')) {
+
+        function imageRoundedRectangle($im, $x1, $y1, $x2, $y2, $radius, $color)
+        {
+            // بخش‌های وسطی (چهار ضلع بدون گوشه‌ها)
+            imagefilledrectangle($im, $x1 + $radius, $y1, $x2 - $radius, $y2, $color);
+            imagefilledrectangle($im, $x1, $y1 + $radius, $x2, $y2 - $radius, $color);
+
+            // گوشه‌ها
+            imagefilledellipse($im, $x1 + $radius, $y1 + $radius, $radius * 2, $radius * 2, $color); // بالا چپ
+            imagefilledellipse($im, $x2 - $radius, $y1 + $radius, $radius * 2, $radius * 2, $color); // بالا راست
+            imagefilledellipse($im, $x1 + $radius, $y2 - $radius, $radius * 2, $radius * 2, $color); // پایین چپ
+            imagefilledellipse($im, $x2 - $radius, $y2 - $radius, $radius * 2, $radius * 2, $color); // پایین راست
+        }
+    }
 
 }
 
