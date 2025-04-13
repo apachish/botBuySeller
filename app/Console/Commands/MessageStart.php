@@ -36,11 +36,16 @@ class MessageStart extends Command
             if($bot_user) {
                 $users = UserTelegram::get();
                 $telegram_user = new Api($bot_user->token);
-                $telegram_user->sendMessage([
-                    'chat_id' => data_get($bot_user,"chanel_id"),
-                    'text' => data_get($message, "message_start.value"),
-                ]);
-                $this->sendSticker($bot_user->token,data_get($bot_user,"chanel_id"));
+                if(env("SEND_TEXT_START",true)){
+                    $telegram_user->sendMessage([
+                        'chat_id' => data_get($bot_user,"chanel_id"),
+                        'text' => data_get($message, "message_start.value"),
+                    ]);
+                }
+                if(env("SEND_STICKER_START",true))
+                    $this->sendStickerStart($bot_user->token,data_get($bot_user,"chanel_id"));
+                if(env("SEND_STICKER_DATE",true))
+                    $this->sendSticker($bot_user->token,data_get($bot_user,"chanel_id"));
                 foreach ($users as $user) {
                     try {
                         if(data_get($user,"telegram_id"))
@@ -60,11 +65,24 @@ class MessageStart extends Command
         }
     }
 
-    public function sendSticker($token,$chat_id)
+    public function sendStickerStart($token,$chat_id)
     {
 
+        $sticker_file = new \CURLFile(public_path('start.webp'), 'image/webp');
 
-        $sticker_file = new \CURLFile(public_path('sticker.webp'), 'image/webp');
+        $ch = curl_init("https://api.telegram.org/bot$token/sendSticker");
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, [
+            'chat_id' => $chat_id,
+            'sticker' => $sticker_file
+        ]);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        $result = curl_exec($ch);
+        curl_close($ch);
+    }
+    public function sendSticker($token,$chat_id)
+    {
+        $sticker_file = new \CURLFile(public_path('today.webp'), 'image/webp');
 
         $ch = curl_init("https://api.telegram.org/bot$token/sendSticker");
         curl_setopt($ch, CURLOPT_POST, 1);
