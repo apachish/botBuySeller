@@ -32,6 +32,7 @@ class SetDateTomorrow extends Command
      */
     public function handle()
     {
+        stikerDay();
         $year =  convertNumber(toJalali(now(),"Y"));
         $month =  convertNumber(toJalali(now(),"m"));
         logger("get month yaer", [
@@ -131,7 +132,7 @@ class SetDateTomorrow extends Command
             }
             cache()->forget("set_tomorrow_date");
         }
-        stikerDay();
+
 
     }
 }
