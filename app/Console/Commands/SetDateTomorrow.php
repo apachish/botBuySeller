@@ -32,7 +32,11 @@ class SetDateTomorrow extends Command
      */
     public function handle()
     {
-        stikerDay();
+        try {
+            stikerDay();
+        }catch (\Exception $exception){
+            logger("create sticker",[$exception->getMessage()]);
+        }
         $year =  convertNumber(toJalali(now(),"Y"));
         $month =  convertNumber(toJalali(now(),"m"));
         logger("get month yaer", [
