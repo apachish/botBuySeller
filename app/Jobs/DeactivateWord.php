@@ -37,6 +37,7 @@ class DeactivateWord implements ShouldQueue
             $token = $bot->token;
             $text_services = new TextServices($token);
             $word = WordTelegram::where("status",WordTelegram::STATUS_PENDING)->find($this->word_id);
+            logger("word di",[$word]);
 
             if ($word) {
                 try {
